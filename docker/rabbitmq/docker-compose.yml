@@ -1,0 +1,21 @@
+version: "3.2"
+services:
+  rabbitmq:
+    image: rabbitmq:3.13.3-management
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./data/:/var/lib/rabbitmq/
+      - ./log/:/var/log/rabbitmq
+      - ./plugins:/usr/lib/rabbitmq/plugins
+      - ./enabled_plugins:/etc/rabbitmq/enabled_plugins:rw
+    environment:
+      - RABBITMQ_PLUGINS_DIR=/opt/rabbitmq/plugins:/usr/lib/rabbitmq/plugins
+    networks:
+      - rabbitmq_go_net
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge

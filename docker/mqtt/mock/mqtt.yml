@@ -1,0 +1,7 @@
+mqtt:
+  host: tcp://localhost:1883
+  username: admin
+  password: admin
+  port: 1883
+  size: 10
+  sleep: 5 # 发送间隔

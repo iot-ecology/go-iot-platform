@@ -1,0 +1,40 @@
+// 此文件用于重写组件库的组件默认样式
+
+// 按钮
+.ant-btn {
+  // 按钮有图标的情况
+  .g-svg-icon {
+    margin-right: 8px;
+  }
+}
+
+// 警告提示
+.ant-alert {
+  // 成功
+  &.ant-alert-success {
+    color: @colorSuccess;
+    background-color: rgba(@colorSuccessRgb, 0.2);
+  }
+  // 失败
+  &.ant-alert-error {
+    color: @colorError;
+    background-color: rgba(@colorErrorRgb, 0.2);
+  }
+  // 信息
+  &.ant-alert-info {
+    color: @colorInfo;
+    background-color: rgba(@colorInfoRgb, 0.2);
+  }
+  // 警戒
+  &.ant-alert-warning {
+    color: @colorWarning;
+    background-color: rgba(@colorWarningRgb, 0.2);
+  }
+}
+
+// 表单
+.ant-form {
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+}
