@@ -140,12 +140,8 @@ func RemoveNodeInfo(name string) error {
 func BeatTask(f NodeInfo) {
 
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			// 执行定时任务的逻辑
-			Register(f)
-		}
+	for range ticker.C {
+		Register(f)
 	}
 }
 

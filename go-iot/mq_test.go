@@ -40,6 +40,7 @@ func TestPushMsg(t *testing.T) {
 	defer func(conn *amqp.Connection) {
 		err := conn.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(conn)
 
@@ -48,6 +49,7 @@ func TestPushMsg(t *testing.T) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(ch)
 
@@ -60,7 +62,7 @@ func TestPushMsg(t *testing.T) {
 		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
 		return
 	}
-	for true {
+	for {
 		err = ch.PublishWithContext(context.Background(), "", "a", // routing key
 			false, // mandatory
 			false, // immediate
@@ -81,6 +83,7 @@ func TestCreateQueueAndEx(t *testing.T) {
 	defer func(conn *amqp.Connection) {
 		err := conn.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(conn)
 
@@ -89,6 +92,7 @@ func TestCreateQueueAndEx(t *testing.T) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(ch)
 
@@ -116,6 +120,7 @@ func TestPushMsg2(t *testing.T) {
 	defer func(conn *amqp.Connection) {
 		err := conn.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(conn)
 
@@ -124,6 +129,7 @@ func TestPushMsg2(t *testing.T) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(ch)
 

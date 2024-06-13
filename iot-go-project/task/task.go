@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/robfig/cron/v3"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/initialize"
@@ -66,7 +67,7 @@ func handlerCalcTask() {
 				// 启动下一轮的计算任务
 				calcRunBiz.Start(myMap["id"])
 			}
-			break
+
 		}
 		lock.Unlock()
 
@@ -83,6 +84,7 @@ func pushToQueue(queueName string, body []byte) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("channel close error: %+v", err)
 		}
 	}(ch)
 

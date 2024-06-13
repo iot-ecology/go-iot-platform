@@ -26,7 +26,7 @@ func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string,
 	db.Model(&models.SignalDelayWaringParam{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&rules)
 
 	for i, rule := range rules {
 		id, err := bizMqtt.FindById(strconv.Itoa(rule.MqttClientId))

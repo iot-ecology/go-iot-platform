@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"igp/glob"
 	"igp/models"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 )
@@ -50,7 +50,6 @@ func (biz *NodeBiz) SendCreateParam(mc *models.MqttClient) string {
 
 	if err2 != nil {
 		panic(err2)
-		return ""
 	}
 	url := fmt.Sprintf("http://%s:%d/public_create_mqtt", node.Host, node.Port)
 
@@ -90,18 +89,14 @@ func (biz *NodeBiz) SendCreateParam(mc *models.MqttClient) string {
 		fmt.Println("Error sending request:", err)
 		return ""
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
-	fmt.Println("Response Status Code:", resp.StatusCode)
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return ""
-	}
-
-	fmt.Println("Response Body:", string(body))
-	return string(body)
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(resp.Body)
+	bodyString := buf.String()
+	return bodyString
 }
 
 func (biz *NodeBiz) SendNodeUsingStatus() string {
@@ -109,7 +104,6 @@ func (biz *NodeBiz) SendNodeUsingStatus() string {
 
 	if err2 != nil {
 		panic(err2)
-		return ""
 	}
 	url := fmt.Sprintf("http://%s:%d/node_using_status", node.Host, node.Port)
 	req, err := http.NewRequest("get", url, nil)
@@ -126,18 +120,14 @@ func (biz *NodeBiz) SendNodeUsingStatus() string {
 		fmt.Println("Error sending request:", err)
 		return ""
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
-	fmt.Println("Response Status Code:", resp.StatusCode)
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return ""
-	}
-
-	fmt.Println("Response Body:", string(body))
-	return string(body)
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(resp.Body)
+	bodyString := buf.String()
+	return bodyString
 }
 
 // SendStopParam 联通MQTT客户端管理集群关闭MQTT客户端
@@ -146,7 +136,6 @@ func (biz *NodeBiz) SendStopParam(mc *models.MqttClient) string {
 
 	if err2 != nil {
 		panic(err2)
-		return ""
 	}
 	url := fmt.Sprintf("http://%s:%d/public_remove_mqtt_client?id=%s", node.Host, node.Port, mc.ClientId)
 
@@ -164,18 +153,16 @@ func (biz *NodeBiz) SendStopParam(mc *models.MqttClient) string {
 		fmt.Println("Error sending request:", err)
 		return ""
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	fmt.Println("Response Status Code:", resp.StatusCode)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return ""
-	}
-
-	fmt.Println("Response Body:", string(body))
-	return string(body)
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(resp.Body)
+	bodyString := buf.String()
+	return bodyString
 }
 
 // SendPushData 联通MQTT客户端管理集群关闭MQTT客户端
@@ -184,7 +171,6 @@ func (biz *NodeBiz) SendPushData(mqttClientId string, param []byte) string {
 
 	if err2 != nil {
 		panic(err2)
-		return ""
 	}
 	url := fmt.Sprintf("http://%s:%d/public_push_data?id=%s", node.Host, node.Port, mqttClientId)
 
@@ -202,16 +188,14 @@ func (biz *NodeBiz) SendPushData(mqttClientId string, param []byte) string {
 		fmt.Println("Error sending request:", err)
 		return ""
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	fmt.Println("Response Status Code:", resp.StatusCode)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return ""
-	}
-
-	fmt.Println("Response Body:", string(body))
-	return string(body)
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(resp.Body)
+	bodyString := buf.String()
+	return bodyString
 }

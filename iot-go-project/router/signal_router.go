@@ -167,7 +167,6 @@ func (api *SignalApi) PageSignal(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteSignal

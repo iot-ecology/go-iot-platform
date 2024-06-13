@@ -18,6 +18,8 @@ func CreateRabbitQueue(queueName string) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+
 		}
 	}(ch)
 
@@ -62,6 +64,8 @@ func PushToQueue(queueName string, body []byte) {
 	defer func(ch *amqp.Channel) {
 		err := ch.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+
 		}
 	}(ch)
 

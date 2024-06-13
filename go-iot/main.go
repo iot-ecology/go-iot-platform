@@ -58,27 +58,25 @@ func removeOldData() {
 // CBeat 是一个无限循环函数，用于定时检查心跳并进行处理
 func CBeat() {
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			lock := NewRedisDistLock(globalRedisClient, "c_beat")
-			if lock.TryLock() {
-				service, err := GetThisTypeService()
-				if err == nil {
-					if processHeartbeats(service) {
-						return
-					}
+
+	for range ticker.C {
+		lock := NewRedisDistLock(globalRedisClient, "c_beat")
+		if lock.TryLock() {
+			service, err := GetThisTypeService()
+			if err == nil {
+				if processHeartbeats(service) {
+					return
 				}
-				lock.Unlock()
-
-			} else {
-
-				zap.S().Error("没有获取到 c_beat 处理的锁")
-
 			}
-		}
-	}
+			lock.Unlock()
 
+		} else {
+
+			zap.S().Error("没有获取到 c_beat 处理的锁")
+
+		}
+
+	}
 }
 
 // processHeartbeats 函数用于处理心跳信息
@@ -159,13 +157,9 @@ func startHttp() {
 
 func timerNoHandlerConfig() {
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			// 执行定时任务的逻辑
 
-			noHandlerConfig()
-		}
+	for range ticker.C {
+		noHandlerConfig()
 	}
 }
 

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -31,7 +33,7 @@ func InitLog() {
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfig), // 使用 Console 编码器
 		zapcore.AddSync(os.Stdout),               // 输出到标准输出
-		zap.NewAtomicLevelAt(zap.ErrorLevel),     // 设置日志级别为 Debug
+		zap.NewAtomicLevelAt(zap.InfoLevel),      // 设置日志级别为 Debug
 	)
 
 	logger := zap.New(core, zap.AddCaller())
@@ -40,7 +42,8 @@ func InitLog() {
 	// 确保日志被刷新
 	defer func(logger *zap.Logger) {
 		err := logger.Sync()
-		if err != nil {
+		if err != nil && !errors.Is(err, syscall.ENOTTY) {
+			zap.S().Errorf("日志同步失败 %+v", err)
 		}
 	}(logger)
 

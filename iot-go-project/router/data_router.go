@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"igp/glob"
 	"igp/servlet"
 	"reflect"
@@ -26,7 +27,6 @@ func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 
-		return
 	}
 	json.Bucket = glob.GConfig.InfluxConfig.Bucket
 	query := json.GenerateFluxQuery()
@@ -35,23 +35,21 @@ func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	defer result.Close()
+	defer func(result *api.QueryTableResult) {
+		_ = result.Close()
+	}(result)
 
 	var v []map[string]interface{}
 
 	for result.Next() {
-		if result.TableChanged() {
-			fmt.Printf("table: %s\n", result.TableMetadata().String())
-		}
+
 		values := result.Record().Values()
-		fmt.Printf("value: %v\n", values)
 		v = append(v, values)
 	}
 	field := groupByField(v)
 
 	servlet.Resp(c, field)
 
-	return
 }
 
 // QueryInfluxdbString
@@ -69,7 +67,6 @@ func (s *InfluxDbApi) QueryInfluxdbString(c *gin.Context) {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 
-		return
 	}
 	json.Bucket = glob.GConfig.InfluxConfig.Bucket
 	query := json.GenerateFluxQueryString()
@@ -78,23 +75,21 @@ func (s *InfluxDbApi) QueryInfluxdbString(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	defer result.Close()
+	defer func(result *api.QueryTableResult) {
+		_ = result.Close()
+	}(result)
 
 	var v []map[string]interface{}
 
 	for result.Next() {
-		if result.TableChanged() {
-			fmt.Printf("table: %s\n", result.TableMetadata().String())
-		}
+
 		values := result.Record().Values()
-		fmt.Printf("value: %v\n", values)
 		v = append(v, values)
 	}
 	field := groupByField(v)
 
 	servlet.Resp(c, field)
 
-	return
 }
 
 func groupByField(records []map[string]interface{}) map[string][]map[string]interface{} {

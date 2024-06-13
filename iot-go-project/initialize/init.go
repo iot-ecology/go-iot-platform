@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ import (
 	"igp/router"
 	"log"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -40,37 +42,67 @@ var (
 func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.MqttClient{}) {
 
-		glob.GDb.AutoMigrate(&models.MqttClient{})
+		err := glob.GDb.AutoMigrate(&models.MqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.Signal{}) {
 
-		glob.GDb.AutoMigrate(&models.Signal{})
+		err := glob.GDb.AutoMigrate(&models.Signal{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.SignalWaringConfig{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalWaringConfig{})
+		err := glob.GDb.AutoMigrate(&models.SignalWaringConfig{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.SignalDelayWaring{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalDelayWaring{})
+		err := glob.GDb.AutoMigrate(&models.SignalDelayWaring{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 
 	if !glob.GDb.Migrator().HasTable(&models.SignalDelayWaringParam{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalDelayWaringParam{})
+		err := glob.GDb.AutoMigrate(&models.SignalDelayWaringParam{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 
 	if !glob.GDb.Migrator().HasTable(&models.CalcRule{}) {
 
-		glob.GDb.AutoMigrate(&models.CalcRule{})
+		err := glob.GDb.AutoMigrate(&models.CalcRule{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.CalcParam{}) {
 
-		glob.GDb.AutoMigrate(&models.CalcParam{})
+		err := glob.GDb.AutoMigrate(&models.CalcParam{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.Dashboard{}) {
 
-		glob.GDb.AutoMigrate(&models.Dashboard{})
+		err := glob.GDb.AutoMigrate(&models.Dashboard{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
 	}
 }
 
@@ -143,7 +175,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer lg.Sync()
+	defer func(lg *zap.Logger) {
+		err := lg.Sync()
+		if err != nil && !errors.Is(err, syscall.ENOTTY) {
+			zap.S().Errorf("日志同步失败 %+v", err)
+		}
+	}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
