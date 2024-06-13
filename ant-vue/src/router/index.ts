@@ -7,7 +7,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Root",
-    redirect: "/icon-preview",
+    redirect: "/mqtt-management",
     meta: { hidden: true },
   },
   ...single,

@@ -1,30 +1,30 @@
 import Layout from "@/layout/index.vue";
 export default [
   {
-    path: "/icon-preview",
+    path: "/mqtt-management",
     component: Layout,
     meta: { title: "MQTT客户端管理" },
-    redirect: "/icon-preview/index",
+    redirect: "/mqtt-management/index",
     children: [
       {
-        path: "/icon-preview/index",
+        path: "/mqtt-management/index",
         name: "IconPreview",
         meta: { title: "MQTT客户端" },
-        component: async () => await import("@/views/icon-preview/index.vue"),
+        component: async () => await import("@/views/mqtt-management/index.vue"),
       },
     ],
   },
   {
-    path: "/comp-preview",
+    path: "/signal-configuration",
     component: Layout,
     meta: { title: "信号配置" },
-    redirect: "/comp-preview/index",
+    redirect: "/signal-configuration/index",
     children: [
       {
-        path: "/comp-preview/index",
+        path: "/signal-configuration/index",
         name: "CompPreview",
         meta: { title: "信号配置" },
-        component: async () => await import("@/views/comp-preview/index.vue"),
+        component: async () => await import("@/views/signal-configuration/index.vue"),
       },
     ],
   },
@@ -43,22 +43,22 @@ export default [
     ],
   },
   {
-    path: "/draggable",
+    path: "/visualization",
     component: Layout,
     meta: { title: "可视化" },
-    redirect: "/draggable/index",
+    redirect: "/visualization/index",
     children: [
       {
-        path: "/draggable/index",
+        path: "/visualization/index",
         name: "List",
         meta: { title: "列表" },
-        component: async () => await import("@/views/draggable/index.vue"),
+        component: async () => await import("@/views/visualization/index.vue"),
       },
       {
-        path: "/draggable/add",
+        path: "/visualization/add",
         name: "Draggable",
         meta: { title: "新增", hidden: true },
-        component: async () => await import("@/views/draggable/add.vue"),
+        component: async () => await import("@/views/visualization/add.vue"),
       },
     ],
   },

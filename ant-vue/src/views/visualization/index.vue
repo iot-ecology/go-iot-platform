@@ -45,7 +45,7 @@ const paginations = reactive({
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const onAdd = () => {
-  jump.routeJump({ path: "/draggable/add" });
+  jump.routeJump({ path: "/visualization/add" });
 };
 
 const listPage = async () => {
@@ -67,7 +67,7 @@ const confirm = async (id: string) => {
 };
 
 const onDetails = (id: string) => {
-  jump.routeJump({ path: "/draggable/add", query: { id } });
+  jump.routeJump({ path: "/visualization/add", query: { id } });
 };
 const handleTableChange = async (pagination: any) => {
   paginations.current = pagination.current;

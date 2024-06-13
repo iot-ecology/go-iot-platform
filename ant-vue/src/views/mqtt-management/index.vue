@@ -326,8 +326,8 @@ const cancel = (key: string) => {
 };
 
 const onSignal = (id: string) => {
-  routerStore.setRouterName("/comp-preview");
-  jump.routeJump({ path: "/comp-preview", query: { mqtt_client_id: id } });
+  routerStore.setRouterName("/signal-configuration");
+  jump.routeJump({ path: "/signal-configuration", query: { mqtt_client_id: id } });
 };
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);

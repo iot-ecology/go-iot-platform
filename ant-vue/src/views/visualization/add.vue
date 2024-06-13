@@ -418,13 +418,13 @@ const setModalSave = () => {
     data.id = id.value;
     DashboardUpdate(data).then(({ data }) => {
       if (data.code === 20000) {
-        router.push({ path: "/draggable/index" });
+        router.push({ path: "/visualization/index" });
       }
     });
   } else {
     DashboardCreate(data).then(({ data }) => {
       if (data.code === 20000) {
-        router.push({ path: "/draggable/index" });
+        router.push({ path: "/visualization/index" });
       }
     });
   }

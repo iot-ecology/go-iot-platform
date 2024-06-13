@@ -4,7 +4,7 @@ export const useRouterNameStore = defineStore({
   id: "routerPath",
   state: () => {
     return {
-      routerPath: "/icon-preview",
+      routerPath: "/mqtt-management",
     };
   },
   getters: {},
