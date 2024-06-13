@@ -61,8 +61,8 @@
         </template>
       </a-table>
 
-      <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="setModal1Visible()" @cancel="clear()">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
+      <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()" @cancel="clear()">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="名称" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
@@ -175,40 +175,41 @@ const paginations = reactive({
 });
 watch(
   () => form.calc_rule_id,
-  (newValue, oldValue) => {
-    pageList();
+  async () => {
+    await pageList();
   },
 );
 watch(
   () => form.mqtt_client_id,
-  (newValue, oldValue) => {
+  () => {
     formRef.value.clearValidate("mqtt_client_id");
   },
 );
 watch(
   () => form.signal_id,
-  (newValue, oldValue) => {
+  () => {
     formRef.value.clearValidate("signal_id");
   },
 );
 
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
-      CalcParamCreate({ ...form }).then(({ data }) => {
+      CalcParamCreate({ ...form }).then(async ({ data }) => {
         if (data.code === 20000) {
           message.success(data.message);
           modalVisible.value = false;
           formRef.value?.resetFields();
-          pageList();
+          await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`操作失败:${data.data}`);
         }
       });
-    })
-    .catch(() => {});
+    }).catch(e=>{
+        console.error(e)
+      });
 };
 
 const clear = () => {
@@ -236,14 +237,16 @@ const cancel = (key: string) => {
   delete editableData[key];
 };
 const confirm = async (id: string) => {
-  CalcParamDelete(id).then(({ data }) => {
+  CalcParamDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 

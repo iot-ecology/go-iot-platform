@@ -59,8 +59,8 @@
     </a-card>
 
     <!--新增-->
-    <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="setModal1Visible()">
-      <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form" name="nest-messages">
+    <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()">
+      <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form">
         <a-form-item label="客户端ID" name="client_id">
           <a-input v-model:value="form.client_id" style="width: 350px" />
         </a-form-item>
@@ -99,13 +99,13 @@
       <template #footer>
         <a-button @click="handleCancel">取消</a-button>
         <a-button :disabled="!(loading && code && param)" type="primary" @click="handleReject">验证</a-button>
-        <a-button :disabled="loading" type="primary" @click="setModalScript()">确定</a-button>
+        <a-button :disabled="loading" type="primary" @click="onConfirmScript()">确定</a-button>
       </template>
     </a-modal>
 
     <!--    模拟发送消息-->
     <a-modal v-model:open="modalNewShow" :destroy-on-close="true" title="发送消息" @ok="setModalNew()">
-      <a-form ref="formRefNews" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="formNews" name="nest-messages">
+      <a-form ref="formRefNews" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="formNews">
         <a-form-item label="消息内容" name="payload">
           <a-input v-model:value="formNews.payload" />
         </a-form-item>
@@ -141,7 +141,7 @@ import { cloneDeep } from "lodash-es";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 
-import { MqttCheckScript, MqttCreate, MqttDelete, MqttPage, MqttSend, MqttSetScript, MqttStart, MqttStop, MqttUpdate, SignalWaringConfigCreate } from "@/api";
+import { MqttCheckScript, MqttCreate, MqttDelete, MqttPage, MqttSend, MqttSetScript, MqttStart, MqttStop, MqttUpdate } from "@/api";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
 const { toClipboard } = useClipboard();
@@ -337,7 +337,6 @@ const save = async (key: string) => {
   const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   if (!ipPattern.test(data.host)) {
     message.error("请输入正确的主机IP");
-    await pageList();
     return;
   }
   // eslint-disable-next-line no-debugger
@@ -365,10 +364,10 @@ const onSearch = async () => {
 };
 
 const confirm = (id: string) => {
-  MqttDelete(id).then(({ data }) => {
+  MqttDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
@@ -377,10 +376,10 @@ const confirm = (id: string) => {
 };
 
 const confirmStop = async (id: string) => {
-  MqttStop({ id }).then(({ data }) => {
+  MqttStop({ id }).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       message.success(data.message);
     }
@@ -391,49 +390,57 @@ onMounted(async () => {
   await pageList();
 });
 
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
-      MqttCreate(form.value).then(({ data }) => {
+      MqttCreate(form.value).then(async ({ data }) => {
         if (data.code === 20000) {
           message.success(data.message);
           modalVisible.value = false;
           formRef.value?.resetFields();
-          pageList();
+          await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`操作失败:${data.data}`);
         }
+      }).catch(e=>{
+        console.error(e);
       });
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e);
+    });
 };
 
-const setModalScript = () => {
-  MqttSetScript({ id: scriptId.value, script: code.value }).then(({ data }) => {
+const onConfirmScript = () => {
+  MqttSetScript({ id: scriptId.value, script: code.value }).then(async ({ data }) => {
     if (data.code === 20000) {
       modalScriptShow.value = false;
       message.success(data.message);
       resultCode.value = "";
       param.value = "";
-      pageList();
+      await pageList();
     } else {
       message.error(data.message || "操作失败");
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 const handleCancel = () => {
   modalScriptShow.value = false;
 };
 const onStart = (id: string) => {
-  MqttStart({ id }).then(({ data }) => {
+  MqttStart({ id }).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 const handleReject = () => {
@@ -453,6 +460,8 @@ const handleReject = () => {
     } else {
       message.error(data.message || "操作失败");
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 
@@ -460,19 +469,23 @@ const setModalNew = () => {
   formRefNews.value
     .validate()
     .then(() => {
-      MqttSend(formNews.value).then(({ data }) => {
+      MqttSend(formNews.value).then(async ({ data }) => {
         if (data.code === 20000) {
           message.success(data.message);
           modalNewShow.value = false;
           formRefNews.value?.resetFields();
-          pageList();
+          await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`操作失败:${data.data}`);
         }
+      }).catch(e=> {
+        console.error(e)
       });
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 
 const handleTableChange = async (pagination: any) => {

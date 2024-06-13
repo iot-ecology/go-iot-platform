@@ -37,7 +37,6 @@
     </VueDraggable>
 
     <a-modal v-model:open="modalVisible" style="width: 35%" title="新增">
-      <!--      <a-spin tip="加载中..." size="large" :spinning="showSpinning">-->
       <a-form ref="formRef" :label-col="{ style: { width: '110px' } }" :model="form" :rules="rules" name="nest-messages">
         <a-form-item label="时间">
           <a-tabs v-model:activeKey="activeKey">
@@ -99,14 +98,13 @@
           </div>
         </div>
       </a-form>
-      <!--      </a-spin>-->
       <template #footer>
         <a-button @click="modalVisible = false">取消</a-button>
-        <a-button type="primary" @click="setModalVisible()">确定</a-button>
+        <a-button type="primary" @click="onConfirm()">确定</a-button>
       </template>
     </a-modal>
 
-    <a-modal v-model:open="modalSave" title="保存" @ok="setModalSave()">
+    <a-modal v-model:open="modalSave" title="保存" @ok="onSave()">
       <a-form name="nest-messages">
         <a-form-item label="名称">
           <a-input v-model:value="createName"></a-input>
@@ -160,7 +158,6 @@ const listArr = ref<Item[]>([
     chart: {},
   },
 ]);
-const showSpinning = ref(false);
 const modalVisible = ref(false);
 const modalSave = ref(false);
 const time = ref<RangeValue>();
@@ -182,6 +179,7 @@ const rules: Record<string, Rule[]> = {
   function: [{ required: true, message: "请选择统计方式", trigger: "change" }],
   create_empty: [{ required: true, message: "请选择是否创建空值", trigger: "change" }],
 };
+const pageSize = 2000
 const reduces = {
   mean: "平均值",
   sum: "求和",
@@ -204,6 +202,8 @@ if (route.query.id) {
         });
       }
     }
+  }).catch(e=>{
+    console.error(e)
   });
 }
 const onCopy = (item: any) => {
@@ -235,7 +235,6 @@ function onAdd() {
 const onSet = (index: number) => {
   indexNumber.value = index;
   if (route.query.id) {
-    console.log(listArr.value[index]);
     form.client_id = Number(listArr.value[index].param.measurement) || "";
     form.fields = listArr.value[index].param.fields || [];
     form.every = listArr.value[index].param.aggregation.every || 1;
@@ -273,7 +272,7 @@ const onSave = () => {
 const onDelete = (index: number) => {
   listArr.value.splice(index, 1);
 };
-const setModalVisible = () => {
+const onConfirm = () => {
   let start_time = null;
   const end_time = dayjs().unix();
   if (activeKey.value === "1") {
@@ -306,7 +305,7 @@ const setModalVisible = () => {
     })
       .then(async ({ data }) => {
         if (data.code === 20000) {
-          const data1 = await SignalPage({ mqtt_client_id: item.client_id, page: 1, page_size: 2000 });
+          const data1 = await SignalPage({ mqtt_client_id: item.client_id, page: 1, page_size: pageSize });
           const signalList = data1.data.data?.data || [];
           listArr.value[indexNumber.value].param = {
             measurement: form.client_id,
@@ -372,10 +371,11 @@ const setModalVisible = () => {
           const mqttName = items?.mqtt_client_name;
           const signalName = items?.name;
           const alias = items?.alias;
-          legend.push(mqttName + "-" + signalName + "(" + alias + ")" + "-" + reduces[item.function]);
+          const tipName = `${mqttName}-${signalName}(${alias})-${reduces[item.function]}`
+          legend.push(tipName);
           Object.keys(list).forEach((text: string) => {
             series.push({
-              name: mqttName + "-" + signalName + "(" + alias + ")" + "-" + reduces[item.function],
+              name: tipName,
               type: listArr.value[indexNumber.value].show.type,
               barWidth: "20",
               data: list[text].map((it) => it._value),
@@ -386,7 +386,7 @@ const setModalVisible = () => {
               trigger: "axis",
               formatter: (params) => {
                 let res = `${params[0].name}` + "<br/>";
-                params.forEach(function (item) {
+                params.forEach(function (item: any) {
                   res += `${item.seriesName}: ${item.value} ${optionList.value[0]?.unit}` + "<br/>";
                 });
                 return res;
@@ -399,7 +399,9 @@ const setModalVisible = () => {
         } else {
           message.error(data.message);
         }
-      })
+      }).catch(e=>{
+      console.error(e)
+    })
       .finally(() => {
         if (index === form.list.length - 1) {
           listArr.value[indexNumber.value].showSpinning = false;
@@ -408,7 +410,7 @@ const setModalVisible = () => {
   });
 };
 
-const setModalSave = () => {
+const onSave = () => {
   const list = listArr.value.map((it) => ({ name: it.name, id: it.id, show: it.show, param: it.param, showSpinning: it.showSpinning }));
   const data = {
     config: JSON.stringify(list),
@@ -420,19 +422,23 @@ const setModalSave = () => {
       if (data.code === 20000) {
         router.push({ path: "/visualization/index" });
       }
+    }).catch(e=>{
+      console.error(e)
     });
   } else {
     DashboardCreate(data).then(({ data }) => {
       if (data.code === 20000) {
         router.push({ path: "/visualization/index" });
       }
+    }).catch(e=>{
+      console.error(e)
     });
   }
 };
 
 // 查看编辑的时候获取数据
 const getModal = async (index: number) => {
-  const { data } = await SignalPage({ mqtt_client_id: listArr.value[index].param.measurement, page: 1, page_size: 2000 });
+  const { data } = await SignalPage({ mqtt_client_id: listArr.value[index].param.measurement, page: 1, page_size: pageSize });
   const signalList = data.data?.data || [];
   let start_time = null;
   const end_time = dayjs().unix();
@@ -467,8 +473,9 @@ const getModal = async (index: number) => {
             const mqttName = items?.mqtt_client_name;
             const signalName = items?.name;
             const alias = items?.alias;
+            const tipName = `${mqttName}-${signalName}(${alias})-${reduces[text.function]}`
             series.push({
-              name: mqttName + "-" + signalName + "(" + alias + ")" + "-" + reduces[text.function],
+              name: tipName,
               type: listArr.value[index].show.type,
               barWidth: "20",
               data: list[item].map((it: any) => it._value),
@@ -520,7 +527,8 @@ const getModal = async (index: number) => {
           const signalName = items?.name;
           const alias = items?.alias;
           const unit = items?.unit;
-          aliasList.push(mqttName + "-" + signalName + "(" + alias + ")" + "-" + reduces[text.function]);
+          const tipName = `${mqttName}-${signalName}(${alias})-${reduces[text.function]}`
+          aliasList.push(tipName);
           if (Object.keys(list).length) {
             listArr.value[index].chart.tooltip = {
               trigger: "axis",
@@ -537,6 +545,8 @@ const getModal = async (index: number) => {
             listArr.value[index].chart.series = [...series];
           }
         }
+      }).catch(e=>{
+        console.error(e)
       })
       .finally(() => {
         if (number === listArr.value[index].param.list.length - 1) {

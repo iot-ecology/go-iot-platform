@@ -13,7 +13,7 @@ router.beforeEach((to, from, next) => {
     if (!userInput) {
       next(false);
     } else {
-      if (userInput === "some") {
+      if (userInput === import.meta.env.VITE_LOGIN) {
         next();
       } else {
         next(false);

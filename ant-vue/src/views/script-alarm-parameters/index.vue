@@ -4,7 +4,6 @@
       <a-form layout="inline" :model="formState">
         <a-form-item label="脚本报警">
           <SignalDelayWaring v-model="form.signal_delay_waring_id" style="width: 300px" />
-          <!--          <a-input v-model:value="formState.name" style="width: 300px" placeholder="请输入" />-->
         </a-form-item>
         <a-form-item>
           <a-button type="primary" @click="pageList()">搜索</a-button>
@@ -47,7 +46,6 @@
               </span>
               <span v-else>
                 <a @click="edit(record.key)">编辑</a>
-                <!--                <a style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">信号报警配置</a>-->
                 <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="onDelete(record.ID)">
                   <a style="margin-left: 10px; color: crimson">删除</a>
                 </a-popconfirm>
@@ -57,8 +55,8 @@
         </template>
       </a-table>
 
-      <a-modal v-model:open="modal1Visible" :destroy-on-close="true" :title="title" class="custom-modal">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
+      <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="名称" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
@@ -71,14 +69,14 @@
         </a-form>
         <template #footer>
           <a-button @click="handleCancel">取消</a-button>
-          <a-button :disabled="loading" type="primary" @click="setModal1Visible()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddData()">确定</a-button>
         </template>
       </a-modal>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, type UnwrapRef, watch } from "vue";
+import {onMounted, reactive, ref, type UnwrapRef, watch} from "vue";
 import { type FormInstance, message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
@@ -144,7 +142,7 @@ const columns = ref([
   },
 ]);
 const formRef = ref<FormInstance>();
-const modal1Visible = ref(false);
+const modalVisible = ref(false);
 const loading = ref(false);
 const list = ref([]);
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
@@ -161,26 +159,25 @@ const signalName = ref("");
 
 watch(
   () => form.signal_delay_waring_id,
-  (newValue, oldValue) => {
-    console.log(newValue);
-    pageList();
+  async () => {
+    await pageList();
   },
 );
 watch(
   () => form.mqtt_client_id,
-  (newValue, oldValue) => {
+  () => {
     formRef.value.clearValidate("mqtt_client_id");
   },
 );
 watch(
   () => form.signal_id,
-  (newValue, oldValue) => {
+  () => {
     formRef.value.clearValidate("signal_id");
   },
 );
 
 const onAdd = () => {
-  modal1Visible.value = true;
+  modalVisible.value = true;
   title.value = "新增";
 };
 const paginations = reactive({
@@ -202,7 +199,6 @@ const pageList = async () => {
     signal_id: item.signal_id,
   }));
 };
-pageList();
 const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
 };
@@ -217,40 +213,46 @@ const handleTableChange = async (pagination: any) => {
   paginations.pageSize = pagination.pageSize;
   await pageList();
 };
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
       if (title.value === "新增") {
         const data = { ...form };
         delete data.id;
-        SignalDelayWaringParamCreate(data).then(({ data }) => {
+        SignalDelayWaringParamCreate(data).then(async ({ data }) => {
           if (data.code === 20000) {
-            modal1Visible.value = false;
+            modalVisible.value = false;
             message.success("新增成功");
             formRef.value?.resetFields();
-            pageList();
+            await pageList();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       } else {
-        SignalDelayWaringParamUpdate(form).then(({ data }) => {
+        SignalDelayWaringParamUpdate(form).then(async ({ data }) => {
           if (data.code === 20000) {
-            modal1Visible.value = false;
+            modalVisible.value = false;
             message.success("编辑成功");
-            pageList();
+            await pageList();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       }
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 
 const handleCancel = () => {
-  modal1Visible.value = false;
+  modalVisible.value = false;
 };
 
 const save = async (key: string) => {
@@ -277,14 +279,16 @@ const save = async (key: string) => {
 
 // 删除
 const onDelete = async (id: string) => {
-  SignalDelayWaringParamDelete(id).then(({ data }) => {
+  SignalDelayWaringParamDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 
@@ -294,5 +298,8 @@ const handleCustomEvent = (payload: any) => {
     signalName.value = payload.name;
   }
 };
+onMounted(async ()=>{
+  await pageList();
+})
 </script>
 <style lang="less" scoped></style>

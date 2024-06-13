@@ -31,7 +31,7 @@
       </a-table>
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="名称" name="name">
             <a-input v-model:value="form.name" style="width: 300px" :disabled="form.start" />
           </a-form-item>
@@ -53,26 +53,25 @@
         </a-form>
         <template #footer>
           <a-button @click="handleCancel">取消</a-button>
-          <!--          <a-button :disabled="!loading" type="primary" @click="handleReject">验证</a-button>-->
-          <a-button :disabled="loading" type="primary" @click="setModal1Visible()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddData()">确定</a-button>
         </template>
       </a-modal>
 
       <a-modal v-model:open="modalTime" title="时间范围" class="custom-modal">
-        <a-form ref="formRefTime" :rules="rules" :model="formTime" name="nest-messages">
+        <a-form ref="formRefTime" :rules="rules" :model="formTime">
           <a-form-item label="时间范围" name="date">
             <a-range-picker v-model:value="formTime.date" show-time @change="bptjTimeChange" />
           </a-form-item>
         </a-form>
         <template #footer>
           <a-button @click="modalTime = false">取消</a-button>
-          <a-button :disabled="loading" type="primary" @click="setModalMock()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="setMockData()">确定</a-button>
         </template>
       </a-modal>
 
       <a-modal v-model:open="modalDate" title="时间范围" class="custom-modal">
         <a-spin tip="加载中..." size="large" :spinning="showSpinning">
-          <a-form ref="formRefDate" :rules="rules" :model="formDate" name="nest-messages">
+          <a-form ref="formRefDate" :rules="rules" :model="formDate">
             <a-form-item label="时间范围" name="date">
               <a-range-picker v-model:value="formDate.date" show-time @change="bptjTime" />
             </a-form-item>
@@ -80,12 +79,12 @@
         </a-spin>
         <template #footer>
           <a-button v-if="!showSpinning" @click="modalDate = false">取消</a-button>
-          <a-button :loading="showSpinning" type="primary" @click="setModalData()">确定</a-button>
+          <a-button :loading="showSpinning" type="primary" @click="setTableData()">确定</a-button>
         </template>
       </a-modal>
 
       <a-modal v-model:open="modalMock" title="确认模拟结果是否符合预期" class="custom-modal">
-        <a-form :model="formTime" name="nest-messages">
+        <a-form :model="formTime">
           <a-form-item label="数据">
             <div>{{ mockValue }}</div>
           </a-form-item>
@@ -116,14 +115,14 @@
         </div>
       </a-modal>
 
-      <a-modal v-model:open="showResult" :footer="null" title="" class="custom-modal">
+      <a-modal v-model:open="modalResult" :footer="null" title="" class="custom-modal">
         <div>{{ textResult }}</div>
       </a-modal>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-import { h, reactive, ref } from "vue";
+import {h, onMounted, reactive, ref} from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
 import { type FormInstance, message } from "ant-design-vue";
@@ -198,7 +197,7 @@ const modalTime = ref(false);
 const modalMock = ref(false);
 const modalDate = ref(false);
 const modalTable = ref(false);
-const showResult = ref(false);
+const modalResult = ref(false);
 const loading = ref(false);
 const textResult = ref("");
 const dataResult = ref([]);
@@ -269,7 +268,6 @@ const listPage = async () => {
   dataSource.value = data.data.data;
   paginations.total = data.data?.total || 0;
 };
-listPage();
 const onCopy = () => {
   copyText(scr);
 };
@@ -291,17 +289,19 @@ const confirmStop = (id: string) => {
       } else {
         message.error(data.message);
       }
-    })
-    .finally(() => {
-      listPage();
+    }).catch(e=>{
+        console.error(e)
+      })
+    .finally(async () => {
+      await listPage();
     });
 };
-const handleTableChange = async (pagination) => {
+const handleTableChange = async (pagination: any) => {
   paginations.current = pagination.current;
   paginations.pageSize = pagination.pageSize;
   await listPage();
 };
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
@@ -324,6 +324,8 @@ const setModal1Visible = () => {
             } else {
               message.error(data.message);
             }
+          }).catch(e=>{
+            console.error(e)
           });
         } else {
           CalcRuleUpdate(form).then(({ data }) => {
@@ -334,13 +336,16 @@ const setModal1Visible = () => {
             } else {
               message.error(data.message);
             }
+          }).catch(e=>{
+            console.error(e)
           });
         }
       } catch (error) {
         message.error("请输入正确周期");
       }
-    })
-    .catch(() => {});
+    }).catch(e=>{
+        console.error(e)
+      })
 };
 
 const onGo = (id: string) => {
@@ -375,10 +380,12 @@ const onConfimStart = () => {
       } else {
         message.error(data.message);
       }
-    })
-    .finally(() => {
+    }).catch(e=>{
+        console.error(e)
+      })
+    .finally(async () => {
       modalMock.value = false;
-      listPage();
+      await listPage();
     });
 };
 
@@ -387,36 +394,37 @@ const onMock = (id: string) => {
   modalTime.value = true;
 };
 
-const setModalMock = () => {
+const setMockData = () => {
   formRefTime.value
     .validate()
     .then(() => {
       CalcParamMock({ id: formTime.id, start_time: formTime.start_time, end_time: formTime.end_time })
-        .then(({ data }) => {
+        .then(async ({ data }) => {
           if (data.code === 20000) {
             message.success(JSON.stringify(data.data));
             formRefTime.value?.resetFields();
-            listPage();
+            await listPage();
           } else {
             message.error(data.message);
           }
         })
+          .catch(e=>{
+            console.error(e)
+          })
         .finally(() => {
           modalTime.value = false;
         });
     })
-    .catch(() => {});
 };
 
-const setModalData = () => {
+const setTableData = () => {
   formRefDate.value
     .validate()
     .then(() => {
       showSpinning.value = true;
       CalcParamRd({ rule_id: formDate.id, start_time: formDate.start_time, end_time: formDate.end_time })
-        .then(({ data }) => {
+        .then(async ({ data }) => {
           if (data.code === 20000) {
-            // message.success(JSON.stringify(data.data));
             dataResult.value =
               data.data?.map(({ start_time, end_time, ex_time, result }) => ({
                 start_time: dayjs(start_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
@@ -425,18 +433,19 @@ const setModalData = () => {
                 result,
               })) || [];
             formRefDate.value?.resetFields();
-            listPage();
+            await listPage();
           } else {
             message.error(data.message);
           }
-        })
+        }).catch(e=>{
+            console.error(e)
+          })
         .finally(() => {
           modalDate.value = false;
           modalTable.value = true;
           showSpinning.value = false;
         });
     })
-    .catch(() => {});
 };
 const bptjTimeChange = (date: any, dataString: any) => {
   formTime.start_time = dayjs(dataString[0]).unix();
@@ -450,7 +459,11 @@ const bptjTime = (date: any, dataString: any) => {
 
 const onView = (record: any) => {
   textResult.value = JSON.stringify(record.result);
-  showResult.value = true;
+  modalResult.value = true;
 };
+
+onMounted(async ()=>{
+  await listPage();
+})
 </script>
 <style lang="less" scoped></style>

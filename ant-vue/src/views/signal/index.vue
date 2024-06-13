@@ -12,7 +12,7 @@
           <a-button type="primary" @click="pageList()">搜索</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="modal1Visible = true">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">新增</a-button>
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -64,7 +64,7 @@
 
       <a-modal v-model:open="modalTime" title="时间范围" class="custom-modal">
         <a-spin tip="加载中..." size="large" :spinning="showSpinning">
-          <a-form ref="formRefTime" :rules="rules" :model="formObj" name="nest-messages">
+          <a-form ref="formRefTime" :rules="rules" :model="formObj">
             <a-form-item label="时间范围" name="date">
               <a-range-picker v-model:value="formObj.date" show-time @change="bptjTimeChange" />
             </a-form-item>
@@ -72,12 +72,12 @@
         </a-spin>
         <template #footer>
           <a-button v-if="!showSpinning" @click="modalTime = false">取消</a-button>
-          <a-button :loading="showSpinning" type="primary" @click="setModalTime()">确定</a-button>
+          <a-button :loading="showSpinning" type="primary" @click="getHistoryData()">确定</a-button>
         </template>
       </a-modal>
 
-      <a-modal v-model:open="modal1Visible" :destroy-on-close="true" title="新增" @ok="setModal1Visible()">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
+      <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="最小值" name="min">
             <a-input-number v-model:value="form.min" style="width: 200px" :min="0" :max="form.max" />
           </a-form-item>
@@ -117,7 +117,7 @@ interface DataItem {
 }
 const formRef = ref<FormInstance>();
 const formRefTime = ref<FormInstance>();
-const modal1Visible = ref(false);
+const modalVisible = ref(false);
 const modalTime = ref(false);
 const modalHistory = ref(false);
 const form = reactive({ mqtt_client_id: "", signal_id: "", max: "", min: "", in_or_out: 1, checked: true });
@@ -185,7 +185,7 @@ watch([() => form.mqtt_client_id, () => form.signal_id], async ([newParam1, newP
   }
 });
 
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
@@ -193,22 +193,26 @@ const setModal1Visible = () => {
         message.error("客户端ID和信号名称必选");
         return;
       }
-      SignalWaringConfigCreate({ ...form }).then(({ data }) => {
+      SignalWaringConfigCreate({ ...form }).then(async ({ data }) => {
         if (data.code === 20000) {
           message.success(data.message);
-          modal1Visible.value = false;
+          modalVisible.value = false;
           formRef.value?.resetFields();
-          pageList();
+          await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`操作失败:${data.data}`);
         }
+      }).catch(e=>{
+        console.error(e)
       });
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 
-const setModalTime = () => {
+const getHistoryData = () => {
   formRefTime.value
     .validate()
     .then(() => {
@@ -221,6 +225,9 @@ const setModalTime = () => {
             value,
           }));
         })
+        .catch(e=>{
+            console.error(e)
+          })
         .finally(() => {
           modalHistory.value = true;
           modalTime.value = false;
@@ -228,7 +235,9 @@ const setModalTime = () => {
           formObj.date = "";
         });
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
@@ -248,14 +257,16 @@ const cancel = (key: string) => {
   delete editableData[key];
 };
 const confirm = async (id: string) => {
-  SignalWaringConfigDelete(id).then(({ data }) => {
+  SignalWaringConfigDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 

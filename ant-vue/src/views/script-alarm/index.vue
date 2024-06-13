@@ -29,7 +29,7 @@
       </a-table>
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="名称" name="name">
             <a-input v-model:value="form.name" style="width: 300px" />
           </a-form-item>
@@ -45,13 +45,13 @@
         </a-form>
         <template #footer>
           <a-button @click="handleCancel">取消</a-button>
-          <a-button :disabled="loading" type="primary" @click="setModal1Visible()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddUpdateData()">确定</a-button>
         </template>
       </a-modal>
 
       <!--  调试脚本    -->
       <a-modal v-model:open="modalScript" :destroy-on-close="true" class="custom-modal">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" name="nest-messages">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }">
           <a-form-item label="模拟参数" name="script">
             <codemirror v-model="mockScript" placeholder="Code here..." :style="{ width: '340px', height: '300px' }" :tab-size="2" :extensions="extensions" />
           </a-form-item>
@@ -63,22 +63,22 @@
       </a-modal>
 
       <!--  时间选择    -->
-      <a-modal v-model:open="showDate" title="时间范围" :destroy-on-close="true" class="custom-modal">
+      <a-modal v-model:open="modalDate" title="时间范围" :destroy-on-close="true" class="custom-modal">
         <a-spin tip="加载中..." size="large" :spinning="showSpinning">
-          <a-form ref="formRefTime" :rules="rules" :model="formObj" name="nest-messages">
+          <a-form ref="formRefTime" :rules="rules" :model="formObj">
             <a-form-item label="时间范围" name="date">
               <a-range-picker v-model:value="formObj.date" show-time @change="bptjTimeChange" />
             </a-form-item>
           </a-form>
         </a-spin>
         <template #footer>
-          <a-button v-if="!showSpinning" @click="showDate = false">取消</a-button>
+          <a-button v-if="!showSpinning" @click="modalDate = false">取消</a-button>
           <a-button :loading="showSpinning" type="primary" @click="getQueryRow()">确定</a-button>
         </template>
       </a-modal>
 
       <!--      报警历史-->
-      <a-modal v-model:open="showResult" style="width: 600px" :footer="null" :destroy-on-close="true" title="报警历史">
+      <a-modal v-model:open="modalResult" style="width: 600px" :footer="null" :destroy-on-close="true" title="报警历史">
         <a-tabs>
           <a-tab-pane key="1" tab="表格">
             <a-table bordered :pagination="false" :data-source="dataResult" :columns="columnsResult">
@@ -103,14 +103,14 @@
       </a-modal>
 
       <!--      脚本-->
-      <a-modal v-model:open="showDetail" :footer="null" title="详情">
+      <a-modal v-model:open="modalDetail" :footer="null" title="详情">
         <codemirror v-model="scriptDetail" placeholder="Code here..." :style="{ width: '300px', height: '150px' }" :tab-size="2" :extensions="extensions" />
       </a-modal>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-import { h, reactive, ref } from "vue";
+import {h, onMounted, reactive, ref} from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
 import { type FormInstance, message } from "ant-design-vue";
@@ -165,8 +165,8 @@ const loading = ref(false);
 const scr = "function main(map){return false}";
 const mockScript = ref("");
 const mockId = ref();
-const showDate = ref(false);
-const showDetail = ref(false);
+const modalDate = ref(false);
+const modalDetail = ref(false);
 const scriptDetail = ref("");
 const option = ref({});
 
@@ -177,7 +177,7 @@ const form = reactive({
   script: "",
 });
 const formState = reactive({ name: "" });
-const showResult = ref(false);
+const modalResult = ref(false);
 const dataResult = ref([]);
 const columnsResult = ref([
   {
@@ -257,7 +257,6 @@ const listPage = async () => {
   paginations.total = data.data?.total || 0;
   dataSource.value = data.data.data;
 };
-listPage();
 const onCopy = () => {
   copyText(scr);
 };
@@ -274,36 +273,42 @@ const handleTableChange = async (pagination: any) => {
   paginations.pageSize = pagination.pageSize;
   await listPage();
 };
-const setModal1Visible = () => {
+const onAddUpdateData = () => {
   formRef.value
     .validate()
     .then(() => {
       if (title.value === "新增") {
         const data = { ...form };
         delete data.id;
-        SignalDelayWaringCreate(data).then(({ data }) => {
+        SignalDelayWaringCreate(data).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
             message.success("新增成功");
             formRef.value?.resetFields();
-            listPage();
+            await listPage();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       } else {
-        SignalDelayWaringUpdate(form).then(({ data }) => {
+        SignalDelayWaringUpdate(form).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
             message.success("编辑成功");
-            listPage();
+            await listPage();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       }
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 
 const onGo = (id: string) => {
@@ -321,7 +326,9 @@ const onScript = (id: number) => {
     .then(({ data }) => {
       mockScript.value = JSON.stringify(data.data);
     })
-    .catch(() => {})
+    .catch(e => {
+      console.error(e)
+    })
     .finally(() => {
       modalScript.value = true;
     });
@@ -333,27 +340,31 @@ const onConfirm = () => {
       message.success("执行结果:" + data.data);
       modalScript.value = false;
     })
-    .catch(() => {})
+    .catch(e => {
+      console.error(e)
+    })
     .finally(() => {});
 };
 
 // 删除
 const onDelete = async (id: string) => {
-  SignalDelayWaringDelete(id).then(({ data }) => {
+  SignalDelayWaringDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      listPage();
+      await listPage();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 
 // 报警历史
 const onWaringHistory = (record: any) => {
   formObj.ID = record.ID;
-  showDate.value = true;
+  modalDate.value = true;
 };
 
 const getQueryRow = () => {
@@ -403,14 +414,19 @@ const getQueryRow = () => {
             ],
           };
         })
+        .catch(e=>{
+            console.error(e)
+          })
         .finally(() => {
-          showResult.value = true;
-          showDate.value = false;
+          modalResult.value = true;
+          modalDate.value = false;
           showSpinning.value = false;
           formObj.date = "";
         });
     })
-    .catch(() => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 const bptjTimeChange = (date: any, dataString: any) => {
   formObj.up_time_start = dayjs(dataString[0]).unix();
@@ -419,8 +435,13 @@ const bptjTimeChange = (date: any, dataString: any) => {
 
 // 查看报警历史内容
 const onView = (record: any, str: string) => {
-  showDetail.value = true;
+  modalDetail.value = true;
   scriptDetail.value = str === "param" ? JSON.stringify(record[str]) : record[str];
 };
+
+onMounted(async ()=>{
+  await listPage();
+})
+
 </script>
 <style lang="less" scoped></style>

@@ -10,7 +10,7 @@
             <a-button type="primary" @click="pageList()">搜索</a-button>
           </a-form-item>
         </a-form>
-        <a-button style="margin: 10px 0" type="primary" @click="modal1Visible = true">新增</a-button>
+        <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">新增</a-button>
 
         <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
           <template #bodyCell="{ column, text, record }">
@@ -55,8 +55,8 @@
           </template>
         </a-table>
 
-        <a-modal v-model:open="modal1Visible" :destroy-on-close="true" title="新增" @ok="setModal1Visible()">
-          <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form" name="nest-messages">
+        <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()">
+          <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form">
             <a-form-item label="客户端ID" name="mqtt_client_id">
               <MqttModSelect v-model="form.mqtt_client_id" :client-id="value" style="width: 350px"></MqttModSelect>
             </a-form-item>
@@ -82,7 +82,7 @@
         </a-modal>
 
         <a-modal v-model:open="modalView" style="width: 60%" title="近三十天数据" @ok="modalView = false">
-          <a-form :model="form" name="nest-messages">
+          <a-form :model="form">
             <div v-if="!option.series?.length" style="text-align: center; font-size: 18px; height: 200px">暂无数据</div>
             <YcECharts v-else :option="option" :height="300" />
           </a-form>
@@ -91,9 +91,9 @@
         <!--历史数据-->
         <a-modal v-model:open="historyView" style="width: 60%" title="历史数据" @ok="historyView = false">
           <a-spin tip="加载中..." size="large" :spinning="showSpinning">
-            <a-form :model="form" name="nest-messages">
+            <a-form :model="form">
               <a-range-picker value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
-              <div v-if="!option.series?.length" style="text-align: center; font-size: 18px; height: 200px">暂无数据</div>
+              <div v-if="!option.series?.length" style="text-align: center; fo。nt-size: 18px; height: 200px">暂无数据</div>
               <YcECharts v-else :option="option" :height="300" />
             </a-form>
           </a-spin>
@@ -136,7 +136,7 @@ const formRef = ref<FormInstance>();
 const routerStore = useRouterNameStore();
 const route = useRoute();
 const value = ref("");
-const modal1Visible = ref(false);
+const modalVisible = ref(false);
 const modalView = ref(false);
 const form = reactive({ mqtt_client_id: Number(route.query.id) || "", name: "", type: "", alias: "", cache_size: 1, unit: "" });
 const columns = [
@@ -181,27 +181,31 @@ const option = ref({});
 const historyView = ref(false);
 const recordObj = ref({});
 const showSpinning = ref(false);
-watch(value, async (newValue, oldValue) => {
+watch(value, async () => {
   await pageList();
 });
 
-const setModal1Visible = () => {
+const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
-      SignalCreate({ ...form }).then(({ data }) => {
+      SignalCreate({ ...form }).then(async ({ data }) => {
         if (data.code === 20000) {
           message.success(data.message);
-          modal1Visible.value = false;
+          modalVisible.value = false;
           formRef.value?.resetFields();
-          pageList();
+          await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`操作失败:${data.data}`);
         }
+      }).catch(e=>{
+        console.error(e)
       });
     })
-    .catch((error) => {});
+    .catch(e => {
+      console.error(e)
+    });
 };
 
 const save = async (key: string) => {
@@ -221,14 +225,16 @@ const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
 };
 const confirm = async (id: string) => {
-  SignalDelete(id).then(({ data }) => {
+  SignalDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 
@@ -247,8 +253,6 @@ const pageList = async () => {
     unit: item.unit,
   }));
 };
-onMounted(async () => {});
-
 const onSignal = (id: string, mqtt_client_id: string) => {
   routerStore.setRouterName("/signal");
   jump.routeJump({ path: "/signal", query: { id, mqtt_client_id } });
@@ -341,8 +345,9 @@ const onView = (id: number, rowId: number, alias: string, unit: string, type: st
       } else {
         message.error(data.message || "操作失败");
       }
-    })
-    .finally(() => {
+    }).catch(e=>{
+      console.error(e)
+    }).finally(() => {
       showSpinning.value = false;
     });
 };
@@ -439,8 +444,9 @@ const bptjTimeChange = (date: any) => {
       } else {
         message.error(data.message || "操作失败");
       }
-    })
-    .finally(() => {
+    }).catch(e=>{
+      console.error(e)
+    }).finally(() => {
       showSpinning.value = false;
     });
 };

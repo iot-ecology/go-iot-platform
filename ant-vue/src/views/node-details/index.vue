@@ -65,7 +65,6 @@ const form = reactive({ name: "", size: "", max_size: "" });
 const getNode = async () => {
   const { data } = await MqttNodeUsingStatus();
   list.value = JSON.parse(data.data).data;
-  console.log(list.value);
 };
 getNode();
 const onSet = (item: any) => {
