@@ -27,7 +27,11 @@ func HandlerDataStorage(messages <-chan amqp.Delivery) {
 
 		for d := range messages {
 			HandlerDataStorageString(d)
-			d.Ack(false)
+			err := d.Ack(false)
+			if err != nil {
+				zap.S().Errorf("消息确认异常：%+v", err)
+
+			}
 		}
 	}()
 
@@ -121,6 +125,7 @@ func StorageDataRowList(dt DataRowList) {
 					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i).Err()
 					if err != nil {
 						// 处理错误
+						zap.S().Errorf("移除 ZSet 元素异常：%+v", err)
 					}
 				}
 			}
@@ -129,6 +134,7 @@ func StorageDataRowList(dt DataRowList) {
 			err := globalRedisClient.ZAdd(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
 			if err != nil {
 				// 处理错误
+				zap.S().Errorf("写入 ZSet 元素异常：%+v", err)
 			}
 		}
 
@@ -179,6 +185,7 @@ func GetMqttClientSignal(mqttClientId string) (map[int]bool, map[int]int64, map[
 	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
+		zap.S().Errorf("获取信号映射表失败：%+v", err)
 	}
 	mapping := make(map[int]bool)
 	mappingName := make(map[string]int)
@@ -203,6 +210,7 @@ func GetMqttClientSignal2(mqttClientId string) map[string]signalMapping {
 	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
+		zap.S().Errorf("获取信号映射表失败：%+v", err)
 	}
 	mapping := make(map[string]signalMapping)
 	for _, strSignal := range result {

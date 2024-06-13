@@ -27,9 +27,10 @@ func ConnectToRMQ() (err error) {
 	if err != nil {
 		return errors.New("create channel error " + err.Error())
 	}
-	chann.Qos(1, 0, false)
+	err = chann.Qos(1, 0, false)
+
 	if err != nil {
-		return errors.New("Error al abrir canal: " + err.Error())
+		return errors.New("qos setting error " + err.Error())
 	}
 
 	observeConnection()
@@ -61,14 +62,22 @@ func closeActiveConnections() {
 		channel, _ := conn.Channel()
 
 		chann = channel
-		chann.Qos(1, 0, false)
+		err := chann.Qos(1, 0, false)
+		if err != nil {
+			zap.S().Errorf("qos setting error：%+v", err)
+
+		}
 
 	}
 
 	if conn.IsClosed() {
 		conn, _ = amqp.Dial(rmqCredentials)
 		chann, _ = conn.Channel()
-		chann.Qos(1, 0, false)
+		err := chann.Qos(1, 0, false)
+		if err != nil {
+			zap.S().Errorf("qos setting error：%+v", err)
+
+		}
 	}
 
 }

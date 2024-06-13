@@ -28,7 +28,10 @@ func HandlerCalc(messages <-chan amqp.Delivery) {
 		for d := range messages {
 
 			HandlerCalcStr(d)
-			d.Ack(false)
+			err := d.Ack(false)
+			if err != nil {
+				zap.S().Errorf("消息确认异常：%+v", err)
+			}
 
 		}
 
