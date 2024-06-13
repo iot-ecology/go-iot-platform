@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import type { UnwrapRef } from "vue";
-import { onMounted, reactive, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { type FormInstance, message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
@@ -118,10 +118,11 @@ import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
 
 interface DataItem {
-  client_id: string;
-  host: string;
-  port: number;
-  username: string;
+  name: string;
+  type: string;
+  alias: string;
+  unit: string;
+  cache_size: number;
 }
 const rules: Record<string, Rule[]> = {
   name: [{ required: true, message: "请输入名称", trigger: "blur" }],

@@ -104,7 +104,7 @@
       </template>
     </a-modal>
 
-    <a-modal v-model:open="modalSave" title="保存" @ok="onSave()">
+    <a-modal v-model:open="modalSave" title="保存" @ok="onSaveInformation()">
       <a-form name="nest-messages">
         <a-form-item label="名称">
           <a-input v-model:value="createName"></a-input>
@@ -198,7 +198,7 @@ if (route.query.id) {
       if (JSON.parse(data.data.config) && JSON.parse(data.data.config)?.length) {
         listArr.value = JSON.parse(data.data.config);
         listArr.value.forEach((item, index) => {
-          getModal(index);
+          getData(index);
         });
       }
     }
@@ -242,9 +242,7 @@ const onSet = (index: number) => {
     form.create_empty = listArr.value[index].param.aggregation.create_empty || false;
     form.list = listArr.value[index].param.list;
     activeKey.value = listArr.value[index].param.dateUnit && listArr.value[index].param.sub ? "1" : "2";
-    if (listArr.value[index].param.dateUnit && listArr.value[index].param.sub) {
-      activeKey.value = "1";
-    } else if (listArr.value[index].param?.start_time && listArr.value[index].param?.end_time) {
+    if (listArr.value[index].param?.start_time && listArr.value[index].param?.end_time) {
       activeKey.value = "2";
     } else {
       activeKey.value = "1";
@@ -305,15 +303,11 @@ const onConfirm = () => {
     })
       .then(async ({ data }) => {
         if (data.code === 20000) {
-          const data1 = await SignalPage({ mqtt_client_id: item.client_id, page: 1, page_size: pageSize });
-          const signalList = data1.data.data?.data || [];
+          const dataArr = await SignalPage({ mqtt_client_id: item.client_id, page: 1, page_size: pageSize });
+          const signalList = dataArr.data.data?.data || [];
           listArr.value[indexNumber.value].param = {
             measurement: form.client_id,
             fields: form.fields,
-            start_time: activeKey.value === "1" ? start_time : form.start_time,
-            end_time: activeKey.value === "1" ? end_time : form.end_time,
-            sub: activeKey.value === "1" ? dateTime.value : "",
-            dateUnit: activeKey.value === "1" ? dateUnit.value : "",
             aggregation: {
               every: form.every,
               function: form.function,
@@ -322,15 +316,15 @@ const onConfirm = () => {
             list: form.list,
           };
           if (activeKey.value === "1") {
-            delete listArr.value[indexNumber.value].param.start_time;
-            delete listArr.value[indexNumber.value].param.end_time;
+            listArr.value[indexNumber.value].param.sub = activeKey.value === "1" ? dateTime.value : "";
+            listArr.value[indexNumber.value].param.sub = activeKey.value === "1" ? dateUnit.value : "";
           }
           if (activeKey.value === "2") {
-            delete listArr.value[indexNumber.value].param.sub;
-            delete listArr.value[indexNumber.value].param.dateUnit;
+            listArr.value[indexNumber.value].param.start_time = activeKey.value === "1" ? start_time : form.start_time;
+            listArr.value[indexNumber.value].param.end_time = activeKey.value === "1" ? end_time : form.end_time;
           }
           const list: any = data.data;
-          const xAxis: any = list?.push_time?.map((it) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss")) || [];
+          const xAxis: any = list?.push_time?.map((it: any) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss")) || [];
           delete list.push_time;
           delete list.storage_time;
 
@@ -367,7 +361,7 @@ const onConfirm = () => {
               },
             ],
           };
-          const items = signalList.find((it) => it.ID === Number(item.fields));
+          const items = signalList.find((it: any) => it.ID === Number(item.fields));
           const mqttName = items?.mqtt_client_name;
           const signalName = items?.name;
           const alias = items?.alias;
@@ -384,7 +378,7 @@ const onConfirm = () => {
           if (Object.keys(list).length) {
             listArr.value[indexNumber.value].chart.tooltip = {
               trigger: "axis",
-              formatter: (params) => {
+              formatter: (params: any) => {
                 let res = `${params[0].name}` + "<br/>";
                 params.forEach(function (item: any) {
                   res += `${item.seriesName}: ${item.value} ${optionList.value[0]?.unit}` + "<br/>";
@@ -410,7 +404,7 @@ const onConfirm = () => {
   });
 };
 
-const onSave = () => {
+const onSaveInformation = () => {
   const list = listArr.value.map((it) => ({ name: it.name, id: it.id, show: it.show, param: it.param, showSpinning: it.showSpinning }));
   const data = {
     config: JSON.stringify(list),
@@ -437,7 +431,7 @@ const onSave = () => {
 };
 
 // 查看编辑的时候获取数据
-const getModal = async (index: number) => {
+const getData = async (index: number) => {
   const { data } = await SignalPage({ mqtt_client_id: listArr.value[index].param.measurement, page: 1, page_size: pageSize });
   const signalList = data.data?.data || [];
   let start_time = null;

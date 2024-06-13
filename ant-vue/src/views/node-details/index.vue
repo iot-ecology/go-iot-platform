@@ -66,7 +66,6 @@ const getNode = async () => {
   const { data } = await MqttNodeUsingStatus();
   list.value = JSON.parse(data.data).data;
 };
-getNode();
 const onSet = (item: any) => {
   const option = {
     series: [
@@ -148,7 +147,9 @@ const onView = (record: any) => {
   form.size = record.size;
   form.max_size = record.max_size;
 };
-onMounted(() => {});
+onMounted(() => {
+  getNode();
+});
 </script>
 <style lang="less" scoped>
 .box {

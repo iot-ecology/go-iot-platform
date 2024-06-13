@@ -300,7 +300,7 @@ watch([code, param], () => {
     loading.value = true;
   }
 });
-const onCopy = () => {
+const onCopy = async () => {
   const text = `function main(nc) {
     var dataRows = [
         { "Name": "Temperature", "Value": "23" },
@@ -315,7 +315,7 @@ const onCopy = () => {
     };
     return [result];
 }`;
-  copyText(text);
+  await copyText(text);
 };
 const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
@@ -339,7 +339,6 @@ const save = async (key: string) => {
     message.error("请输入正确的主机IP");
     return;
   }
-  // eslint-disable-next-line no-debugger
   await MqttUpdate(data);
   await pageList();
 };

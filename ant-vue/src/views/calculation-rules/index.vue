@@ -268,8 +268,8 @@ const listPage = async () => {
   dataSource.value = data.data.data;
   paginations.total = data.data?.total || 0;
 };
-const onCopy = () => {
-  copyText(scr);
+const onCopy = async () => {
+  await copyText(scr);
 };
 const confirm = async (record: any) => {
   modalVisible.value = true;
@@ -315,12 +315,12 @@ const onAddData = () => {
           const data = { ...form };
           delete data.id;
           delete data.start;
-          CalcRuleCreate(data).then(({ data }) => {
+          CalcRuleCreate(data).then(async({ data }) => {
             if (data.code === 20000) {
               modalVisible.value = false;
               message.success("新增成功");
               formRef.value?.resetFields();
-              listPage();
+              await listPage();
             } else {
               message.error(data.message);
             }
@@ -328,11 +328,11 @@ const onAddData = () => {
             console.error(e)
           });
         } else {
-          CalcRuleUpdate(form).then(({ data }) => {
+          CalcRuleUpdate(form).then(async({ data }) => {
             if (data.code === 20000) {
               modalVisible.value = false;
               message.success("编辑成功");
-              listPage();
+              await listPage();
             } else {
               message.error(data.message);
             }

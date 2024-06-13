@@ -100,10 +100,10 @@ import { CalcParamCreate, CalcParamDelete, CalcParamPage, CalcParamUpdate } from
 import { CalculateSelect, MqttSelect, SignalSelect } from "@/components/index.ts";
 
 interface DataItem {
-  client_id: string;
-  host: string;
-  port: number;
-  username: string;
+  name: string;
+  mqtt_client_name: string;
+  signal_name: string;
+  reduce: string;
 }
 const rules: Record<string, Rule[]> = {
   name: [

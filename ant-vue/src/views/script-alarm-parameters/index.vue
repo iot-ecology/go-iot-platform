@@ -85,10 +85,9 @@ import { SignalDelayWaringParamCreate, SignalDelayWaringParamDelete, SignalDelay
 import { MqttSelect, SignalDelayWaring, SignalSelect } from "@/components/index.ts";
 
 interface DataItem {
-  client_id: string;
-  host: string;
-  port: number;
-  username: string;
+  name: string;
+  mqtt_client_id: string;
+  signal_id: string;
 }
 const rules: Record<string, Rule[]> = {
   name: [
@@ -264,7 +263,6 @@ const save = async (key: string) => {
   // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
     message.error("客户端ID和信号名称必选");
-    await pageList();
     return;
   }
   if (!englishLetterRegex.test(data.name.charAt(0))) {

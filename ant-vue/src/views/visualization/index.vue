@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import {onMounted, reactive, ref} from "vue";
 import { message } from "ant-design-vue";
 
 import { DashboardDelete, DashboardPage } from "@/api";
@@ -53,7 +53,6 @@ const listPage = async () => {
   paginations.total = data.data?.total || 0;
   dataSource.value = data.data.data;
 };
-listPage();
 const confirm = async (id: string) => {
   DashboardDelete(id).then(({ data }) => {
     if (data.code === 20000) {
@@ -74,5 +73,8 @@ const handleTableChange = async (pagination: any) => {
   paginations.pageSize = pagination.pageSize;
   await listPage();
 };
+onMounted(async ()=>{
+  await listPage();
+})
 </script>
 <style lang="less" scoped></style>

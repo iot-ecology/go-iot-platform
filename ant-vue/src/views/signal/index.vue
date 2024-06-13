@@ -110,10 +110,9 @@ import { SignalWaringConfigCreate, SignalWaringConfigDelete, SignalWaringConfigP
 import { MqttSelect, SignalSelect } from "@/components/index.ts";
 
 interface DataItem {
-  client_id: string;
-  host: string;
-  port: number;
-  username: string;
+  max: number;
+  min: number;
+  in_or_out: boolean;
 }
 const formRef = ref<FormInstance>();
 const formRefTime = ref<FormInstance>();
@@ -179,7 +178,7 @@ const columnsResult = ref([
   },
 ]);
 
-watch([() => form.mqtt_client_id, () => form.signal_id], async ([newParam1, newParam2], [oldParam1, oldParam2]) => {
+watch([() => form.mqtt_client_id, () => form.signal_id], async ([newParam1, newParam2], []) => {
   if (newParam1 && newParam2) {
     await pageList();
   }
@@ -248,12 +247,10 @@ const save = async (key: string) => {
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
   data.in_or_out = data.in_or_out ? 1 : 0;
-  // eslint-disable-next-line no-debugger
   await SignalWaringConfigUpdate(data);
   await pageList();
 };
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 const confirm = async (id: string) => {
@@ -262,7 +259,6 @@ const confirm = async (id: string) => {
       message.success(data.message);
       await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   }).catch(e=>{
