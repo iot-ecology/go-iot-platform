@@ -1,0 +1,28 @@
+// 整个滚动条
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+// 滚动条有滑块的轨道部分
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+// 滚动条滑块(竖向:vertical 横向:horizontal)
+::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background-color: var(--g-scrollbar-thumb-bg);
+    border-radius: 5px;
+}
+
+// 滚动条滑块hover
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--g-scrollbar-thumb-hover-bg);
+}
+
+// 同时有垂直和水平滚动条时交汇的部分
+::-webkit-scrollbar-corner {
+    display: block;
+}
