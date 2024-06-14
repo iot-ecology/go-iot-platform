@@ -1,10 +1,10 @@
 <template>
   <div class="box">
-    <a-button style="margin-bottom: 10px" type="primary" @click="onAdd">新增</a-button>
-    <a-button style="margin-bottom: 10px; margin-left: 10px" type="primary" @click="onSave">保存</a-button>
+    <a-button style="margin-bottom: 10px" type="primary" @click="onAdd">{{ $t('message.addition') }}</a-button>
+    <a-button style="margin-bottom: 10px; margin-left: 10px" type="primary" @click="onSave">{{$t('message.save')}}</a-button>
     <VueDraggable v-model="listArr" :animation="150" ghost-class="ghost" group="people" handle=".drag-handle">
       <div v-for="(item, index) in listArr" :key="item.id" class="cursor-move">
-        <a-spin tip="加载中..." size="large" :spinning="item.showSpinning">
+        <a-spin :tip="$t('message.loading')" size="large" :spinning="item.showSpinning">
           <a-collapse :bordered="false" style="background: rgb(255, 255, 255)" :default-active-key="['1']" collapsible="icon">
             <template #expandIcon="{ isActive }">
               <caret-right-outlined :rotate="isActive ? 90 : 0" />
@@ -14,20 +14,20 @@
                 <div class="drag-handle" style="display: flex; justify-content: space-between; border-bottom: 1px solid; padding: 5px">
                   <div>
                     <a-input v-model:value="item.name" style="width: 300px"></a-input>
-                    <a-button style="margin: 0 12px" type="primary" @click="onSet(index)">配置</a-button>
-                    <a-select v-model:value="item.show.type" style="width: 100px" placeholder="请选择" @change="onChange(item.show.type, index)">
-                      <a-select-option value="line">折线图</a-select-option>
-                      <a-select-option value="bar">柱状图</a-select-option>
+                    <a-button style="margin: 0 12px" type="primary" @click="onSet(index)">{{ $t('message.allocation') }}</a-button>
+                    <a-select v-model:value="item.show.type" style="width: 100px" :placeholder="$t('message.pleaseSelect')" @change="onChange(item.show.type, index)">
+                      <a-select-option value="line">{{ $t('message.lineChart') }}</a-select-option>
+                      <a-select-option value="bar">{{ $t('message.barChart') }}</a-select-option>
                     </a-select>
-                    <a-button style="margin: 0 12px" type="primary" @click="onCopy(item)">复制</a-button>
+                    <a-button style="margin: 0 12px" type="primary" @click="onCopy(item)">{{ $t('message.copy') }}</a-button>
                   </div>
-                  <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="onDelete(index)">
+                  <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(index)">
                     <close-circle-two-tone two-tone-color="crimson" style="font-size: 24px" />
                   </a-popconfirm>
                 </div>
               </template>
               <div class="chart-container">
-                <div v-if="!item.chart?.series?.length" style="text-align: center; font-size: 18px; height: 200px">暂无数据</div>
+                <div v-if="!item.chart?.series?.length" style="text-align: center; font-size: 18px; height: 200px">{{ $t('message.noData') }}</div>
                 <YcECharts v-else :option="item.chart" :height="300" />
               </div>
             </a-collapse-panel>
@@ -36,47 +36,47 @@
       </div>
     </VueDraggable>
 
-    <a-modal v-model:open="modalVisible" style="width: 35%" title="新增">
+    <a-modal v-model:open="modalVisible" style="width: 35%" :title="$t('message.addition')">
       <a-form ref="formRef" :label-col="{ style: { width: '110px' } }" :model="form" :rules="rules" name="nest-messages">
-        <a-form-item label="时间">
+        <a-form-item :label="$t('message.time')">
           <a-tabs v-model:activeKey="activeKey">
-            <a-tab-pane key="1" tab="动态时间">
+            <a-tab-pane key="1" :tab="$t('message.dynamicTime')">
               <div style="display: flex; align-items: center">
-                最近
+                {{ $t('message.recently') }}
                 <a-input-number v-model:value="dateTime" style="margin: 0 5px; width: 150px"></a-input-number>
                 <a-select v-model:value="dateUnit" style="width: 165px">
-                  <a-select-option value="year">年</a-select-option>
-                  <a-select-option value="month">月</a-select-option>
-                  <a-select-option value="day">日</a-select-option>
-                  <a-select-option value="week">周</a-select-option>
-                  <a-select-option value="hour">时</a-select-option>
+                  <a-select-option value="year">{{ $t('message.year') }}</a-select-option>
+                  <a-select-option value="month">{{ $t('message.month') }}</a-select-option>
+                  <a-select-option value="day">{{ $t('message.day') }}</a-select-option>
+                  <a-select-option value="week">{{ $t('message.week') }}</a-select-option>
+                  <a-select-option value="hour">{{ $t('message.hour') }}</a-select-option>
                 </a-select>
               </div>
             </a-tab-pane>
-            <a-tab-pane key="2" tab="静态时间">
+            <a-tab-pane key="2" :tab="$t('message.staticTime')">
               <a-range-picker v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
             </a-tab-pane>
           </a-tabs>
         </a-form-item>
-        <a-form-item label="时间间隔（秒）" name="every">
+        <a-form-item :label="$t('message.timeInterval')" name="every">
           <a-input-number v-model:value="form.every" :precision="0" style="width: 350px"></a-input-number>
         </a-form-item>
 
-        <a-form-item label="是否创建空值" name="create_empty">
+        <a-form-item :label="$t('message.createValue')" name="create_empty">
           <a-radio-group v-model:value="form.create_empty">
-            <a-radio :value="true">是</a-radio>
-            <a-radio :value="false">否</a-radio>
+            <a-radio :value="true">{{ $t('message.yes') }}</a-radio>
+            <a-radio :value="false">{{ $t('message.no') }}</a-radio>
           </a-radio-group>
         </a-form-item>
 
-        <a-divider>信号配置</a-divider>
-        <a-button type="primary" @click="onAddSignal"> 新增</a-button>
+        <a-divider>{{ $t('message.signalConfig') }}</a-divider>
+        <a-button type="primary" @click="onAddSignal">{{ $t('message.addition') }}</a-button>
 
         <div style="border: 1px solid #d9d9d9; margin-top: 12px">
           <div style="display: flex; line-height: 32px; border-bottom: 1px solid #d9d9d9">
-            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">客户端ID</div>
-            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">信号名称</div>
-            <div style="width: 33.3%; text-align: center">统计方式</div>
+            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.clientID') }}</div>
+            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.signalName') }}</div>
+            <div style="width: 33.3%; text-align: center">{{ $t('message.statisticalMethods') }}</div>
           </div>
           <div v-for="(item, index) in form.list" :key="index" style="display: flex; justify-content: space-between">
             <div style="width: 33.3%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
@@ -87,26 +87,26 @@
             </div>
             <div style="width: 33.3%; text-align: center; padding: 4px 0">
               <a-select v-model:value="item.function" style="width: 160px">
-                <a-select-option value="mean">平均值</a-select-option>
-                <a-select-option value="sum">求和</a-select-option>
-                <a-select-option value="min">最小值</a-select-option>
-                <a-select-option value="max">最大值</a-select-option>
-                <a-select-option value="first">首条</a-select-option>
-                <a-select-option value="last">尾条</a-select-option>
+                <a-select-option value="mean">{{ $t('message.mean') }}</a-select-option>
+                <a-select-option value="sum">{{ $t('message.sum') }}</a-select-option>
+                <a-select-option value="min">{{ $t('message.min') }}</a-select-option>
+                <a-select-option value="max">{{ $t('message.max') }}</a-select-option>
+                <a-select-option value="first">{{ $t('message.first') }}</a-select-option>
+                <a-select-option value="last">{{ $t('message.last') }}</a-select-option>
               </a-select>
             </div>
           </div>
         </div>
       </a-form>
       <template #footer>
-        <a-button @click="modalVisible = false">取消</a-button>
-        <a-button type="primary" @click="onConfirm()">确定</a-button>
+        <a-button @click="modalVisible = false">{{$t('message.cancel')}}</a-button>
+        <a-button type="primary" @click="onConfirm()">{$t('message.confirm')}}</a-button>
       </template>
     </a-modal>
 
-    <a-modal v-model:open="modalSave" title="保存" @ok="onSaveInformation()">
+    <a-modal v-model:open="modalSave" :title="$t('message.save')" @ok="onSaveInformation()">
       <a-form name="nest-messages">
-        <a-form-item label="名称">
+        <a-form-item :label="$t('message.name')">
           <a-input v-model:value="createName"></a-input>
         </a-form-item>
       </a-form>

@@ -6,21 +6,21 @@
           <a-input v-model:value="formState.name" style="width: 300px" placeholder="请输入" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="listPage">搜索</a-button>
+          <a-button type="primary" @click="listPage">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <a-table :data-source="dataSource" :columns="columns" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">编辑</a>
+                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a>
                 <a v-if="!record.start" style="margin-left: 10px" @click="onGo(record.ID)">参数配置</a>
                 <a v-if="!record.start" style="margin-left: 10px" @click="onMock(record.ID)">模拟执行</a>
                 <a v-if="!record.start" style="margin-left: 10px" @click="onStart(record.ID, record.mock_value)">启动</a>
 
-                <a-popconfirm v-else title="确认是否停止?" ok-text="是" cancel-text="否" @confirm="confirmStop(record.ID)">
+                <a-popconfirm v-else title="确认是否停止?" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirmStop(record.ID)">
                   <a style="margin-left: 10px">停止</a>
                 </a-popconfirm>
                 <a style="margin-left: 10px" @click="onResult(record.ID)">结果查看</a>
@@ -52,33 +52,33 @@
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="handleCancel">取消</a-button>
+          <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="onAddData()">确定</a-button>
         </template>
       </a-modal>
 
-      <a-modal v-model:open="modalTime" title="时间范围" class="custom-modal">
+      <a-modal v-model:open="modalTime" :title="$t('message.timeframe')" class="custom-modal">
         <a-form ref="formRefTime" :rules="rules" :model="formTime">
-          <a-form-item label="时间范围" name="date">
+          <a-form-item :label="$t('message.timeframe')" name="date">
             <a-range-picker v-model:value="formTime.date" show-time @change="bptjTimeChange" />
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="modalTime = false">取消</a-button>
+          <a-button @click="modalTime = false">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="setMockData()">确定</a-button>
         </template>
       </a-modal>
 
-      <a-modal v-model:open="modalDate" title="时间范围" class="custom-modal">
-        <a-spin tip="加载中..." size="large" :spinning="showSpinning">
+      <a-modal v-model:open="modalDate" :title="$t('message.timeframe')" class="custom-modal">
+        <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefDate" :rules="rules" :model="formDate">
-            <a-form-item label="时间范围" name="date">
+            <a-form-item :label="$t('message.timeframe')" name="date">
               <a-range-picker v-model:value="formDate.date" show-time @change="bptjTime" />
             </a-form-item>
           </a-form>
         </a-spin>
         <template #footer>
-          <a-button v-if="!showSpinning" @click="modalDate = false">取消</a-button>
+          <a-button v-if="!showSpinning" @click="modalDate = false">{{$t('message.cancel')}}</a-button>
           <a-button :loading="showSpinning" type="primary" @click="setTableData()">确定</a-button>
         </template>
       </a-modal>
@@ -90,7 +90,7 @@
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="modalMock = false">取消</a-button>
+          <a-button @click="modalMock = false">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="onConfimStart()">确定</a-button>
         </template>
       </a-modal>
@@ -103,13 +103,13 @@
             <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">查询结束时间</div>
             <div style="width: 19%; padding: 8px 0">结果</div>
           </div>
-          <div v-if="!dataResult?.length" style="text-align: center; font-size: 18px; height: 300px">暂无数据</div>
+          <div v-if="!dataResult?.length" style="text-align: center; font-size: 18px; height: 300px">{{ $t('message.noData') }}</div>
           <RecycleScroller v-else v-slot="{ item }" style="height: 480px" class="scroller" :items="dataResult" :item-size="40" key-field="start_time">
             <div style="display: flex; text-align: center; border-bottom: 1px solid #f0f0f0">
               <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">{{ item.ex_time }}</div>
               <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">{{ item.start_time }}</div>
               <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">{{ item.end_time }}</div>
-              <div style="width: 19%; padding: 8px 0; cursor: pointer; color: rgb(24, 144, 255)" @click="onView(item)">查看</div>
+              <div style="width: 19%; padding: 8px 0; cursor: pointer; color: rgb(24, 144, 255)" @click="onView(item)">{{ $t('message.check') }}</div>
             </div>
           </RecycleScroller>
         </div>

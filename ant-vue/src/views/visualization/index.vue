@@ -1,15 +1,15 @@
 <template>
   <div>
     <a-card title="" :bordered="true">
-      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <a-table :data-source="dataSource" bordered :columns="columns" :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a @click="onDetails(record.ID)">查看</a>
-                <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="confirm(record.ID)" @cancel="cancel1">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a @click="onDetails(record.ID)">{{ $t('message.check') }}</a>
+                <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)" @cancel="cancel1">
+                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
               </span>
             </div>
@@ -20,20 +20,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import { message } from "ant-design-vue";
 
 import { DashboardDelete, DashboardPage } from "@/api";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
+import {useI18n} from "vue-i18n";
+const { t,locale } = useI18n();
 
 const jump = useRouteJump();
 const columns = ref([
   {
-    title: "名称",
+    title: t('message.name'),
     dataIndex: "name",
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
 ]);
@@ -44,6 +46,20 @@ const paginations = reactive({
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
+watch(locale, () => {
+  columns.value = [
+    {
+      title: t('message.name'),
+      dataIndex: "name",
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    },
+  ]
+});
+
+
 const onAdd = () => {
   jump.routeJump({ path: "/visualization/add" });
 };

@@ -6,21 +6,21 @@
           <a-input v-model:value="formState.name" style="width: 300px" placeholder="请输入" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="listPage">搜索</a-button>
+          <a-button type="primary" @click="listPage">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <a-table :data-source="dataSource" :columns="columns" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">编辑</a>
+                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a>
                 <a style="margin-left: 10px" @click="onWaringHistory(record)">报警历史</a>
                 <a style="margin-left: 10px" @click="onGo(record.ID)">参数配置</a>
                 <a style="margin-left: 10px" @click="onScript(record.ID)">调试脚本</a>
-                <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="onDelete(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(record.ID)">
+                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
               </span>
             </div>
@@ -44,7 +44,7 @@
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="handleCancel">取消</a-button>
+          <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="onAddUpdateData()">确定</a-button>
         </template>
       </a-modal>
@@ -57,22 +57,22 @@
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="modalScript = false">取消</a-button>
+          <a-button @click="modalScript = false">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="onConfirm()">执行</a-button>
         </template>
       </a-modal>
 
       <!--  时间选择    -->
-      <a-modal v-model:open="modalDate" title="时间范围" :destroy-on-close="true" class="custom-modal">
-        <a-spin tip="加载中..." size="large" :spinning="showSpinning">
+      <a-modal v-model:open="modalDate" :title="$t('message.timeframe')" :destroy-on-close="true" class="custom-modal">
+        <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefTime" :rules="rules" :model="formObj">
-            <a-form-item label="时间范围" name="date">
+            <a-form-item :label="$t('message.timeframe')" name="date">
               <a-range-picker v-model:value="formObj.date" show-time @change="bptjTimeChange" />
             </a-form-item>
           </a-form>
         </a-spin>
         <template #footer>
-          <a-button v-if="!showSpinning" @click="modalDate = false">取消</a-button>
+          <a-button v-if="!showSpinning" @click="modalDate = false">{{$t('message.cancel')}}</a-button>
           <a-button :loading="showSpinning" type="primary" @click="getQueryRow()">确定</a-button>
         </template>
       </a-modal>
@@ -86,7 +86,7 @@
                 <template v-if="column.dataIndex === 'param' || column.dataIndex === 'script'">
                   <div class="editable-row-operations">
                     <span>
-                      <a @click="onView(record, column.dataIndex)">查看</a>
+                      <a @click="onView(record, column.dataIndex)">{{ $t('message.check') }}</a>
                     </span>
                   </div>
                 </template>
@@ -95,7 +95,7 @@
           </a-tab-pane>
           <a-tab-pane key="2" tab="折线图">
             <div>
-              <div v-if="!option.series[0].data?.length" style="height: 223px; text-align: center; font-size: 18px">暂无数据</div>
+              <div v-if="!option.series[0].data?.length" style="height: 223px; text-align: center; font-size: 18px">{{ $t('message.noData') }}</div>
               <YcECharts v-else :option="option" :height="300" />
             </div>
           </a-tab-pane>

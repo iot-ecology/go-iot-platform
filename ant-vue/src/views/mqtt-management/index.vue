@@ -2,14 +2,14 @@
   <div class="icon-preview">
     <a-card title="" :bordered="true">
       <a-form layout="inline" :model="formState">
-        <a-form-item label="客户端ID">
-          <a-input v-model:value="formState.client_id" style="width: 300px" placeholder="请输入" />
+        <a-form-item :label="$t('message.clientID')">
+          <a-input v-model:value="formState.client_id" style="width: 300px" :placeholder="$t('message.pleaseEnter')" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="onSearch">搜索</a-button>
+          <a-button type="primary" @click="onSearch">{{$t('message.search')}}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
       <!--      表格-->
       <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -33,23 +33,23 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">保存</a-typography-link>
-                <a-popconfirm title="确定取消编辑吗?" @confirm="cancel(record.key)">
-                  <a>取消</a>
+                <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                <a-popconfirm :title="$t('message.sureEdit')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="cancel(record.key)">
+                  <a>{{$t('message.cancel')}}</a>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a v-if="!record.start" style="margin-right: 10px" @click="edit(record.key)">编辑</a>
-                <a v-if="!record.start" @click="onStart(record.ID)">启动</a>
-                <a-popconfirm v-else title="确认是否停止?" ok-text="是" cancel-text="否" @confirm="confirmStop(record.ID)">
-                  <a>停止</a>
+                <a v-if="!record.start" style="margin-right: 10px" @click="edit(record.key)">{{$t('message.edit')}}</a>
+                <a v-if="!record.start" @click="onStart(record.ID)">{{$t('message.startUp')}}</a>
+                <a-popconfirm v-else :title="$t('message.sureStop')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirmStop(record.ID)">
+                  <a>{{$t('message.stop')}}</a>
                 </a-popconfirm>
 
-                <a style="margin-left: 10px" @click="(code = record.script), (scriptId = record.ID), (modalScriptShow = true)">解析脚本</a>
-                <a style="margin-left: 10px" @click="onSignal(record.ID)">信号配置</a>
-                <a v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true), (formNews.client_id = record.client_id)">模拟发送</a>
-                <a-popconfirm v-if="!record.start" title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="confirm(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a style="margin-left: 10px" @click="(code = record.script), (scriptId = record.ID), (modalScriptShow = true)">{{$t('message.parsingScripts')}}</a>
+                <a style="margin-left: 10px" @click="onSignal(record.ID)">{{$t('message.signalConfig')}}</a>
+                <a v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true), (formNews.client_id = record.client_id)">{{$t('message.simulated')}}</a>
+                <a-popconfirm v-if="!record.start" :title="$t('message.sureDelete')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirm(record.ID)">
+                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
               </span>
             </div>
@@ -59,24 +59,24 @@
     </a-card>
 
     <!--新增-->
-    <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()">
-      <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form">
-        <a-form-item label="客户端ID" name="client_id">
+    <a-modal v-model:open="modalVisible" :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
+      <a-form ref="formRef" :label-col="{ style: { width: '90px' } }" :rules="rules" :model="form">
+        <a-form-item :label="$t('message.clientID')" name="client_id">
           <a-input v-model:value="form.client_id" style="width: 350px" />
         </a-form-item>
-        <a-form-item label="主机" name="host">
+        <a-form-item :label="$t('message.host')" name="host">
           <a-input-password v-model:value="form.host" style="width: 350px" />
         </a-form-item>
-        <a-form-item label="端口" name="port">
+        <a-form-item :label="$t('message.port')" name="port">
           <a-input-number v-model:value="form.port" :precision="0" style="width: 350px" />
         </a-form-item>
-        <a-form-item label="账号" name="username">
+        <a-form-item :label="$t('message.account')" name="username">
           <a-input v-model:value="form.username" style="width: 350px" />
         </a-form-item>
-        <a-form-item label="密码" name="password">
+        <a-form-item :label="$t('message.password')" name="password">
           <a-input-password v-model:value="form.password" style="width: 350px" />
         </a-form-item>
-        <a-form-item label="订阅的主题" name="subtopic">
+        <a-form-item :label="$t('message.theme')" name="subtopic">
           <a-input v-model:value="form.subtopic" style="width: 350px" />
         </a-form-item>
       </a-form>
@@ -84,45 +84,45 @@
 
     <!--    解析脚本-->
     <a-modal v-model:open="modalScriptShow" title="">
-      <a-divider>解析脚本</a-divider>
+      <a-divider>{{ $t('message.parsingScripts') }}</a-divider>
       <a-tooltip placement="right">
         <template #title>
           <span @click="onCopy">{{ scrValue }}</span>
         </template>
-        <p style="cursor: pointer; width: 60px">示列脚本</p>
+        <p style="cursor: pointer; width: 60px">{{ $t('message.listScript') }}</p>
       </a-tooltip>
       <codemirror v-model="code" placeholder="Code here..." :style="{ height: '150px' }" :autofocus="true" :tab-size="2" :extensions="extensions" />
-      <a-divider>传递参数</a-divider>
+      <a-divider>{{ $t('message.parameters') }}</a-divider>
       <a-input v-model:value="param" style="margin: 10px 0" placeholder="请输入传递参数"></a-input>
-      <a-divider>解析结果</a-divider>
+      <a-divider>{{ $t('message.analysis') }}</a-divider>
       <codemirror v-model="resultCode" placeholder="Code here..." :style="{ height: '150px' }" :autofocus="true" :tab-size="2" :extensions="extensions" />
       <template #footer>
-        <a-button @click="handleCancel">取消</a-button>
-        <a-button :disabled="!(loading && code && param)" type="primary" @click="handleReject">验证</a-button>
-        <a-button :disabled="loading" type="primary" @click="onConfirmScript()">确定</a-button>
+        <a-button @click="handleCancel">{{ $t('message.cancel') }}</a-button>
+        <a-button :disabled="!(loading && code && param)" type="primary" @click="handleReject">{{ $t('message.validate') }}</a-button>
+        <a-button :disabled="loading" type="primary" @click="onConfirmScript()">{{ $t('message.confirm') }}</a-button>
       </template>
     </a-modal>
 
     <!--    模拟发送消息-->
-    <a-modal v-model:open="modalNewShow" :destroy-on-close="true" title="发送消息" @ok="setModalNew()">
-      <a-form ref="formRefNews" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="formNews">
-        <a-form-item label="消息内容" name="payload">
+    <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalNewShow" :destroy-on-close="true" :title="$t('message.sendMessage')" @ok="setModalNew()">
+      <a-form ref="formRefNews" :label-col="{ style: { width: '120px' } }" :rules="rules" :model="formNews">
+        <a-form-item :label="$t('message.messageContent')" name="payload">
           <a-input v-model:value="formNews.payload" />
         </a-form-item>
-        <a-form-item label="服务质量" name="qos">
+        <a-form-item :label="$t('message.serviceQuality')" name="qos">
           <a-select v-model:value="formNews.qos">
-            <a-select-option :value="0">最多发送一次，可能会丢失</a-select-option>
-            <a-select-option :value="1">至少发送一次，可能会重复</a-select-option>
-            <a-select-option :value="2">发送一次，确保消息不会重复</a-select-option>
+            <a-select-option :value="0">{{ $t('message.once') }}</a-select-option>
+            <a-select-option :value="1">{{ $t('message.leastOnce') }}</a-select-option>
+            <a-select-option :value="2">{{ $t('message.notRepeat') }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="主题" name="topic">
+        <a-form-item :label="$t('message.theme')" name="topic">
           <a-input v-model:value="formNews.topic" />
         </a-form-item>
-        <a-form-item label="保留消息" name="retained">
+        <a-form-item :label="$t('message.keep')" name="retained">
           <a-radio-group v-model:value="formNews.retained">
-            <a-radio :value="true">是</a-radio>
-            <a-radio :value="false">否</a-radio>
+            <a-radio :value="true">{{ $t('message.yes') }}</a-radio>
+            <a-radio :value="false">{{ $t('message.no') }}</a-radio>
           </a-radio-group>
         </a-form-item>
       </a-form>
@@ -140,11 +140,13 @@ import { type Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
+import { useI18n } from 'vue-i18n';
 
 import { MqttCheckScript, MqttCreate, MqttDelete, MqttPage, MqttSend, MqttSetScript, MqttStart, MqttStop, MqttUpdate } from "@/api";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
 const { toClipboard } = useClipboard();
+const { t,locale } = useI18n();
 interface DataItem {
   client_id: string;
   host: string;
@@ -162,8 +164,8 @@ const copyText = async (text: string) => {
   }
 };
 const jump = useRouteJump();
-const rules: Record<string, Rule[]> = {
-  client_id: [{ required: true, message: "请输入客户端ID", trigger: "blur" }],
+let rules: Record<string, Rule[]> = {
+  client_id: [{ required: true, message: t('message.pleaseClientID'), trigger: "blur" }],
   host: [
     {
       required: true,
@@ -171,26 +173,26 @@ const rules: Record<string, Rule[]> = {
         if (value) {
           await Promise.resolve();
         } else {
-          await Promise.reject("请输入主机IP");
+          await Promise.reject(t('message.pleaseHostIP'));
         }
         const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         if (ipPattern.test(value)) {
           await Promise.resolve();
         } else {
-          await Promise.reject("请输入正确的主机IP");
+          await Promise.reject(t('message.pleaseCorrectHostIP'));
         }
       },
       trigger: "blur",
     },
   ],
-  port: [{ required: true, message: "请输入端口", trigger: "blur" }],
-  username: [{ required: true, message: "请输入账号", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-  subtopic: [{ required: true, message: "请输入订阅的主题", trigger: "blur" }],
-  payload: [{ required: true, message: "请输入消息内容", trigger: "blur" }],
-  qos: [{ required: true, message: "请选择服务质量", trigger: "change" }],
-  topic: [{ required: true, message: "请输入主题", trigger: "blur" }],
-  retained: [{ required: true, message: "请选择是否保留消息", trigger: "change" }],
+  port: [{ required: true, message: t('message.pleasePort'), trigger: "blur" }],
+  username: [{ required: true, message: t('message.pleaseUsername'), trigger: "blur" }],
+  password: [{ required: true, message: t('message.pleasePassword'), trigger: "blur" }],
+  subtopic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+  payload: [{ required: true, message: t('message.pleaseMessage'), trigger: "blur" }],
+  qos: [{ required: true, message: t('message.pleaseService'), trigger: "change" }],
+  topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+  retained: [{ required: true, message: t('message.pleaseChooseMessage'), trigger: "change" }],
 };
 const routerStore = useRouterNameStore();
 const scriptId = ref("");
@@ -240,47 +242,47 @@ const formState = reactive({ client_id: "" });
 const form = ref({ client_id: "", host: "", port: "", username: "", password: "", subtopic: "" });
 const formNews = ref({ client_id: "", payload: "", qos: "", retained: false, topic: "" });
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
-const columns = [
+const columns = ref([
   {
-    title: "唯一码",
+    title: t('message.uniCode'),
     dataIndex: "ID",
   },
   {
-    title: "客户端ID",
+    title: t('message.clientID'),
     dataIndex: "client_id",
   },
   {
-    title: "主机",
+    title: t('message.host'),
     dataIndex: "host",
   },
   {
-    title: "端口",
+    title: t('message.port'),
     dataIndex: "port",
   },
   {
-    title: "账号",
+    title: t('message.account'),
     dataIndex: "username",
   },
   {
-    title: "密码",
+    title: t('message.password'),
     dataIndex: "password",
   },
   {
-    title: "订阅的主题",
+    title: t('message.theme'),
     dataIndex: "subtopic",
   },
   {
-    title: "是否启动",
+    title: t('message.start'),
     dataIndex: "start",
     customRender: ({ text }) => {
-      return h("span", text ? "是" : "否");
+      return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
-];
+]);
 const paginations = reactive({
   total: 0,
   current: 1,
@@ -289,7 +291,7 @@ const paginations = reactive({
 });
 const list = ref([]);
 const scrValue =
-  'function main(nc) {\n    var dataRows = [\n        { "Name": "Temperature", "Value": "23" },\n        { "Name": "Humidity", "Value": "30" },\n        { "Name": "A", "Value": nc },\n    ];\n    var result = {\n        "Time":  Math.floor(Date.now() / 1000),\n        "DataRows": dataRows,\n        "DeviceUid": "",\n        "Nc": nc // 确保结果对象中包含nc参数\n    };\n    return [result];\n}';
+  'function main(nc) {\n    var dataRows = [\n        { "Name": "Temperature", "Value": "23" },\n        { "Name": "Humidity", "Value": "30" },\n        { "Name": "A", "Value": nc },\n    ];\n    var result = {\n        "Time":  Math.floor(Date.now() / 1000),\n        "DataRows": dataRows,\n        "DeviceUid": "",\n        "Nc": nc \n    };\n    return [result];\n}';
 
 const code = ref("");
 const param = ref("");
@@ -298,6 +300,79 @@ const resultCode = ref("");
 watch([code, param], () => {
   if (!loading.value) {
     loading.value = true;
+  }
+});
+watch(locale, () => {
+  columns.value = [
+    {
+      title: t('message.uniCode'),
+      dataIndex: "ID",
+    },
+    {
+      title: t('message.clientID'),
+      dataIndex: "client_id",
+    },
+    {
+      title: t('message.host'),
+      dataIndex: "host",
+    },
+    {
+      title: t('message.port'),
+      dataIndex: "port",
+    },
+    {
+      title: t('message.account'),
+      dataIndex: "username",
+    },
+    {
+      title: t('message.password'),
+      dataIndex: "password",
+    },
+    {
+      title: t('message.theme'),
+      dataIndex: "subtopic",
+    },
+    {
+      title: t('message.start'),
+      dataIndex: "start",
+      customRender: ({ text }) => {
+        return h("span", text ? t('message.yes') : t('message.no'));
+      },
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    },
+  ]
+  rules = {
+    client_id: [{ required: true, message: t('message.pleaseClientID'), trigger: "blur" }],
+    host: [
+      {
+        required: true,
+        validator: async (rule, value) => {
+          if (value) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.pleaseHostIP'));
+          }
+          const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+          if (ipPattern.test(value)) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.pleaseCorrectHostIP'));
+          }
+        },
+        trigger: "blur",
+      },
+    ],
+    port: [{ required: true, message: t('message.pleasePort'), trigger: "blur" }],
+    username: [{ required: true, message: t('message.pleaseUsername'), trigger: "blur" }],
+    password: [{ required: true, message: t('message.pleasePassword'), trigger: "blur" }],
+    subtopic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+    payload: [{ required: true, message: t('message.pleaseMessage'), trigger: "blur" }],
+    qos: [{ required: true, message: t('message.pleaseService'), trigger: "change" }],
+    topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+    retained: [{ required: true, message: t('message.pleaseChooseMessage'), trigger: "change" }],
   }
 });
 const onCopy = async () => {
@@ -311,7 +386,7 @@ const onCopy = async () => {
         "Time":  Math.floor(Date.now() / 1000),
         "DataRows": dataRows,
         "DeviceUid": "${scriptId.value}",
-        "Nc": nc // 确保结果对象中包含nc参数
+        "Nc": nc
     };
     return [result];
 }`;
@@ -336,7 +411,7 @@ const save = async (key: string) => {
   delete editableData[key];
   const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   if (!ipPattern.test(data.host)) {
-    message.error("请输入正确的主机IP");
+    message.error(t('message.pleaseCorrectHostIP'));
     return;
   }
   await MqttUpdate(data);
@@ -401,7 +476,7 @@ const onAddData = () => {
           await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          message.error(`操作失败:${data.data}`);
+          message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       }).catch(e=>{
         console.error(e);
@@ -421,7 +496,7 @@ const onConfirmScript = () => {
       param.value = "";
       await pageList();
     } else {
-      message.error(data.message || "操作失败");
+      message.error(data.message || t('message.operationFailed'));
     }
   }).catch(e=>{
     console.error(e)
@@ -444,11 +519,11 @@ const onStart = (id: string) => {
 };
 const handleReject = () => {
   if (!code.value) {
-    message.error("请输入脚本");
+    message.error(t('message.pleaseScript'));
     return;
   }
   if (!param.value) {
-    message.error("请输入传递参数");
+    message.error(t('message.pleaseParameters'));
     return;
   }
   MqttCheckScript({ param: param.value, script: code.value }).then(({ data }) => {
@@ -457,7 +532,7 @@ const handleReject = () => {
       loading.value = false;
       message.success(data.message);
     } else {
-      message.error(data.message || "操作失败");
+      message.error(data.message || t('message.operationFailed'));
     }
   }).catch(e=>{
     console.error(e)
@@ -476,7 +551,7 @@ const setModalNew = () => {
           await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          message.error(`操作失败:${data.data}`);
+          message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       }).catch(e=> {
         console.error(e)

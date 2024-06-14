@@ -6,10 +6,10 @@
           <SignalDelayWaring v-model="form.signal_delay_waring_id" style="width: 300px" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="pageList()">搜索</a-button>
+          <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <!--      表格-->
       <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -39,15 +39,15 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">保存</a-typography-link>
-                <a-popconfirm title="确定取消编辑吗?" @confirm="cancel(record.key)">
-                  <a>取消</a>
+                <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                <a-popconfirm :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
+                  <a>{{$t('message.cancel')}}</a>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a @click="edit(record.key)">编辑</a>
-                <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="onDelete(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a @click="edit(record.key)">{{$t('message.edit')}}</a>
+                <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(record.ID)">
+                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
               </span>
             </div>
@@ -63,12 +63,12 @@
           <a-form-item label="客户端ID" name="mqtt_client_id">
             <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
-          <a-form-item label="信号名称" name="signal_id">
+          <a-form-item :label="$t('message.signalName')" name="signal_id">
             <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="handleCancel">取消</a-button>
+          <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
           <a-button :disabled="loading" type="primary" @click="onAddData()">确定</a-button>
         </template>
       </a-modal>

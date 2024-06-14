@@ -6,10 +6,10 @@
           <CalculateSelect v-model="form.calc_rule_id"></CalculateSelect>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="pageList()">搜索</a-button>
+          <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -45,15 +45,15 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">保存</a-typography-link>
-                <a-popconfirm title="确定取消编辑吗?" @confirm="cancel(record.key)">
-                  <a>取消</a>
+                <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                <a-popconfirm :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
+                  <a>{{$t('message.cancel')}}</a>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a @click="edit(record.key)">编辑</a>
-                <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="confirm(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a @click="edit(record.key)">{{$t('message.edit')}}</a>
+                <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)">
+                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
               </span>
             </div>
@@ -61,7 +61,7 @@
         </template>
       </a-table>
 
-      <a-modal v-model:open="modalVisible" :destroy-on-close="true" title="新增" @ok="onAddData()" @cancel="clear()">
+      <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()" @cancel="clear()">
         <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
           <a-form-item label="名称" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
@@ -69,7 +69,7 @@
           <a-form-item label="客户端ID" name="mqtt_client_id">
             <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
-          <a-form-item label="信号名称" name="signal_id">
+          <a-form-item :label="$t('message.signalName')" name="signal_id">
             <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
           </a-form-item>
           <a-form-item label="聚合方式" name="reduce">
