@@ -10,6 +10,14 @@ import (
 	"net/http"
 )
 
+// SendCreateMqttMessage 向指定节点发送创建MQTT客户端的请求
+//
+// 参数：
+// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+// param string - 创建MQTT客户端的参数
+//
+// 返回值：
+// bool - 发送请求是否成功，成功返回true，失败返回false
 func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 
 	url := fmt.Sprintf("http://%s:%d/create_mqtt", node.Host, node.Port)
@@ -30,12 +38,6 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 		_ = Body.Close()
 	}(resp.Body)
 
-	//bodyBytes, err := ioutil.ReadAll(resp.Body)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//bodyString := string(bodyBytes)
-
 	buf := new(bytes.Buffer)
 	_, _ = buf.ReadFrom(resp.Body)
 	bodyString := buf.String()
@@ -52,6 +54,14 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 
 }
 
+// SendBeat 向指定节点发送心跳请求
+//
+// 参数：
+// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+// param string - 心跳请求参数
+//
+// 返回值：
+// bool - 发送心跳请求是否成功，成功返回true，失败返回false
 func SendBeat(node *NodeInfo, param string) bool {
 
 	url := fmt.Sprintf("http://%s:%d/beat", node.Host, node.Port)
@@ -98,6 +108,13 @@ func HttpBeat(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintf(w, "ok")
 }
 
+// CreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+// 参数：
+//
+//	w http.ResponseWriter: HTTP响应的写入对象
+//	r *http.Request: HTTP请求对象
+//
+// 返回值：无
 func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	// 确保请求方法是POST
 	if r.Method != http.MethodPost {
@@ -116,13 +133,6 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 读取请求体
-	//body, err := ioutil.ReadAll(r.Body)
-
-	//if err != nil {
-	//	http.Error(w, "Error reading request body", http.StatusInternalServerError)
-	//	return
-	//}
-
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
@@ -177,6 +187,11 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PubCreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+// 参数：
+// w: http.ResponseWriter类型，HTTP响应的写入对象
+// r: *http.Request类型，HTTP请求对象
+// 返回值：无
 func PubCreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")

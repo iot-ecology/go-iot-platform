@@ -35,6 +35,9 @@ func HandlerWaring(messages <-chan amqp.Delivery) {
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
 
+// HandlerWaringString 是一个处理来自AMQP的报警信息的函数
+// 参数d是AMQP的交付对象
+// 函数返回一个布尔值，表示处理是否成功
 func HandlerWaringString(d amqp.Delivery) bool {
 	var data []DataRowList
 	err := json.Unmarshal(d.Body, &data)

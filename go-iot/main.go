@@ -64,9 +64,7 @@ func CBeat() {
 		if lock.TryLock() {
 			service, err := GetThisTypeService()
 			if err == nil {
-				if processHeartbeats(service) {
-					return
-				}
+				processHeartbeats(service)
 			}
 			lock.Unlock()
 
@@ -83,10 +81,7 @@ func CBeat() {
 //
 // 参数：
 // service []NodeInfo - 节点信息切片，包含待处理的心跳信息
-//
-// 返回值：
-// bool - 若成功处理某个节点的心跳信息则返回true，否则返回false
-func processHeartbeats(service []NodeInfo) bool {
+func processHeartbeats(service []NodeInfo) {
 	for _, info := range service {
 		if !SendBeat(&info, "beat") {
 			globalRedisClient.HDel(context.Background(), "register:"+globalConfig.NodeInfo.Type, info.Name)
@@ -94,7 +89,6 @@ func processHeartbeats(service []NodeInfo) bool {
 		}
 
 	}
-	return false
 }
 
 // HandlerOffNode 函数用于处理节点下线的情况
@@ -193,6 +187,13 @@ func noHandlerConfig() {
 
 }
 
+// PubCreateMqttClientOp 函数用于创建MQTT客户端
+//
+// 参数：
+// conf string - MQTT客户端配置信息
+//
+// 返回值：
+// int - 创建MQTT客户端的结果，成功返回1，失败返回-1
 func PubCreateMqttClientOp(conf string) int {
 	lose := GetSizeLose("")
 
