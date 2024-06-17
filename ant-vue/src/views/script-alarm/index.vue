@@ -2,8 +2,8 @@
   <div>
     <a-card title="" :bordered="true">
       <a-form layout="inline" :model="formState">
-        <a-form-item label="名称">
-          <a-input v-model:value="formState.name" style="width: 300px" placeholder="请输入" />
+        <a-form-item :label="$t('message.name')">
+          <a-input v-model:value="formState.name" style="width: 300px" :placeholder="$t('message.pleaseEnter')" />
         </a-form-item>
         <a-form-item>
           <a-button type="primary" @click="listPage">{{ $t('message.search') }}</a-button>
@@ -16,9 +16,9 @@
             <div class="editable-row-operations">
               <span>
                 <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a>
-                <a style="margin-left: 10px" @click="onWaringHistory(record)">报警历史</a>
-                <a style="margin-left: 10px" @click="onGo(record.ID)">参数配置</a>
-                <a style="margin-left: 10px" @click="onScript(record.ID)">调试脚本</a>
+                <a style="margin-left: 10px" @click="onWaringHistory(record)">{{ $t('message.alarmHistory') }}</a>
+                <a style="margin-left: 10px" @click="onGo(record.ID)">{{ $t('message.parameterConfiguration') }}</a>
+                <a style="margin-left: 10px" @click="onScript(record.ID)">{{ $t('message.debuggingScripts') }}</a>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(record.ID)">
                   <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
                 </a-popconfirm>
@@ -30,35 +30,35 @@
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
         <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
-          <a-form-item label="名称" name="name">
+          <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 300px" />
           </a-form-item>
-          <a-form-item label="脚本" name="script">
+          <a-form-item :label="$t('message.script')" name="script">
             <a-tooltip placement="right">
               <template #title>
                 <span @click="onCopy">{{ scr }}</span>
               </template>
-              <div style="cursor: pointer; width: 60px; line-height: 32px">示列脚本</div>
+              <div style="cursor: pointer; width: 60px; line-height: 32px">{{ $t('message.listScript') }}</div>
             </a-tooltip>
             <codemirror v-model="form.script" placeholder="Code here..." :style="{ width: '300px', height: '150px' }" :tab-size="2" :extensions="extensions" />
           </a-form-item>
         </a-form>
         <template #footer>
           <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
-          <a-button :disabled="loading" type="primary" @click="onAddUpdateData()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddUpdateData()">{{$t('message.confirm')}}</a-button>
         </template>
       </a-modal>
 
       <!--  调试脚本    -->
       <a-modal v-model:open="modalScript" :destroy-on-close="true" class="custom-modal">
         <a-form ref="formRef" :label-col="{ style: { width: '100px' } }">
-          <a-form-item label="模拟参数" name="script">
+          <a-form-item :label="$t('message.simulatedParameters')" name="script">
             <codemirror v-model="mockScript" placeholder="Code here..." :style="{ width: '340px', height: '300px' }" :tab-size="2" :extensions="extensions" />
           </a-form-item>
         </a-form>
         <template #footer>
           <a-button @click="modalScript = false">{{$t('message.cancel')}}</a-button>
-          <a-button :disabled="loading" type="primary" @click="onConfirm()">执行</a-button>
+          <a-button :disabled="loading" type="primary" @click="onConfirm()">{{$t('message.implement')}}</a-button>
         </template>
       </a-modal>
 
@@ -73,14 +73,14 @@
         </a-spin>
         <template #footer>
           <a-button v-if="!showSpinning" @click="modalDate = false">{{$t('message.cancel')}}</a-button>
-          <a-button :loading="showSpinning" type="primary" @click="getQueryRow()">确定</a-button>
+          <a-button :loading="showSpinning" type="primary" @click="getQueryRow()">{{$t('message.confirm')}}</a-button>
         </template>
       </a-modal>
 
       <!--      报警历史-->
-      <a-modal v-model:open="modalResult" style="width: 600px" :footer="null" :destroy-on-close="true" title="报警历史">
+      <a-modal v-model:open="modalResult" style="width: 600px" :footer="null" :destroy-on-close="true" :title="$t('message.alarmHistory')">
         <a-tabs>
-          <a-tab-pane key="1" tab="表格">
+          <a-tab-pane key="1" :tab="$t('message.table')">
             <a-table bordered :pagination="false" :data-source="dataResult" :columns="columnsResult">
               <template #bodyCell="{ column, text, record }">
                 <template v-if="column.dataIndex === 'param' || column.dataIndex === 'script'">
@@ -93,7 +93,7 @@
               </template>
             </a-table>
           </a-tab-pane>
-          <a-tab-pane key="2" tab="折线图">
+          <a-tab-pane key="2" :tab="$t('message.lineChart')">
             <div>
               <div v-if="!option.series[0].data?.length" style="height: 223px; text-align: center; font-size: 18px">{{ $t('message.noData') }}</div>
               <YcECharts v-else :option="option" :height="300" />
@@ -103,14 +103,14 @@
       </a-modal>
 
       <!--      脚本-->
-      <a-modal v-model:open="modalDetail" :footer="null" title="详情">
+      <a-modal v-model:open="modalDetail" :footer="null" :title="$t('message.details')">
         <codemirror v-model="scriptDetail" placeholder="Code here..." :style="{ width: '300px', height: '150px' }" :tab-size="2" :extensions="extensions" />
       </a-modal>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-import {h, onMounted, reactive, ref} from "vue";
+import {h, onMounted, reactive, ref,watch} from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
 import { type FormInstance, message } from "ant-design-vue";
@@ -123,36 +123,39 @@ import { SignalDelayWaringCreate, SignalDelayWaringDelete, SignalDelayWaringGenP
 import { YcECharts } from "@/components";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
+import {useI18n} from "vue-i18n";
 const { toClipboard } = useClipboard();
+
+const { t,locale } = useI18n();
 const copyText = async (text: any) => {
   try {
     await toClipboard(text);
-    message.success("复制成功");
+    message.success(t('message.copySuccess'));
   } catch (e) {
     console.error(e);
   }
 };
 
 const jump = useRouteJump();
-const rules: Record<string, Rule[]> = {
-  name: [{ required: true, message: "请输入名称", trigger: "blur" }],
-  script: [{ required: true, message: "请输入脚本", trigger: "blur" }],
-  date: [{ required: true, message: "请选择时间", trigger: "change" }],
+let rules: Record<string, Rule[]> = {
+  name: [{ required: true, message: t('message.copySuccess'), trigger: "blur" }],
+  script: [{ required: true, message: t('message.pleaseScript'), trigger: "blur" }],
+  date: [{ required: true, message: t('message.pleaseTime'), trigger: "change" }],
 };
 const showSpinning = ref(false);
 const routerStore = useRouterNameStore();
-const title = ref("新增");
+const title = ref(t('message.addition'));
 const columns = ref([
   {
-    title: "名称",
+    title: t('message.name'),
     dataIndex: "name",
   },
   {
-    title: "脚本",
+    title: t('message.script'),
     dataIndex: "script",
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
 ]);
@@ -181,26 +184,26 @@ const modalResult = ref(false);
 const dataResult = ref([]);
 const columnsResult = ref([
   {
-    title: "上报时间",
+    title: t('message.reportingTime'),
     dataIndex: "up_time",
   },
   {
-    title: "是否符合规则",
+    title: t('message.complyRules'),
     dataIndex: "value",
     customRender: ({ text }) => {
-      return h("span", text ? "是" : "否");
+      return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
   {
-    title: "处理时间",
+    title: t('message.processingTime'),
     dataIndex: "insert_time",
   },
   {
-    title: "参数",
+    title: t('message.parameter'),
     dataIndex: "param",
   },
   {
-    title: "脚本",
+    title: t('message.script'),
     dataIndex: "script",
   },
 ]);
@@ -242,9 +245,56 @@ const myTheme = EditorView.theme(
   { dark: true },
 );
 const extensions = [javascript(), myTheme, EditorView.lineWrapping];
+
+watch(locale, () => {
+  columns.value = [
+    {
+      title: t('message.name'),
+      dataIndex: "name",
+    },
+    {
+      title: t('message.script'),
+      dataIndex: "script",
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    }]
+  rules = {
+    name: [{ required: true, message: t('message.copySuccess'), trigger: "blur" }],
+    script: [{ required: true, message: t('message.pleaseScript'), trigger: "blur" }],
+    date: [{ required: true, message: t('message.pleaseTime'), trigger: "change" }]
+  },
+  columnsResult.value = [
+    {
+      title: t('message.reportingTime'),
+      dataIndex: "up_time",
+    },
+    {
+      title: t('message.complyRules'),
+      dataIndex: "value",
+      customRender: ({ text }) => {
+        return h("span", text ? t('message.yes') : t('message.no'));
+      },
+    },
+    {
+      title: t('message.processingTime'),
+      dataIndex: "insert_time",
+    },
+    {
+      title: t('message.parameter'),
+      dataIndex: "param",
+    },
+    {
+      title: t('message.script'),
+      dataIndex: "script",
+    },
+  ]
+});
+
 const onAdd = () => {
   modalVisible.value = true;
-  title.value = "新增";
+  title.value = t('message.addition');
 };
 const paginations = reactive({
   total: 0,
@@ -262,7 +312,7 @@ const onCopy = () => {
 };
 const confirm = async (record: any) => {
   modalVisible.value = true;
-  title.value = "编辑";
+  title.value = t('message.edit');
   form.id = record.ID;
   form.name = record.name;
   form.script = record.script;
@@ -277,13 +327,13 @@ const onAddUpdateData = () => {
   formRef.value
     .validate()
     .then(() => {
-      if (title.value === "新增") {
+      if (title.value === t('message.addition')) {
         const data = { ...form };
         delete data.id;
         SignalDelayWaringCreate(data).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
-            message.success("新增成功");
+            message.success(t('message.newSuccessfullyAdded'));
             formRef.value?.resetFields();
             await listPage();
           } else {
@@ -296,7 +346,7 @@ const onAddUpdateData = () => {
         SignalDelayWaringUpdate(form).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
-            message.success("编辑成功");
+            message.success(t('message.editSuccessful'));
             await listPage();
           } else {
             message.error(data.message);
@@ -337,7 +387,7 @@ const onScript = (id: number) => {
 const onConfirm = () => {
   SignalDelayWaringMock(mockId.value)
     .then(({ data }) => {
-      message.success("执行结果:" + data.data);
+      message.success(`${t('message.resultsOfEnforcement')}:` + data.data);
       modalScript.value = false;
     })
     .catch(e => {

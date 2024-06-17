@@ -2,7 +2,7 @@
   <div>
     <a-card title="" :bordered="true">
       <a-form layout="inline" :model="formState">
-        <a-form-item label="脚本报警">
+        <a-form-item :label="$t('message.scriptAlarm')">
           <SignalDelayWaring v-model="form.signal_delay_waring_id" style="width: 300px" />
         </a-form-item>
         <a-form-item>
@@ -40,7 +40,7 @@
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
                 <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
-                <a-popconfirm :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
+                <a-popconfirm :okText="$t('message.yes')" :cancelText="$t('message.no')" :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
                   <a>{{$t('message.cancel')}}</a>
                 </a-popconfirm>
               </span>
@@ -57,10 +57,10 @@
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
         <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
-          <a-form-item label="名称" name="name">
+          <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
-          <a-form-item label="客户端ID" name="mqtt_client_id">
+          <a-form-item :label="$t('message.clientID')" name="mqtt_client_id">
             <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
           <a-form-item :label="$t('message.signalName')" name="signal_id">
@@ -69,7 +69,7 @@
         </a-form>
         <template #footer>
           <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
-          <a-button :disabled="loading" type="primary" @click="onAddData()">确定</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddData()">{{$t('message.confirm')}}</a-button>
         </template>
       </a-modal>
     </a-card>
@@ -83,13 +83,15 @@ import { cloneDeep } from "lodash-es";
 
 import { SignalDelayWaringParamCreate, SignalDelayWaringParamDelete, SignalDelayWaringParamPage, SignalDelayWaringParamUpdate } from "@/api";
 import { MqttSelect, SignalDelayWaring, SignalSelect } from "@/components/index.ts";
+import {useI18n} from "vue-i18n";
 
 interface DataItem {
   name: string;
   mqtt_client_id: string;
   signal_id: string;
 }
-const rules: Record<string, Rule[]> = {
+const { t,locale } = useI18n();
+let rules: Record<string, Rule[]> = {
   name: [
     {
       required: true,
@@ -97,46 +99,46 @@ const rules: Record<string, Rule[]> = {
         if (value) {
           await Promise.resolve();
         } else {
-          await Promise.reject("请输入名称");
+          await Promise.reject(t('message.pleaseName'));
         }
         if (/^[A-Za-z]/.test(value)) {
           await Promise.resolve();
         } else {
-          await Promise.reject("名称必须以英文字母开头");
+          await Promise.reject(t('message.startWithAnEnglish'));
         }
       },
       trigger: "blur",
     },
   ],
-  mqtt_client_id: [{ required: true, message: "请选择客户端ID", trigger: "change" }],
-  signal_id: [{ required: true, message: "请选择信号名称", trigger: "change" }],
+  mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+  signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
 };
-const title = ref("新增");
+const title = ref(t('message.addition'));
 const columns = ref([
   {
-    title: "ID",
+    title: t('message.uniCode'),
     dataIndex: "ID",
   },
   {
-    title: "名称",
+    title: t('message.name'),
     dataIndex: "name",
   },
   {
-    title: "客户端ID",
+    title: t('message.clientID'),
     dataIndex: "mqtt_client_id",
     render: ({ record }) => {
       return record.mqtt_client_name;
     },
   },
   {
-    title: "信号名称",
+    title: t('message.signalName'),
     dataIndex: "signal_id",
     render: ({ record }) => {
       return record.signal_name;
     },
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
 ]);
@@ -174,10 +176,62 @@ watch(
     formRef.value.clearValidate("signal_id");
   },
 );
+watch(locale, () => {
+  columns.value = [
+    {
+      title: t('message.uniCode'),
+      dataIndex: "ID",
+    },
+    {
+      title: t('message.name'),
+      dataIndex: "name",
+    },
+    {
+      title: t('message.clientID'),
+      dataIndex: "mqtt_client_id",
+      render: ({ record }) => {
+        return record.mqtt_client_name;
+      },
+    },
+    {
+      title: t('message.signalName'),
+      dataIndex: "signal_id",
+      render: ({ record }) => {
+        return record.signal_name;
+      },
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    },
+  ]
+  rules = {
+    name: [
+      {
+        required: true,
+        validator: async (rule, value) => {
+          if (value) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.pleaseName'));
+          }
+          if (/^[A-Za-z]/.test(value)) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.startWithAnEnglish'));
+          }
+        },
+        trigger: "blur",
+      },
+    ],
+    mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+    signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }]
+  }
+});
 
 const onAdd = () => {
   modalVisible.value = true;
-  title.value = "新增";
+  title.value = t('message.addition');
 };
 const paginations = reactive({
   total: 0,
@@ -216,13 +270,13 @@ const onAddData = () => {
   formRef.value
     .validate()
     .then(() => {
-      if (title.value === "新增") {
+      if (title.value === t('message.addition')) {
         const data = { ...form };
         delete data.id;
         SignalDelayWaringParamCreate(data).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
-            message.success("新增成功");
+            message.success(t('message.newSuccessfullyAdded'));
             formRef.value?.resetFields();
             await pageList();
           } else {
@@ -235,7 +289,7 @@ const onAddData = () => {
         SignalDelayWaringParamUpdate(form).then(async ({ data }) => {
           if (data.code === 20000) {
             modalVisible.value = false;
-            message.success("编辑成功");
+            message.success(t('message.editSuccessful'));
             await pageList();
           } else {
             message.error(data.message);
@@ -262,11 +316,11 @@ const save = async (key: string) => {
   delete editableData[key];
   // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
-    message.error("客户端ID和信号名称必选");
+    message.error(t('message.clientSignal'));
     return;
   }
   if (!englishLetterRegex.test(data.name.charAt(0))) {
-    message.error("名称必须以英文字母开头");
+    message.error(t('message.startWithAnEnglish'));
     return;
   }
 

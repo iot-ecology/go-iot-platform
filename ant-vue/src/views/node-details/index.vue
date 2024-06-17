@@ -8,13 +8,13 @@
 
     <!--      详情-->
     <a-modal v-model:open="showResult" style="width: 700px" :footer="null" :destroy-on-close="true" title="">
-      <a-divider>节点信息</a-divider>
+      <a-divider>{{ $t('message.nodeInformation') }}</a-divider>
       <a-descriptions title="" bordered>
-        <a-descriptions-item label="名称">{{ form.name }}</a-descriptions-item>
-        <a-descriptions-item label="当前容量">{{ form.size }}</a-descriptions-item>
-        <a-descriptions-item label="最大容量">{{ form.max_size }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('message.name')">{{ form.name }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('message.currentCapacity')">{{ form.size }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('message.maximumCapacity')">{{ form.max_size }}</a-descriptions-item>
       </a-descriptions>
-      <a-divider>客户端信息</a-divider>
+      <a-divider>{{ $t('message.clientInformation') }}</a-divider>
       <a-table bordered :pagination="false" :data-source="dataResult" :columns="columnsResult">
         <template #bodyCell="{ column, text, record }">
           <template v-if="column.dataIndex === 'password' || column.dataIndex === 'broker'">
@@ -26,42 +26,73 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 
 import { MqttNodeUsingStatus } from "@/api";
 import { YcECharts } from "@/components";
+import {useI18n} from "vue-i18n";
 
+const { t,locale } = useI18n();
 const myEcharts = ref(null);
 const list = ref("");
 const showResult = ref(false);
 const dataResult = ref([]);
 const columnsResult = ref([
   {
-    title: "客户端ID",
+    title: t('message.clientID'),
     dataIndex: "client_id",
   },
   {
-    title: "主机",
+    title: t('message.host'),
     dataIndex: "broker",
   },
   {
-    title: "端口",
+    title: t('message.port'),
     dataIndex: "port",
   },
   {
-    title: "账号",
+    title: t('message.account'),
     dataIndex: "username",
   },
   {
-    title: "密码",
+    title: t('message.password'),
     dataIndex: "password",
   },
   {
-    title: "订阅的主题",
+    title: t('message.theme'),
     dataIndex: "sub_topic",
   },
 ]);
 const form = reactive({ name: "", size: "", max_size: "" });
+
+watch(locale, () => {
+  columnsResult.value = [
+    {
+      title: t('message.clientID'),
+      dataIndex: "client_id",
+    },
+    {
+      title: t('message.host'),
+      dataIndex: "broker",
+    },
+    {
+      title: t('message.port'),
+      dataIndex: "port",
+    },
+    {
+      title: t('message.account'),
+      dataIndex: "username",
+    },
+    {
+      title: t('message.password'),
+      dataIndex: "password",
+    },
+    {
+      title: t('message.theme'),
+      dataIndex: "sub_topic",
+    },
+  ]
+});
 const getNode = async () => {
   const { data } = await MqttNodeUsingStatus();
   list.value = JSON.parse(data.data).data;

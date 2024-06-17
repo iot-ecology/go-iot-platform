@@ -9,7 +9,7 @@
           <!-- 单路由 -->
           <template v-else-if="menu.children?.length">
             <a-menu-item :key="menu.path">
-              {{ menu.meta?.title }}
+              {{ getMetaTitle(menu.meta?.title) }}
             </a-menu-item>
           </template>
           <!-- 有子路由 -->
@@ -42,6 +42,7 @@ import { useRouter } from "vue-router";
 import type { MenuClickEventHandler } from "ant-design-vue/lib/menu/src/interface";
 import { useI18n } from 'vue-i18n';
 import { useRouterNameStore } from "@/stores/routerPath.ts";
+import {getMetaTitle} from "@/utils/i18n.ts";
 
 const router = useRouter();
 const routes = router.options.routes;

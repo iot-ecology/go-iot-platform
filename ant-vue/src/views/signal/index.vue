@@ -21,8 +21,8 @@
               <a-switch
                 v-if="editableData[record.key] && column.dataIndex === 'in_or_out'"
                 v-model:checked="editableData[record.key][column.dataIndex]"
-                checked-children="内报警"
-                un-checked-children="外报警"
+                :checked-children="$t('message.internalAlarm')"
+                :un-checked-children="$t('message.externalAlarm')"
               />
               <a-input-number
                 v-else-if="editableData[record.key] && column.dataIndex == 'min'"
@@ -38,7 +38,7 @@
               />
               <template v-else>
                 <div v-if="column.dataIndex !== 'in_or_out'">{{ text }}</div>
-                <div v-else>{{ text ? "内报警" : "外报警" }}</div>
+                <div v-else>{{ text ? $t('message.internalAlarm') : $t('message.externalAlarm') }}</div>
               </template>
             </div>
           </template>

@@ -37,7 +37,7 @@
     </VueDraggable>
 
     <a-modal v-model:open="modalVisible" style="width: 35%" :title="$t('message.addition')">
-      <a-form ref="formRef" :label-col="{ style: { width: '110px' } }" :model="form" :rules="rules" name="nest-messages">
+      <a-form ref="formRef" :label-col="{ style: { width: '130px' } }" :model="form" :rules="rules" name="nest-messages">
         <a-form-item :label="$t('message.time')">
           <a-tabs v-model:activeKey="activeKey">
             <a-tab-pane key="1" :tab="$t('message.dynamicTime')">
@@ -100,7 +100,7 @@
       </a-form>
       <template #footer>
         <a-button @click="modalVisible = false">{{$t('message.cancel')}}</a-button>
-        <a-button type="primary" @click="onConfirm()">{$t('message.confirm')}}</a-button>
+        <a-button type="primary" @click="onConfirm()">{{$t('message.confirm')}}</a-button>
       </template>
     </a-modal>
 
@@ -114,7 +114,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref ,watch} from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import { useRoute, useRouter } from "vue-router";
 import { type FormInstance, message } from "ant-design-vue";
@@ -127,7 +127,8 @@ import { CaretRightOutlined, CloseCircleTwoTone } from "@ant-design/icons-vue";
 import { DashboardCreate, DashboardId, DashboardUpdate, QueryInfluxdb, SignalPage } from "@/api";
 import { YcECharts } from "@/components";
 import { MqttSelect, SignalModeSelect } from "@/components/index.ts";
-
+import {useI18n} from "vue-i18n";
+const { t,locale } = useI18n();
 interface Item {
   id?: number;
   name: string;
@@ -172,23 +173,32 @@ const router = useRouter();
 const route = useRoute();
 const optionList = ref([]);
 const customStyle = "background: #f7f7f7;border-radius: 4px;margin-bottom: 24px;border: 0;overflow: hidden";
-const rules: Record<string, Rule[]> = {
-  client_id: [{ required: true, message: "请选择客户端ID", trigger: "change" }],
-  fields: [{ required: true, message: "请选择信号配置名称", trigger: "change" }],
-  every: [{ required: true, message: "请输入时间间隔（秒）", trigger: "blur" }],
-  function: [{ required: true, message: "请选择统计方式", trigger: "change" }],
-  create_empty: [{ required: true, message: "请选择是否创建空值", trigger: "change" }],
+let rules: Record<string, Rule[]> = {
+  client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+  fields: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
+  every: [{ required: true, message: t('message.pleaseTimeInterval'), trigger: "blur" }],
+  function: [{ required: true, message: t('message.pleaseStatisticalMethod'), trigger: "change" }],
+  create_empty: [{ required: true, message: t('message.pleaseChooseValue'), trigger: "change" }],
 };
 const pageSize = 2000
 const reduces = {
-  mean: "平均值",
-  sum: "求和",
-  min: "最小值",
-  max: "最大值",
-  原始: "原始",
-  first: "首条",
-  last: "尾条",
+  mean: t('message.mean'),
+  sum: t('message.sum'),
+  min: t('message.max'),
+  max: t('message.min'),
+  原始: t('message.original'),
+  first: t('message.first'),
+  last: t('message.last'),
 };
+watch(locale, () => {
+  rules = {
+    client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+    fields: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
+    every: [{ required: true, message: t('message.pleaseTimeInterval'), trigger: "blur" }],
+    function: [{ required: true, message: t('message.pleaseStatisticalMethod'), trigger: "change" }],
+    create_empty: [{ required: true, message: t('message.pleaseChooseValue'), trigger: "change" }],
+  }
+});
 
 if (route.query.id) {
   DashboardId(route.query.id).then(({ data }) => {
@@ -209,7 +219,7 @@ if (route.query.id) {
 const onCopy = (item: any) => {
   const obj = cloneDeep(item);
   const { name, show, param, chart } = obj;
-  listArr.value.push({ name: name + "（复制）", show, param, chart, showSpinning: false });
+  listArr.value.push({ name: name + `（${t('message.copy')}）`, show, param, chart, showSpinning: false });
 };
 
 function onAdd() {
@@ -277,12 +287,12 @@ const onConfirm = () => {
     start_time = dayjs().subtract(dateTime.value, dateUnit.value).unix();
   }
   if (activeKey.value === "1" && !dateTime.value) {
-    message.error("请选择时间");
+    message.error(t('message.pleaseTime'));
     return;
   }
 
   if (activeKey.value === "2" && !(form.start_time && form.end_time)) {
-    message.error("请选择时间");
+    message.error(t('message.pleaseTime'));
     return;
   }
   const series: any = [];

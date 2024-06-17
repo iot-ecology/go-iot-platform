@@ -2,7 +2,7 @@
   <div class="comp-preview">
     <a-card :bordered="true">
       <a-form layout="inline">
-        <a-form-item label="计算规则">
+        <a-form-item :label="$t('message.calculationRules')">
           <CalculateSelect v-model="form.calc_rule_id"></CalculateSelect>
         </a-form-item>
         <a-form-item>
@@ -21,11 +21,11 @@
                 style="margin: -5px 0"
               />
               <a-select v-else-if="editableData[record.key] && column.dataIndex == 'reduce'" v-model:value="editableData[record.key][column.dataIndex]" style="width: 200px">
-                <a-select-option value="mean">平均值</a-select-option>
-                <a-select-option value="sum">求和</a-select-option>
-                <a-select-option value="min">最小值</a-select-option>
-                <a-select-option value="max">最大值</a-select-option>
-                <a-select-option value="原始">原始</a-select-option>
+                <a-select-option value="mean">{{ $t('message.mean') }}</a-select-option>
+                <a-select-option value="sum">{{ $t('message.sum') }}</a-select-option>
+                <a-select-option value="min">{{ $t('message.min') }}</a-select-option>
+                <a-select-option value="max">{{ $t('message.max') }}</a-select-option>
+                <a-select-option value="原始">{{ $t('message.original') }}</a-select-option>
               </a-select>
               <MqttSelect v-else-if="editableData[record.key] && column.dataIndex == 'mqtt_client_id'" v-model="editableData[record.key][column.dataIndex]"></MqttSelect>
               <SignalSelect
@@ -62,25 +62,25 @@
       </a-table>
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()" @cancel="clear()">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
-          <a-form-item label="名称" name="name">
+        <a-form ref="formRef" :label-col="{ style: { width: '110px' } }" :rules="rules" :model="form">
+          <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
-          <a-form-item label="客户端ID" name="mqtt_client_id">
+          <a-form-item :label="$t('message.clientID')" name="mqtt_client_id">
             <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
           <a-form-item :label="$t('message.signalName')" name="signal_id">
             <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
           </a-form-item>
-          <a-form-item label="聚合方式" name="reduce">
+          <a-form-item :label="$t('message.aggregationMethod')" name="reduce">
             <a-select v-model:value="form.reduce" style="width: 350px">
-              <a-select-option value="mean">平均值</a-select-option>
-              <a-select-option value="sum">求和</a-select-option>
-              <a-select-option value="min">最小值</a-select-option>
-              <a-select-option value="max">最大值</a-select-option>
-              <a-select-option value="原始">原始</a-select-option>
-              <a-select-option value="first">首条</a-select-option>
-              <a-select-option value="last">尾条</a-select-option>
+              <a-select-option value="mean">{{ $t('message.mean') }}</a-select-option>
+              <a-select-option value="sum">{{ $t('message.sum') }}</a-select-option>
+              <a-select-option value="min">{{ $t('message.min') }}</a-select-option>
+              <a-select-option value="max">{{ $t('message.max') }}</a-select-option>
+              <a-select-option value="原始">{{ $t('message.original') }}</a-select-option>
+              <a-select-option value="first">{{ $t('message.first') }}</a-select-option>
+              <a-select-option value="last">{{ $t('message.last') }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-form>
@@ -98,6 +98,7 @@ import { cloneDeep } from "lodash-es";
 
 import { CalcParamCreate, CalcParamDelete, CalcParamPage, CalcParamUpdate } from "@/api";
 import { CalculateSelect, MqttSelect, SignalSelect } from "@/components/index.ts";
+import {useI18n} from "vue-i18n";
 
 interface DataItem {
   name: string;
@@ -105,7 +106,8 @@ interface DataItem {
   signal_name: string;
   reduce: string;
 }
-const rules: Record<string, Rule[]> = {
+const { t,locale } = useI18n();
+let rules: Record<string, Rule[]> = {
   name: [
     {
       required: true,
@@ -113,58 +115,58 @@ const rules: Record<string, Rule[]> = {
         if (value) {
           await Promise.resolve();
         } else {
-          await Promise.reject("请输入名称");
+          await Promise.reject(t('message.pleaseName'));
         }
         if (/^[A-Za-z]/.test(value)) {
           await Promise.resolve();
         } else {
-          await Promise.reject("名称必须以英文字母开头");
+          await Promise.reject(t('message.startWithAnEnglish'));
         }
       },
       trigger: "blur",
     },
   ],
-  mqtt_client_id: [{ required: true, message: "请选择客户端ID", trigger: "change" }],
-  signal_id: [{ required: true, message: "请选择信号名称", trigger: "change" }],
-  reduce: [{ required: true, message: "请选择聚合方式", trigger: "change" }],
+  mqtt_client_id: [{ required: true, message: t('message.pleaseClientID'), trigger: "change" }],
+  signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
+  reduce: [{ required: true, message: t('message.pleaseAggregationMethod'), trigger: "change" }],
 };
 const formRef = ref<FormInstance>();
 const modalVisible = ref(false);
 const form = reactive({ calc_rule_id: "", mqtt_client_id: "", signal_id: "", signal_name: "", name: "", reduce: "" });
-const columns = [
+let columns = [
   {
-    title: "名称",
+    title: t('message.name'),
     dataIndex: "name",
   },
   {
-    title: "客户端ID",
+    title: t('message.clientID'),
     dataIndex: "mqtt_client_id",
     render: ({ record }) => {
       return record.mqtt_client_name;
     },
   },
   {
-    title: "信号名称",
+    title: t('message.signalName'),
     dataIndex: "signal_name",
   },
   {
-    title: "聚合方式",
+    title: t('message.aggregationMethod'),
     dataIndex: "reduce",
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
 ];
 const list = ref([]);
 const reduces = {
-  mean: "平均值",
-  sum: "求和",
-  min: "最小值",
-  max: "最大值",
-  原始: "原始",
-  first: "首条",
-  last: "尾条",
+  mean: t('message.mean'),
+  sum: t('message.sum'),
+  min: t('message.max'),
+  max: t('message.min'),
+  原始: t('message.original'),
+  first: t('message.first'),
+  last: t('message.last'),
 };
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 const paginations = reactive({
@@ -191,6 +193,55 @@ watch(
     formRef.value.clearValidate("signal_id");
   },
 );
+watch(locale, () => {
+  columns = [
+    {
+    title: t('message.name'),
+    dataIndex: "name",
+    },
+    {
+      title: t('message.clientID'),
+      dataIndex: "mqtt_client_id",
+      render: ({ record }) => {
+        return record.mqtt_client_name;
+      },
+    },
+    {
+      title: t('message.signalName'),
+      dataIndex: "signal_name",
+    },
+    {
+      title: t('message.aggregationMethod'),
+      dataIndex: "reduce",
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    }]
+  rules = {
+    name: [
+      {
+        required: true,
+        validator: async (rule, value) => {
+          if (value) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.pleaseName'));
+          }
+          if (/^[A-Za-z]/.test(value)) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.startWithAnEnglish'));
+          }
+        },
+        trigger: "blur",
+      },
+    ],
+    mqtt_client_id: [{ required: true, message: t('message.pleaseClientID'), trigger: "change" }],
+    signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
+    reduce: [{ required: true, message: t('message.pleaseAggregationMethod'), trigger: "change" }],
+  }
+});
 
 const onAddData = () => {
   formRef.value
@@ -204,7 +255,7 @@ const onAddData = () => {
           await pageList();
         } else {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          message.error(`操作失败:${data.data}`);
+          message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       });
     }).catch(e=>{
@@ -225,7 +276,7 @@ const save = async (key: string) => {
   delete editableData[key];
   // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
-    message.error("客户端ID和信号名称必选");
+    message.error(t('message.clientSignal'));
     await pageList();
     return;
   }

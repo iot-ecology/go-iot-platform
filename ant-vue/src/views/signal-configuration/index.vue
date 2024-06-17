@@ -29,7 +29,8 @@
                 />
                 <a-input v-else-if="editableData[record.key] && column.dataIndex !== 'type'" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
                 <template v-else>
-                  {{ text }}
+                  <div v-if="column.dataIndex == 'type'">{{ text==='数字' ? t('message.number') : t('message.text') }}</div>
+                  <div v-else>{{ text }}</div>
                 </template>
               </div>
             </template>
@@ -57,31 +58,31 @@
 
         <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
           <a-form ref="formRef" :label-col="{ style: { width: '80px' } }" :rules="rules" :model="form">
-            <a-form-item label="客户端ID" name="mqtt_client_id">
+            <a-form-item :label="$t('message.clientID')" name="mqtt_client_id">
               <MqttModSelect v-model="form.mqtt_client_id" :client-id="value" style="width: 350px"></MqttModSelect>
             </a-form-item>
-            <a-form-item label="名称" name="name">
+            <a-form-item :label="$t('message.name')" name="name">
               <a-input v-model:value="form.name" style="width: 350px" />
             </a-form-item>
-            <a-form-item label="类型" name="type">
+            <a-form-item :label="$t('message.type')" name="type">
               <a-select v-model:value="form.type" style="width: 350px">
                 <a-select-option value="文本">{{ $t('message.text') }}</a-select-option>
                 <a-select-option value="数字">{{ $t('message.number') }}</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="别名" name="alias">
+            <a-form-item :label="$t('message.alias')" name="alias">
               <a-input v-model:value="form.alias" style="width: 350px"></a-input>
             </a-form-item>
-            <a-form-item label="缓存大小" name="cache_size">
+            <a-form-item :label="$t('message.cacheSize')" name="cache_size">
               <a-input-number v-model:value="form.cache_size" :min="1" :precision="0" style="width: 350px"></a-input-number>
             </a-form-item>
-            <a-form-item label="单位" name="unit">
+            <a-form-item :label="$t('message.unit')" name="unit">
               <a-input v-model:value="form.unit" style="width: 350px"></a-input>
             </a-form-item>
           </a-form>
         </a-modal>
 
-        <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalView" style="width: 60%" title="近三十天数据" @ok="modalView = false">
+        <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalView" style="width: 60%" :title="$t('message.thirtyDays')" @ok="modalView = false">
           <a-form :model="form">
             <div v-if="!option.series?.length" style="text-align: center; font-size: 18px; height: 200px">{{ $t('message.noData') }}</div>
             <YcECharts v-else :option="option" :height="300" />
@@ -105,7 +106,7 @@
 
 <script setup lang="ts">
 import type { UnwrapRef } from "vue";
-import {h, reactive, ref, watch} from "vue";
+import {h,reactive, ref, watch} from "vue";
 import { useRoute } from "vue-router";
 import { type FormInstance, message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";

@@ -158,7 +158,7 @@ interface DataItem {
 const copyText = async (text: string) => {
   try {
     await toClipboard(text);
-    message.success("复制成功");
+    message.success(t('message.copySuccess'));
   } catch (e) {
     console.error(e);
   }

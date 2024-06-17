@@ -1,15 +1,16 @@
 import Layout from "@/layout/index.vue";
+import {getMetaTitle} from  '@/utils/i18n.ts'
 export default [
   {
     path: "/mqtt-management",
     component: Layout,
-    meta: { title: "MQTT客户端管理" },
+    meta: { title: 'message.mqttManagement' },
     redirect: "/mqtt-management/index",
     children: [
       {
         path: "/mqtt-management/index",
         name: "IconPreview",
-        meta: { title: "MQTT客户端" },
+        meta: { title: "message.mqttManagement" },
         component: async () => await import("@/views/mqtt-management/index.vue"),
       },
     ],
@@ -17,13 +18,13 @@ export default [
   {
     path: "/signal-configuration",
     component: Layout,
-    meta: { title: "信号配置" },
+    meta: { title: "message.signalConfig" },
     redirect: "/signal-configuration/index",
     children: [
       {
         path: "/signal-configuration/index",
         name: "CompPreview",
-        meta: { title: "信号配置" },
+        meta: { title: "message.signalConfig" },
         component: async () => await import("@/views/signal-configuration/index.vue"),
       },
     ],
@@ -31,13 +32,13 @@ export default [
   {
     path: "/signal",
     component: Layout,
-    meta: { title: "信号报警配置" },
+    meta: { title: "message.SignalAlarmConfig" },
     redirect: "/signal/index",
     children: [
       {
         path: "/signal/index",
         name: "Signal",
-        meta: { title: "信号报警配置" },
+        meta: { title: "message.SignalAlarmConfig" },
         component: async () => await import("@/views/signal/index.vue"),
       },
     ],
@@ -45,7 +46,7 @@ export default [
   {
     path: "/visualization",
     component: Layout,
-    meta: { title: "可视化" },
+    meta: { title: "message.visualization" },
     redirect: "/visualization/index",
     children: [
       {
@@ -65,13 +66,13 @@ export default [
   {
     path: "/calculation-rules",
     component: Layout,
-    meta: { title: "计算规则" },
+    meta: { title: "message.calculationRules" },
     redirect: "/calculation-rules/index",
     children: [
       {
         path: "/calculation-rules/index",
         name: "calculation-rules",
-        meta: { title: "计算规则" },
+        meta: { title: "message.calculationRules" },
         component: async () => await import("@/views/calculation-rules/index.vue"),
       },
     ],
@@ -79,13 +80,13 @@ export default [
   {
     path: "/calculate-parameters",
     component: Layout,
-    meta: { title: "计算参数" },
+    meta: { title: "message.calculateParameters" },
     redirect: "/calculate-parameters/index",
     children: [
       {
         path: "/calculate-parameters/index",
         name: "calculate-parameters",
-        meta: { title: "计算参数" },
+        meta: { title: "message.calculateParameters" },
         component: async () => await import("@/views/calculate-parameters/index.vue"),
       },
     ],
@@ -93,13 +94,13 @@ export default [
   {
     path: "/script-alarm",
     component: Layout,
-    meta: { title: "脚本报警" },
+    meta: { title: "message.scriptAlarm" },
     redirect: "/script-alarm/index",
     children: [
       {
         path: "/script-alarm/index",
         name: "script-alarm",
-        meta: { title: "脚本报警" },
+        meta: { title: "message.scriptAlarm" },
         component: async () => await import("@/views/script-alarm/index.vue"),
       },
     ],
@@ -107,13 +108,13 @@ export default [
   {
     path: "/script-alarm-parameters",
     component: Layout,
-    meta: { title: "脚本报警参数" },
+    meta: { title: "message.scriptAlarmParameters" },
     redirect: "/script-alarm-parameters/index",
     children: [
       {
         path: "/script-alarm-parameters/index",
         name: "script-alarm-parameters",
-        meta: { title: "脚本报警参数" },
+        meta: { title: "message.scriptAlarmParameters" },
         component: async () => await import("@/views/script-alarm-parameters/index.vue"),
       },
     ],
@@ -121,13 +122,13 @@ export default [
   {
     path: "/node-details",
     component: Layout,
-    meta: { title: "节点详情" },
+    meta: { title: "message.nodeDetails" },
     redirect: "/node-details/index",
     children: [
       {
         path: "/node-details/index",
         name: "node-details",
-        meta: { title: "节点详情" },
+        meta: { title: "message.nodeDetails" },
         component: async () => await import("@/views/node-details/index.vue"),
       },
     ],
