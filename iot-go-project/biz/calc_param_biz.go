@@ -34,7 +34,7 @@ func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string,
 	db.Model(&models.CalcParam{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&rules)
 
 	for i, rule := range rules {
 		id, err := bizMqtt.FindById(strconv.Itoa(rule.MqttClientId))

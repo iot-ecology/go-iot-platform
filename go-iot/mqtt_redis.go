@@ -181,7 +181,7 @@ func FindMqttClientId(mqttClientId string) string {
 	background := context.Background()
 	result, err := globalRedisClient.Keys(background, "node_bind:*").Result()
 	if err != nil {
-
+		zap.S().Errorf("Error: %+v", err)
 	}
 	for _, elm := range result {
 		for _, storageMqttClientId := range globalRedisClient.SMembers(background, elm).Val() {

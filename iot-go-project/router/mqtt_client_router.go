@@ -33,11 +33,9 @@ func (s *MqttApi) CreateMqtt(c *gin.Context) {
 	if err != nil {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
-		return
 	}
 
 	servlet.Resp(c, bizMqtt.CreateMqtt(mqttClient))
-	return
 }
 
 // UpdateMqtt
@@ -104,7 +102,6 @@ func (s *MqttApi) StartMqtt(c *gin.Context) {
 
 	servlet.Resp2(c, fmt.Sprintf("%v", msg))
 
-	return
 }
 
 // StopMqtt
@@ -133,7 +130,6 @@ func (s *MqttApi) StopMqtt(c *gin.Context) {
 
 	servlet.Resp2(c, fmt.Sprintf("%v", msg))
 
-	return
 }
 
 // SendMqttMessage
@@ -167,7 +163,6 @@ func (s *MqttApi) SendMqttMessage(c *gin.Context) {
 
 	servlet.Resp2(c, fmt.Sprintf("%v", msg))
 
-	return
 }
 
 // PageMqtt
@@ -204,7 +199,6 @@ func (s *MqttApi) PageMqtt(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // NodeUsingStatus
@@ -284,7 +278,6 @@ func (s *MqttApi) SetScript(c *gin.Context) {
 	}
 	bizMqtt.SetScriptRedis(mqttClient.ClientId, mqttClient.Script)
 	servlet.Resp(c, "ok")
-	return
 
 }
 

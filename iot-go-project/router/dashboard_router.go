@@ -124,7 +124,6 @@ func (api *DashboardApi) Pagedashboard(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // Deletedashboard

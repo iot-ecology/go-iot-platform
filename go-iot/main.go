@@ -58,37 +58,30 @@ func removeOldData() {
 // CBeat 是一个无限循环函数，用于定时检查心跳并进行处理
 func CBeat() {
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			lock := NewRedisDistLock(globalRedisClient, "c_beat")
-			if lock.TryLock() {
-				service, err := GetThisTypeService()
-				if err == nil {
-					if processHeartbeats(service) {
-						return
-					}
-				}
-				lock.Unlock()
 
-			} else {
-
-				zap.S().Error("没有获取到 c_beat 处理的锁")
-
+	for range ticker.C {
+		lock := NewRedisDistLock(globalRedisClient, "c_beat")
+		if lock.TryLock() {
+			service, err := GetThisTypeService()
+			if err == nil {
+				processHeartbeats(service)
 			}
-		}
-	}
+			lock.Unlock()
 
+		} else {
+
+			zap.S().Error("没有获取到 c_beat 处理的锁")
+
+		}
+
+	}
 }
 
 // processHeartbeats 函数用于处理心跳信息
 //
 // 参数：
 // service []NodeInfo - 节点信息切片，包含待处理的心跳信息
-//
-// 返回值：
-// bool - 若成功处理某个节点的心跳信息则返回true，否则返回false
-func processHeartbeats(service []NodeInfo) bool {
+func processHeartbeats(service []NodeInfo) {
 	for _, info := range service {
 		if !SendBeat(&info, "beat") {
 			globalRedisClient.HDel(context.Background(), "register:"+globalConfig.NodeInfo.Type, info.Name)
@@ -96,7 +89,6 @@ func processHeartbeats(service []NodeInfo) bool {
 		}
 
 	}
-	return false
 }
 
 // HandlerOffNode 函数用于处理节点下线的情况
@@ -159,13 +151,9 @@ func startHttp() {
 
 func timerNoHandlerConfig() {
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			// 执行定时任务的逻辑
 
-			noHandlerConfig()
-		}
+	for range ticker.C {
+		noHandlerConfig()
 	}
 }
 
@@ -199,6 +187,13 @@ func noHandlerConfig() {
 
 }
 
+// PubCreateMqttClientOp 函数用于创建MQTT客户端
+//
+// 参数：
+// conf string - MQTT客户端配置信息
+//
+// 返回值：
+// int - 创建MQTT客户端的结果，成功返回1，失败返回-1
 func PubCreateMqttClientOp(conf string) int {
 	lose := GetSizeLose("")
 

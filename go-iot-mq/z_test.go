@@ -37,6 +37,9 @@ func TestMqCustomer(t *testing.T) {
 		true,  // no-wait
 		nil,   // args
 	)
+	if err != nil {
+		failOnError(err, "Failed to register a consumer")
+	}
 	go func() {
 		for d := range preHandlerMessage {
 			t.Log(string(d.Body))

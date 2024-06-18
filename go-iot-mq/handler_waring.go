@@ -23,7 +23,11 @@ func HandlerWaring(messages <-chan amqp.Delivery) {
 		for d := range messages {
 
 			HandlerWaringString(d)
-			d.Ack(false)
+			err := d.Ack(false)
+			if err != nil {
+				zap.S().Errorf("消息确认异常：%+v", err)
+
+			}
 
 		}
 	}()
@@ -31,6 +35,9 @@ func HandlerWaring(messages <-chan amqp.Delivery) {
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
 
+// HandlerWaringString 是一个处理来自AMQP的报警信息的函数
+// 参数d是AMQP的交付对象
+// 函数返回一个布尔值，表示处理是否成功
 func HandlerWaringString(d amqp.Delivery) bool {
 	var data []DataRowList
 	err := json.Unmarshal(d.Body, &data)
@@ -112,7 +119,10 @@ func handlerWaringOnce(msg DataRowList) {
 		}
 
 	}
-	collection.InsertMany(context.Background(), toInsert)
+	_, err := collection.InsertMany(context.Background(), toInsert)
+	if err != nil {
+		zap.S().Errorf("消息确认异常：%+v", err)
+	}
 }
 
 // getMqttClientMappingSignalWarningConfig 根据 MQTT 客户端 ID 获取信号警告配置的映射
@@ -128,6 +138,7 @@ func getMqttClientMappingSignalWarningConfig(mqttClientId string) map[string][]S
 	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
+		zap.S().Errorf("获取信号列表失败: %+v", err)
 	}
 
 	// 创建一个映射，用于存放 signal.Name 到 swcs 的映射

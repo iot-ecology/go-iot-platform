@@ -55,7 +55,6 @@ func Resp(c *gin.Context, data interface{}) {
 	result.Data = data
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func Resp2(c *gin.Context, msg string) {
@@ -64,7 +63,6 @@ func Resp2(c *gin.Context, msg string) {
 	result.Code = 20000
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 func Error(c *gin.Context, data interface{}) {
 	result := JSONResult{}
@@ -73,7 +71,6 @@ func Error(c *gin.Context, data interface{}) {
 	result.Data = data
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 type ParamStruct struct {

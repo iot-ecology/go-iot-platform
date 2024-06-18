@@ -24,7 +24,7 @@ func (biz *SignalDelayWaringBiz) PageData(name string, page, size int) (*servlet
 	db.Model(&models.SignalDelayWaring{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&rules)
 
 	pagination.Data = rules
 	pagination.Page = page

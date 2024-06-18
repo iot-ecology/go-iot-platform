@@ -27,13 +27,26 @@ func HandlerDataStorage(messages <-chan amqp.Delivery) {
 
 		for d := range messages {
 			HandlerDataStorageString(d)
-			d.Ack(false)
+			err := d.Ack(false)
+			if err != nil {
+				zap.S().Errorf("消息确认异常：%+v", err)
+
+			}
 		}
 	}()
 
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
 
+// HandlerDataStorageString 是一个处理来自AMQP的消息的函数
+// 它从传入的AMQP交付对象中反序列化MQTT消息
+// 如果反序列化失败，则记录错误并返回
+// 如果成功，则打印反序列化后的MQTT消息
+// 它通过调用GetScriptRedis获取MQTT客户端的脚本
+// 如果脚本不为空，则执行脚本并获取数据
+// 遍历数据，并将每一行存储到InfluxDB
+// 最后，将数据存储为JSON格式，并推送到两个消息队列中
+// 如果脚本为空，则记录消息
 func HandlerDataStorageString(d amqp.Delivery) {
 	var msg MQTTMessage
 	err := json.Unmarshal(d.Body, &msg)
@@ -41,23 +54,15 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return
 	}
-
-	// 打印反序列化后的消息
 	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
 
 	script := GetScriptRedis(msg.MQTTClientID)
 	if script != "" {
 		data := runScript(msg.Message, script)
-		// 这个原始数据
-		// 1. 需要持久化到influxdb
-
 		for i := 0; i < len(*data); i++ {
-			// 解引用指针并访问切片中的元素
 			row := (*data)[i]
-
 			StorageDataRowList(row)
 		}
-		// 2. 发送到报警消息队列
 		zap.S().Debugf("DataRowList: %+v", data)
 
 		jsonData, err := json.Marshal(data)
@@ -73,10 +78,6 @@ func HandlerDataStorageString(d amqp.Delivery) {
 	} else {
 		zap.S().Infof("执行脚本为空")
 	}
-	//err = d.Ack(false)
-	//if err != nil {
-	//	zap.S().Errorf("Failed to ack message: %s", err)
-	//}
 
 }
 
@@ -121,6 +122,7 @@ func StorageDataRowList(dt DataRowList) {
 					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i).Err()
 					if err != nil {
 						// 处理错误
+						zap.S().Errorf("移除 ZSet 元素异常：%+v", err)
 					}
 				}
 			}
@@ -129,13 +131,13 @@ func StorageDataRowList(dt DataRowList) {
 			err := globalRedisClient.ZAdd(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
 			if err != nil {
 				// 处理错误
+				zap.S().Errorf("写入 ZSet 元素异常：%+v", err)
 			}
 		}
 
 	}
 
 	writeAPI.WritePoint(p)
-	// fixme: 持久化完成后需要进一步推送给delay的报警队列，找出关联的signal_delay报警配置表的id
 
 }
 
@@ -179,6 +181,7 @@ func GetMqttClientSignal(mqttClientId string) (map[int]bool, map[int]int64, map[
 	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
+		zap.S().Errorf("获取信号映射表失败：%+v", err)
 	}
 	mapping := make(map[int]bool)
 	mappingName := make(map[string]int)
@@ -203,6 +206,7 @@ func GetMqttClientSignal2(mqttClientId string) map[string]signalMapping {
 	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
+		zap.S().Errorf("获取信号映射表失败：%+v", err)
 	}
 	mapping := make(map[string]signalMapping)
 	for _, strSignal := range result {

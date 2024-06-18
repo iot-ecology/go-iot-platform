@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
@@ -85,7 +86,7 @@ func (api *SignalDelayWaringParamApi) UpdateSignalDelayWaring(c *gin.Context) {
 	configBytes, _ := json.Marshal(old)
 	count, err := glob.GRedis.LRem(context.Background(), "delay_param", 0, configBytes).Result()
 	if err != nil {
-		// 处理错误
+		zap.S().Errorf("err %+v", err)
 	}
 	glob.GLog.Sugar().Infof("删除键 %d 个", count)
 
@@ -109,7 +110,6 @@ func (api *SignalDelayWaringParamApi) UpdateSignalDelayWaring(c *gin.Context) {
 	glob.GRedis.LPush(context.Background(), "delay_param", configBytes)
 
 	servlet.Resp(c, old)
-	return
 }
 
 // PageSignalDelayWaring
@@ -149,7 +149,6 @@ func (api *SignalDelayWaringParamApi) PageSignalDelayWaring(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteSignalDelayWaring

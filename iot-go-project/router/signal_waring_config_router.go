@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
@@ -141,7 +142,6 @@ func (api *SignalWaringConfigApi) PageSignalWaringConfig(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteSignalWaringConfig
@@ -186,7 +186,6 @@ func (api *SignalWaringConfigApi) QueryWaringList(c *gin.Context) {
 	}
 
 	servlet.Resp(c, query(req))
-	return
 
 }
 
@@ -208,6 +207,8 @@ func query(req servlet.WaringRowQuery) []bson.M {
 	defer func(cur *mongo.Cursor, ctx context.Context) {
 		err := cur.Close(ctx)
 		if err != nil {
+			zap.S().Errorf("err %+v", err)
+
 		}
 	}(cur, context.TODO())
 	var c []bson.M

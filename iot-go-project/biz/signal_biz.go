@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"igp/glob"
 	"igp/models"
@@ -31,12 +32,12 @@ func (biz *SignalBiz) PageSignal(mqttClientId, ty string, page, size int) (*serv
 	db.Model(&models.Signal{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&signals)
+	db.Offset(offset).Limit(size).Find(&signals)
 
 	for i, signal := range signals {
 		id, err := bizMqtt.FindById(signal.MqttClientId)
 		if err != nil {
-
+			zap.S().Errorf("error %+v", err)
 		}
 		if id != nil {
 			signals[i].MqttClientName = id.ClientId
@@ -100,7 +101,7 @@ func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, 
 	db.Model(&models.SignalWaringConfig{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&signals)
+	db.Offset(offset).Limit(size).Find(&signals)
 
 	//for i, signal := range signals {
 	//	forSignal, err := biz.FindByIdForSignal(signal.SignalId)

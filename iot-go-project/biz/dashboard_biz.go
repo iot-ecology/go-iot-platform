@@ -20,7 +20,7 @@ func (biz *DashboardBiz) PageData(name string, page, size int) (*servlet.Paginat
 
 	db.Model(&models.Dashboard{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&dashboards)
+	db.Offset(offset).Limit(size).Find(&dashboards)
 
 	pagination.Data = dashboards
 	pagination.Page = page
