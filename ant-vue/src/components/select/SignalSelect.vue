@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { SignalPage } from "@/api";
+import {useI18n} from "vue-i18n";
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object, Boolean],
@@ -30,6 +31,7 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const mqttClientId = ref<number | string>(props.mqtt_client_id);
 const page = ref(1);
 const page1 = ref(1);
@@ -87,7 +89,7 @@ const List = async () => {
       page.value++;
       options.value.push({
         value: -11,
-        label: "加载更多",
+        label: t('message.loadMore'),
       });
     }
   }
@@ -126,7 +128,7 @@ const select = async (ValueClick: any) => {
         page1.value++;
         options.value.push({
           value: -11,
-          label: "加载更多",
+          label: t('message.loadMore'),
         });
       }
     }
@@ -147,7 +149,7 @@ const onChange = (val, option) => {
 <template>
   <a-select
     v-model:value="value"
-    placeholder="请输入"
+    :placeholder="$t('message.pleaseEnter')"
     :show-search="true"
     :open="showOpen"
     style="width: 300px"

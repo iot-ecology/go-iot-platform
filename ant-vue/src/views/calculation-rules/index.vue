@@ -15,15 +15,15 @@
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a>
-                <a v-if="!record.start" style="margin-left: 10px" @click="onGo(record.ID)">{{$t('message.parameterConfiguration')}}</a>
-                <a v-if="!record.start" style="margin-left: 10px" @click="onMock(record.ID)">{{$t('message.simulateExecution')}}</a>
-                <a v-if="!record.start" style="margin-left: 10px" @click="onStart(record.ID, record.mock_value)">{{ $t('message.startUp') }}</a>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a-button>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-left: 10px" @click="onGo(record.ID)">{{$t('message.parameterConfiguration')}}</a-button>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-left: 10px" @click="onMock(record.ID)">{{$t('message.simulateExecution')}}</a-button>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-left: 10px" @click="onStart(record.ID, record.mock_value)">{{ $t('message.startUp') }}</a-button>
 
                 <a-popconfirm v-else :title="$t('message.sureStop')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirmStop(record.ID)">
-                  <a style="margin-left: 10px">{{ $t('message.stop') }}</a>
+                  <a-button type="primary" size="small" style="margin-left: 10px">{{ $t('message.stop') }}</a-button>
                 </a-popconfirm>
-                <a style="margin-left: 10px" @click="onResult(record.ID)">{{ $t('message.resultViewing') }}</a>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="onResult(record.ID)">{{ $t('message.resultViewing') }}</a-button>
               </span>
             </div>
           </template>
@@ -60,7 +60,7 @@
       <a-modal v-model:open="modalTime" :title="$t('message.timeframe')" class="custom-modal">
         <a-form ref="formRefTime" :rules="rules" :model="formTime">
           <a-form-item :label="$t('message.timeframe')" name="date">
-            <a-range-picker v-model:value="formTime.date" show-time @change="bptjTimeChange" />
+            <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formTime.date" show-time @change="bptjTimeChange" />
           </a-form-item>
         </a-form>
         <template #footer>
@@ -73,7 +73,7 @@
         <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefDate" :rules="rules" :model="formDate">
             <a-form-item :label="$t('message.timeframe')" name="date">
-              <a-range-picker v-model:value="formDate.date" show-time @change="bptjTime" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formDate.date" show-time @change="bptjTime" />
             </a-form-item>
           </a-form>
         </a-spin>
@@ -183,7 +183,7 @@ const columns = ref([
     title: t('message.start'),
     dataIndex: "start",
     customRender: ({ text }) => {
-      return h("span", text ? "是" : "否");
+      return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
   {
@@ -284,7 +284,7 @@ watch(locale, () => {
       title: t('message.start'),
       dataIndex: "start",
       customRender: ({ text }) => {
-        return h("span", text ? "是" : "否");
+        return h("span", text ? t('message.yes') : t('message.no'));
       },
     },
     {

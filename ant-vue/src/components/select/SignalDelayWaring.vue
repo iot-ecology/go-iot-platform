@@ -4,12 +4,14 @@ import { useRoute } from "vue-router";
 import { message } from "ant-design-vue";
 
 import { SignalDelayWaringPage } from "@/api";
+import {useI18n} from "vue-i18n";
 defineProps({
   modelValue: {
     type: [String, Number, Object, Boolean],
     default: "",
   },
 });
+const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
 const options = ref([]);
@@ -32,7 +34,7 @@ const List = async () => {
       page.value++;
       options.value.push({
         value: -11,
-        label: "加载更多",
+        label: t('message.loadMore'),
       });
     }
   }
@@ -40,7 +42,7 @@ const List = async () => {
   valueResult.value = value.value;
 };
 List();
-watch(value, (newValue, oldValue) => {
+watch(value, (newValue) => {
   if (!newValue) {
     options.value = [];
     page.value = 1;
@@ -62,7 +64,7 @@ const select = async (ValueClick: any) => {
         pageSelect.value++;
         options.value.push({
           value: -11,
-          label: "加载更多",
+          label: t('message.loadMore'),
         });
       }
     }
@@ -82,7 +84,7 @@ const handleSearch = async (val: string) => {
   pageSelect.value = 1;
   const { data } = await SignalDelayWaringPage({ name: val, page: pageSelect.value, page_size: 100 });
   if (data.data.total === 0) {
-    message.error("当前搜索没有相关数据");
+    message.error(t('message.ThereNoSearch'));
     setTimeout(() => {
       value.value = options.value[0].value;
       valueSearch.value = "";
@@ -98,7 +100,7 @@ const handleSearch = async (val: string) => {
     pageSelect.value++;
     options.value.push({
       value: -11,
-      label: "加载更多",
+      label: t('message.loadMore'),
     });
   }
 };
@@ -110,7 +112,7 @@ const handleSearch = async (val: string) => {
     :show-search="true"
     :open="showOpen"
     allow-clear
-    placeholder="请输入"
+    :placeholder="$t('message.pleaseEnter')"
     style="width: 300px"
     :default-active-first-option="false"
     :show-arrow="false"

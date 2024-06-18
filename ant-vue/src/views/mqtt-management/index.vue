@@ -33,23 +33,22 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                <a-button type="primary" size="small" style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-button>
                 <a-popconfirm :title="$t('message.sureEdit')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="cancel(record.key)">
-                  <a>{{$t('message.cancel')}}</a>
+                  <a-button type="primary" size="small">{{$t('message.cancel')}}</a-button>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a v-if="!record.start" style="margin-right: 10px" @click="edit(record.key)">{{$t('message.edit')}}</a>
-                <a v-if="!record.start" @click="onStart(record.ID)">{{$t('message.startUp')}}</a>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-right: 10px" @click="edit(record.key)">{{$t('message.edit')}}</a-button>
+                <a-button type="primary" size="small" v-if="!record.start" @click="onStart(record.ID)">{{$t('message.startUp')}}</a-button>
                 <a-popconfirm v-else :title="$t('message.sureStop')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirmStop(record.ID)">
-                  <a>{{$t('message.stop')}}</a>
+                  <a-button type="primary" size="small">{{$t('message.stop')}}</a-button>
                 </a-popconfirm>
-
-                <a style="margin-left: 10px" @click="(code = record.script), (scriptId = record.ID), (modalScriptShow = true)">{{$t('message.parsingScripts')}}</a>
-                <a style="margin-left: 10px" @click="onSignal(record.ID)">{{$t('message.signalConfig')}}</a>
-                <a v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true), (formNews.client_id = record.client_id)">{{$t('message.simulated')}}</a>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="(code = record.script), (scriptId = record.ID), (modalScriptShow = true)">{{$t('message.parsingScripts')}}</a-button>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="onSignal(record.ID)">{{$t('message.signalConfig')}}</a-button>
+                <a-button type="primary" size="small" v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true), (formNews.client_id = record.client_id)">{{$t('message.simulated')}}</a-button>
                 <a-popconfirm v-if="!record.start" :title="$t('message.sureDelete')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirm(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
+                  <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
               </span>
             </div>

@@ -74,11 +74,11 @@ const en = {
         signalName: 'Signal Name',
         timeframe: 'Time Frame',
         alarmHistory: 'Alarm History',
-        max: 'Maximum Value',
-        min: 'Minimum Value',
+        max: 'Max',
+        min: 'Min',
         internalAlarm: 'Internal Alarm',
         externalAlarm: 'External Alarm',
-        internalExternalAlarm: 'Internal Alarm And External Alarm',
+        internalExternalAlarm: 'In Or Out',
         pleaseMinimum: 'Please Enter The Minimum Value',
         pleaseMaximum: 'Please Enter The Maximum Value',
         pleaseAlarm: 'Please Select Internal Alarm And External Alarm',
@@ -116,10 +116,10 @@ const en = {
         pleaseChooseValue:'Please Choose Whether To Create A Null Value',
         parameterConfiguration: 'Parameter Configuration',
         simulateExecution: 'Simulate Execution',
-        resultViewing: 'Result Viewing',
+        resultViewing: 'Result View',
         forwardTime: 'Forward Time(s)',
         executionCycle: 'Execution Cycle',
-        script: 'script',
+        script: 'Script',
         confirmExpectations:'Confirm if the simulation results meet expectations',
         data: 'data',
         executionTime: 'Execution Time',
@@ -154,7 +154,11 @@ const en = {
         visualization: 'Visualization',
         calculateParameters: 'Calculate Parameters',
         scriptAlarmParameters: 'Script Alarm Parameters',
-        nodeDetails: 'Node Details'
+        nodeDetails: 'Node Details',
+        loadMore: 'Load More',
+        ThereNoSearch: 'There is no relevant data for the current search',
+        startTime: 'Start Time',
+        endTime: 'End Time'
     }
 };
 

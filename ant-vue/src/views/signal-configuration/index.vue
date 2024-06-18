@@ -37,18 +37,18 @@
             <template v-else-if="column.dataIndex === 'operation'">
               <div class="editable-row-operations">
                 <span v-if="editableData[record.key]">
-                  <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                  <a-button type="primary" size="small" style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-button>
                   <a-popconfirm :title="$t('message.sureEdit')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="cancel(record.key)">
-                    <a>{{$t('message.cancel')}}</a>
+                    <a-button type="primary" size="small">{{$t('message.cancel')}}</a-button>
                   </a-popconfirm>
                 </span>
                 <span v-else>
-                  <a style="margin-right: 10px" @click="onView(record.mqtt_client_id, record.ID, record.alias, record.unit, record.type)">{{ $t('message.check') }}</a>
-                  <a @click="edit(record.key)">{{$t('message.edit')}}</a>
-                  <a style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">{{ $t('message.SignalAlarmConfig') }}</a>
-                  <a style="margin-left: 10px" @click="onHistoryView(record)">{{ $t('message.historicalData') }}</a>
+                  <a-button type="primary" size="small" style="margin-right: 10px" @click="onView(record.mqtt_client_id, record.ID, record.alias, record.unit, record.type)">{{ $t('message.check') }}</a-button>
+                  <a-button type="primary" size="small"  @click="edit(record.key)">{{$t('message.edit')}}</a-button>
+                  <a-button type="primary" size="small"  style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">{{ $t('message.SignalAlarmConfig') }}</a-button>
+                  <a-button type="primary" size="small"  style="margin-left: 10px" @click="onHistoryView(record)">{{ $t('message.historicalData') }}</a-button>
                   <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)">
-                    <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
+                    <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                   </a-popconfirm>
                 </span>
               </div>
@@ -93,7 +93,7 @@
         <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="historyView" style="width: 60%" :title="$t('message.historicalData')" @ok="historyView = false">
           <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
             <a-form :model="form">
-              <a-range-picker value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
               <div v-if="!option.series?.length" style="text-align: center; font-size: 18px; height: 200px">{{ $t('message.noData') }}</div>
               <YcECharts v-else :option="option" :height="300" />
             </a-form>
@@ -106,7 +106,7 @@
 
 <script setup lang="ts">
 import type { UnwrapRef } from "vue";
-import {h,reactive, ref, watch} from "vue";
+import {reactive, ref, watch} from "vue";
 import { useRoute } from "vue-router";
 import { type FormInstance, message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";

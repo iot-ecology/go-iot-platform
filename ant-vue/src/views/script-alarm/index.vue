@@ -15,12 +15,12 @@
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a>
-                <a style="margin-left: 10px" @click="onWaringHistory(record)">{{ $t('message.alarmHistory') }}</a>
-                <a style="margin-left: 10px" @click="onGo(record.ID)">{{ $t('message.parameterConfiguration') }}</a>
-                <a style="margin-left: 10px" @click="onScript(record.ID)">{{ $t('message.debuggingScripts') }}</a>
+                <a-button type="primary" size="small" v-if="!record.start" style="margin-left: 10px" @click="confirm(record)">{{$t('message.edit')}}</a-button>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="onWaringHistory(record)">{{ $t('message.alarmHistory') }}</a-button>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="onGo(record.ID)">{{ $t('message.parameterConfiguration') }}</a-button>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="onScript(record.ID)">{{ $t('message.debuggingScripts') }}</a-button>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
+                  <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
               </span>
             </div>
@@ -67,7 +67,7 @@
         <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefTime" :rules="rules" :model="formObj">
             <a-form-item :label="$t('message.timeframe')" name="date">
-              <a-range-picker v-model:value="formObj.date" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formObj.date" show-time @change="bptjTimeChange" />
             </a-form-item>
           </a-form>
         </a-spin>

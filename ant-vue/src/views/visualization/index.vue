@@ -7,9 +7,9 @@
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span>
-                <a @click="onDetails(record.ID)">{{ $t('message.check') }}</a>
+                <a-button type="primary" size="small" @click="onDetails(record.ID)">{{ $t('message.check') }}</a-button>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)" @cancel="cancel1">
-                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
+                  <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
               </span>
             </div>

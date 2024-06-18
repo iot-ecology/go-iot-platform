@@ -147,13 +147,18 @@ const zhCHS = {
         resultsOfEnforcement: '执行结果',
         scriptAlarm: '脚本报警',
         nodeInformation: '节点信息',
+        maximumCapacity : '最大容量',
         currentCapacity: '当前容量',
         clientInformation: '客户端信息',
         thirtyDays: '近三十天数据',
         visualization: '可视化',
         calculateParameters: '计算参数',
         scriptAlarmParameters: '脚本报警参数',
-        nodeDetails: '节点详情'
+        nodeDetails: '节点详情',
+        loadMore: '加载更多',
+        ThereNoSearch: '当前搜索没有相关数据',
+        startTime: '开始时间',
+        endTime: '结束时间'
     }
 };
 

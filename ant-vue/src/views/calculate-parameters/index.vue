@@ -45,15 +45,15 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-typography-link>
+                <a-button type="primary" size="small" style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-button>
                 <a-popconfirm :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
-                  <a>{{$t('message.cancel')}}</a>
+                  <a-button type="primary" size="small">{{$t('message.cancel')}}</a-button>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a @click="edit(record.key)">{{$t('message.edit')}}</a>
+                <a-button type="primary" size="small" @click="edit(record.key)">{{$t('message.edit')}}</a-button>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">{{$t('message.delete')}}</a>
+                  <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
               </span>
             </div>

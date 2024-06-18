@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 
 import { SignalPage } from "@/api";
+import {useI18n} from "vue-i18n";
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object, Boolean],
@@ -23,6 +24,7 @@ const props = defineProps({
     default: () => false,
   },
 });
+const { t } = useI18n();
 const mqttClientId = ref<number | string>(props.mqtt_client_id);
 const page = ref(1);
 const pageSelect = ref(1);
@@ -70,7 +72,7 @@ const List = async () => {
       page.value++;
       options.value.push({
         value: -11,
-        label: "加载更多",
+        label: t('message.loadMore'),
       });
     }
   }
@@ -99,7 +101,7 @@ const select = async (ValueClick: any, option: any) => {
         pageSelect.value++;
         options.value.push({
           value: -11,
-          label: "加载更多",
+          label: t('message.loadMore'),
         });
       }
     }
@@ -128,7 +130,7 @@ function containsAllElements<T>(value: string | number, arr2: T[]): boolean {
 <template>
   <a-select
     v-model:value="value"
-    placeholder="请输入"
+    :placeholder="$t('message.pleaseEnter')"
     style="width: 300px"
     :open="showOpen"
     :default-active-first-option="false"

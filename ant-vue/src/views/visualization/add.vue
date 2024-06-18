@@ -54,7 +54,7 @@
               </div>
             </a-tab-pane>
             <a-tab-pane key="2" :tab="$t('message.staticTime')">
-              <a-range-picker v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
             </a-tab-pane>
           </a-tabs>
         </a-form-item>

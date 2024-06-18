@@ -9,7 +9,12 @@
           <!-- 单路由 -->
           <template v-else-if="menu.children?.length">
             <a-menu-item :key="menu.path">
-              {{ getMetaTitle(menu.meta?.title) }}
+              <a-tooltip placement="right">
+                <template #title>
+                  <span>{{ getMetaTitle(menu.meta?.title) }}</span>
+                </template>
+                {{ getMetaTitle(menu.meta?.title) }}
+              </a-tooltip>
             </a-menu-item>
           </template>
           <!-- 有子路由 -->
