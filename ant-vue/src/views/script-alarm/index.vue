@@ -10,7 +10,7 @@
         </a-form-item>
       </a-form>
       <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
-      <a-table :data-source="dataSource" :columns="columns" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :data-source="dataSource" :columns="columns" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
@@ -67,7 +67,7 @@
         <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefTime" :rules="rules" :model="formObj">
             <a-form-item :label="$t('message.timeframe')" name="date">
-              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formObj.date" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formObj.date" show-time @change="onTimeChange" />
             </a-form-item>
           </a-form>
         </a-spin>
@@ -82,7 +82,7 @@
         <a-tabs>
           <a-tab-pane key="1" :tab="$t('message.table')">
             <a-table bordered :pagination="false" :data-source="dataResult" :columns="columnsResult">
-              <template #bodyCell="{ column, text, record }">
+              <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'param' || column.dataIndex === 'script'">
                   <div class="editable-row-operations">
                     <span>
@@ -113,7 +113,7 @@
 import {h, onMounted, reactive, ref,watch} from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import dayjs from "dayjs";
 import { javascript } from "@codemirror/lang-javascript";
@@ -159,8 +159,8 @@ const columns = ref([
     dataIndex: "operation",
   },
 ]);
-const formRef = ref<FormInstance>();
-const formRefTime = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
+const formRefTime = ref<HTMLFormElement | null>(null);
 const dataSource = ref([]);
 const modalVisible = ref(false);
 const modalScript = ref(false);
@@ -190,7 +190,7 @@ const columnsResult = ref([
   {
     title: t('message.complyRules'),
     dataIndex: "value",
-    customRender: ({ text }) => {
+    customRender: ({ text }: any) => {
       return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
@@ -264,7 +264,7 @@ watch(locale, () => {
     name: [{ required: true, message: t('message.copySuccess'), trigger: "blur" }],
     script: [{ required: true, message: t('message.pleaseScript'), trigger: "blur" }],
     date: [{ required: true, message: t('message.pleaseTime'), trigger: "change" }]
-  },
+  };
   columnsResult.value = [
     {
       title: t('message.reportingTime'),
@@ -296,15 +296,15 @@ const onAdd = () => {
   modalVisible.value = true;
   title.value = t('message.addition');
 };
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const listPage = async () => {
-  const { data } = await SignalDelayWaringPage({ name: formState.name, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await SignalDelayWaringPage({ name: formState.name, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   dataSource.value = data.data.data;
 };
 const onCopy = () => {
@@ -318,13 +318,13 @@ const confirm = async (record: any) => {
   form.script = record.script;
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await listPage();
 };
 const onAddUpdateData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       if (title.value === t('message.addition')) {
@@ -356,7 +356,7 @@ const onAddUpdateData = () => {
         });
       }
     })
-    .catch(e => {
+    .catch((e: any) => {
       console.error(e)
     });
 };
@@ -393,7 +393,6 @@ const onConfirm = () => {
     .catch(e => {
       console.error(e)
     })
-    .finally(() => {});
 };
 
 // 删除
@@ -403,7 +402,6 @@ const onDelete = async (id: string) => {
       message.success(data.message);
       await listPage();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   }).catch(e=>{
@@ -418,13 +416,13 @@ const onWaringHistory = (record: any) => {
 };
 
 const getQueryRow = () => {
-  formRefTime.value
+  (formRefTime.value as HTMLFormElement)
     .validate()
     .then(() => {
       showSpinning.value = true;
       SignalDelayWaringQueryRow(formObj)
         .then(({ data }) => {
-          dataResult.value = data.data?.map(({ insert_time, up_time, value, param, script }) => ({
+          dataResult.value = data.data?.map(({ insert_time, up_time, value, param, script }: any) => ({
             insert_time: dayjs(insert_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
             up_time: dayjs(up_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
             value,
@@ -434,7 +432,7 @@ const getQueryRow = () => {
           option.value = {
             tooltip: {
               trigger: "axis",
-              formatter: (params) => {
+              formatter: (params: any) => {
                 return `${params[0].name}: ${params[0].value === 1 ? "是" : "否"}`;
               },
             },
@@ -474,11 +472,11 @@ const getQueryRow = () => {
           formObj.date = "";
         });
     })
-    .catch(e => {
+    .catch((e :any) => {
       console.error(e)
     });
 };
-const bptjTimeChange = (date: any, dataString: any) => {
+const onTimeChange = (dataString: any) => {
   formObj.up_time_start = dayjs(dataString[0]).unix();
   formObj.up_time_end = dayjs(dataString[1]).unix();
 };

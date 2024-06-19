@@ -22,7 +22,7 @@
     "countup.js": "^2.8.0",
     "cron-parser": "4.9.0",
     "dayjs": "^1.11.9",
-    "echarts": "^5.4.3",
+    "echarts": "5.5.0",
     "lodash-es": "^4.17.21",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18.1.0",
     "@commitlint/config-conventional": "^18.1.0",
+    "@types/echarts": "^4.9.18",
     "@types/lodash-es": "^4.17.8",
     "@types/nprogress": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",

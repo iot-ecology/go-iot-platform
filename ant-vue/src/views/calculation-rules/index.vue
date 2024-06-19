@@ -10,7 +10,7 @@
         </a-form-item>
       </a-form>
       <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
-      <a-table :data-source="dataSource" :columns="columns" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :data-source="dataSource" :columns="columns" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
@@ -60,7 +60,7 @@
       <a-modal v-model:open="modalTime" :title="$t('message.timeframe')" class="custom-modal">
         <a-form ref="formRefTime" :rules="rules" :model="formTime">
           <a-form-item :label="$t('message.timeframe')" name="date">
-            <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formTime.date" show-time @change="bptjTimeChange" />
+            <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formTime.date" show-time @change="onTimeChange" />
           </a-form-item>
         </a-form>
         <template #footer>
@@ -73,7 +73,7 @@
         <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefDate" :rules="rules" :model="formDate">
             <a-form-item :label="$t('message.timeframe')" name="date">
-              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formDate.date" show-time @change="bptjTime" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formDate.date" show-time @change="onResultTime" />
             </a-form-item>
           </a-form>
         </a-spin>
@@ -91,7 +91,7 @@
         </a-form>
         <template #footer>
           <a-button @click="modalMock = false">{{$t('message.cancel')}}</a-button>
-          <a-button :disabled="loading" type="primary" @click="onConfimStart()">{{$t('message.confirm')}}</a-button>
+          <a-button :disabled="loading" type="primary" @click="onConfirmStart()">{{$t('message.confirm')}}</a-button>
         </template>
       </a-modal>
 
@@ -104,7 +104,7 @@
             <div style="width: 19%; padding: 8px 0">{{ $t('message.result') }}</div>
           </div>
           <div v-if="!dataResult?.length" style="text-align: center; font-size: 18px; height: 300px">{{ $t('message.noData') }}</div>
-          <RecycleScroller v-else v-slot="{ item }" style="height: 480px" class="scroller" :items="dataResult" :item-size="40" key-field="start_time">
+          <RecycleScroller v-else v-slot="{ item }" style="height: 480px" class="scroller" :items="dataResult" :item-size="40" key-field="id">
             <div style="display: flex; text-align: center; border-bottom: 1px solid #f0f0f0">
               <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">{{ item.ex_time }}</div>
               <div style="width: 27%; border-right: 1px solid #f0f0f0; padding: 8px 0">{{ item.start_time }}</div>
@@ -125,14 +125,14 @@
 import {h, onMounted, reactive, ref,watch} from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import cronParse from "cron-parser";
 import dayjs from "dayjs";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 
-import { CalcParamMock, CalcParamRd, CalcParamStart, CalcParamStop, CalcRuleCreate, CalcRulePage, CalcRuleUpdate, SignalCreate } from "@/api";
+import { CalcParamMock, CalcParamRd, CalcParamStart, CalcParamStop, CalcRuleCreate, CalcRulePage, CalcRuleUpdate } from "@/api";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
 import {useI18n} from "vue-i18n";
@@ -182,7 +182,7 @@ const columns = ref([
   {
     title: t('message.start'),
     dataIndex: "start",
-    customRender: ({ text }) => {
+    customRender: ({ text }:any) => {
       return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
@@ -191,9 +191,9 @@ const columns = ref([
     dataIndex: "operation",
   },
 ]);
-const formRef = ref<FormInstance>();
-const formRefTime = ref<FormInstance>();
-const formRefDate = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
+const formRefTime = ref<HTMLFormElement | null>(null);
+const formRefDate = ref<HTMLFormElement | null>(null);
 const dataSource = ref([]);
 const modalVisible = ref(false);
 const modalTime = ref(false);
@@ -304,16 +304,16 @@ const onAdd = () => {
   modalVisible.value = true;
   title.value = t('message.addition');
 };
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const listPage = async () => {
-  const { data } = await CalcRulePage({ name: formState.name, page: paginations.current, page_size: paginations.pageSize });
+  const { data } = await CalcRulePage({ name: formState.name, page: pagination.current, page_size: pagination.pageSize });
   dataSource.value = data.data.data;
-  paginations.total = data.data?.total || 0;
+  pagination.total = data.data?.total || 0;
 };
 const onCopy = async () => {
   await copyText(scr);
@@ -343,57 +343,59 @@ const confirmStop = (id: string) => {
       await listPage();
     });
 };
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await listPage();
 };
-const onAddData = () => {
-  formRef.value
-    .validate()
-    .then(() => {
-      try {
-        const interval = cronParse.parseExpression(form.cron);
-        if (form.cron.split(" ").length !== 6) {
-          message.error(t('message.PleaseCorrectExecutionCycle'));
-          return;
-        }
-        if (title.value === t('message.addition')) {
-          const data = { ...form };
-          delete data.id;
-          delete data.start;
-          CalcRuleCreate(data).then(async({ data }) => {
-            if (data.code === 20000) {
-              modalVisible.value = false;
-              message.success(t('message.newSuccessfullyAdded'));
-              formRef.value?.resetFields();
-              await listPage();
-            } else {
-              message.error(data.message);
+const onAddData = () =>
+    {
+      (formRef.value as HTMLFormElement)
+          .validate()
+          .then(() => {
+            try {
+              cronParse.parseExpression(form.cron);
+              if (form.cron.split(" ").length !== 6) {
+                message.error(t('message.PleaseCorrectExecutionCycle'));
+                return;
+              }
+              if (title.value === t('message.addition')) {
+                const data = { ...form };
+                delete data.id;
+                delete data.start;
+                CalcRuleCreate(data).then(async({ data }) => {
+                  if (data.code === 20000) {
+                    modalVisible.value = false;
+                    message.success(t('message.newSuccessfullyAdded'));
+                    formRef.value?.resetFields();
+                    await listPage();
+                  } else {
+                    message.error(data.message);
+                  }
+                }).catch(e=>{
+                  console.error(e)
+                });
+              } else {
+                CalcRuleUpdate(form).then(async({ data }) => {
+                  if (data.code === 20000) {
+                    modalVisible.value = false;
+                    message.success(t('message.editSuccessful'));
+                    await listPage();
+                  } else {
+                    message.error(data.message);
+                  }
+                }).catch(e=>{
+                  console.error(e)
+                });
+              }
+            } catch (error) {
+              message.error(t('message.pleaseCorrectCycle'));
             }
-          }).catch(e=>{
-            console.error(e)
-          });
-        } else {
-          CalcRuleUpdate(form).then(async({ data }) => {
-            if (data.code === 20000) {
-              modalVisible.value = false;
-              message.success(t('message.editSuccessful'));
-              await listPage();
-            } else {
-              message.error(data.message);
-            }
-          }).catch(e=>{
-            console.error(e)
-          });
-        }
-      } catch (error) {
-        message.error(t('message.pleaseCorrectCycle'));
-      }
-    }).catch(e=>{
+          }).catch((e: any)=>{
         console.error(e)
       })
-};
+    }
+;
 
 const onGo = (id: string) => {
   routerStore.setRouterName("/calculate-parameters");
@@ -419,7 +421,7 @@ const onResult = (id: string) => {
   formDate.id = id;
 };
 
-const onConfimStart = () => {
+const onConfirmStart = () => {
   CalcParamStart(startId.value)
     .then(({ data }) => {
       if (data.code === 20000) {
@@ -442,7 +444,7 @@ const onMock = (id: string) => {
 };
 
 const setMockData = () => {
-  formRefTime.value
+  (formRefTime.value as HTMLFormElement)
     .validate()
     .then(() => {
       CalcParamMock({ id: formTime.id, start_time: formTime.start_time, end_time: formTime.end_time })
@@ -465,7 +467,7 @@ const setMockData = () => {
 };
 
 const setTableData = () => {
-  formRefDate.value
+  (formRefDate.value as HTMLFormElement)
     .validate()
     .then(() => {
       showSpinning.value = true;
@@ -473,7 +475,8 @@ const setTableData = () => {
         .then(async ({ data }) => {
           if (data.code === 20000) {
             dataResult.value =
-              data.data?.map(({ start_time, end_time, ex_time, result }) => ({
+              data.data?.map(({ start_time, end_time, ex_time, result }: any,index: number) => ({
+                id: index+1,
                 start_time: dayjs(start_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
                 end_time: dayjs(end_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
                 ex_time: dayjs(ex_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
@@ -494,12 +497,12 @@ const setTableData = () => {
         });
     })
 };
-const bptjTimeChange = (date: any, dataString: any) => {
+const onTimeChange = (dataString: any) => {
   formTime.start_time = dayjs(dataString[0]).unix();
   formTime.end_time = dayjs(dataString[1]).unix();
 };
 
-const bptjTime = (date: any, dataString: any) => {
+const onResultTime = (dataString: any) => {
   formDate.start_time = dayjs(dataString[0]).unix();
   formDate.end_time = dayjs(dataString[1]).unix();
 };

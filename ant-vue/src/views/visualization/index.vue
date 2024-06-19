@@ -2,7 +2,7 @@
   <div>
     <a-card title="" :bordered="true">
       <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
-      <a-table :data-source="dataSource" bordered :columns="columns" :pagination="paginations" @change="handleTableChange">
+      <a-table :data-source="dataSource" bordered :columns="columns" :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
@@ -40,7 +40,7 @@ const columns = ref([
   },
 ]);
 const dataSource = ref([]);
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
@@ -65,8 +65,8 @@ const onAdd = () => {
 };
 
 const listPage = async () => {
-  const { data } = await DashboardPage({ page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await DashboardPage({ page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   dataSource.value = data.data.data;
 };
 const confirm = async (id: string) => {
@@ -84,9 +84,9 @@ const confirm = async (id: string) => {
 const onDetails = (id: string) => {
   jump.routeJump({ path: "/visualization/add", query: { id } });
 };
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await listPage();
 };
 onMounted(async ()=>{

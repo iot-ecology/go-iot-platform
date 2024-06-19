@@ -178,8 +178,8 @@ const onView = (record: any) => {
   form.size = record.size;
   form.max_size = record.max_size;
 };
-onMounted(() => {
-  getNode();
+onMounted(async() => {
+ await getNode();
 });
 </script>
 <style lang="less" scoped>

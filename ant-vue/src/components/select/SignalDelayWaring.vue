@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { useRoute } from "vue-router";
 import { message } from "ant-design-vue";
 
@@ -14,11 +14,11 @@ defineProps({
 const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
-const options = ref([]);
+const options = ref<any>([]);
 const route = useRoute();
-const value = ref(Number(route.query.rule_id) || "");
-const valueResult = ref(Number(route.query.rule_id) || "");
-const valueSearch = ref("");
+const value = ref<any>(Number(route.query.rule_id) || "");
+const valueResult = ref<any>(Number(route.query.rule_id) || "");
+const valueSearch = ref<any>("");
 const showOpen = ref(false);
 const emits = defineEmits(["update:modelValue"]);
 const List = async () => {
@@ -26,7 +26,7 @@ const List = async () => {
   const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
   options.value = options.value.concat(listArr);
   value.value = value.value || Number(route.query.signal_delay_waring_id) || options.value[0]?.value;
-  if (data.data.total > 0 && Number(route.query.signal_delay_waring_id) && !options.value.map((it) => it.value).includes(Number(route.query.signal_delay_waring_id))) {
+  if (data.data.total > 0 && Number(route.query.signal_delay_waring_id) && !options.value.map((it: any) => it.value).includes(Number(route.query.signal_delay_waring_id))) {
     page.value++;
     await List();
   } else {
@@ -41,13 +41,12 @@ const List = async () => {
   emits("update:modelValue", value.value);
   valueResult.value = value.value;
 };
-List();
-watch(value, (newValue) => {
+watch(value, async (newValue) => {
   if (!newValue) {
     options.value = [];
     page.value = 1;
     valueSearch.value = "";
-    List();
+    await List();
   }
 });
 const select = async (ValueClick: any) => {
@@ -80,7 +79,6 @@ const handleSearch = async (val: string) => {
   }
   valueSearch.value = val;
 
-  // options.value = [];
   pageSelect.value = 1;
   const { data } = await SignalDelayWaringPage({ name: val, page: pageSelect.value, page_size: 100 });
   if (data.data.total === 0) {
@@ -104,6 +102,10 @@ const handleSearch = async (val: string) => {
     });
   }
 };
+
+onMounted(async ()=>{
+  await List();
+})
 </script>
 
 <template>

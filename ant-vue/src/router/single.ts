@@ -1,5 +1,4 @@
 import Layout from "@/layout/index.vue";
-import {getMetaTitle} from  '@/utils/i18n.ts'
 export default [
   {
     path: "/mqtt-management",

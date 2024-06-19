@@ -54,7 +54,7 @@
               </div>
             </a-tab-pane>
             <a-tab-pane key="2" :tab="$t('message.staticTime')">
-              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="onTimeChange" />
             </a-tab-pane>
           </a-tabs>
         </a-form-item>
@@ -382,7 +382,7 @@ const onConfirm = () => {
               name: tipName,
               type: listArr.value[indexNumber.value].show.type,
               barWidth: "20",
-              data: list[text].map((it) => it._value),
+              data: list[text].map((it: any) => it._value),
             });
           });
           if (Object.keys(list).length) {
@@ -419,6 +419,7 @@ const onSaveInformation = () => {
   const data = {
     config: JSON.stringify(list),
     name: createName.value,
+    id:""
   };
   if (route.query.id) {
     data.id = id.value;
@@ -444,7 +445,7 @@ const onSaveInformation = () => {
 const getData = async (index: number) => {
   const { data } = await SignalPage({ mqtt_client_id: listArr.value[index].param.measurement, page: 1, page_size: pageSize });
   const signalList = data.data?.data || [];
-  let start_time = null;
+  let start_time: any = null;
   const end_time = dayjs().unix();
   if (listArr.value[index].param.sub && listArr.value[index].param.dateUnit) {
     start_time = dayjs().subtract(listArr.value[index].param.sub, listArr.value[index].param.dateUnit).unix();
@@ -560,7 +561,7 @@ const getData = async (index: number) => {
   });
 };
 
-const bptjTimeChange = (date: any) => {
+const onTimeChange = (date: any) => {
   if (!date) {
     form.start_time = "";
     form.end_time = "";
@@ -583,7 +584,6 @@ const handleCustomEvent = (payload: any) => {
   if (payload.value !== -11) {
     optionList.value.push(...payload);
   }
-  // 处理从子组件传递来的参数
 };
 
 const onAddSignal = () => {

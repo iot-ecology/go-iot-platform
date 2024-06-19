@@ -11,7 +11,7 @@
       </a-form>
       <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <!--      表格-->
-      <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
           <template v-if="['name', 'signal_name', 'signal_id', 'mqtt_client_id', 'mqtt_client_name'].includes(column.dataIndex)">
             <div>
@@ -77,7 +77,7 @@
 </template>
 <script setup lang="ts">
 import {onMounted, reactive, ref, type UnwrapRef, watch} from "vue";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
 
@@ -95,7 +95,7 @@ let rules: Record<string, Rule[]> = {
   name: [
     {
       required: true,
-      validator: async (rule, value) => {
+      validator: async (_, value) => {
         if (value) {
           await Promise.resolve();
         } else {
@@ -126,14 +126,14 @@ const columns = ref([
   {
     title: t('message.clientID'),
     dataIndex: "mqtt_client_id",
-    render: ({ record }) => {
+    render: ({ record }: any) => {
       return record.mqtt_client_name;
     },
   },
   {
     title: t('message.signalName'),
     dataIndex: "signal_id",
-    render: ({ record }) => {
+    render: ({ record }: any) => {
       return record.signal_name;
     },
   },
@@ -142,7 +142,7 @@ const columns = ref([
     dataIndex: "operation",
   },
 ]);
-const formRef = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
 const modalVisible = ref(false);
 const loading = ref(false);
 const list = ref([]);
@@ -167,13 +167,13 @@ watch(
 watch(
   () => form.mqtt_client_id,
   () => {
-    formRef.value.clearValidate("mqtt_client_id");
+    (formRef.value as HTMLFormElement).clearValidate("mqtt_client_id");
   },
 );
 watch(
   () => form.signal_id,
   () => {
-    formRef.value.clearValidate("signal_id");
+    (formRef.value as HTMLFormElement).clearValidate("signal_id");
   },
 );
 watch(locale, () => {
@@ -204,12 +204,12 @@ watch(locale, () => {
       title: t('message.operation'),
       dataIndex: "operation",
     },
-  ]
+  ];
   rules = {
     name: [
       {
         required: true,
-        validator: async (rule, value) => {
+        validator: async (_, value) => {
           if (value) {
             await Promise.resolve();
           } else {
@@ -233,15 +233,15 @@ const onAdd = () => {
   modalVisible.value = true;
   title.value = t('message.addition');
 };
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const pageList = async () => {
-  const { data } = await SignalDelayWaringParamPage({ signal_delay_waring_id: form.signal_delay_waring_id, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await SignalDelayWaringParamPage({ signal_delay_waring_id: form.signal_delay_waring_id, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
@@ -257,17 +257,16 @@ const edit = (key: string) => {
 };
 
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await pageList();
 };
 const onAddData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       if (title.value === t('message.addition')) {
@@ -299,7 +298,7 @@ const onAddData = () => {
         });
       }
     })
-    .catch(e => {
+    .catch((e: any) => {
       console.error(e)
     });
 };
@@ -312,9 +311,7 @@ const save = async (key: string) => {
   const englishLetterRegex = /^[A-Za-z]$/;
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
-  // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
     message.error(t('message.clientSignal'));
     return;
@@ -336,7 +333,6 @@ const onDelete = async (id: string) => {
       message.success(data.message);
       await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   }).catch(e=>{

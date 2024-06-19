@@ -11,7 +11,7 @@
       </a-form>
       <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
 
-      <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
           <template v-if="['name', 'reduce', 'signal_name', 'mqtt_client_id', 'mqtt_client_name'].includes(column.dataIndex)">
             <div>
@@ -92,7 +92,7 @@
 <script setup lang="ts">
 import type { UnwrapRef } from "vue";
 import { reactive, ref, watch } from "vue";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
 
@@ -111,7 +111,7 @@ let rules: Record<string, Rule[]> = {
   name: [
     {
       required: true,
-      validator: async (rule, value) => {
+      validator: async (_, value) => {
         if (value) {
           await Promise.resolve();
         } else {
@@ -130,7 +130,7 @@ let rules: Record<string, Rule[]> = {
   signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
   reduce: [{ required: true, message: t('message.pleaseAggregationMethod'), trigger: "change" }],
 };
-const formRef = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
 const modalVisible = ref(false);
 const form = reactive({ calc_rule_id: "", mqtt_client_id: "", signal_id: "", signal_name: "", name: "", reduce: "" });
 let columns = [
@@ -141,7 +141,7 @@ let columns = [
   {
     title: t('message.clientID'),
     dataIndex: "mqtt_client_id",
-    render: ({ record }) => {
+    render: ({ record }:any) => {
       return record.mqtt_client_name;
     },
   },
@@ -169,7 +169,7 @@ const reduces = {
   last: t('message.last'),
 };
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
@@ -184,13 +184,13 @@ watch(
 watch(
   () => form.mqtt_client_id,
   () => {
-    formRef.value.clearValidate("mqtt_client_id");
+    (formRef.value as HTMLFormElement).clearValidate("mqtt_client_id");
   },
 );
 watch(
   () => form.signal_id,
   () => {
-    formRef.value.clearValidate("signal_id");
+    (formRef.value as HTMLFormElement).clearValidate("signal_id");
   },
 );
 watch(locale, () => {
@@ -222,7 +222,7 @@ watch(locale, () => {
     name: [
       {
         required: true,
-        validator: async (rule, value) => {
+        validator: async (_, value) => {
           if (value) {
             await Promise.resolve();
           } else {
@@ -244,7 +244,7 @@ watch(locale, () => {
 });
 
 const onAddData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       CalcParamCreate({ ...form }).then(async ({ data }) => {
@@ -254,11 +254,10 @@ const onAddData = () => {
           formRef.value?.resetFields();
           await pageList();
         } else {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       });
-    }).catch(e=>{
+    }).catch((e:any)=>{
         console.error(e)
       });
 };
@@ -272,9 +271,7 @@ const edit = (key: string) => {
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
-  // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
     message.error(t('message.clientSignal'));
     await pageList();
@@ -284,7 +281,6 @@ const save = async (key: string) => {
   await pageList();
 };
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 const confirm = async (id: string) => {
@@ -293,7 +289,6 @@ const confirm = async (id: string) => {
       message.success(data.message);
       await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   }).catch(e=>{
@@ -303,8 +298,8 @@ const confirm = async (id: string) => {
 
 
 const pageList = async () => {
-  const { data } = await CalcParamPage({ rule_id: form.calc_rule_id, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await CalcParamPage({ rule_id: form.calc_rule_id, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
@@ -322,9 +317,9 @@ const handleCustomEvent = (payload: any) => {
   }
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await pageList();
 };
 </script>

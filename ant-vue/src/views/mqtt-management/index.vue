@@ -11,9 +11,9 @@
       </a-form>
       <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
       <!--      表格-->
-      <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
-          <template v-if="['host', 'port', 'username', 'password', 'subtopic'].includes(column.dataIndex)">
+          <template v-if="['host', 'port', 'username', 'password', 'subtopic'].includes(String(column.dataIndex))">
             <div>
               <a-input-number v-if="editableData[record.key] && column.dataIndex === 'port'" v-model:value="editableData[record.key][column.dataIndex]" :precision="0" style="margin: -5px 0" />
               <a-input-password v-else-if="editableData[record.key] && column.dataIndex === 'host'" v-model:value="editableData[record.key][column.dataIndex]" :precision="0" style="margin: -5px 0" />
@@ -134,7 +134,7 @@ import type { UnwrapRef } from "vue";
 import { h, onMounted, reactive, ref, watch } from "vue";
 import useClipboard from "vue-clipboard3";
 import { Codemirror } from "vue-codemirror";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
 import { javascript } from "@codemirror/lang-javascript";
@@ -168,7 +168,7 @@ let rules: Record<string, Rule[]> = {
   host: [
     {
       required: true,
-      validator: async (rule, value) => {
+      validator: async (_, value) => {
         if (value) {
           await Promise.resolve();
         } else {
@@ -195,8 +195,8 @@ let rules: Record<string, Rule[]> = {
 };
 const routerStore = useRouterNameStore();
 const scriptId = ref("");
-const formRef = ref<FormInstance>();
-const formRefNews = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
+const formRefNews = ref<HTMLFormElement | null>(null);
 const myTheme = EditorView.theme(
   {
     // 输入的字体颜色
@@ -273,7 +273,7 @@ const columns = ref([
   {
     title: t('message.start'),
     dataIndex: "start",
-    customRender: ({ text }) => {
+    customRender: ({ text }: any) => {
       return h("span", text ? t('message.yes') : t('message.no'));
     },
   },
@@ -282,7 +282,7 @@ const columns = ref([
     dataIndex: "operation",
   },
 ]);
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
@@ -348,7 +348,7 @@ watch(locale, () => {
     host: [
       {
         required: true,
-        validator: async (rule, value) => {
+        validator: async (_, value) => {
           if (value) {
             await Promise.resolve();
           } else {
@@ -395,7 +395,6 @@ const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
 };
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 
@@ -406,7 +405,6 @@ const onSignal = (id: string) => {
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
   const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   if (!ipPattern.test(data.host)) {
@@ -417,8 +415,8 @@ const save = async (key: string) => {
   await pageList();
 };
 const pageList = async () => {
-  const { data } = await MqttPage({ client_id: formState.client_id, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await MqttPage({ client_id: formState.client_id, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
@@ -442,7 +440,6 @@ const confirm = (id: string) => {
       message.success(data.message);
       await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   });
@@ -464,7 +461,7 @@ onMounted(async () => {
 });
 
 const onAddData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       MqttCreate(form.value).then(async ({ data }) => {
@@ -474,14 +471,13 @@ const onAddData = () => {
           formRef.value?.resetFields();
           await pageList();
         } else {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       }).catch(e=>{
         console.error(e);
       });
     })
-    .catch(e => {
+    .catch((e:any) => {
       console.error(e);
     });
 };
@@ -539,7 +535,7 @@ const handleReject = () => {
 };
 
 const setModalNew = () => {
-  formRefNews.value
+  (formRefNews.value as HTMLFormElement)
     .validate()
     .then(() => {
       MqttSend(formNews.value).then(async ({ data }) => {
@@ -549,21 +545,20 @@ const setModalNew = () => {
           formRefNews.value?.resetFields();
           await pageList();
         } else {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       }).catch(e=> {
         console.error(e)
       });
     })
-    .catch(e => {
+    .catch((e:any) => {
       console.error(e)
     });
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await pageList();
 };
 </script>

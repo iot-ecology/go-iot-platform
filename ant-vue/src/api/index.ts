@@ -96,7 +96,7 @@ export async function DashboardDelete(id: string) {
   return await axios.post(`${url}/dashboard/delete/${id}`);
 }
 
-export async function DashboardId(id:number | string ) {
+export async function DashboardId(id: any ) {
   return await axios.get(`${url}/dashboard/${id}`);
 }
 

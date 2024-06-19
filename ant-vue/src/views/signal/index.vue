@@ -16,7 +16,7 @@
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
-          <template v-if="['min', 'max', 'in_or_out'].includes(column.dataIndex)">
+          <template v-if="['min', 'max', 'in_or_out'].includes(String(column.dataIndex))">
             <div>
               <a-switch
                 v-if="editableData[record.key] && column.dataIndex === 'in_or_out'"
@@ -66,7 +66,7 @@
         <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
           <a-form ref="formRefTime" :rules="rules" :model="formObj">
             <a-form-item :label="$t('message.timeframe')" name="date">
-              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formObj.date" show-time @change="bptjTimeChange" />
+              <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="formObj.date" show-time @change="onTimeChange" />
             </a-form-item>
           </a-form>
         </a-spin>
@@ -100,7 +100,6 @@
 <script setup lang="ts">
 import type { UnwrapRef } from "vue";
 import { reactive, ref, watch} from "vue";
-import type { FormInstance } from "ant-design-vue";
 import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import dayjs from "dayjs";
@@ -115,8 +114,8 @@ interface DataItem {
   min: number;
   in_or_out: boolean;
 }
-const formRef = ref<FormInstance>();
-const formRefTime = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
+const formRefTime = ref<HTMLFormElement | null>(null);
 const modalVisible = ref(false);
 const modalTime = ref(false);
 const modalHistory = ref(false);
@@ -137,7 +136,7 @@ let columns = [
   {
     title: t('message.internalExternalAlarm'),
     dataIndex: "in_or_out",
-    render: ({ record }) => {
+    render: ({ record }: any) => {
       return record.in_or_out ? t('message.internalAlarm') : t('message.externalAlarm');
     },
   },
@@ -162,7 +161,7 @@ const paginations = reactive({
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
-const formObj = reactive({ ID: "", up_time_start: "", up_time_end: "", date: "" });
+const formObj = reactive({ ID: "", up_time_start: 0, up_time_end: 0, date: "" });
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 const columnsResult = ref([
   {
@@ -233,7 +232,7 @@ watch(locale, () => {
 });
 
 const onAddData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       if (!form.signal_id || !form.mqtt_client_id) {
@@ -260,13 +259,13 @@ const onAddData = () => {
 };
 
 const getHistoryData = () => {
-  formRefTime.value
+  (formRefTime.value as HTMLFormElement)
     .validate()
     .then(() => {
       showSpinning.value = true;
       SignalWaringConfigQueryRow(formObj)
         .then(({ data }) => {
-          dataResult.value = data.data?.map(({ insert_time, up_time, value }) => ({
+          dataResult.value = data.data?.map(({ insert_time, up_time, value }: any) => ({
             insert_time: dayjs(insert_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
             up_time: dayjs(up_time * 1000).format("YYYY-MM-DD HH:mm:ss"),
             value,
@@ -282,7 +281,7 @@ const getHistoryData = () => {
           formObj.date = "";
         });
     })
-    .catch(e => {
+    .catch((e: any) => {
       console.error(e)
     });
 };
@@ -342,7 +341,7 @@ const onWaringHistory = (record: any) => {
   formObj.ID = record.ID;
   modalTime.value = true;
 };
-const bptjTimeChange = (date: any, dataString: any) => {
+const onTimeChange = (dataString: any) => {
   formObj.up_time_start = dayjs(dataString[0]).unix();
   formObj.up_time_end = dayjs(dataString[1]).unix();
 };

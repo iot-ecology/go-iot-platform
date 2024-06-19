@@ -12,9 +12,9 @@
         </a-form>
         <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
 
-        <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
+        <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
           <template #bodyCell="{ column, text, record }">
-            <template v-if="['name', 'type', 'alias', 'cache_size', 'unit'].includes(column.dataIndex)">
+            <template v-if="['name', 'type', 'alias', 'cache_size', 'unit'].includes(String(column.dataIndex))">
               <div>
                 <a-select v-if="editableData[record.key] && column.dataIndex == 'type'" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0; width: 300px">
                   <a-select-option value="文本">{{ $t('message.text') }}</a-select-option>
@@ -108,7 +108,7 @@
 import type { UnwrapRef } from "vue";
 import {reactive, ref, watch} from "vue";
 import { useRoute } from "vue-router";
-import { type FormInstance, message } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash-es";
@@ -136,7 +136,7 @@ let rules: Record<string, Rule[]> = {
   unit: [{ required: true, message: t('message.pleaseUnit'), trigger: "blur" }],
 };
 const jump = useRouteJump();
-const formRef = ref<FormInstance>();
+const formRef = ref<HTMLFormElement | null>(null);
 const routerStore = useRouterNameStore();
 const route = useRoute();
 const value = ref("");
@@ -175,7 +175,7 @@ let columns = [
 ];
 const list = ref([]);
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
@@ -230,7 +230,7 @@ watch(locale, () => {
 });
 
 const onAddData = () => {
-  formRef.value
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
       SignalCreate({ ...form }).then(async ({ data }) => {
@@ -240,14 +240,13 @@ const onAddData = () => {
           formRef.value?.resetFields();
           await pageList();
         } else {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           message.error(`${t('message.operationFailed')}:${data.data}`);
         }
       }).catch(e=>{
         console.error(e)
       });
     })
-    .catch(e => {
+    .catch((e:any) => {
       console.error(e)
     });
 };
@@ -255,14 +254,11 @@ const onAddData = () => {
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
-  // eslint-disable-next-line no-debugger
   await SignalUpdate(data);
   await pageList();
 };
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 const edit = (key: string) => {
@@ -274,7 +270,6 @@ const confirm = async (id: string) => {
       message.success(data.message);
       await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
   }).catch(e=>{
@@ -283,8 +278,8 @@ const confirm = async (id: string) => {
 };
 
 const pageList = async () => {
-  const { data } = await SignalPage({ mqtt_client_id: value.value, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await SignalPage({ mqtt_client_id: value.value, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
@@ -302,9 +297,9 @@ const onSignal = (id: string, mqtt_client_id: string) => {
   jump.routeJump({ path: "/signal", query: { id, mqtt_client_id } });
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await pageList();
 };
 
@@ -328,7 +323,7 @@ const onView = (id: number, rowId: number, alias: string, unit: string, type: st
         modalView.value = true;
         const series: any = [];
         const list: any = data.data;
-        let xAxis: any = list?.push_time?.map((it) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss"));
+        let xAxis: any = list?.push_time?.map((it:any) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss"));
         delete list.push_time;
         delete list.storage_time;
         Object.keys(list).forEach((item: string) => {
@@ -336,14 +331,14 @@ const onView = (id: number, rowId: number, alias: string, unit: string, type: st
             name: alias,
             type: "line",
             barWidth: "20",
-            data: list[item].map((it) => it._value),
+            data: list[item].map((it:any) => it._value),
           });
         });
         xAxis = xAxis?.length ? xAxis.slice(0, series[0].data?.length) : [];
         option.value = {
           tooltip: {
             trigger: "axis",
-            formatter: (params) => {
+            formatter: (params: any) => {
               return `${params[0].name}: ${params[0].value} ${unit}`;
             },
           },
@@ -426,7 +421,7 @@ const bptjTimeChange = (date: any) => {
         historyView.value = true;
         const series: any = [];
         const list: any = data.data;
-        let xAxis: any = list?.push_time?.map((it) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss")) || [];
+        let xAxis: any = list?.push_time?.map((it: any) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss")) || [];
         delete list.push_time;
         delete list.storage_time;
 
@@ -435,14 +430,14 @@ const bptjTimeChange = (date: any) => {
             name: recordObj.value.alias,
             type: "line",
             barWidth: "20",
-            data: list[item].map((it) => it._value),
+            data: list[item].map((it :any) => it._value),
           });
         });
         xAxis = xAxis?.length ? xAxis.slice(0, series[0].data?.length) : [];
         option.value = {
           tooltip: {
             trigger: "axis",
-            formatter: (params) => {
+            formatter: (params:any) => {
               return `${params[0].name}: ${params[0].value} ${recordObj.value.unit}`;
             },
           },

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { message } from "ant-design-vue";
 
 import { MqttPage } from "@/api";
@@ -23,10 +23,10 @@ const props = defineProps({
 const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
-const options = ref([]);
-const value = ref(props.clientId);
-const valueResult = ref("");
-const valueSearch = ref("");
+const options = ref<any>([]);
+const value = ref<any>(props.clientId);
+const valueResult = ref<any>("");
+const valueSearch = ref<any>("");
 const showOpen = ref(false);
 
 const emits = defineEmits(["update:modelValue"]);
@@ -49,7 +49,6 @@ const List = async () => {
   emits("update:modelValue", value.value);
   valueResult.value = value.value;
 };
-List();
 
 const select = async (ValueClick: any) => {
   if (ValueClick === -11) {
@@ -80,7 +79,6 @@ const handleSearch = async (val: string) => {
     return;
   }
   valueSearch.value = val;
-  // options.value = [];
   pageSelect.value = 1;
   const { data } = await MqttPage({ client_id: val, page: pageSelect.value, page_size: 100 });
   if (data.data.total === 0) {
@@ -104,14 +102,18 @@ const handleSearch = async (val: string) => {
   }
 };
 
-watch(value, (newValue) => {
+watch(value, async (newValue) => {
   if (!newValue) {
     options.value = [];
     page.value = 1;
     valueSearch.value = "";
-    List();
+    await List();
   }
 });
+
+onMounted(async ()=>{
+  await List();
+})
 </script>
 
 <template>
