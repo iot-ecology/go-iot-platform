@@ -123,6 +123,7 @@ import { SignalDelayWaringCreate, SignalDelayWaringDelete, SignalDelayWaringGenP
 import { YcECharts } from "@/components";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
+import { MY_THEME } from "@/constants"
 import {useI18n} from "vue-i18n";
 const { toClipboard } = useClipboard();
 
@@ -208,43 +209,7 @@ const columnsResult = ref([
   },
 ]);
 
-const myTheme = EditorView.theme(
-  {
-    // 输入的字体颜色
-    "&": {
-      color: "#0052D9",
-      backgroundColor: "#FFFFFF",
-    },
-    ".cm-content": {
-      caretColor: "#0052D9",
-    },
-    // 激活背景色
-    ".cm-activeLine": {
-      backgroundColor: "#FAFAFA",
-    },
-    // 激活序列的背景色
-    ".cm-activeLineGutter": {
-      backgroundColor: "#FAFAFA",
-    },
-    // 光标的颜色
-    "&.cm-focused .cm-cursor": {
-      borderLeftColor: "#0052D9",
-    },
-    // 选中的状态
-    "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "#0052D9",
-      color: "#FFFFFF",
-    },
-    // 左侧侧边栏的颜色
-    ".cm-gutters": {
-      backgroundColor: "#FFFFFF",
-      color: "#ddd", // 侧边栏文字颜色
-      border: "none",
-    },
-  },
-  { dark: true },
-);
-const extensions = [javascript(), myTheme, EditorView.lineWrapping];
+const extensions = [javascript(), MY_THEME, EditorView.lineWrapping];
 
 watch(locale, () => {
   columns.value = [

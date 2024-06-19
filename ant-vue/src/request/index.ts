@@ -56,7 +56,7 @@ instance.interceptors.response.use(
     if (response.status === 200) {
       // 处理二进制流
       if (res instanceof ArrayBuffer) {
-        return await Promise.resolve(response);
+        return response;
       }
       // 处理其他非正常响应
       else if (res.code !== 20000) {

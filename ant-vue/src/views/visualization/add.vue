@@ -5,11 +5,11 @@
     <VueDraggable v-model="listArr" :animation="150" ghost-class="ghost" group="people" handle=".drag-handle">
       <div v-for="(item, index) in listArr" :key="item.id" class="cursor-move">
         <a-spin :tip="$t('message.loading')" size="large" :spinning="item.showSpinning">
-          <a-collapse :bordered="false" style="background: rgb(255, 255, 255)" :default-active-key="['1']" collapsible="icon">
+          <a-collapse :bordered="false" style="background: rgb(255, 255, 255)" :default-active-key="['coll']" collapsible="icon">
             <template #expandIcon="{ isActive }">
               <caret-right-outlined :rotate="isActive ? 90 : 0" />
             </template>
-            <a-collapse-panel key="1" :style="customStyle" :collapsible="icon">
+            <a-collapse-panel key="coll" :style="customStyle" :collapsible="icon">
               <template #header>
                 <div class="drag-handle" style="display: flex; justify-content: space-between; border-bottom: 1px solid; padding: 5px">
                   <div>
@@ -40,7 +40,7 @@
       <a-form ref="formRef" :label-col="{ style: { width: '130px' } }" :model="form" :rules="rules" name="nest-messages">
         <a-form-item :label="$t('message.time')">
           <a-tabs v-model:activeKey="activeKey">
-            <a-tab-pane key="1" :tab="$t('message.dynamicTime')">
+            <a-tab-pane key="dynamic_Time" :tab="$t('message.dynamicTime')">
               <div style="display: flex; align-items: center">
                 {{ $t('message.recently') }}
                 <a-input-number v-model:value="dateTime" style="margin: 0 5px; width: 150px"></a-input-number>
@@ -53,7 +53,7 @@
                 </a-select>
               </div>
             </a-tab-pane>
-            <a-tab-pane key="2" :tab="$t('message.staticTime')">
+            <a-tab-pane key="static_Time" :tab="$t('message.staticTime')">
               <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" v-model:value="time" value-format="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss" style="width: 350px" show-time @change="onTimeChange" />
             </a-tab-pane>
           </a-tabs>
@@ -164,8 +164,8 @@ const modalSave = ref(false);
 const time = ref<RangeValue>();
 const form = reactive({ client_id: "", fields: [], start_time: "", end_time: "", every: 1, function: "mean", create_empty: false, list: [{ client_id: "", fields: "", function: "mean" }] });
 const indexNumber = ref(0);
-const activeKey = ref("1");
-const dateTime = ref(null);
+const activeKey = ref("dynamic_Time");
+const dateTime = ref('');
 const dateUnit = ref("day");
 const createName = ref("");
 const id = ref("");
@@ -207,7 +207,7 @@ if (route.query.id) {
       id.value = data.data.ID;
       if (JSON.parse(data.data.config) && JSON.parse(data.data.config)?.length) {
         listArr.value = JSON.parse(data.data.config);
-        listArr.value.forEach((item, index) => {
+        listArr.value.forEach((_, index:number) => {
           getData(index);
         });
       }
@@ -251,17 +251,17 @@ const onSet = (index: number) => {
     form.function = listArr.value[index].param.aggregation.function || "mean";
     form.create_empty = listArr.value[index].param.aggregation.create_empty || false;
     form.list = listArr.value[index].param.list;
-    activeKey.value = listArr.value[index].param.dateUnit && listArr.value[index].param.sub ? "1" : "2";
+    activeKey.value = listArr.value[index].param.dateUnit && listArr.value[index].param.sub ? "dynamic_Time" : "static_Time";
     if (listArr.value[index].param?.start_time && listArr.value[index].param?.end_time) {
-      activeKey.value = "2";
+      activeKey.value = "static_Time";
     } else {
-      activeKey.value = "1";
+      activeKey.value = "dynamic_Time";
     }
     dateUnit.value = listArr.value[index].param?.dateUnit || "day";
     dateTime.value = listArr.value[index].param?.sub || "";
     form.start_time = listArr.value[index].param?.start_time || "";
     form.end_time = listArr.value[index].param?.end_time || "";
-    if (activeKey.value === "1") {
+    if (activeKey.value === "dynamic_Time") {
       time.value = [];
     } else {
       if (listArr.value[index].param.start_time && listArr.value[index].param.end_time) {
@@ -281,17 +281,17 @@ const onDelete = (index: number) => {
   listArr.value.splice(index, 1);
 };
 const onConfirm = () => {
-  let start_time = null;
+  let start_time: any = null;
   const end_time = dayjs().unix();
-  if (activeKey.value === "1") {
+  if (activeKey.value === "dynamic_Time") {
     start_time = dayjs().subtract(dateTime.value, dateUnit.value).unix();
   }
-  if (activeKey.value === "1" && !dateTime.value) {
+  if (activeKey.value === "dynamic_Time" && !dateTime.value) {
     message.error(t('message.pleaseTime'));
     return;
   }
 
-  if (activeKey.value === "2" && !(form.start_time && form.end_time)) {
+  if (activeKey.value === "static_Time" && !(form.start_time && form.end_time)) {
     message.error(t('message.pleaseTime'));
     return;
   }
@@ -303,8 +303,8 @@ const onConfirm = () => {
     QueryInfluxdb({
       measurement: String(item.client_id),
       fields: [String(item.fields), "storage_time", "push_time"],
-      start_time: activeKey.value === "1" ? start_time : form.start_time,
-      end_time: activeKey.value === "1" ? end_time : form.end_time,
+      start_time: activeKey.value === "dynamic_Time" ? start_time : form.start_time,
+      end_time: activeKey.value === "dynamic_Time" ? end_time : form.end_time,
       aggregation: {
         every: form.every,
         function: item.function,
@@ -325,15 +325,15 @@ const onConfirm = () => {
             },
             list: form.list,
           };
-          if (activeKey.value === "1") {
-            listArr.value[indexNumber.value].param.sub = activeKey.value === "1" ? dateTime.value : "";
-            listArr.value[indexNumber.value].param.sub = activeKey.value === "1" ? dateUnit.value : "";
+          if (activeKey.value === "dynamic_Time") {
+            listArr.value[indexNumber.value].param.sub = activeKey.value === "dynamic_Time" ? dateTime.value : "";
+            listArr.value[indexNumber.value].param.sub = activeKey.value === "dynamic_Time" ? dateUnit.value : "";
           }
-          if (activeKey.value === "2") {
-            listArr.value[indexNumber.value].param.start_time = activeKey.value === "1" ? start_time : form.start_time;
-            listArr.value[indexNumber.value].param.end_time = activeKey.value === "1" ? end_time : form.end_time;
+          if (activeKey.value === "static_Time") {
+            listArr.value[indexNumber.value].param.start_time = activeKey.value === "dynamic_Time" ? start_time : form.start_time;
+            listArr.value[indexNumber.value].param.end_time = activeKey.value === "dynamic_Time" ? end_time : form.end_time;
           }
-          const list: any = data.data;
+          const list: any = data.data || [];
           const xAxis: any = list?.push_time?.map((it: any) => dayjs(it._time).format("YYYY-MM-DD HH:mm:ss")) || [];
           delete list.push_time;
           delete list.storage_time;

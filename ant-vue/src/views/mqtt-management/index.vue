@@ -44,9 +44,9 @@
                 <a-popconfirm v-else :title="$t('message.sureStop')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirmStop(record.ID)">
                   <a-button type="primary" size="small">{{$t('message.stop')}}</a-button>
                 </a-popconfirm>
-                <a-button type="primary" size="small" style="margin-left: 10px" @click="(code = record.script), (scriptId = record.ID), (modalScriptShow = true)">{{$t('message.parsingScripts')}}</a-button>
+                <a-button type="primary" size="small" style="margin-left: 10px" @click="(code = record.script); (scriptId = record.ID); (modalScriptShow = true)">{{$t('message.parsingScripts')}}</a-button>
                 <a-button type="primary" size="small" style="margin-left: 10px" @click="onSignal(record.ID)">{{$t('message.signalConfig')}}</a-button>
-                <a-button type="primary" size="small" v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true), (formNews.client_id = record.client_id)">{{$t('message.simulated')}}</a-button>
+                <a-button type="primary" size="small" v-if="record.start" style="margin-left: 10px" @click="(modalNewShow = true); (formNews.client_id = record.client_id)">{{$t('message.simulated')}}</a-button>
                 <a-popconfirm v-if="!record.start" :title="$t('message.sureDelete')" :ok-text="$t('message.yes')" :cancel-text="$t('message.no')" @confirm="confirm(record.ID)">
                   <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
@@ -144,6 +144,7 @@ import { useI18n } from 'vue-i18n';
 import { MqttCheckScript, MqttCreate, MqttDelete, MqttPage, MqttSend, MqttSetScript, MqttStart, MqttStop, MqttUpdate } from "@/api";
 import { useRouteJump } from "@/hooks/useRouteJump.ts";
 import { useRouterNameStore } from "@/stores/routerPath.ts";
+import { MY_THEME } from "@/constants"
 const { toClipboard } = useClipboard();
 const { t,locale } = useI18n();
 interface DataItem {
@@ -197,43 +198,7 @@ const routerStore = useRouterNameStore();
 const scriptId = ref("");
 const formRef = ref<HTMLFormElement | null>(null);
 const formRefNews = ref<HTMLFormElement | null>(null);
-const myTheme = EditorView.theme(
-  {
-    // 输入的字体颜色
-    "&": {
-      color: "#0052D9",
-      backgroundColor: "#FFFFFF",
-    },
-    ".cm-content": {
-      caretColor: "#0052D9",
-    },
-    // 激活背景色
-    ".cm-activeLine": {
-      backgroundColor: "#FAFAFA",
-    },
-    // 激活序列的背景色
-    ".cm-activeLineGutter": {
-      backgroundColor: "#FAFAFA",
-    },
-    // 光标的颜色
-    "&.cm-focused .cm-cursor": {
-      borderLeftColor: "#0052D9",
-    },
-    // 选中的状态
-    "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "#0052D9",
-      color: "#FFFFFF",
-    },
-    // 左侧侧边栏的颜色
-    ".cm-gutters": {
-      backgroundColor: "#FFFFFF",
-      color: "#ddd", // 侧边栏文字颜色
-      border: "none",
-    },
-  },
-  { dark: true },
-);
-const extensions = [javascript(), myTheme, EditorView.lineWrapping];
+const extensions = [javascript(), MY_THEME, EditorView.lineWrapping];
 const modalVisible = ref(false);
 const modalScriptShow = ref(false);
 const modalNewShow = ref(false);
