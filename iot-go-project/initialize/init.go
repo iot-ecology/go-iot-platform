@@ -37,6 +37,11 @@ var (
 	calcParamApi              = router.CalcParamApi{}
 	signalDelayWaringParamApi = router.SignalDelayWaringParamApi{}
 	signalDelayWaringApi      = router.SignalDelayWaringApi{}
+	productApi                = router.ProductApi{}
+	deviceGroupApi            = router.DeviceGroupApi{}
+	deviceInfoApi             = router.DeviceInfoApi{}
+	productionPlanApi         = router.ProductionPlanApi{}
+	repairRecordApi           = router.RepairRecordApi{}
 )
 
 func initTable() {
@@ -100,6 +105,62 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.Dashboard{}) {
 
 		err := glob.GDb.AutoMigrate(&models.Dashboard{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Product{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Product{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceInfo{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceInfo{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroup{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroup{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroupDevice{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroupDevice{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.RepairRecord{}) {
+
+		err := glob.GDb.AutoMigrate(&models.RepairRecord{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductionPlan{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductionPlan{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductPlan{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductPlan{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductionBatch{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductionBatch{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -213,11 +274,41 @@ func initRouter(r *gin.Engine) {
 	r.POST("/signal-waring-config/update", signalWaringConfigApi.UpdateSignalWaringConfig)
 	r.GET("/signal-waring-config/page", signalWaringConfigApi.PageSignalWaringConfig)
 
-	r.POST("/dashboard/create", dashboardApi.Createdashboard)
-	r.POST("/dashboard/update", dashboardApi.Updatedashboard)
-	r.GET("/dashboard/:id", dashboardApi.ByIddashboard)
-	r.GET("/dashboard/page", dashboardApi.Pagedashboard)
-	r.POST("/dashboard/delete/:id", dashboardApi.Deletedashboard)
+	r.POST("/dashboard/create", dashboardApi.CreateDashboard)
+	r.POST("/dashboard/update", dashboardApi.UpdateDashboard)
+	r.GET("/dashboard/:id", dashboardApi.ByIdDashboard)
+	r.GET("/dashboard/page", dashboardApi.PageDashboard)
+	r.POST("/dashboard/delete/:id", dashboardApi.DeleteDashboard)
+
+	r.POST("/product/create", productApi.CreateProduct)
+	r.POST("/product/update", productApi.UpdateProduct)
+	r.GET("/product/:id", productApi.ByIdProduct)
+	r.GET("/product/page", productApi.PageProduct)
+	r.POST("/product/delete/:id", productApi.DeleteProduct)
+
+	r.POST("/device_group/create", deviceGroupApi.CreateDeviceGroup)
+	r.POST("/device_group/update", deviceGroupApi.UpdateDeviceGroup)
+	r.GET("/device_group/:id", deviceGroupApi.ByIdDeviceGroup)
+	r.GET("/device_group/page", deviceGroupApi.PageDeviceGroup)
+	r.POST("/device_group/delete/:id", deviceGroupApi.DeleteDeviceGroup)
+
+	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
+	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
+	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
+	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
+	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
+
+	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
+	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
+	r.GET("/ProductionPlan/:id", productionPlanApi.ByIdProductionPlan)
+	r.GET("/ProductionPlan/page", productionPlanApi.PageProductionPlan)
+	r.POST("/ProductionPlan/delete/:id", productionPlanApi.DeleteProductionPlan)
+
+	r.POST("/RepairRecord/create", repairRecordApi.CreateRepairRecord)
+	r.POST("/RepairRecord/update", repairRecordApi.UpdateRepairRecord)
+	r.GET("/RepairRecord/:id", repairRecordApi.ByIdRepairRecord)
+	r.GET("/RepairRecord/page", repairRecordApi.PageRepairRecord)
+	r.POST("/RepairRecord/delete/:id", repairRecordApi.DeleteRepairRecord)
 
 	r.POST("/calc-rule/create", calcRuleApi.CreateCalcRule)
 	r.POST("/calc-rule/update", calcRuleApi.UpdateCalcRule)
