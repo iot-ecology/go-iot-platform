@@ -2,3 +2,5 @@ docs/
 ppt/
 
 .idea/
+
+/docker/rabbitmq/data
