@@ -236,3 +236,19 @@ type UserBindRoleParam struct {
 	UserId  int   `json:"user_id"`
 	RoleIds []int `json:"role_id"`
 }
+
+type UserBindDeviceInfoParam struct {
+	UserId        int   `json:"user_id"`
+	DeviceInfoIds []int `json:"device_info_id"`
+}
+
+type DeviceBindMqttClientParam struct {
+	DeviceId     int   `json:"device_id"`
+	MqttClientId []int `json:"mqtt_client_id"`
+}
+
+type DeviceGroupBindMqttClientParam struct {
+	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
+
+	MqttClientId []int `json:"mqtt_client_id"`
+}

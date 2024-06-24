@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
@@ -187,4 +188,81 @@ func (api *DeviceInfoApi) ByIdDeviceInfo(c *gin.Context) {
 	}
 
 	servlet.Resp(c, DeviceInfo)
+}
+
+// QueryBindMqtt
+// @Tags      DeviceInfos
+// @Summary   查询绑定MQTT客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindMqtt [get]
+func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var deviceBindMqttClients []models.DeviceBindMqttClient
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&deviceBindMqttClients)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, deviceBindMqttClients)
+}
+
+// BindMqtt
+// @Tags      DeviceInfos
+// @Summary   绑定mqtt客户端
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
+// @Router    /DeviceInfo/BindMqtt [post]
+func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
+	var param servlet.DeviceBindMqttClientParam
+	if err := c.ShouldBindJSON(&param); err != nil {
+
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	// 开启事务
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
+
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var groupBindMqttClients []models.DeviceBindMqttClient
+	for _, mqttClientId := range param.MqttClientId {
+		groupBindMqttClients = append(groupBindMqttClients, models.DeviceBindMqttClient{
+			DeviceInfoId: uint(param.DeviceId),
+			MqttClientId: uint(mqttClientId),
+		})
+	}
+
+	result = tx.Model(&models.DeviceBindMqttClient{}).CreateInBatches(groupBindMqttClients, len(groupBindMqttClients))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "绑定成功")
+
 }

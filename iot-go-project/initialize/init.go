@@ -213,6 +213,27 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.UserBindDeviceInfo{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserBindDeviceInfo{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindMqttClient{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindMqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroupBindMqttClient{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroupBindMqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -342,12 +363,16 @@ func initRouter(r *gin.Engine) {
 
 	r.GET("/device_group/query_bind_device", deviceGroupApi.QueryBindDeviceInfo)
 	r.POST("/device_group/bind_device", deviceGroupApi.BindDeviceInfo)
+	r.POST("/device_group/BindMqtt", deviceGroupApi.BindMqtt)
+	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
 
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
 	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
 	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
+	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
+	r.POST("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -384,6 +409,8 @@ func initRouter(r *gin.Engine) {
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
 	r.POST("/User/QueryBindRole", userApi.QueryBindRole)
+	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
+	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 
 	r.POST("/Dept/create", deptApi.CreateDept)
 	r.POST("/Dept/update", deptApi.UpdateDept)

@@ -262,3 +262,78 @@ func (api *UserApi) QueryBindRole(c *gin.Context) {
 	}
 	servlet.Resp(c, userRoles)
 }
+
+// QueryBindDeviceInfo
+// @Tags      Users
+// @Summary   查询绑定设备
+// @Param user_id path int true "主键"
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.UserBindDeviceInfo}} "绑定关系"
+// @Produce   application/json
+// @Router    /User/QueryBindDeviceInfo [post]
+func (api *UserApi) QueryBindDeviceInfo(c *gin.Context) {
+	param := c.Param("user_id")
+
+	var bindDeviceInfos []models.UserBindDeviceInfo
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`user_id` = ?", param).Find(&bindDeviceInfos)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, bindDeviceInfos)
+}
+
+// BindDeviceInfo
+// @Tags      Users
+// @Summary   用户绑定设备
+// @Param User body servlet.UserBindDeviceInfoParam true "绑定参数"
+// @Produce   application/json
+// @Router    /User/BindDeviceInfo [post]
+func (api *UserApi) BindDeviceInfo(c *gin.Context) {
+
+	var param servlet.UserBindDeviceInfoParam
+
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	result := tx.Where("`user_id` = ?", param.UserId).Delete(&models.UserBindDeviceInfo{})
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var bindDeviceInfos []models.UserBindDeviceInfo
+	for _, roleId := range param.DeviceInfoIds {
+		bindDeviceInfos = append(bindDeviceInfos, models.UserBindDeviceInfo{
+			UserId:   uint(param.UserId),
+			DeviceId: uint(roleId),
+		})
+	}
+
+	result = tx.Model(&models.UserBindDeviceInfo{}).CreateInBatches(bindDeviceInfos, len(bindDeviceInfos))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "绑定成功")
+
+}

@@ -219,3 +219,21 @@ type Dept struct {
 	Name       string `json:"name" structs:"name"`                     // 部门名
 	ParentId   uint   `json:"parent_id,omitempty" structs:"parent_id"` // 父部门ID
 }
+
+type UserBindDeviceInfo struct {
+	gorm.Model `structs:"-"`
+	UserId     uint `json:"user_id" structs:"user_id"`     // 用户ID
+	DeviceId   uint `json:"device_id" structs:"device_id"` // 设备ID
+}
+
+type DeviceBindMqttClient struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	MqttClientId uint `json:"mqtt_client_id"`                          // MQTT客户端表的外键ID
+}
+
+type DeviceGroupBindMqttClient struct {
+	gorm.Model    `structs:"-"`
+	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
+	MqttClientId  uint `json:"mqtt_client_id"`                            // MQTT客户端表的外键ID
+}
