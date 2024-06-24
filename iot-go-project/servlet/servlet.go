@@ -231,3 +231,8 @@ type ProductPlanCreateParam struct {
 	Quantity int `json:"quantity" structs:"quantity"` // 计划生产数量
 
 }
+
+type UserBindRoleParam struct {
+	UserId  int   `json:"user_id"`
+	RoleIds []int `json:"role_id"`
+}

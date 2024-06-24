@@ -18,7 +18,7 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 		db = db.Where("sn like ?", "%"+sn+"%")
 	}
 
-	db.Model(&models.Product{}).Count(&pagination.Total)
+	db.Model(&models.DeviceInfo{}).Count(&pagination.Total)
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&dt)
 

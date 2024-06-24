@@ -14,7 +14,7 @@ func (biz *RepairRecordBiz) PageData(sn string, page, size int) (*servlet.Pagina
 
 	db := glob.GDb
 
-	db.Model(&models.Product{}).Count(&pagination.Total)
+	db.Model(&models.RepairRecord{}).Count(&pagination.Total)
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&dt)
 

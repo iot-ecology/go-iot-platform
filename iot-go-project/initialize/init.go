@@ -43,6 +43,10 @@ var (
 	productionPlanApi         = router.ProductionPlanApi{}
 	repairRecordApi           = router.RepairRecordApi{}
 	fileApi                   = router.FileApi{}
+	userApi                   = router.UserApi{}
+	deptApi                   = router.DeptApi{}
+	roleApi                   = router.RoleApi{}
+	shipmentRecordApi         = router.ShipmentRecordApi{}
 )
 
 func initTable() {
@@ -162,6 +166,49 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.ProductionBatch{}) {
 
 		err := glob.GDb.AutoMigrate(&models.ProductionBatch{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+
+	if !glob.GDb.Migrator().HasTable(&models.User{}) {
+
+		err := glob.GDb.AutoMigrate(&models.User{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Role{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Role{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.UserRole{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserRole{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Dept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Dept{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ShipmentRecord{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ShipmentRecord{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ShipmentProductDetail{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ShipmentProductDetail{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -328,6 +375,35 @@ func initRouter(r *gin.Engine) {
 	r.POST("/calc-param/update", calcParamApi.UpdateCalcParam)
 	r.GET("/calc-param/page", calcParamApi.PageCalcParam)
 	r.POST("/calc-param/delete/:id", calcParamApi.DeleteCalcParam)
+
+	r.POST("/User/create", userApi.CreateUser)
+	r.POST("/User/update", userApi.UpdateUser)
+	r.GET("/User/page", userApi.PageUser)
+	r.POST("/User/delete/:id", userApi.DeleteUser)
+	r.GET("/User/:id", userApi.ByIdUser)
+	r.GET("/User/list", userApi.ListUser)
+	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/QueryBindRole", userApi.QueryBindRole)
+
+	r.POST("/Dept/create", deptApi.CreateDept)
+	r.POST("/Dept/update", deptApi.UpdateDept)
+	r.GET("/Dept/page", deptApi.PageDept)
+	r.POST("/Dept/delete/:id", deptApi.DeleteDept)
+	r.GET("/Dept/:id", deptApi.ByIdDept)
+	r.GET("/Dept/subs", deptApi.FindByIdSubs)
+
+	r.POST("/Role/create", roleApi.CreateRole)
+	r.POST("/Role/update", roleApi.UpdateRole)
+	r.GET("/Role/page", roleApi.PageRole)
+	r.POST("/Role/delete/:id", roleApi.DeleteRole)
+	r.GET("/Role/:id", roleApi.ByIdRole)
+	r.GET("/Role/list", roleApi.ListRole)
+
+	r.POST("/ShipmentRecord/create", shipmentRecordApi.CreateShipmentRecord)
+	r.POST("/ShipmentRecord/update", shipmentRecordApi.UpdateShipmentRecord)
+	r.GET("/ShipmentRecord/page", shipmentRecordApi.PageShipmentRecord)
+	r.POST("/ShipmentRecord/delete/:id", shipmentRecordApi.DeleteShipmentRecord)
+	r.GET("/ShipmentRecord/:id", shipmentRecordApi.ByIdShipmentRecord)
 
 	r.POST("/signal-delay-waring-param/create", signalDelayWaringParamApi.CreateSignalDelayWaring)
 	r.POST("/signal-delay-waring-param/update", signalDelayWaringParamApi.UpdateSignalDelayWaring)

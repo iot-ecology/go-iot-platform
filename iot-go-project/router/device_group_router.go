@@ -178,7 +178,7 @@ func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 // @Summary   查询绑定设备
 // @Accept json
 // @Produce json
-// @Param id path int true "主键"
+// @Param group_id path int true "主键"
 // @Router    /device_group/query_bind_device [get]
 func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
 	param := c.Param("group_id")
@@ -200,7 +200,7 @@ func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
 // @Summary   绑定设备
 // @Accept json
 // @Produce json
-// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "设备组"
+// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
 // @Router    /device_group/bind_device [post]
 func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 	var param servlet.DeviceGroupCreateParam

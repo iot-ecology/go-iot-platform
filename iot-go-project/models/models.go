@@ -146,6 +146,27 @@ type RepairRecord struct {
 	gorm.Model   `structs:"-"`
 }
 
+// ShipmentRecord 发货记录
+type ShipmentRecord struct {
+	gorm.Model      `structs:"-"`
+	ShipmentDate    time.Time `json:"shipment_date" structs:"shipment_date"`       // 发货日期
+	Technician      string    `json:"technician" structs:"technician"`             // 发货人员
+	CustomerName    string    `json:"customer_name" structs:"customer_name"`       // 客户名称
+	CustomerAddress string    `json:"customer_address" structs:"customer_address"` // 客户地址
+	Quantity        int       `json:"quantity" structs:"quantity"`                 // 发货数量
+	TrackingNumber  string    `json:"tracking_number" structs:"tracking_number"`   // 跟踪号码
+	Status          string    `json:"status" structs:"status"`                     // 发货状态（例如：pending, shipped, delivered）
+	Description     string    `json:"description" structs:"description"`           // 发货描述
+}
+
+// ShipmentProductDetail 发货记录中的具体产品
+type ShipmentProductDetail struct {
+	gorm.Model       `structs:"-"`
+	ShipmentRecordId uint `json:"shipment_record_id" structs:"shipment_record_id"` // 发货记录ID
+	ProductID        uint `json:"product_id" structs:"product_id"`                 // 关联的产品ID
+	Quantity         int  `json:"quantity" structs:"quantity"`                     // 发货数量
+}
+
 // ProductionPlan 表示生产计划
 type ProductionPlan struct {
 	gorm.Model  `structs:"-"`
@@ -172,4 +193,29 @@ type ProductionBatch struct {
 	EndDate          time.Time `json:"end_date" structs:"end_date"`                     // 生产批次结束日期
 	QuantityProduced int       `json:"quantity_produced" structs:"quantity_produced"`   // 实际生产数量
 	QualityStatus    string    `json:"quality_status" structs:"quality_status"`         // 质量状态
+}
+
+type User struct {
+	gorm.Model `structs:"-"`
+	Username   string `json:"username" structs:"username"` // 用户名
+	Password   string `json:"password" structs:"password"` // 密码
+	Email      string `json:"email" structs:"email"`       // 电子邮箱
+	Status     string `json:"status" structs:"status"`     // 用户状态（例如：active, inactive）
+}
+
+type Role struct {
+	gorm.Model  `structs:"-"`
+	Name        string `json:"name" structs:"name"`               // 角色名
+	Description string `json:"description" structs:"description"` // 角色描述
+}
+
+type UserRole struct {
+	gorm.Model `structs:"-"`
+	UserId     uint `json:"user_id" structs:"user_id"` // 用户ID
+	RoleId     uint `json:"role_id" structs:"role_id"` // 角色ID
+}
+type Dept struct {
+	gorm.Model `structs:"-"`
+	Name       string `json:"name" structs:"name"`                     // 部门名
+	ParentId   uint   `json:"parent_id,omitempty" structs:"parent_id"` // 父部门ID
 }
