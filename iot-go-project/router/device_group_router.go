@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
@@ -170,4 +171,81 @@ func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 	}
 
 	servlet.Resp(c, DeviceGroup)
+}
+
+// QueryBindDeviceInfo
+// @Tags      DeviceGroups
+// @Summary   查询绑定设备
+// @Accept json
+// @Produce json
+// @Param id path int true "主键"
+// @Router    /device_group/query_bind_device [get]
+func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
+	param := c.Param("group_id")
+
+	var deviceGroupDevices []models.DeviceGroupDevice
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`group_id` = ?", param).Find(&deviceGroupDevices)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, deviceGroupDevices)
+}
+
+// BindDeviceInfo
+// @Tags      DeviceGroups
+// @Summary   绑定设备
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "设备组"
+// @Router    /device_group/bind_device [post]
+func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
+	var param servlet.DeviceGroupCreateParam
+	if err := c.ShouldBindJSON(&param); err != nil {
+
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	// 开启事务
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	result := tx.Where("`group_id` = ?", param.GroupId).Delete(&models.DeviceGroupDevice{})
+
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var deviceGroupDevices []models.DeviceGroupDevice
+	for _, deviceId := range param.DeviceId {
+		deviceGroupDevices = append(deviceGroupDevices, models.DeviceGroupDevice{
+			GroupId:      uint(param.GroupId),
+			DeviceInfoId: uint(deviceId),
+		})
+	}
+
+	result = tx.Model(&models.DeviceGroupDevice{}).CreateInBatches(deviceGroupDevices, len(deviceGroupDevices))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "绑定成功")
+
 }

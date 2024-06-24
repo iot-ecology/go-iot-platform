@@ -53,7 +53,6 @@ func (api *DashboardApi) CreateDashboard(c *gin.Context) {
 // @Tags dashboards
 // @Accept json
 // @Produce json
-// @Param id path int true "面板id"
 // @Param dashboard body models.Dashboard true "面板"
 // @Success 200 {object}  servlet.JSONResult{data=models.Dashboard} "面板"
 // @Failure 400 {string} string "请求数据错误"

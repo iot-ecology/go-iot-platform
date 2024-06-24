@@ -2,11 +2,13 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+	"time"
 )
 
 type ProductionPlanApi struct{}
@@ -25,26 +27,56 @@ var ProductionPlanBiz = biz.ProductionPlanBiz{}
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ProductionPlan/create [post]
 func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
-	var ProductionPlan models.ProductionPlan
-	if err := c.ShouldBindJSON(&ProductionPlan); err != nil {
+	var param servlet.ProductionPlanCreateParam
+	if err := c.ShouldBindJSON(&param); err != nil {
 		servlet.Error(c, err.Error())
 		return
 	}
 
-	// 检查 ProductionPlan 是否被正确初始化
-	if ProductionPlan.Name == "" {
-		servlet.Error(c, "名称不能为空")
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
 
-	result := glob.GDb.Create(&ProductionPlan)
+	var productionPlan models.ProductionPlan
+
+	productionPlan.Name = param.Name
+	productionPlan.Description = param.Description
+	productionPlan.StartDate = param.StartDate
+	productionPlan.EndDate = param.EndDate
+
+	create := tx.Model(models.ProductionPlan{}).Create(productionPlan)
+	if create.Error != nil {
+		tx.Rollback()
+		zap.S().Errorf("创建 ProductionPlan 异常 %+v", create.Error)
+		servlet.Error(c, create.Error.Error())
+		return
+	}
+
+	var productPlans []models.ProductPlan
+	for _, createParam := range param.ProductPlanCreateParams {
+		productPlans = append(productPlans, models.ProductPlan{
+			ProductionPlanID: productionPlan.ID,
+			ProductID:        createParam.ProductID,
+			Quantity:         createParam.Quantity,
+		})
+	}
+
+	result := tx.Model(&models.ProductPlan{}).CreateInBatches(productPlans, len(productPlans))
 
 	if result.Error != nil {
-		servlet.Error(c, result.Error.Error())
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
 		return
 	}
-	// 返回创建成功的生产计划
-	servlet.Resp(c, ProductionPlan)
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "创建成功")
 }
 
 // UpdateProductionPlan
@@ -53,7 +85,6 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 // @Tags ProductionPlans
 // @Accept json
 // @Produce json
-// @Param id path int true "生产计划id"
 // @Param ProductionPlan body models.ProductionPlan true "生产计划"
 // @Success 200 {object}  servlet.JSONResult{data=models.ProductionPlan} "生产计划"
 // @Failure 400 {string} string "请求数据错误"
@@ -61,32 +92,80 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ProductionPlan/update [post]
 func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
-	var req models.ProductionPlan
-	if err := c.ShouldBindJSON(&req); err != nil {
-
+	var param servlet.ProductionPlanCreateParam
+	if err := c.ShouldBindJSON(&param); err != nil {
 		servlet.Error(c, err.Error())
 		return
 	}
 
 	var old models.ProductionPlan
-	result := glob.GDb.First(&old, req.ID)
+	result := glob.GDb.First(&old, param.ID)
 	if result.Error != nil {
-
 		servlet.Error(c, "ProductionPlan not found")
 		return
 	}
 
-	var newV models.ProductionPlan
-	newV = old
-	newV.Name = req.Name
-	result = glob.GDb.Model(&newV).Updates(newV)
+	currentTime := time.Now()
 
-	if result.Error != nil {
-
-		servlet.Error(c, result.Error.Error())
+	if old.StartDate.Before(currentTime) {
+		servlet.Error(c, "开始时间小于当前时间不允许修改")
 		return
 	}
-	servlet.Resp(c, old)
+
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	var productionPlan models.ProductionPlan
+	productionPlan = old
+
+	productionPlan.Name = param.Name
+	productionPlan.Description = param.Description
+	productionPlan.StartDate = param.StartDate
+	productionPlan.EndDate = param.EndDate
+
+	create := tx.Model(models.ProductionPlan{}).Updates(productionPlan)
+	if create.Error != nil {
+		tx.Rollback()
+		zap.S().Errorf("更新 ProductionPlan 异常 %+v", create.Error)
+		servlet.Error(c, create.Error.Error())
+		return
+	}
+
+	db := tx.Model(&models.ProductPlan{}).Where("production_plan_id = ?", productionPlan.ID).Delete(models.ProductPlan{})
+	if db.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during deletion:", db.Error)
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var productPlans []models.ProductPlan
+	for _, createParam := range param.ProductPlanCreateParams {
+		productPlans = append(productPlans, models.ProductPlan{
+			ProductionPlanID: productionPlan.ID,
+			ProductID:        createParam.ProductID,
+			Quantity:         createParam.Quantity,
+		})
+	}
+
+	result = tx.Model(&models.ProductPlan{}).CreateInBatches(productPlans, len(productPlans))
+
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "绑定成功")
+
 }
 
 // PageProductionPlan
@@ -157,6 +236,7 @@ func (api *ProductionPlanApi) DeleteProductionPlan(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ProductionPlan/:id [get]
+// @Success 200 {object} servlet.JSONResult{data=servlet.ProductionPlanCreateParam} "生产计划"
 func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 	var ProductionPlan models.ProductionPlan
 
@@ -169,5 +249,25 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 		return
 	}
 
-	servlet.Resp(c, ProductionPlan)
+	var res servlet.ProductionPlanCreateParam
+	res.ID = ProductionPlan.ID
+	res.Name = ProductionPlan.Name
+	res.StartDate = ProductionPlan.StartDate
+	res.EndDate = ProductionPlan.EndDate
+	res.Description = ProductionPlan.Description
+	var dt []models.ProductPlan
+
+	tx := glob.GDb.Model(models.ProductPlan{}).Where("production_plan_id = ?", ProductionPlan.ID).Find(&dt)
+	if tx.Error != nil {
+		servlet.Error(c, tx.Error.Error())
+		return
+	}
+
+	res.ProductPlanCreateParams = make([]servlet.ProductPlanCreateParam, len(dt))
+	for i, v := range dt {
+		res.ProductPlanCreateParams[i].ProductID = v.ProductID
+		res.ProductPlanCreateParams[i].Quantity = v.Quantity
+	}
+
+	servlet.Resp(c, res)
 }

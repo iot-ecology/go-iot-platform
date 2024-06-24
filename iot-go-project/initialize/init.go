@@ -292,6 +292,9 @@ func initRouter(r *gin.Engine) {
 	r.GET("/device_group/page", deviceGroupApi.PageDeviceGroup)
 	r.POST("/device_group/delete/:id", deviceGroupApi.DeleteDeviceGroup)
 
+	r.GET("/device_group/query_bind_device", deviceGroupApi.QueryBindDeviceInfo)
+	r.POST("/device_group/bind_device", deviceGroupApi.BindDeviceInfo)
+
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
 	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)

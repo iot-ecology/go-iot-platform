@@ -37,7 +37,16 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	result := glob.GDb.Create(&DeviceInfo)
+	var Product models.Product
+	result := glob.GDb.First(&Product, DeviceInfo.ProductId)
+	if result.Error != nil {
+		servlet.Error(c, result.Error.Error())
+		return
+	}
+	if !DeviceInfo.ManufacturingDate.IsZero() {
+		DeviceInfo.WarrantyExpiry = DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+	}
+	result = glob.GDb.Create(&DeviceInfo)
 
 	if result.Error != nil {
 		servlet.Error(c, result.Error.Error())
@@ -53,7 +62,6 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 // @Tags DeviceInfos
 // @Accept json
 // @Produce json
-// @Param id path int true "设备详情id"
 // @Param DeviceInfo body models.DeviceInfo true "设备详情"
 // @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo} "设备详情"
 // @Failure 400 {string} string "请求数据错误"
@@ -78,6 +86,16 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 
 	var newV models.DeviceInfo
 	newV = old
+
+	var Product models.Product
+	result = glob.GDb.First(&Product, newV.ProductId)
+	if result.Error != nil {
+		servlet.Error(c, result.Error.Error())
+		return
+	}
+	if !newV.ManufacturingDate.IsZero() {
+		newV.WarrantyExpiry = newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

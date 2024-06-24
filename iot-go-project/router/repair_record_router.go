@@ -47,7 +47,6 @@ func (api *RepairRecordApi) CreateRepairRecord(c *gin.Context) {
 // @Tags RepairRecords
 // @Accept json
 // @Produce json
-// @Param id path int true "维修日志id"
 // @Param RepairRecord body models.RepairRecord true "维修日志"
 // @Success 200 {object}  servlet.JSONResult{data=models.RepairRecord} "维修日志"
 // @Failure 400 {string} string "请求数据错误"

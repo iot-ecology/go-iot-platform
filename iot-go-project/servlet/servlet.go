@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type GetTodoReq struct {
@@ -208,4 +209,25 @@ type WaringRowQuery struct {
 	ID          int   `json:"ID"`
 	UpTimeStart int64 `json:"up_time_start"`
 	UpTimeEnd   int64 `json:"up_time_end"`
+}
+
+type DeviceGroupCreateParam struct {
+	GroupId  int   `json:"group_id"`
+	DeviceId []int `json:"device_id"`
+}
+
+type ProductionPlanCreateParam struct {
+	ID                      uint                     `json:"id,omitempty" structs:"id"`         // 生产计划名称
+	Name                    string                   `json:"name" structs:"name"`               // 生产计划名称
+	StartDate               time.Time                `json:"start_date" structs:"start_date"`   // 生产计划开始日期
+	EndDate                 time.Time                `json:"end_date" structs:"end_date"`       // 生产计划结束日期
+	Description             string                   `json:"description" structs:"description"` // 生产计划描述
+	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans"`
+}
+
+type ProductPlanCreateParam struct {
+	ProductID uint `json:"product_id" structs:"product_id"` // 关联的产品ID
+
+	Quantity int `json:"quantity" structs:"quantity"` // 计划生产数量
+
 }

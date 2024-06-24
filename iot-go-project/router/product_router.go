@@ -53,7 +53,6 @@ func (api *ProductApi) CreateProduct(c *gin.Context) {
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param id path int true "产品id"
 // @Param Product body models.Product true "产品"
 // @Success 200 {object}  servlet.JSONResult{data=models.Product} "产品"
 // @Failure 400 {string} string "请求数据错误"
