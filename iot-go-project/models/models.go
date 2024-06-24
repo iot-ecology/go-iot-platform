@@ -128,6 +128,15 @@ type DeviceGroupDevice struct {
 	gorm.Model   `structs:"-"`
 }
 
+type DeviceInstallRecord struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint      `json:"device_info_id" structs:"device_info_id"` // 设备表的外键ID
+	InstallDate  time.Time `json:"install_date" structs:"install_date"`     // 安装日期
+	Technician   string    `json:"technician" structs:"technician"`         // 安装人员
+	Description  string    `json:"description" structs:"description"`       // 安装描述
+	PhotoURL     string    `json:"photo_url" structs:"photo_url"`           // 照片URL
+}
+
 type RepairRecord struct {
 	DeviceInfoId uint      `json:"device_info_id" structs:"device_info_id"` // 设备表的外键ID
 	RepairDate   time.Time `json:"repair_date" structs:"repair_date"`       // 维修日期

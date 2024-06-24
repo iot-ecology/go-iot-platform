@@ -42,6 +42,7 @@ var (
 	deviceInfoApi             = router.DeviceInfoApi{}
 	productionPlanApi         = router.ProductionPlanApi{}
 	repairRecordApi           = router.RepairRecordApi{}
+	fileApi                   = router.FileApi{}
 )
 
 func initTable() {
@@ -340,6 +341,9 @@ func initRouter(r *gin.Engine) {
 	r.POST("/signal-delay-waring/Mock/:id", signalDelayWaringApi.Mock)
 	r.POST("/signal-delay-waring/GenParam/:id", signalDelayWaringApi.GenParam)
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
+
+	r.POST("/file/update", fileApi.UpdateFile)
+	r.POST("/file/download", fileApi.DownloadFile)
 
 }
 func initGlobalRedisClient() {
