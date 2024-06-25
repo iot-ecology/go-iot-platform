@@ -108,12 +108,13 @@ type Product struct {
 	gorm.Model     `structs:"-"`
 }
 type DeviceInfo struct {
-	ProductId         uint      `json:"product_id" structs:"product_id"`                 // 产品ID
-	SN                string    `json:"sn" structs:"sn"`                                 // 设备编号
-	ManufacturingDate time.Time `json:"manufacturing_date" structs:"manufacturing_date"` // 制造日期
-	ProcurementDate   time.Time `json:"procurement_date" structs:"procurement_date"`     // 采购日期
-	Source            int       `json:"source" structs:"source"`                         // 设备来源,1: 内部,2: 外源
-	WarrantyExpiry    time.Time `json:"warranty_expiry" structs:"warranty_expiry"`       // 保修截止日期
+	ProductId         uint      `json:"product_id" structs:"product_id"`                   // 产品ID
+	ProductionBatchId uint      `json:"production_batch_id" structs:"production_batch_id"` // 产品批次ID
+	SN                string    `json:"sn" structs:"sn"`                                   // 设备编号
+	ManufacturingDate time.Time `json:"manufacturing_date" structs:"manufacturing_date"`   // 制造日期
+	ProcurementDate   time.Time `json:"procurement_date" structs:"procurement_date"`       // 采购日期
+	Source            int       `json:"source" structs:"source"`                           // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    time.Time `json:"warranty_expiry" structs:"warranty_expiry"`         // 保修截止日期
 	gorm.Model        `structs:"-"`
 }
 
@@ -152,8 +153,8 @@ type ShipmentRecord struct {
 	ShipmentDate    time.Time `json:"shipment_date" structs:"shipment_date"`       // 发货日期
 	Technician      string    `json:"technician" structs:"technician"`             // 发货人员
 	CustomerName    string    `json:"customer_name" structs:"customer_name"`       // 客户名称
+	CustomerPhone   string    `json:"customer_phone" structs:"customer_phone"`     // 客户手机
 	CustomerAddress string    `json:"customer_address" structs:"customer_address"` // 客户地址
-	Quantity        int       `json:"quantity" structs:"quantity"`                 // 发货数量
 	TrackingNumber  string    `json:"tracking_number" structs:"tracking_number"`   // 跟踪号码
 	Status          string    `json:"status" structs:"status"`                     // 发货状态（例如：pending, shipped, delivered）
 	Description     string    `json:"description" structs:"description"`           // 发货描述

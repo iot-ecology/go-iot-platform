@@ -2,11 +2,14 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+	"time"
 )
 
 type ShipmentRecordApi struct{}
@@ -25,20 +28,66 @@ var shipmentRecordBiz = biz.ShipmentRecordBiz{}
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ShipmentRecord/create [post]
 func (api *ShipmentRecordApi) CreateShipmentRecord(c *gin.Context) {
-	var ShipmentRecord models.ShipmentRecord
-	if err := c.ShouldBindJSON(&ShipmentRecord); err != nil {
+	var param servlet.ShipmentRecordCreateParam
+	if err := c.ShouldBindJSON(&param); err != nil {
 		servlet.Error(c, err.Error())
 		return
 	}
 
-	result := glob.GDb.Create(&ShipmentRecord)
-
-	if result.Error != nil {
-		servlet.Error(c, result.Error.Error())
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
-	// 返回创建成功的发货记录
-	servlet.Resp(c, ShipmentRecord)
+
+	newUUID, err := uuid.NewUUID()
+	if err != nil {
+		servlet.Error(c, "Failed to generate uuid")
+		tx.Rollback()
+		return
+	}
+	var shipmentRecord = models.ShipmentRecord{
+		ShipmentDate:    param.ShipmentDate,
+		Technician:      param.Technician,
+		CustomerName:    param.CustomerName,
+		CustomerPhone:   param.CustomerPhone,
+		CustomerAddress: param.CustomerAddress,
+		TrackingNumber:  newUUID.String(),
+		Status:          param.Status,
+		Description:     param.Description,
+	}
+
+	create := tx.Model(models.ShipmentRecord{}).Create(shipmentRecord)
+	if create.Error != nil {
+		tx.Rollback()
+		zap.S().Errorf("创建 ShipmentRecord 异常 %+v", create.Error)
+		servlet.Error(c, create.Error.Error())
+		return
+	}
+
+	var shipmentProductDetail []models.ShipmentProductDetail
+	for _, createParam := range param.ProductPlanCreateParams {
+		shipmentProductDetail = append(shipmentProductDetail, models.ShipmentProductDetail{
+			ShipmentRecordId: shipmentRecord.ID,
+			ProductID:        createParam.ProductID,
+			Quantity:         createParam.Quantity,
+		})
+	}
+
+	result := tx.Model(&models.ShipmentProductDetail{}).CreateInBatches(shipmentProductDetail, len(shipmentProductDetail))
+
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "创建成功")
 }
 
 // UpdateShipmentRecord
@@ -54,31 +103,79 @@ func (api *ShipmentRecordApi) CreateShipmentRecord(c *gin.Context) {
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ShipmentRecord/update [post]
 func (api *ShipmentRecordApi) UpdateShipmentRecord(c *gin.Context) {
-	var req models.ShipmentRecord
-	if err := c.ShouldBindJSON(&req); err != nil {
-
+	var param servlet.ShipmentRecordCreateParam
+	if err := c.ShouldBindJSON(&param); err != nil {
 		servlet.Error(c, err.Error())
 		return
 	}
 
 	var old models.ShipmentRecord
-	result := glob.GDb.First(&old, req.ID)
+	result := glob.GDb.First(&old, param.ID)
 	if result.Error != nil {
-
-		servlet.Error(c, "ShipmentRecord not found")
+		servlet.Error(c, "ProductionPlan not found")
 		return
 	}
 
-	var newV models.ShipmentRecord
-	newV = old
-	result = glob.GDb.Model(&newV).Updates(newV)
+	currentTime := time.Now()
 
-	if result.Error != nil {
-
-		servlet.Error(c, result.Error.Error())
+	if old.ShipmentDate.Before(currentTime) {
+		servlet.Error(c, "发货小于当前时间不允许修改")
 		return
 	}
-	servlet.Resp(c, old)
+
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	var shipmentRecord models.ShipmentRecord
+	shipmentRecord.ShipmentDate = param.ShipmentDate
+	shipmentRecord.Technician = param.Technician
+	shipmentRecord.CustomerName = param.CustomerName
+	shipmentRecord.CustomerPhone = param.CustomerPhone
+	shipmentRecord.CustomerAddress = param.CustomerAddress
+	shipmentRecord.Status = param.Status
+	shipmentRecord.Description = param.Description
+	create := tx.Model(models.ShipmentRecord{}).Updates(shipmentRecord)
+	if create.Error != nil {
+		tx.Rollback()
+		zap.S().Errorf("更新 ShipmentRecord 异常 %+v", create.Error)
+		servlet.Error(c, create.Error.Error())
+		return
+	}
+
+	db := tx.Model(&models.ShipmentProductDetail{}).Where("shipment_record_id = ?", shipmentRecord.ID).Delete(models.ProductPlan{})
+	if db.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during deletion:", db.Error)
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var shipmentProductDetail []models.ShipmentProductDetail
+	for _, createParam := range param.ProductPlanCreateParams {
+		shipmentProductDetail = append(shipmentProductDetail, models.ShipmentProductDetail{
+			ShipmentRecordId: shipmentRecord.ID,
+			ProductID:        createParam.ProductID,
+			Quantity:         createParam.Quantity,
+		})
+	}
+
+	result = tx.Model(&models.ShipmentProductDetail{}).CreateInBatches(shipmentProductDetail, len(shipmentProductDetail))
+
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "更新成功")
 }
 
 // PageShipmentRecord

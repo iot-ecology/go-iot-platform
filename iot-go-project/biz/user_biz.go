@@ -28,3 +28,10 @@ func (biz *UserBiz) PageData(name string, page, size int) (*servlet.PaginationQ,
 
 	return &pagination, nil
 }
+
+func (biz *UserBiz) FindUser(name string, password string) *models.User {
+	var user models.User
+	db := glob.GDb
+	db.Where("username  = ?", name).Where("password = ?", password).First(&user)
+	return &user
+}

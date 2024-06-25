@@ -47,6 +47,7 @@ var (
 	deptApi                   = router.DeptApi{}
 	roleApi                   = router.RoleApi{}
 	shipmentRecordApi         = router.ShipmentRecordApi{}
+	loginApi                  = router.LoginApi{}
 )
 
 func initTable() {
@@ -317,8 +318,9 @@ func initLog() {
 	glob.GLog = lg
 }
 
-func initRouter(r *gin.Engine) {
-	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+func initRouter(r *gin.RouterGroup) {
+	r.Use(router.JwtCheck())
+	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
 	r.GET("/mqtt/start", mqttApi.StartMqtt)
@@ -448,6 +450,9 @@ func initRouter(r *gin.Engine) {
 	r.POST("/file/update", fileApi.UpdateFile)
 	r.POST("/file/download", fileApi.DownloadFile)
 
+	r.POST("/login", loginApi.Login)
+	r.POST("/userinfo", loginApi.UserInfo)
+
 }
 func initGlobalRedisClient() {
 
@@ -481,7 +486,7 @@ func InitConfig() {
 
 }
 
-func InitAll(r *gin.Engine) {
+func InitAll(r *gin.RouterGroup) {
 	InitConfig()
 	initLog()
 	glob.GLog.Info("日志初始化完成")

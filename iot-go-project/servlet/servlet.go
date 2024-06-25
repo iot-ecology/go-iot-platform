@@ -227,9 +227,21 @@ type ProductionPlanCreateParam struct {
 
 type ProductPlanCreateParam struct {
 	ProductID uint `json:"product_id" structs:"product_id"` // 关联的产品ID
+	Quantity  int  `json:"quantity" structs:"quantity"`     // 计划生产数量
+}
 
-	Quantity int `json:"quantity" structs:"quantity"` // 计划生产数量
+type ShipmentRecordCreateParam struct {
+	ID              uint      `json:"id,omitempty" structs:"id"`                   // 发货记录ID
+	ShipmentDate    time.Time `json:"shipment_date" structs:"shipment_date"`       // 发货日期
+	Technician      string    `json:"technician" structs:"technician"`             // 发货人员
+	CustomerName    string    `json:"customer_name" structs:"customer_name"`       // 客户名称
+	CustomerAddress string    `json:"customer_address" structs:"customer_address"` // 客户地址
+	TrackingNumber  string    `json:"tracking_number" structs:"tracking_number"`   // 跟踪号码
+	Status          string    `json:"status" structs:"status"`                     // 发货状态（例如：pending, shipped, delivered）
+	Description     string    `json:"description" structs:"description"`           // 发货描述
+	CustomerPhone   string    `json:"customer_phone" structs:"customer_phone"`     // 客户手机
 
+	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans"`
 }
 
 type UserBindRoleParam struct {
@@ -251,4 +263,9 @@ type DeviceGroupBindMqttClientParam struct {
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
 
 	MqttClientId []int `json:"mqtt_client_id"`
+}
+
+type LoginParam struct {
+	UserName string `json:"user_name" form:"user_name"` // 用户名
+	Password string `json:"password" form:"password"`   // 密码
 }
