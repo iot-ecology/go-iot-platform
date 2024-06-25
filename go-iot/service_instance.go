@@ -33,10 +33,6 @@ func GetSizeLose(passNodeName string) *NodeInfo {
 
 		i := globalRedisClient.SCard(context.Background(), "node_bind:"+v.Name).Val()
 
-		if err != nil {
-			continue
-		}
-
 		if i < v.Size {
 
 			if minNodeInfo == nil || v.Size < minSize {
@@ -144,12 +140,8 @@ func RemoveNodeInfo(name string) error {
 func BeatTask(f NodeInfo) {
 
 	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			// 执行定时任务的逻辑
-			Register(f)
-		}
+	for range ticker.C {
+		Register(f)
 	}
 }
 

@@ -11,6 +11,7 @@ import directiveRegister from "./directives";
 import VxeTable from "./plugins/vxe-table";
 import router from "./router";
 import store from "./stores";
+import i18n from './i18n';
 
 const app = createApp(App);
 
@@ -19,5 +20,6 @@ app.use(store);
 app.component("RecycleScroller", RecycleScroller);
 app.use(directiveRegister);
 app.use(VxeTable);
+app.use(i18n);
 
 app.mount("#app");

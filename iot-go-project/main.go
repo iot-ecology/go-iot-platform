@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 	"igp/docs"
 	"igp/glob"
 	"igp/initialize"
@@ -55,7 +56,10 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/beat", Beat)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	r.Run(":" + strconv.Itoa(glob.GConfig.NodeInfo.Port))
+	err := r.Run(":" + strconv.Itoa(glob.GConfig.NodeInfo.Port))
+	if err != nil {
+		zap.S().Fatal("启动服务失败", zap.Error(err))
+	}
 
 }
 

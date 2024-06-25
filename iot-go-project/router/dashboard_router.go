@@ -13,7 +13,7 @@ type DashboardApi struct{}
 
 var dashBiz = biz.DashboardBiz{}
 
-// Createdashboard
+// CreateDashboard
 // @Summary 创建面板
 // @Description 创建面板
 // @Tags dashboards
@@ -24,7 +24,7 @@ var dashBiz = biz.DashboardBiz{}
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /dashboard/create [post]
-func (api *DashboardApi) Createdashboard(c *gin.Context) {
+func (api *DashboardApi) CreateDashboard(c *gin.Context) {
 	var dashboard models.Dashboard
 	if err := c.ShouldBindJSON(&dashboard); err != nil {
 		servlet.Error(c, err.Error())
@@ -47,20 +47,19 @@ func (api *DashboardApi) Createdashboard(c *gin.Context) {
 	servlet.Resp(c, dashboard)
 }
 
-// Updatedashboard
+// UpdateDashboard
 // @Summary 更新一个面板
 // @Description 更新一个面板
 // @Tags dashboards
 // @Accept json
 // @Produce json
-// @Param id path int true "面板id"
 // @Param dashboard body models.Dashboard true "面板"
 // @Success 200 {object}  servlet.JSONResult{data=models.Dashboard} "面板"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 404 {string} string "面板未找到"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /dashboard/update [post]
-func (api *DashboardApi) Updatedashboard(c *gin.Context) {
+func (api *DashboardApi) UpdateDashboard(c *gin.Context) {
 	var req models.Dashboard
 	if err := c.ShouldBindJSON(&req); err != nil {
 
@@ -90,7 +89,7 @@ func (api *DashboardApi) Updatedashboard(c *gin.Context) {
 	servlet.Resp(c, old)
 }
 
-// Pagedashboard
+// PageDashboard
 // @Summary 分页查询面板
 // @Description 分页查询面板
 // @Tags dashboards
@@ -102,7 +101,7 @@ func (api *DashboardApi) Updatedashboard(c *gin.Context) {
 // @Failure 400 {string} string "请求参数错误"
 // @Failure 500 {string} string "查询异常"
 // @Router /dashboard/page [get]
-func (api *DashboardApi) Pagedashboard(c *gin.Context) {
+func (api *DashboardApi) PageDashboard(c *gin.Context) {
 	var name = c.Query("name")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
@@ -124,16 +123,15 @@ func (api *DashboardApi) Pagedashboard(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
-// Deletedashboard
+// DeleteDashboard
 // @Tags      dashboards
 // @Summary   删除面板
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /dashboard/delete/:id [post]
-func (api *DashboardApi) Deletedashboard(c *gin.Context) {
+func (api *DashboardApi) DeleteDashboard(c *gin.Context) {
 	var dashboard models.Dashboard
 
 	param := c.Param("id")
@@ -153,13 +151,13 @@ func (api *DashboardApi) Deletedashboard(c *gin.Context) {
 	servlet.Resp(c, "删除成功")
 }
 
-// ByIddashboard
+// ByIdDashboard
 // @Tags      dashboards
 // @Summary   单个详情
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /dashboard/:id [get]
-func (api *DashboardApi) ByIddashboard(c *gin.Context) {
+func (api *DashboardApi) ByIdDashboard(c *gin.Context) {
 	var dashboard models.Dashboard
 
 	param := c.Param("id")

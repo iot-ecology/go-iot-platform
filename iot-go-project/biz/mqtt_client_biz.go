@@ -38,7 +38,6 @@ func (s *MqttClientBiz) CreateMqtt(client models.MqttClient) *models.MqttClient 
 
 	}
 
-	return nil
 }
 
 func (s *MqttClientBiz) Start(id any) *models.MqttClient {
@@ -92,7 +91,7 @@ func (s *MqttClientBiz) PageMqttData(name string, page, size int) (*servlet.Pagi
 
 	db.Model(&models.MqttClient{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&mqttClients)
+	db.Offset(offset).Limit(size).Find(&mqttClients)
 
 	background := context.Background()
 	var cc []string

@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { useRoute } from "vue-router";
 
 import { SignalPage } from "@/api";
+import {useI18n} from "vue-i18n";
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object, Boolean],
@@ -30,13 +31,14 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const mqttClientId = ref<number | string>(props.mqtt_client_id);
 const page = ref(1);
 const page1 = ref(1);
-const options = ref([]);
-const value = ref(props.modelValue);
-const valueResult = ref(props.modelValue);
-const valueSearch = ref("");
+const options = ref<any>([]);
+const value = ref<any>(props.modelValue);
+const valueResult = ref<any>(props.modelValue);
+const valueSearch = ref<any>("");
 const showOpen = ref(false);
 const route = useRoute();
 const emits = defineEmits(["update:modelValue", "custom-event"]);
@@ -78,7 +80,7 @@ const List = async () => {
   }
   if (
     data.data?.total > 0 &&
-    ((value.value && !options.value.map((it) => it.value).includes(value.value)) || (Number(route.query.id) && !options.value.map((it) => it.value).includes(Number(route.query.id))))
+    ((value.value && !options.value.map((it: any) => it.value).includes(value.value)) || (Number(route.query.id) && !options.value.map((it: any) => it.value).includes(Number(route.query.id))))
   ) {
     page.value++;
     await List();
@@ -87,22 +89,18 @@ const List = async () => {
       page.value++;
       options.value.push({
         value: -11,
-        label: "加载更多",
+        label: t('message.loadMore'),
       });
     }
   }
-  // console.log(options.value.find((it) => it.value === value.value));
-  console.log(value.value);
   emits("update:modelValue", value.value);
   emits(
     "custom-event",
-    options.value.find((it) => it.value === value.value),
+    options.value.find((it:any) => it.value === value.value),
   );
   valueResult.value = value.value;
 };
-if (mqttClientId.value) {
-  List();
-}
+
 
 const select = async (ValueClick: any) => {
   if (ValueClick === -11) {
@@ -126,7 +124,7 @@ const select = async (ValueClick: any) => {
         page1.value++;
         options.value.push({
           value: -11,
-          label: "加载更多",
+          label: t('message.loadMore'),
         });
       }
     }
@@ -136,18 +134,24 @@ const select = async (ValueClick: any) => {
     valueResult.value = value.value;
   }
 };
-const onChange = (val, option) => {
+const onChange = (val:any, option:any) => {
   emits("custom-event", option);
   if (val !== -11) {
     emits("update:modelValue", value);
   }
 };
+
+onMounted(async ()=>{
+  if (mqttClientId.value) {
+    await List();
+  }
+})
 </script>
 
 <template>
   <a-select
     v-model:value="value"
-    placeholder="请输入"
+    :placeholder="$t('message.pleaseEnter')"
     :show-search="true"
     :open="showOpen"
     style="width: 300px"

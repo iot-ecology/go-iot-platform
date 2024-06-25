@@ -13,7 +13,7 @@ export async function MqttCreate(data: any) {
 }
 
 export async function MqttSetScript(data: any) {
-  return await axios.post(`${url}/mqtt/set-script`, data);
+  return await axios.post(`${url}/mqtt/set-script1`, data);
 }
 
 export async function MqttCheckScript(data: any) {
@@ -96,7 +96,7 @@ export async function DashboardDelete(id: string) {
   return await axios.post(`${url}/dashboard/delete/${id}`);
 }
 
-export async function DashboardId(id: string | number) {
+export async function DashboardId(id: any ) {
   return await axios.get(`${url}/dashboard/${id}`);
 }
 

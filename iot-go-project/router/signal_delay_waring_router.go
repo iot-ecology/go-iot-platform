@@ -109,7 +109,6 @@ func (api *SignalDelayWaringApi) UpdateSignalDelayWaring(c *gin.Context) {
 	}
 
 	servlet.Resp(c, old)
-	return
 }
 
 // PageSignalDelayWaring
@@ -147,7 +146,6 @@ func (api *SignalDelayWaringApi) PageSignalDelayWaring(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteSignalDelayWaring
@@ -228,7 +226,6 @@ func (api *SignalDelayWaringApi) QueryWaringList(c *gin.Context) {
 	}
 
 	servlet.Resp(c, query2(req))
-	return
 
 }
 func query2(req servlet.WaringRowQuery) []bson.M {
@@ -249,6 +246,7 @@ func query2(req servlet.WaringRowQuery) []bson.M {
 	defer func(cur *mongo.Cursor, ctx context.Context) {
 		err := cur.Close(ctx)
 		if err != nil {
+			zap.S().Errorf("err %+v", err)
 		}
 	}(cur, context.TODO())
 	var c []bson.M

@@ -1,22 +1,24 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { useRoute } from "vue-router";
 import { message } from "ant-design-vue";
 
 import { SignalDelayWaringPage } from "@/api";
+import {useI18n} from "vue-i18n";
 defineProps({
   modelValue: {
     type: [String, Number, Object, Boolean],
     default: "",
   },
 });
+const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
-const options = ref([]);
+const options = ref<any>([]);
 const route = useRoute();
-const value = ref(Number(route.query.rule_id) || "");
-const valueResult = ref(Number(route.query.rule_id) || "");
-const valueSearch = ref("");
+const value = ref<any>(Number(route.query.rule_id) || "");
+const valueResult = ref<any>(Number(route.query.rule_id) || "");
+const valueSearch = ref<any>("");
 const showOpen = ref(false);
 const emits = defineEmits(["update:modelValue"]);
 const List = async () => {
@@ -24,7 +26,7 @@ const List = async () => {
   const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
   options.value = options.value.concat(listArr);
   value.value = value.value || Number(route.query.signal_delay_waring_id) || options.value[0]?.value;
-  if (data.data.total > 0 && Number(route.query.signal_delay_waring_id) && !options.value.map((it) => it.value).includes(Number(route.query.signal_delay_waring_id))) {
+  if (data.data.total > 0 && Number(route.query.signal_delay_waring_id) && !options.value.map((it: any) => it.value).includes(Number(route.query.signal_delay_waring_id))) {
     page.value++;
     await List();
   } else {
@@ -32,20 +34,19 @@ const List = async () => {
       page.value++;
       options.value.push({
         value: -11,
-        label: "加载更多",
+        label: t('message.loadMore'),
       });
     }
   }
   emits("update:modelValue", value.value);
   valueResult.value = value.value;
 };
-List();
-watch(value, (newValue, oldValue) => {
+watch(value, async (newValue) => {
   if (!newValue) {
     options.value = [];
     page.value = 1;
     valueSearch.value = "";
-    List();
+    await List();
   }
 });
 const select = async (ValueClick: any) => {
@@ -62,7 +63,7 @@ const select = async (ValueClick: any) => {
         pageSelect.value++;
         options.value.push({
           value: -11,
-          label: "加载更多",
+          label: t('message.loadMore'),
         });
       }
     }
@@ -78,11 +79,10 @@ const handleSearch = async (val: string) => {
   }
   valueSearch.value = val;
 
-  // options.value = [];
   pageSelect.value = 1;
   const { data } = await SignalDelayWaringPage({ name: val, page: pageSelect.value, page_size: 100 });
   if (data.data.total === 0) {
-    message.error("当前搜索没有相关数据");
+    message.error(t('message.ThereNoSearch'));
     setTimeout(() => {
       value.value = options.value[0].value;
       valueSearch.value = "";
@@ -98,10 +98,14 @@ const handleSearch = async (val: string) => {
     pageSelect.value++;
     options.value.push({
       value: -11,
-      label: "加载更多",
+      label: t('message.loadMore'),
     });
   }
 };
+
+onMounted(async ()=>{
+  await List();
+})
 </script>
 
 <template>
@@ -110,7 +114,7 @@ const handleSearch = async (val: string) => {
     :show-search="true"
     :open="showOpen"
     allow-clear
-    placeholder="请输入"
+    :placeholder="$t('message.pleaseEnter')"
     style="width: 300px"
     :default-active-first-option="false"
     :show-arrow="false"

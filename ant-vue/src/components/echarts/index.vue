@@ -34,17 +34,6 @@ watch(
       return;
     }
     await nextTick(() => {
-      // 重置为数值类、（false）的时候开启加载动画
-      // if (!Object.keys(value || {}).length) {
-      //   chart.showLoading("default", {
-      //     text: "加载中...",
-      //     color: "rgb(22, 93, 255)",
-      //     textColor: "#000",
-      //     maskColor: "rgba(255, 255, 255, 0.7)",
-      //   });
-      // } else {
-      //   chart.hideLoading();
-      // }
       chart.clear();
       chart.setOption(value || {}, true);
     });

@@ -81,6 +81,7 @@ func ListenerBeat() {
 	defer func(pubsub *redis.PubSub) {
 		err := pubsub.Close()
 		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
 		}
 	}(pubsub)
 

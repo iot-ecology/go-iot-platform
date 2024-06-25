@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type GetTodoReq struct {
@@ -55,7 +56,6 @@ func Resp(c *gin.Context, data interface{}) {
 	result.Data = data
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 func Resp2(c *gin.Context, msg string) {
@@ -64,7 +64,6 @@ func Resp2(c *gin.Context, msg string) {
 	result.Code = 20000
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 func Error(c *gin.Context, data interface{}) {
 	result := JSONResult{}
@@ -73,7 +72,6 @@ func Error(c *gin.Context, data interface{}) {
 	result.Data = data
 	c.Status(http.StatusOK)
 	c.JSON(http.StatusOK, result)
-	return
 }
 
 type ParamStruct struct {
@@ -211,4 +209,46 @@ type WaringRowQuery struct {
 	ID          int   `json:"ID"`
 	UpTimeStart int64 `json:"up_time_start"`
 	UpTimeEnd   int64 `json:"up_time_end"`
+}
+
+type DeviceGroupCreateParam struct {
+	GroupId  int   `json:"group_id"`
+	DeviceId []int `json:"device_id"`
+}
+
+type ProductionPlanCreateParam struct {
+	ID                      uint                     `json:"id,omitempty" structs:"id"`         // 生产计划名称
+	Name                    string                   `json:"name" structs:"name"`               // 生产计划名称
+	StartDate               time.Time                `json:"start_date" structs:"start_date"`   // 生产计划开始日期
+	EndDate                 time.Time                `json:"end_date" structs:"end_date"`       // 生产计划结束日期
+	Description             string                   `json:"description" structs:"description"` // 生产计划描述
+	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans"`
+}
+
+type ProductPlanCreateParam struct {
+	ProductID uint `json:"product_id" structs:"product_id"` // 关联的产品ID
+
+	Quantity int `json:"quantity" structs:"quantity"` // 计划生产数量
+
+}
+
+type UserBindRoleParam struct {
+	UserId  int   `json:"user_id"`
+	RoleIds []int `json:"role_id"`
+}
+
+type UserBindDeviceInfoParam struct {
+	UserId        int   `json:"user_id"`
+	DeviceInfoIds []int `json:"device_info_id"`
+}
+
+type DeviceBindMqttClientParam struct {
+	DeviceId     int   `json:"device_id"`
+	MqttClientId []int `json:"mqtt_client_id"`
+}
+
+type DeviceGroupBindMqttClientParam struct {
+	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
+
+	MqttClientId []int `json:"mqtt_client_id"`
 }

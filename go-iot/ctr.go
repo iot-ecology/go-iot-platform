@@ -10,6 +10,14 @@ import (
 	"net/http"
 )
 
+// SendCreateMqttMessage 向指定节点发送创建MQTT客户端的请求
+//
+// 参数：
+// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+// param string - 创建MQTT客户端的参数
+//
+// 返回值：
+// bool - 发送请求是否成功，成功返回true，失败返回false
 func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 
 	url := fmt.Sprintf("http://%s:%d/create_mqtt", node.Host, node.Port)
@@ -30,12 +38,6 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 		_ = Body.Close()
 	}(resp.Body)
 
-	//bodyBytes, err := ioutil.ReadAll(resp.Body)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//bodyString := string(bodyBytes)
-
 	buf := new(bytes.Buffer)
 	_, _ = buf.ReadFrom(resp.Body)
 	bodyString := buf.String()
@@ -52,6 +54,14 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 
 }
 
+// SendBeat 向指定节点发送心跳请求
+//
+// 参数：
+// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+// param string - 心跳请求参数
+//
+// 返回值：
+// bool - 发送心跳请求是否成功，成功返回true，失败返回false
 func SendBeat(node *NodeInfo, param string) bool {
 
 	url := fmt.Sprintf("http://%s:%d/beat", node.Host, node.Port)
@@ -98,6 +108,13 @@ func HttpBeat(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintf(w, "ok")
 }
 
+// CreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+// 参数：
+//
+//	w http.ResponseWriter: HTTP响应的写入对象
+//	r *http.Request: HTTP请求对象
+//
+// 返回值：无
 func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	// 确保请求方法是POST
 	if r.Method != http.MethodPost {
@@ -116,18 +133,15 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 读取请求体
-	//body, err := ioutil.ReadAll(r.Body)
-
-	//if err != nil {
-	//	http.Error(w, "Error reading request body", http.StatusInternalServerError)
-	//	return
-	//}
-
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+		return
+	}
 	var body = buf.Bytes()
 	var config MqttConfig
-	err := json.Unmarshal(body, &config)
+	err = json.Unmarshal(body, &config)
 	if err != nil {
 		http.Error(w, "Error decoding JSON: "+err.Error(), http.StatusBadRequest)
 		return
@@ -135,7 +149,10 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if CheckHasConfig(config) {
-		json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "已经存在客户端id"})
+		err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "已经存在客户端id"})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 
 	} else {
@@ -143,17 +160,26 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		usz := CreateMqttClient(config)
 
 		if usz == -1 {
-			json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "达到最大客户端数量"})
+			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "达到最大客户端数量"})
+			if err != nil {
+				zap.S().Errorf("Error: %+v", err)
+			}
 			return
 
 		}
 		if usz == -2 {
-			json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "MQTT客户端配置异常"})
+			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "MQTT客户端配置异常"})
+			if err != nil {
+				zap.S().Errorf("Error: %+v", err)
+			}
 			return
 		} else {
 			AddNoUseConfig(config, body)
 			BindNode(config, globalConfig.NodeInfo.Name)
-			json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建成功", "size": usz})
+			err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建成功", "size": usz})
+			if err != nil {
+				zap.S().Errorf("Error: %+v", err)
+			}
 			return
 
 		}
@@ -161,6 +187,11 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PubCreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+// 参数：
+// w: http.ResponseWriter类型，HTTP响应的写入对象
+// r: *http.Request类型，HTTP请求对象
+// 返回值：无
 func PubCreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -180,25 +211,26 @@ func PubCreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 读取请求体
-	//body, err := ioutil.ReadAll(r.Body)
-	//if err != nil {
-	//	http.Error(w, "Error reading request body", http.StatusInternalServerError)
-	//	return
-	//}
-	//str := string(body)
-
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 	var str = buf.String()
 
 	w.Header().Set("Content-Type", "application/json")
 
 	if PubCreateMqttClientOp(str) == 1 {
-		json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建成功"})
+		err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建成功"})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 	} else {
-		json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建失败"})
+		err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建失败"})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 
 	}
@@ -221,17 +253,24 @@ func PubRemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 	id := query.Get("id")
 	nodeName := FindMqttClientId(id)
 	if nodeName == "" {
-		json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "节点未找到"})
+		err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "节点未找到"})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 	}
 	info, err := GetNodeInfo(nodeName)
 	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
 	}
 
 	sendRemoveMqttClient(id, info)
 
 	// fixme: 找到节点并发送请求
-	json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "移除成功"})
+	err = json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "移除成功"})
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 
 }
 
@@ -244,7 +283,12 @@ func sendRemoveMqttClient(id string, nodeinfo NodeInfo) {
 		zap.S().Error("Error sending GET request: %s", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
+	}(resp.Body)
 
 	// 打印响应状态码
 	zap.S().Infof("Response Status Code: %d", resp.StatusCode)
@@ -270,17 +314,11 @@ func PubPushMqttData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 读取请求体
-	//body, err := ioutil.ReadAll(r.Body)
-	//
-	//if err != nil {
-	//	http.Error(w, "Error reading request body", http.StatusInternalServerError)
-	//	return
-	//}
-	//str := string(body)
-
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 	var str = buf.String()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -291,16 +329,23 @@ func PubPushMqttData(w http.ResponseWriter, r *http.Request) {
 	id := query.Get("id")
 	nodeName := FindMqttClientId(id)
 	if nodeName == "" {
-		json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "节点未找到"})
+		err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "节点未找到"})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 	}
 	info, err := GetNodeInfo(nodeName)
 	if err != nil {
+		zap.S().Error("Error getting node info: %s", err)
 	}
 
 	sendPushMqttData(info, str)
 
-	json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "消息发送成功"})
+	err = json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "消息发送成功"})
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 
 }
 
@@ -320,17 +365,18 @@ func sendPushMqttData(node NodeInfo, param string) bool {
 	if err != nil {
 		return false
 	}
-	defer resp.Body.Close()
-
-	//bodyBytes, err := ioutil.ReadAll(resp.Body)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//bodyString := string(bodyBytes)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
+	}(resp.Body)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 	var bodyString = buf.String()
 
 	zap.S().Infof("Response Status: %v , body = %v", resp.Status, bodyString)
@@ -366,11 +412,14 @@ func NodeList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// 编码并发送JSON响应
-	json.NewEncoder(w).Encode(map[string]any{
+	err = json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "创建成功",
 		"data":    service,
 	})
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 
 func NodeUsingStatus(w http.ResponseWriter, r *http.Request) {
@@ -442,14 +491,14 @@ func NodeUsingStatus(w http.ResponseWriter, r *http.Request) {
 		})
 
 	}
-
-	// 至此，nodeInfos切片包含了所有的节点名称和大小
-	// 你可以将这个切片编码为JSON并发送给客户端
-	json.NewEncoder(w).Encode(map[string]any{
+	err = json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "成功",
 		"data":    nodeInfos,
 	})
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 
 func GetUseMqttConfig(w http.ResponseWriter, r *http.Request) {
@@ -491,21 +540,26 @@ func GetUseMqttConfig(w http.ResponseWriter, r *http.Request) {
 	err := json.Unmarshal(b, &config)
 	if err != nil {
 		zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
-		json.NewEncoder(w).Encode(map[string]any{
+		err := json.NewEncoder(w).Encode(map[string]any{
 			"status":  200,
 			"message": "Success",
 			"data":    nil,
 		})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 	}
 
 	// 将配置信息编码为JSON并发送给客户端
-	json.NewEncoder(w).Encode(map[string]any{
+	err = json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "Success",
 		"data":    config,
 	})
-	return
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 
 func GetNoUseMqttConfig(w http.ResponseWriter, r *http.Request) {
@@ -539,20 +593,25 @@ func GetNoUseMqttConfig(w http.ResponseWriter, r *http.Request) {
 	err := json.Unmarshal(b, &config)
 	if err != nil {
 		zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
-		json.NewEncoder(w).Encode(map[string]any{
+		err := json.NewEncoder(w).Encode(map[string]any{
 			"status":  200,
 			"message": "Success",
 			"data":    nil,
 		})
+		if err != nil {
+			zap.S().Errorf("Error: %+v", err)
+		}
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]any{
+	err = json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "Success",
 		"data":    config,
 	})
-	return
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 func RemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 	if cros(w, r) {
@@ -581,12 +640,14 @@ func RemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 	StopMqttClient(id)
 
 	// 将配置信息编码为JSON并发送给客户端
-	json.NewEncoder(w).Encode(map[string]any{
+	err := json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "Success",
 		"data":    "已停止",
 	})
-	return
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 func PushMqttData(w http.ResponseWriter, r *http.Request) {
 	if cros(w, r) {
@@ -619,12 +680,14 @@ func PushMqttData(w http.ResponseWriter, r *http.Request) {
 	PushMqttMsg(params.ClientID, params.Topic, params.QOS, params.Retained, params.Payload)
 
 	// 将配置信息编码为JSON并发送给客户端
-	json.NewEncoder(w).Encode(map[string]any{
+	err = json.NewEncoder(w).Encode(map[string]any{
 		"status":  200,
 		"message": "Success",
 		"data":    "已发送",
 	})
-	return
+	if err != nil {
+		zap.S().Errorf("Error: %+v", err)
+	}
 }
 
 func cros(w http.ResponseWriter, r *http.Request) bool {

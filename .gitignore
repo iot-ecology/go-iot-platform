@@ -2,3 +2,7 @@ docs/
 ppt/
 
 .idea/
+
+/docker/rabbitmq/data
+/docker/mongo/database
+fileupdate/

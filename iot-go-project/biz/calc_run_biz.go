@@ -51,17 +51,12 @@ func (b CalcRunBiz) Start(id any) bool {
 
 		glob.GLog.Error("redis zadd 异常", zap.Any("err", err))
 		panic(err)
-		return false
 	}
-
-	var newV models.CalcRule
-	newV = calcRule
-	newV.Start = true
 
 	mup := map[string]interface{}{
 		"Start": true, // 更新 Start 字段为 true
 	}
-	result = glob.GDb.Table("calc_rules").Where("id = ?", newV.ID).Updates(mup)
+	result = glob.GDb.Table("calc_rules").Where("id = ?", calcRule.ID).Updates(mup)
 
 	if result.Error != nil {
 		glob.GLog.Error("更新异常", zap.Any("err", result.Error))
@@ -153,17 +148,13 @@ func (b CalcRunBiz) Stop(id any) bool {
 	glob.GRedis.HDel(context.Background(), "calc_cache", strconv.Itoa(int(calcRule.ID)))
 	glob.GRedis.Del(context.Background(), "calc_queue_param:"+strconv.Itoa(int(calcRule.ID)))
 
-	var newV models.CalcRule
-	newV = calcRule
-	newV.Start = false
-
 	mup := map[string]interface{}{
 		"Start": false, // 更新 Start 字段为 true
 	}
-	result = glob.GDb.Table("calc_rules").Where("id = ?", newV.ID).Updates(mup)
+	result = glob.GDb.Table("calc_rules").Where("id = ?", calcRule.ID).Updates(mup)
 
 	if result.Error != nil {
-
+		zap.S().Errorf("update error %+v", result.Error)
 		return false
 	}
 	return true
@@ -315,13 +306,14 @@ func runCalcScriot(param map[string]any, script string) map[string]interface{} {
 	vm := goja.New()
 	_, err := vm.RunString(script)
 	if err != nil {
-		fmt.Println("JS代码有问题！")
+		zap.S().Errorf("JS代码有问题 %+v", err)
+
 		return nil
 	}
 	var fn func(string2 map[string]any) map[string]interface{}
 	err = vm.ExportTo(vm.Get("main"), &fn)
 	if err != nil {
-		fmt.Println("Js函数映射到 Go 函数失败！")
+		zap.S().Errorf("Js函数映射到 Go 函数失败！ %+v", err)
 		return nil
 	}
 	a := fn(param)
@@ -362,6 +354,8 @@ func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 	defer func(cur *mongo.Cursor, ctx context.Context) {
 		err := cur.Close(ctx)
 		if err != nil {
+			zap.S().Errorf("err %+v", err)
+
 		}
 	}(cur, context.TODO())
 	var c []bson.M

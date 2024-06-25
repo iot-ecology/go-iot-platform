@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -41,7 +43,8 @@ func InitLog() {
 	// 确保日志被刷新
 	defer func(logger *zap.Logger) {
 		err := logger.Sync()
-		if err != nil {
+		if err != nil && !errors.Is(err, syscall.ENOTTY) {
+			zap.S().Errorf("日志同步失败 %+v", err)
 		}
 	}(logger)
 

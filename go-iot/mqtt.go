@@ -131,7 +131,14 @@ func sub(client mqtt.Client, topic string) {
 	zap.S().Debugf("订阅主题: %s", topic)
 }
 
-// CreateMqttClient 创建MQTT客户端
+// CreateMqttClient 函数根据传入的MqttConfig配置创建一个MQTT客户端
+// 参数：
+//
+//	config MqttConfig: MQTT客户端配置信息
+//
+// 返回值：
+//
+//	int64: 创建MQTT客户端后的总数，如果达到最大客户端数量则返回-1，如果MQTT客户端配置异常则返回-2
 func CreateMqttClient(config MqttConfig) int64 {
 
 	i := globalRedisClient.SCard(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name).Val()
@@ -149,7 +156,5 @@ func CreateMqttClient(config MqttConfig) int64 {
 		return -1
 
 	}
-
-	return -1
 
 }

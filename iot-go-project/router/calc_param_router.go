@@ -94,7 +94,6 @@ func (api *CalcParamApi) UpdateCalcParam(c *gin.Context) {
 	calcRunBiz.RefreshRule(old.CalcRuleId)
 
 	servlet.Resp(c, old)
-	return
 }
 
 // PageCalcParam
@@ -138,7 +137,6 @@ func (api *CalcParamApi) PageCalcParam(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteCalcParam

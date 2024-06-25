@@ -48,7 +48,6 @@ func (api *CalcRuleApi) CreateCalcRule(c *gin.Context) {
 	}
 	// 返回创建成功的计算规则
 	servlet.Resp(c, CalcRule)
-	return
 }
 
 // UpdateCalcRule
@@ -137,7 +136,6 @@ func (api *CalcRuleApi) PageCalcRule(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, data)
-	return
 }
 
 // DeleteCalcRule
@@ -204,7 +202,6 @@ func (api *CalcRuleApi) MockCalcRule(c *gin.Context) {
 	start := calcRunBiz.MockCalc(req.StartTime, req.EndTime, req.ID)
 
 	servlet.Resp(c, start)
-	return
 
 }
 
@@ -218,7 +215,6 @@ func (api *CalcRuleApi) Refresh(c *gin.Context) {
 
 	calcRunBiz.RefreshRule(param)
 	servlet.Resp(c, "刷新成功")
-	return
 
 }
 
@@ -276,5 +272,4 @@ func (api *CalcRuleApi) CalcRuleResult(c *gin.Context) {
 	start := calcRunBiz.QueryRuleExData(ruleId, startTime, endTime)
 
 	servlet.Resp(c, start)
-	return
 }

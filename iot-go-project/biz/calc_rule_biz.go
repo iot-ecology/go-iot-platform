@@ -20,7 +20,7 @@ func (biz *CalcRuleBiz) PageData(name string, page, size int) (*servlet.Paginati
 	db.Model(&models.CalcRule{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
-	db = db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&rules)
 
 	pagination.Data = rules
 	pagination.Page = page

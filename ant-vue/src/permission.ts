@@ -2,18 +2,20 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 
 import router from "./router";
-NProgress.configure({ showSpinner: false });
+// import {getMetaTitle} from "@/utils/i18n.ts";
+import i18n  from "@/i18n";
 
+NProgress.configure({ showSpinner: false });
 router.beforeEach((to, from, next) => {
   // 开启进度条
   NProgress.start();
   if (to.name && !from.name && import.meta.env.PROD) {
     // 弹出输入框
-    const userInput = window.prompt("请输入一个值:");
+    const userInput = window.prompt(i18n.global.t('message.pleaseEnter'));
     if (!userInput) {
       next(false);
     } else {
-      if (userInput === "some") {
+      if (userInput === import.meta.env.VITE_LOGIN) {
         next();
       } else {
         next(false);
@@ -22,9 +24,9 @@ router.beforeEach((to, from, next) => {
   } else {
     // 替换标题
     if (to.meta.title) {
-      document.title = `${String(to.meta.title)}`;
+      document.title = `${String(i18n.global.t(to.meta.title))}`;
     } else {
-      document.title = "客户端管理";
+      document.title = i18n.global.t('message.mqttManagement');
     }
     next();
   }

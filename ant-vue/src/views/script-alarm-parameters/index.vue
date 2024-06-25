@@ -2,17 +2,16 @@
   <div>
     <a-card title="" :bordered="true">
       <a-form layout="inline" :model="formState">
-        <a-form-item label="脚本报警">
+        <a-form-item :label="$t('message.scriptAlarm')">
           <SignalDelayWaring v-model="form.signal_delay_waring_id" style="width: 300px" />
-          <!--          <a-input v-model:value="formState.name" style="width: 300px" placeholder="请输入" />-->
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="pageList()">搜索</a-button>
+          <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">新增</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="onAdd()">{{ $t('message.addition') }}</a-button>
       <!--      表格-->
-      <a-table :columns="columns" :data-source="list" bordered :pagination="paginations" @change="handleTableChange">
+      <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
           <template v-if="['name', 'signal_name', 'signal_id', 'mqtt_client_id', 'mqtt_client_name'].includes(column.dataIndex)">
             <div>
@@ -40,16 +39,15 @@
           <template v-else-if="column.dataIndex === 'operation'">
             <div class="editable-row-operations">
               <span v-if="editableData[record.key]">
-                <a-typography-link style="margin-right: 10px" @click="save(record.key)">保存</a-typography-link>
-                <a-popconfirm title="确定取消编辑吗?" @confirm="cancel(record.key)">
-                  <a>取消</a>
+                <a-button type="primary" size="small" style="margin-right: 10px" @click="save(record.key)">{{$t('message.save')}}</a-button>
+                <a-popconfirm :okText="$t('message.yes')" :cancelText="$t('message.no')" :title="$t('message.sureEdit')" @confirm="cancel(record.key)">
+                  <a-button type="primary" size="small">{{$t('message.cancel')}}</a-button>
                 </a-popconfirm>
               </span>
               <span v-else>
-                <a @click="edit(record.key)">编辑</a>
-                <!--                <a style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">信号报警配置</a>-->
-                <a-popconfirm title="确认是否删除?" ok-text="是" cancel-text="否" @confirm="onDelete(record.ID)">
-                  <a style="margin-left: 10px; color: crimson">删除</a>
+                <a-button type="primary" size="small" @click="edit(record.key)">{{$t('message.edit')}}</a-button>
+                <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="onDelete(record.ID)">
+                  <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
               </span>
             </div>
@@ -57,94 +55,95 @@
         </template>
       </a-table>
 
-      <a-modal v-model:open="modal1Visible" :destroy-on-close="true" :title="title" class="custom-modal">
-        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form" name="nest-messages">
-          <a-form-item label="名称" name="name">
+      <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="title" class="custom-modal">
+        <a-form ref="formRef" :label-col="{ style: { width: '100px' } }" :rules="rules" :model="form">
+          <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
-          <a-form-item label="客户端ID" name="mqtt_client_id">
+          <a-form-item :label="$t('message.clientID')" name="mqtt_client_id">
             <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
-          <a-form-item label="信号名称" name="signal_id">
+          <a-form-item :label="$t('message.signalName')" name="signal_id">
             <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
           </a-form-item>
         </a-form>
         <template #footer>
-          <a-button @click="handleCancel">取消</a-button>
-          <a-button :disabled="loading" type="primary" @click="setModal1Visible()">确定</a-button>
+          <a-button @click="handleCancel">{{$t('message.cancel')}}</a-button>
+          <a-button :disabled="loading" type="primary" @click="onAddData()">{{$t('message.confirm')}}</a-button>
         </template>
       </a-modal>
     </a-card>
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, type UnwrapRef, watch } from "vue";
-import { type FormInstance, message } from "ant-design-vue";
+import {onMounted, reactive, ref, type UnwrapRef, watch} from "vue";
+import { message } from "ant-design-vue";
 import { type Rule } from "ant-design-vue/es/form";
 import { cloneDeep } from "lodash-es";
 
 import { SignalDelayWaringParamCreate, SignalDelayWaringParamDelete, SignalDelayWaringParamPage, SignalDelayWaringParamUpdate } from "@/api";
 import { MqttSelect, SignalDelayWaring, SignalSelect } from "@/components/index.ts";
+import {useI18n} from "vue-i18n";
 
 interface DataItem {
-  client_id: string;
-  host: string;
-  port: number;
-  username: string;
+  name: string;
+  mqtt_client_id: string;
+  signal_id: string;
 }
-const rules: Record<string, Rule[]> = {
+const { t,locale } = useI18n();
+let rules: Record<string, Rule[]> = {
   name: [
     {
       required: true,
-      validator: async (rule, value) => {
+      validator: async (_, value) => {
         if (value) {
           await Promise.resolve();
         } else {
-          await Promise.reject("请输入名称");
+          await Promise.reject(t('message.pleaseName'));
         }
         if (/^[A-Za-z]/.test(value)) {
           await Promise.resolve();
         } else {
-          await Promise.reject("名称必须以英文字母开头");
+          await Promise.reject(t('message.startWithAnEnglish'));
         }
       },
       trigger: "blur",
     },
   ],
-  mqtt_client_id: [{ required: true, message: "请选择客户端ID", trigger: "change" }],
-  signal_id: [{ required: true, message: "请选择信号名称", trigger: "change" }],
+  mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+  signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
 };
-const title = ref("新增");
+const title = ref(t('message.addition'));
 const columns = ref([
   {
-    title: "ID",
+    title: t('message.uniCode'),
     dataIndex: "ID",
   },
   {
-    title: "名称",
+    title: t('message.name'),
     dataIndex: "name",
   },
   {
-    title: "客户端ID",
+    title: t('message.clientID'),
     dataIndex: "mqtt_client_id",
-    render: ({ record }) => {
+    render: ({ record }: any) => {
       return record.mqtt_client_name;
     },
   },
   {
-    title: "信号名称",
+    title: t('message.signalName'),
     dataIndex: "signal_id",
-    render: ({ record }) => {
+    render: ({ record }: any) => {
       return record.signal_name;
     },
   },
   {
-    title: "操作",
+    title: t('message.operation'),
     dataIndex: "operation",
   },
 ]);
-const formRef = ref<FormInstance>();
-const modal1Visible = ref(false);
+const formRef = ref<HTMLFormElement | null>(null);
+const modalVisible = ref(false);
 const loading = ref(false);
 const list = ref([]);
 const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
@@ -161,37 +160,88 @@ const signalName = ref("");
 
 watch(
   () => form.signal_delay_waring_id,
-  (newValue, oldValue) => {
-    console.log(newValue);
-    pageList();
+  async () => {
+    await pageList();
   },
 );
 watch(
   () => form.mqtt_client_id,
-  (newValue, oldValue) => {
-    formRef.value.clearValidate("mqtt_client_id");
+  () => {
+    (formRef.value as HTMLFormElement).clearValidate("mqtt_client_id");
   },
 );
 watch(
   () => form.signal_id,
-  (newValue, oldValue) => {
-    formRef.value.clearValidate("signal_id");
+  () => {
+    (formRef.value as HTMLFormElement).clearValidate("signal_id");
   },
 );
+watch(locale, () => {
+  columns.value = [
+    {
+      title: t('message.uniCode'),
+      dataIndex: "ID",
+    },
+    {
+      title: t('message.name'),
+      dataIndex: "name",
+    },
+    {
+      title: t('message.clientID'),
+      dataIndex: "mqtt_client_id",
+      render: ({ record }) => {
+        return record.mqtt_client_name;
+      },
+    },
+    {
+      title: t('message.signalName'),
+      dataIndex: "signal_id",
+      render: ({ record }) => {
+        return record.signal_name;
+      },
+    },
+    {
+      title: t('message.operation'),
+      dataIndex: "operation",
+    },
+  ];
+  rules = {
+    name: [
+      {
+        required: true,
+        validator: async (_, value) => {
+          if (value) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.pleaseName'));
+          }
+          if (/^[A-Za-z]/.test(value)) {
+            await Promise.resolve();
+          } else {
+            await Promise.reject(t('message.startWithAnEnglish'));
+          }
+        },
+        trigger: "blur",
+      },
+    ],
+    mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+    signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }]
+  }
+});
 
 const onAdd = () => {
-  modal1Visible.value = true;
-  title.value = "新增";
+  modalVisible.value = true;
+  title.value = t('message.addition');
 };
-const paginations = reactive({
+const pagination = reactive({
   total: 0,
   current: 1,
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const pageList = async () => {
-  const { data } = await SignalDelayWaringParamPage({ signal_delay_waring_id: form.signal_delay_waring_id, page: paginations.current, page_size: paginations.pageSize });
-  paginations.total = data.data?.total || 0;
+  const { data } = await SignalDelayWaringParamPage({ signal_delay_waring_id: form.signal_delay_waring_id, page: pagination.current, page_size: pagination.pageSize });
+  pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
@@ -202,71 +252,72 @@ const pageList = async () => {
     signal_id: item.signal_id,
   }));
 };
-pageList();
 const edit = (key: string) => {
   editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
 };
 
 const cancel = (key: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
 };
 
-const handleTableChange = async (pagination: any) => {
-  paginations.current = pagination.current;
-  paginations.pageSize = pagination.pageSize;
+const handleTableChange = async (page: any) => {
+  pagination.current = page.current;
+  pagination.pageSize = page.pageSize;
   await pageList();
 };
-const setModal1Visible = () => {
-  formRef.value
+const onAddData = () => {
+  (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
-      if (title.value === "新增") {
+      if (title.value === t('message.addition')) {
         const data = { ...form };
         delete data.id;
-        SignalDelayWaringParamCreate(data).then(({ data }) => {
+        SignalDelayWaringParamCreate(data).then(async ({ data }) => {
           if (data.code === 20000) {
-            modal1Visible.value = false;
-            message.success("新增成功");
+            modalVisible.value = false;
+            message.success(t('message.newSuccessfullyAdded'));
             formRef.value?.resetFields();
-            pageList();
+            await pageList();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       } else {
-        SignalDelayWaringParamUpdate(form).then(({ data }) => {
+        SignalDelayWaringParamUpdate(form).then(async ({ data }) => {
           if (data.code === 20000) {
-            modal1Visible.value = false;
-            message.success("编辑成功");
-            pageList();
+            modalVisible.value = false;
+            message.success(t('message.editSuccessful'));
+            await pageList();
           } else {
             message.error(data.message);
           }
+        }).catch(e=>{
+          console.error(e)
         });
       }
     })
-    .catch(() => {});
+    .catch((e: any) => {
+      console.error(e)
+    });
 };
 
 const handleCancel = () => {
-  modal1Visible.value = false;
+  modalVisible.value = false;
 };
 
 const save = async (key: string) => {
   const englishLetterRegex = /^[A-Za-z]$/;
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
-  // eslint-disable-next-line no-debugger
   if (!data.mqtt_client_id || !data.signal_name) {
-    message.error("客户端ID和信号名称必选");
-    await pageList();
+    message.error(t('message.clientSignal'));
     return;
   }
   if (!englishLetterRegex.test(data.name.charAt(0))) {
-    message.error("名称必须以英文字母开头");
+    message.error(t('message.startWithAnEnglish'));
     return;
   }
 
@@ -277,14 +328,15 @@ const save = async (key: string) => {
 
 // 删除
 const onDelete = async (id: string) => {
-  SignalDelayWaringParamDelete(id).then(({ data }) => {
+  SignalDelayWaringParamDelete(id).then(async ({ data }) => {
     if (data.code === 20000) {
       message.success(data.message);
-      pageList();
+      await pageList();
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message.success(data.message);
     }
+  }).catch(e=>{
+    console.error(e)
   });
 };
 
@@ -294,5 +346,8 @@ const handleCustomEvent = (payload: any) => {
     signalName.value = payload.name;
   }
 };
+onMounted(async ()=>{
+  await pageList();
+})
 </script>
 <style lang="less" scoped></style>

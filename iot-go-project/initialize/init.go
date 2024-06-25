@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ import (
 	"igp/router"
 	"log"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -35,42 +37,202 @@ var (
 	calcParamApi              = router.CalcParamApi{}
 	signalDelayWaringParamApi = router.SignalDelayWaringParamApi{}
 	signalDelayWaringApi      = router.SignalDelayWaringApi{}
+	productApi                = router.ProductApi{}
+	deviceGroupApi            = router.DeviceGroupApi{}
+	deviceInfoApi             = router.DeviceInfoApi{}
+	productionPlanApi         = router.ProductionPlanApi{}
+	repairRecordApi           = router.RepairRecordApi{}
+	fileApi                   = router.FileApi{}
+	userApi                   = router.UserApi{}
+	deptApi                   = router.DeptApi{}
+	roleApi                   = router.RoleApi{}
+	shipmentRecordApi         = router.ShipmentRecordApi{}
 )
 
 func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.MqttClient{}) {
 
-		glob.GDb.AutoMigrate(&models.MqttClient{})
+		err := glob.GDb.AutoMigrate(&models.MqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.Signal{}) {
 
-		glob.GDb.AutoMigrate(&models.Signal{})
+		err := glob.GDb.AutoMigrate(&models.Signal{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.SignalWaringConfig{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalWaringConfig{})
+		err := glob.GDb.AutoMigrate(&models.SignalWaringConfig{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.SignalDelayWaring{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalDelayWaring{})
+		err := glob.GDb.AutoMigrate(&models.SignalDelayWaring{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 
 	if !glob.GDb.Migrator().HasTable(&models.SignalDelayWaringParam{}) {
 
-		glob.GDb.AutoMigrate(&models.SignalDelayWaringParam{})
+		err := glob.GDb.AutoMigrate(&models.SignalDelayWaringParam{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 
 	if !glob.GDb.Migrator().HasTable(&models.CalcRule{}) {
 
-		glob.GDb.AutoMigrate(&models.CalcRule{})
+		err := glob.GDb.AutoMigrate(&models.CalcRule{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.CalcParam{}) {
 
-		glob.GDb.AutoMigrate(&models.CalcParam{})
+		err := glob.GDb.AutoMigrate(&models.CalcParam{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+
+		}
 	}
 	if !glob.GDb.Migrator().HasTable(&models.Dashboard{}) {
 
-		glob.GDb.AutoMigrate(&models.Dashboard{})
+		err := glob.GDb.AutoMigrate(&models.Dashboard{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Product{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Product{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceInfo{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceInfo{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroup{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroup{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroupDevice{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroupDevice{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.RepairRecord{}) {
+
+		err := glob.GDb.AutoMigrate(&models.RepairRecord{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductionPlan{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductionPlan{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductPlan{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductPlan{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ProductionBatch{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ProductionBatch{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+
+	if !glob.GDb.Migrator().HasTable(&models.User{}) {
+
+		err := glob.GDb.AutoMigrate(&models.User{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Role{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Role{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.UserRole{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserRole{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.Dept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.Dept{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ShipmentRecord{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ShipmentRecord{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ShipmentProductDetail{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ShipmentProductDetail{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.UserBindDeviceInfo{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserBindDeviceInfo{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindMqttClient{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindMqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceGroupBindMqttClient{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceGroupBindMqttClient{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
 	}
 }
 
@@ -143,7 +305,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer lg.Sync()
+	defer func(lg *zap.Logger) {
+		err := lg.Sync()
+		if err != nil && !errors.Is(err, syscall.ENOTTY) {
+			zap.S().Errorf("日志同步失败 %+v", err)
+		}
+	}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -176,11 +343,48 @@ func initRouter(r *gin.Engine) {
 	r.POST("/signal-waring-config/update", signalWaringConfigApi.UpdateSignalWaringConfig)
 	r.GET("/signal-waring-config/page", signalWaringConfigApi.PageSignalWaringConfig)
 
-	r.POST("/dashboard/create", dashboardApi.Createdashboard)
-	r.POST("/dashboard/update", dashboardApi.Updatedashboard)
-	r.GET("/dashboard/:id", dashboardApi.ByIddashboard)
-	r.GET("/dashboard/page", dashboardApi.Pagedashboard)
-	r.POST("/dashboard/delete/:id", dashboardApi.Deletedashboard)
+	r.POST("/dashboard/create", dashboardApi.CreateDashboard)
+	r.POST("/dashboard/update", dashboardApi.UpdateDashboard)
+	r.GET("/dashboard/:id", dashboardApi.ByIdDashboard)
+	r.GET("/dashboard/page", dashboardApi.PageDashboard)
+	r.POST("/dashboard/delete/:id", dashboardApi.DeleteDashboard)
+
+	r.POST("/product/create", productApi.CreateProduct)
+	r.POST("/product/update", productApi.UpdateProduct)
+	r.GET("/product/:id", productApi.ByIdProduct)
+	r.GET("/product/page", productApi.PageProduct)
+	r.POST("/product/delete/:id", productApi.DeleteProduct)
+
+	r.POST("/device_group/create", deviceGroupApi.CreateDeviceGroup)
+	r.POST("/device_group/update", deviceGroupApi.UpdateDeviceGroup)
+	r.GET("/device_group/:id", deviceGroupApi.ByIdDeviceGroup)
+	r.GET("/device_group/page", deviceGroupApi.PageDeviceGroup)
+	r.POST("/device_group/delete/:id", deviceGroupApi.DeleteDeviceGroup)
+
+	r.GET("/device_group/query_bind_device", deviceGroupApi.QueryBindDeviceInfo)
+	r.POST("/device_group/bind_device", deviceGroupApi.BindDeviceInfo)
+	r.POST("/device_group/BindMqtt", deviceGroupApi.BindMqtt)
+	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
+
+	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
+	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
+	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
+	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
+	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
+	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
+	r.POST("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
+
+	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
+	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
+	r.GET("/ProductionPlan/:id", productionPlanApi.ByIdProductionPlan)
+	r.GET("/ProductionPlan/page", productionPlanApi.PageProductionPlan)
+	r.POST("/ProductionPlan/delete/:id", productionPlanApi.DeleteProductionPlan)
+
+	r.POST("/RepairRecord/create", repairRecordApi.CreateRepairRecord)
+	r.POST("/RepairRecord/update", repairRecordApi.UpdateRepairRecord)
+	r.GET("/RepairRecord/:id", repairRecordApi.ByIdRepairRecord)
+	r.GET("/RepairRecord/page", repairRecordApi.PageRepairRecord)
+	r.POST("/RepairRecord/delete/:id", repairRecordApi.DeleteRepairRecord)
 
 	r.POST("/calc-rule/create", calcRuleApi.CreateCalcRule)
 	r.POST("/calc-rule/update", calcRuleApi.UpdateCalcRule)
@@ -197,6 +401,37 @@ func initRouter(r *gin.Engine) {
 	r.GET("/calc-param/page", calcParamApi.PageCalcParam)
 	r.POST("/calc-param/delete/:id", calcParamApi.DeleteCalcParam)
 
+	r.POST("/User/create", userApi.CreateUser)
+	r.POST("/User/update", userApi.UpdateUser)
+	r.GET("/User/page", userApi.PageUser)
+	r.POST("/User/delete/:id", userApi.DeleteUser)
+	r.GET("/User/:id", userApi.ByIdUser)
+	r.GET("/User/list", userApi.ListUser)
+	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/QueryBindRole", userApi.QueryBindRole)
+	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
+	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
+
+	r.POST("/Dept/create", deptApi.CreateDept)
+	r.POST("/Dept/update", deptApi.UpdateDept)
+	r.GET("/Dept/page", deptApi.PageDept)
+	r.POST("/Dept/delete/:id", deptApi.DeleteDept)
+	r.GET("/Dept/:id", deptApi.ByIdDept)
+	r.GET("/Dept/subs", deptApi.FindByIdSubs)
+
+	r.POST("/Role/create", roleApi.CreateRole)
+	r.POST("/Role/update", roleApi.UpdateRole)
+	r.GET("/Role/page", roleApi.PageRole)
+	r.POST("/Role/delete/:id", roleApi.DeleteRole)
+	r.GET("/Role/:id", roleApi.ByIdRole)
+	r.GET("/Role/list", roleApi.ListRole)
+
+	r.POST("/ShipmentRecord/create", shipmentRecordApi.CreateShipmentRecord)
+	r.POST("/ShipmentRecord/update", shipmentRecordApi.UpdateShipmentRecord)
+	r.GET("/ShipmentRecord/page", shipmentRecordApi.PageShipmentRecord)
+	r.POST("/ShipmentRecord/delete/:id", shipmentRecordApi.DeleteShipmentRecord)
+	r.GET("/ShipmentRecord/:id", shipmentRecordApi.ByIdShipmentRecord)
+
 	r.POST("/signal-delay-waring-param/create", signalDelayWaringParamApi.CreateSignalDelayWaring)
 	r.POST("/signal-delay-waring-param/update", signalDelayWaringParamApi.UpdateSignalDelayWaring)
 	r.GET("/signal-delay-waring-param/page", signalDelayWaringParamApi.PageSignalDelayWaring)
@@ -209,6 +444,9 @@ func initRouter(r *gin.Engine) {
 	r.POST("/signal-delay-waring/Mock/:id", signalDelayWaringApi.Mock)
 	r.POST("/signal-delay-waring/GenParam/:id", signalDelayWaringApi.GenParam)
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
+
+	r.POST("/file/update", fileApi.UpdateFile)
+	r.POST("/file/download", fileApi.DownloadFile)
 
 }
 func initGlobalRedisClient() {

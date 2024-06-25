@@ -1,8 +1,8 @@
 package biz
 
 import (
-	"fmt"
 	"github.com/dop251/goja"
+	"go.uber.org/zap"
 	"igp/servlet"
 )
 
@@ -13,13 +13,13 @@ func (biz *ScirptBiz) CheckScript(param string, script string) *[]servlet.DataRo
 	vm := goja.New()
 	_, err := vm.RunString(script)
 	if err != nil {
-		fmt.Println("JS代码有问题！")
+		zap.S().Errorf("JS代码有问题！ %+v", err)
 		return nil
 	}
 	var fn func(string2 string) *[]servlet.DataRowList
 	err = vm.ExportTo(vm.Get("main"), &fn)
 	if err != nil {
-		fmt.Println("Js函数映射到 Go 函数失败！")
+		zap.S().Errorf("Js函数映射到 Go 函数失败！ %+v", err)
 		return nil
 	}
 	a := fn(param)

@@ -2,6 +2,7 @@ package models
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 type MqttClient struct {
@@ -90,4 +91,149 @@ type Dashboard struct {
 	Name       string `json:"name"`                    // 名称
 	Config     string `json:"config" gorm:"type:text"` // 配置
 	gorm.Model `structs:"-"`
+}
+
+type Product struct {
+	Name           string  `json:"name"`                                      // 产品名称
+	Description    string  `json:"description" structs:"description"`         // 产品描述
+	SKU            string  `json:"sku" structs:"sku"`                         // 库存单位
+	Price          float64 `json:"price" structs:"price"`                     // 销售价格
+	Cost           float64 `json:"cost" structs:"cost"`                       // 成本
+	Quantity       int     `json:"quantity" structs:"quantity"`               // 库存数量
+	MinimumStock   int     `json:"minimum_stock" structs:"minimum_stock"`     // 最低库存量
+	WarrantyPeriod int     `json:"warranty_period" structs:"warranty_period"` // 质保时间（天）
+	Status         string  `json:"status" structs:"status"`                   // 产品状态
+	Tags           string  `json:"tags" structs:"tags"`                       // 标签
+	ImageURL       string  `json:"image_url" structs:"image_url"`             // 图片URL
+	gorm.Model     `structs:"-"`
+}
+type DeviceInfo struct {
+	ProductId         uint      `json:"product_id" structs:"product_id"`                 // 产品ID
+	SN                string    `json:"sn" structs:"sn"`                                 // 设备编号
+	ManufacturingDate time.Time `json:"manufacturing_date" structs:"manufacturing_date"` // 制造日期
+	ProcurementDate   time.Time `json:"procurement_date" structs:"procurement_date"`     // 采购日期
+	Source            int       `json:"source" structs:"source"`                         // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    time.Time `json:"warranty_expiry" structs:"warranty_expiry"`       // 保修截止日期
+	gorm.Model        `structs:"-"`
+}
+
+type DeviceGroup struct {
+	Name       string `json:"name" structs:"name"` // 名称
+	gorm.Model `structs:"-"`
+}
+
+type DeviceGroupDevice struct {
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备表的外键ID
+	GroupId      uint `json:"group_id" structs:"group_id"`             // 设备组表的外键ID
+	gorm.Model   `structs:"-"`
+}
+
+type DeviceInstallRecord struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint      `json:"device_info_id" structs:"device_info_id"` // 设备表的外键ID
+	InstallDate  time.Time `json:"install_date" structs:"install_date"`     // 安装日期
+	Technician   string    `json:"technician" structs:"technician"`         // 安装人员
+	Description  string    `json:"description" structs:"description"`       // 安装描述
+	PhotoURL     string    `json:"photo_url" structs:"photo_url"`           // 照片URL
+}
+
+type RepairRecord struct {
+	DeviceInfoId uint      `json:"device_info_id" structs:"device_info_id"` // 设备表的外键ID
+	RepairDate   time.Time `json:"repair_date" structs:"repair_date"`       // 维修日期
+	Technician   string    `json:"technician" structs:"technician"`         // 维修人员
+	Cost         float64   `json:"cost" structs:"cost"`                     // 维修成本
+	Description  string    `json:"description" structs:"description"`       // 维修描述
+	gorm.Model   `structs:"-"`
+}
+
+// ShipmentRecord 发货记录
+type ShipmentRecord struct {
+	gorm.Model      `structs:"-"`
+	ShipmentDate    time.Time `json:"shipment_date" structs:"shipment_date"`       // 发货日期
+	Technician      string    `json:"technician" structs:"technician"`             // 发货人员
+	CustomerName    string    `json:"customer_name" structs:"customer_name"`       // 客户名称
+	CustomerAddress string    `json:"customer_address" structs:"customer_address"` // 客户地址
+	Quantity        int       `json:"quantity" structs:"quantity"`                 // 发货数量
+	TrackingNumber  string    `json:"tracking_number" structs:"tracking_number"`   // 跟踪号码
+	Status          string    `json:"status" structs:"status"`                     // 发货状态（例如：pending, shipped, delivered）
+	Description     string    `json:"description" structs:"description"`           // 发货描述
+}
+
+// ShipmentProductDetail 发货记录中的具体产品
+type ShipmentProductDetail struct {
+	gorm.Model       `structs:"-"`
+	ShipmentRecordId uint `json:"shipment_record_id" structs:"shipment_record_id"` // 发货记录ID
+	ProductID        uint `json:"product_id" structs:"product_id"`                 // 关联的产品ID
+	Quantity         int  `json:"quantity" structs:"quantity"`                     // 发货数量
+}
+
+// ProductionPlan 表示生产计划
+type ProductionPlan struct {
+	gorm.Model  `structs:"-"`
+	Name        string    `json:"name" structs:"name"`               // 生产计划名称
+	StartDate   time.Time `json:"start_date" structs:"start_date"`   // 生产计划开始日期
+	EndDate     time.Time `json:"end_date" structs:"end_date"`       // 生产计划结束日期
+	Description string    `json:"description" structs:"description"` // 生产计划描述
+}
+
+// ProductPlan 表示生产计划中的具体产品计划
+type ProductPlan struct {
+	gorm.Model       `structs:"-"`
+	ProductionPlanID uint `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
+	ProductID        uint `json:"product_id" structs:"product_id"`                 // 关联的产品ID
+	Quantity         int  `json:"quantity" structs:"quantity"`                     // 计划生产数量
+}
+
+// ProductionBatch 表示生产批次
+type ProductionBatch struct {
+	gorm.Model       `structs:"-"`
+	BatchNumber      string    `json:"batch_number" structs:"batch_number"`             // 生产批次号
+	ProductionPlanID uint      `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
+	StartDate        time.Time `json:"start_date" structs:"start_date"`                 // 生产批次开始日期
+	EndDate          time.Time `json:"end_date" structs:"end_date"`                     // 生产批次结束日期
+	QuantityProduced int       `json:"quantity_produced" structs:"quantity_produced"`   // 实际生产数量
+	QualityStatus    string    `json:"quality_status" structs:"quality_status"`         // 质量状态
+}
+
+type User struct {
+	gorm.Model `structs:"-"`
+	Username   string `json:"username" structs:"username"` // 用户名
+	Password   string `json:"password" structs:"password"` // 密码
+	Email      string `json:"email" structs:"email"`       // 电子邮箱
+	Status     string `json:"status" structs:"status"`     // 用户状态（例如：active, inactive）
+}
+
+type Role struct {
+	gorm.Model  `structs:"-"`
+	Name        string `json:"name" structs:"name"`               // 角色名
+	Description string `json:"description" structs:"description"` // 角色描述
+}
+
+type UserRole struct {
+	gorm.Model `structs:"-"`
+	UserId     uint `json:"user_id" structs:"user_id"` // 用户ID
+	RoleId     uint `json:"role_id" structs:"role_id"` // 角色ID
+}
+type Dept struct {
+	gorm.Model `structs:"-"`
+	Name       string `json:"name" structs:"name"`                     // 部门名
+	ParentId   uint   `json:"parent_id,omitempty" structs:"parent_id"` // 父部门ID
+}
+
+type UserBindDeviceInfo struct {
+	gorm.Model `structs:"-"`
+	UserId     uint `json:"user_id" structs:"user_id"`     // 用户ID
+	DeviceId   uint `json:"device_id" structs:"device_id"` // 设备ID
+}
+
+type DeviceBindMqttClient struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	MqttClientId uint `json:"mqtt_client_id"`                          // MQTT客户端表的外键ID
+}
+
+type DeviceGroupBindMqttClient struct {
+	gorm.Model    `structs:"-"`
+	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
+	MqttClientId  uint `json:"mqtt_client_id"`                            // MQTT客户端表的外键ID
 }
