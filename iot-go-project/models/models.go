@@ -180,9 +180,10 @@ type ProductionPlan struct {
 // ProductPlan 表示生产计划中的具体产品计划
 type ProductPlan struct {
 	gorm.Model       `structs:"-"`
-	ProductionPlanID uint `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
-	ProductID        uint `json:"product_id" structs:"product_id"`                 // 关联的产品ID
-	Quantity         int  `json:"quantity" structs:"quantity"`                     // 计划生产数量
+	ProductionPlanID uint   `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
+	ProductID        uint   `json:"product_id" structs:"product_id"`                 // 关联的产品ID
+	Quantity         int    `json:"quantity" structs:"quantity"`                     // 计划生产数量
+	Status           string `json:"status" structs:"status"`                         // 计划状态（例如：准备中,进行中, 已完成）
 }
 
 // ProductionBatch 表示生产批次
@@ -193,7 +194,7 @@ type ProductionBatch struct {
 	StartDate        time.Time `json:"start_date" structs:"start_date"`                 // 生产批次开始日期
 	EndDate          time.Time `json:"end_date" structs:"end_date"`                     // 生产批次结束日期
 	QuantityProduced int       `json:"quantity_produced" structs:"quantity_produced"`   // 实际生产数量
-	QualityStatus    string    `json:"quality_status" structs:"quality_status"`         // 质量状态
+	QualityStatus    string    `json:"quality_status" structs:"quality_status"`         // 质量状态 例如：合格，不合格
 }
 
 type User struct {
