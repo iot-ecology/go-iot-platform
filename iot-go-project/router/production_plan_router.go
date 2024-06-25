@@ -21,7 +21,7 @@ var ProductionPlanBiz = biz.ProductionPlanBiz{}
 // @Tags ProductionPlans
 // @Accept json
 // @Produce json
-// @Param ProductionPlan body models.ProductionPlan true "生产计划"
+// @Param ProductionPlan body servlet.ProductionPlanCreateParam true "生产计划"
 // @Success 201 {object} servlet.JSONResult{data=models.ProductionPlan} "创建成功的生产计划"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
@@ -33,6 +33,11 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 		return
 	}
 
+	e := param.ValidateUniqueIDs()
+	if e != nil {
+		servlet.Error(c, e.Error())
+		return
+	}
 	tx := glob.GDb.Begin()
 	if tx.Error != nil {
 		servlet.Error(c, "Failed to begin transaction")
@@ -76,7 +81,7 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 		return
 	}
 
-	servlet.Resp(c, "创建成功")
+	servlet.Resp(c, productionPlan)
 }
 
 // UpdateProductionPlan
@@ -92,9 +97,16 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ProductionPlan/update [post]
 func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
+
 	var param servlet.ProductionPlanCreateParam
 	if err := c.ShouldBindJSON(&param); err != nil {
 		servlet.Error(c, err.Error())
+		return
+	}
+
+	e := param.ValidateUniqueIDs()
+	if e != nil {
+		servlet.Error(c, e.Error())
 		return
 	}
 
@@ -270,4 +282,26 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 	}
 
 	servlet.Resp(c, res)
+}
+
+// ChangeProductionPlanState
+// @Tags      ProductionPlans
+// @Summary   修改生产计划状态
+// @Param ProductionPlan body servlet.ProductionPlanChangeParam true "修改参数"
+// @Produce   application/json
+// @Router    /ProductionPlan/change_state [post]
+func (api *ProductionPlanApi) ChangeProductionPlanState(c *gin.Context) {
+	var param servlet.ProductionPlanChangeParam
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	state := ProductionPlanBiz.ChangeProductionPlanState(param)
+	if state {
+
+		servlet.Resp(c, "修改成功")
+	} else {
+		servlet.Error(c, "修改失败")
+	}
 }

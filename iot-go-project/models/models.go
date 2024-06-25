@@ -175,26 +175,15 @@ type ProductionPlan struct {
 	StartDate   time.Time `json:"start_date" structs:"start_date"`   // 生产计划开始日期
 	EndDate     time.Time `json:"end_date" structs:"end_date"`       // 生产计划结束日期
 	Description string    `json:"description" structs:"description"` // 生产计划描述
+	Status      string    `json:"status" structs:"status"`           // 计划状态（准备中,进行中, 已完成）
 }
 
 // ProductPlan 表示生产计划中的具体产品计划
 type ProductPlan struct {
 	gorm.Model       `structs:"-"`
-	ProductionPlanID uint   `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
-	ProductID        uint   `json:"product_id" structs:"product_id"`                 // 关联的产品ID
-	Quantity         int    `json:"quantity" structs:"quantity"`                     // 计划生产数量
-	Status           string `json:"status" structs:"status"`                         // 计划状态（例如：准备中,进行中, 已完成）
-}
-
-// ProductionBatch 表示生产批次
-type ProductionBatch struct {
-	gorm.Model       `structs:"-"`
-	BatchNumber      string    `json:"batch_number" structs:"batch_number"`             // 生产批次号
-	ProductionPlanID uint      `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
-	StartDate        time.Time `json:"start_date" structs:"start_date"`                 // 生产批次开始日期
-	EndDate          time.Time `json:"end_date" structs:"end_date"`                     // 生产批次结束日期
-	QuantityProduced int       `json:"quantity_produced" structs:"quantity_produced"`   // 实际生产数量
-	QualityStatus    string    `json:"quality_status" structs:"quality_status"`         // 质量状态 例如：合格，不合格
+	ProductionPlanID uint `json:"production_plan_id" structs:"production_plan_id"` // 关联的生产计划ID
+	ProductID        uint `json:"product_id" structs:"product_id"`                 // 关联的产品ID
+	Quantity         int  `json:"quantity" structs:"quantity"`                     // 计划生产数量
 }
 
 type User struct {
@@ -238,4 +227,16 @@ type DeviceGroupBindMqttClient struct {
 	gorm.Model    `structs:"-"`
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
 	MqttClientId  uint `json:"mqtt_client_id"`                            // MQTT客户端表的外键ID
+}
+
+type MessageTypeBindRole struct {
+	gorm.Model  `structs:"-"`
+	MessageType string `json:"message_type" structs:"message_type"` // 消息类型
+	RoleId      uint   `json:"role_id" structs:"role_id"`           // 角色ID
+}
+
+type MessageList struct {
+	gorm.Model    `structs:"-"`
+	Content       string `json:"content" structs:"content"`                 // 消息内容
+	MessageTypeId uint   `json:"message_type_id" structs:"message_type_id"` // 消息类型ID
 }

@@ -1,6 +1,7 @@
 package servlet
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -222,7 +223,23 @@ type ProductionPlanCreateParam struct {
 	StartDate               time.Time                `json:"start_date" structs:"start_date"`   // 生产计划开始日期
 	EndDate                 time.Time                `json:"end_date" structs:"end_date"`       // 生产计划结束日期
 	Description             string                   `json:"description" structs:"description"` // 生产计划描述
-	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans"`
+	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans" `
+}
+
+func (p *ProductionPlanCreateParam) ValidateUniqueIDs() error {
+	idMap := make(map[uint]bool)
+	for _, param := range p.ProductPlanCreateParams {
+		if _, exists := idMap[param.ProductID]; exists {
+			return errors.New("error: duplicate ID found")
+		}
+		idMap[param.ProductID] = true
+	}
+	return nil
+}
+
+type ProductionPlanChangeParam struct {
+	ID     uint   `json:"id,omitempty" structs:"id"` // 生产计划名称
+	Status string `json:"status" structs:"status"`   // 计划状态（例如：准备中,进行中, 已完成）
 }
 
 type ProductPlanCreateParam struct {
@@ -242,6 +259,17 @@ type ShipmentRecordCreateParam struct {
 	CustomerPhone   string    `json:"customer_phone" structs:"customer_phone"`     // 客户手机
 
 	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans"`
+}
+
+func (s *ShipmentRecordCreateParam) ValidateUniqueIDs() error {
+	idMap := make(map[uint]bool)
+	for _, param := range s.ProductPlanCreateParams {
+		if _, exists := idMap[param.ProductID]; exists {
+			return errors.New("error: duplicate ID found")
+		}
+		idMap[param.ProductID] = true
+	}
+	return nil
 }
 
 type UserBindRoleParam struct {

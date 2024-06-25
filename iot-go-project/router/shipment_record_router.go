@@ -33,6 +33,11 @@ func (api *ShipmentRecordApi) CreateShipmentRecord(c *gin.Context) {
 		servlet.Error(c, err.Error())
 		return
 	}
+	err2 := param.ValidateUniqueIDs()
+	if err2 != nil {
+		servlet.Error(c, err2.Error())
+		return
+	}
 
 	tx := glob.GDb.Begin()
 	if tx.Error != nil {
@@ -108,7 +113,11 @@ func (api *ShipmentRecordApi) UpdateShipmentRecord(c *gin.Context) {
 		servlet.Error(c, err.Error())
 		return
 	}
-
+	err2 := param.ValidateUniqueIDs()
+	if err2 != nil {
+		servlet.Error(c, err2.Error())
+		return
+	}
 	var old models.ShipmentRecord
 	result := glob.GDb.First(&old, param.ID)
 	if result.Error != nil {

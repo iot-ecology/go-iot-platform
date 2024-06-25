@@ -164,13 +164,6 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&models.ProductionBatch{}) {
-
-		err := glob.GDb.AutoMigrate(&models.ProductionBatch{})
-		if err != nil {
-			zap.S().Errorf("数据库表创建失败 %+v", err)
-		}
-	}
 
 	if !glob.GDb.Migrator().HasTable(&models.User{}) {
 
