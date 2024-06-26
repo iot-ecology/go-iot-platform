@@ -28,10 +28,10 @@ Go IoT Platform, a high-efficiency and scalable Internet of Things solution deve
 | Data Visualization     | ![image-20240524123820684](readme/image-20240524123820684.png) |
 
 ## Table of Contents
-- [go-iot](,/go-iot): MQTT Client Management Service
+- [go-iot](./go-iot): MQTT Client Management Service
 - [go-iot-mq](./go-iot-mq): Rabbit Message Queue Service
 - [iot-go-project](./iot-go-project): Management Backend Service
-
+- [ant-vue](./ant-vue): 基于ant-vue开发的后台管理系统
 
 ## Documentation
 

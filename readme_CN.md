@@ -2,6 +2,9 @@
 
 Go IoT 平台，这是一个高效、可扩展的物联网解决方案，使用 Go 语言开发。本平台专注于提供稳定、可靠的 MQTT 客户端管理，以及对 MQTT上报数据的全面处理和分析。
 
+如果可以请为我投票：
+<a href="https://www.producthunt.com/posts/go-iot-platform?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-go&#0045;iot&#0045;platform" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=465692&theme=light" alt="Go&#0032;IoT&#0032;Platform - GoIoT&#0058;&#0032;Efficient&#0044;&#0032;scalable&#0032;MQTT&#0032;IoT&#0032;platform&#0032;in&#0032;Go&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 ## 特点
 
 - **MQTT 客户端管理**：维持大量 MQTT 客户端的稳定连接。
@@ -25,9 +28,10 @@ Go IoT 平台，这是一个高效、可扩展的物联网解决方案，使用 
 | 数据可视化     | ![image-20240524123820684](readme/image-20240524123820684.png) |
 
 ## 目录
-- [go-iot](,/go-iot): MQTT客户端管理服务
+- [go-iot](./go-iot): MQTT客户端管理服务
 - [go-iot-mq](./go-iot-mq): rabbit 消息队列处理服务
 - [iot-go-project](./iot-go-project): 管理后台服务
+- [ant-vue](./ant-vue): 基于ant-vue开发的后台管理系统
 
 
 
