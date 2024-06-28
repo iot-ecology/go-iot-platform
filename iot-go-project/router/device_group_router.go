@@ -229,8 +229,8 @@ func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 	var deviceGroupDevices []models.DeviceGroupDevice
 	for _, deviceId := range param.DeviceId {
 		deviceGroupDevices = append(deviceGroupDevices, models.DeviceGroupDevice{
-			GroupId:      uint(param.GroupId),
-			DeviceInfoId: uint(deviceId),
+			DeviceGroupGroupId: uint(param.GroupId),
+			DeviceInfoId:       uint(deviceId),
 		})
 	}
 

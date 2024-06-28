@@ -81,6 +81,7 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 		return
 	}
 
+	ProductionPlanBiz.BeforeCreate(productionPlan)
 	servlet.Resp(c, productionPlan)
 }
 

@@ -9,6 +9,7 @@ import (
 	"igp/docs"
 	"igp/glob"
 	"igp/initialize"
+	"igp/router"
 	"igp/servlet"
 	"igp/task"
 	"net/http"
@@ -56,6 +57,8 @@ func main() {
 
 	r.Use(CORSMiddleware())
 	r.Use(ExceptionMiddleware)
+	r.POST("/login", router.Login)
+
 	initialize.InitAll(group)
 	task.InitTask()
 

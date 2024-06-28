@@ -18,6 +18,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/router"
@@ -48,6 +49,7 @@ var (
 	roleApi                   = router.RoleApi{}
 	shipmentRecordApi         = router.ShipmentRecordApi{}
 	loginApi                  = router.LoginApi{}
+	messageListApi            = router.MessageListApi{}
 )
 
 func initTable() {
@@ -443,8 +445,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/file/update", fileApi.UpdateFile)
 	r.POST("/file/download", fileApi.DownloadFile)
 
-	r.POST("/login", loginApi.Login)
 	r.POST("/userinfo", loginApi.UserInfo)
+
+	r.GET("/MessageList/page", messageListApi.PageMessageList)
 
 }
 func initGlobalRedisClient() {
@@ -493,6 +496,7 @@ func InitAll(r *gin.RouterGroup) {
 	initMongo()
 
 	initRouter(r)
+	biz.InitRedisExpireHandler(glob.GRedis)
 	InitInfluxDbClient()
 }
 

@@ -95,7 +95,7 @@ func ParseToken(tokenStr string) (*jwt.Token, *MyClaims, error) {
 // @Produce   application/json
 // @Param     data  body      servlet.LoginParam true "账号密码"
 // @Router    /login [post]
-func (v LoginApi) Login(c *gin.Context) {
+func Login(c *gin.Context) {
 
 	var param servlet.LoginParam
 
