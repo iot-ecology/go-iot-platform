@@ -28,3 +28,15 @@ func (biz *RoleBiz) PageData(name string, page, size int) (*servlet.PaginationQ,
 
 	return &pagination, nil
 }
+
+func (biz *RoleBiz) FindByUserId(userId uint) []uint {
+	var roles []models.UserRole
+	db := glob.GDb
+	db.Where("user_id = ?", userId).Find(&roles)
+	var roleIds []uint
+	for _, v := range roles {
+		roleIds = append(roleIds, v.RoleId)
+	}
+	return roleIds
+
+}

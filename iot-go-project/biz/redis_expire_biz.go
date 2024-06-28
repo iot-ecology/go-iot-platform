@@ -44,30 +44,34 @@ func InitRedisExpireHandler(client *redis.Client) {
 		if strings.HasPrefix(msg.Payload, glob.StartNotification.String()) {
 			model.Content = "您有新的生产计划需要开始请注意!"
 			model.EnContent = "You have a new production plan that needs to start, please take note!"
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 		if strings.HasPrefix(msg.Payload, glob.DueSoonNotification.String()) {
 			model.Content = "您的生产计划马上到达截止时间请注意!"
 			model.EnContent = "Your production plan is about to reach its deadline, please take note!"
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 		if strings.HasPrefix(msg.Payload, glob.DueNotification.String()) {
 			model.Content = "您的生产计划按要求应当完成，请确认是否完成!"
 			model.EnContent = "Your production plan should be completed as required, please confirm if it is done!"
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 
 		if strings.HasPrefix(msg.Payload, glob.MaintenanceNotification.String()) {
 			model.Content = "您有新的维修任务，请查收!"
 			model.EnContent = "You have a new maintenance task, please check it out!"
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 		if strings.HasPrefix(msg.Payload, glob.MaintenanceStartNotification.String()) {
 			model.Content = "维修任务已开始."
 			model.EnContent = "The maintenance task has started."
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 		if strings.HasPrefix(msg.Payload, glob.MaintenanceEndNotification.String()) {
 			model.Content = "维修任务已完成."
 			model.EnContent = "The maintenance task has been completed."
+			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
-
-		glob.GDb.Model(&models.MessageList{}).Create(model)
 
 	}
 }

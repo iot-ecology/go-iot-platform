@@ -13,6 +13,7 @@ type LoginApi struct{}
 type MyClaims struct {
 	Uid      int    // 用户id
 	UserName string // 用户名
+	RoleIds  []uint // 用户角色id
 	jwt.StandardClaims
 }
 
@@ -31,11 +32,12 @@ var expireTime = time.Now().Add(24 * time.Hour).Unix()
 // 返回值：
 // - string类型，生成的JWT令牌字符串
 // - error类型，如果生成令牌过程中发生错误，则返回非零的错误码；否则返回nil
-func GenerateToken(uid int, username string) (string, error) {
+func GenerateToken(uid int, username string, roleId []uint) (string, error) {
 	// 创建MyClaims实例
 	myClaims := MyClaims{
 		uid,      // 用户id
 		username, // 用户名
+		roleId,   // 用户角色id
 		jwt.StandardClaims{
 			ExpiresAt: expireTime,
 			Issuer:    "test",
@@ -112,7 +114,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	// 走到这说明登录成功,生成token
-	tokenStr, err := GenerateToken(int(user.ID), user.Username)
+	tokenStr, err := GenerateToken(int(user.ID), user.Username, roleBiz.FindByUserId(user.ID))
 
 	if err != nil {
 		servlet.Error(c, "登录失败")
@@ -148,6 +150,7 @@ func (v LoginApi) UserInfo(c *gin.Context) {
 	servlet.Resp(c, gin.H{
 		"uid":      userInfos.Uid,
 		"username": userInfos.UserName,
+		"roleIds":  userInfos.RoleIds,
 		"token":    tokenObj.Raw,
 	})
 
@@ -206,6 +209,7 @@ func JwtCheck() gin.HandlerFunc {
 		}
 		c.Set("claims", tokenObj)
 		c.Set("user_info", userInfos)
+		c.Set("role_ids", userInfos.RoleIds)
 		c.Next()
 	}
 }

@@ -497,6 +497,94 @@ func InitConfig() {
 }
 
 func initTableData() {
+
+	glob.GDb.Model(models.User{}).Create(&models.User{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		Username: "admin",
+		Password: "admin",
+		Email:    "",
+		Status:   "active",
+	})
+
+	glob.GDb.Model(models.User{}).Create(&models.User{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Username: "p1",
+		Password: "p1",
+		Email:    "",
+		Status:   "active",
+	})
+
+	glob.GDb.Model(models.User{}).Create(&models.User{
+		Model: gorm.Model{
+			ID: 3,
+		},
+		Username: "p1-1",
+		Password: "p1-1",
+		Email:    "",
+		Status:   "active",
+	})
+
+	glob.GDb.Model(models.User{}).Create(&models.User{
+		Model: gorm.Model{
+			ID: 4,
+		},
+		Username: "p2",
+		Password: "p2",
+		Email:    "",
+		Status:   "active",
+	})
+	glob.GDb.Model(models.User{}).Create(&models.User{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		Username: "p2-1",
+		Password: "p2-1",
+		Email:    "",
+		Status:   "active",
+	})
+
+	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		UserId: 1,
+		RoleId: 1,
+	})
+
+	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		UserId: 2,
+		RoleId: 2,
+	})
+
+	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+		Model: gorm.Model{
+			ID: 3,
+		},
+		UserId: 3,
+		RoleId: 3,
+	})
+	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+		Model: gorm.Model{
+			ID: 4,
+		},
+		UserId: 4,
+		RoleId: 4,
+	})
+	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		UserId: 5,
+		RoleId: 5,
+	})
+
 	glob.GDb.Model(models.Role{}).Create(&models.Role{
 		Model: gorm.Model{
 			ID: 1,
