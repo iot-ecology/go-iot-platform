@@ -496,7 +496,7 @@ func InitAll(r *gin.RouterGroup) {
 	initMongo()
 
 	initRouter(r)
-	biz.InitRedisExpireHandler(glob.GRedis)
+	go biz.InitRedisExpireHandler(glob.GRedis)
 	InitInfluxDbClient()
 }
 

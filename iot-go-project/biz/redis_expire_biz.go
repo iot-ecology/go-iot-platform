@@ -33,6 +33,9 @@ func InitRedisExpireHandler(client *redis.Client) {
 		zap.S().Infof("Redis Expire key: %s", msg.Payload)
 
 		parts := strings.Split(msg.Payload, ":")
+		if len(parts) < 2 {
+			continue
+		}
 		refId := parts[len(parts)-1]
 		model := models.MessageList{
 			MessageTypeId: int(glob.StartNotification),
