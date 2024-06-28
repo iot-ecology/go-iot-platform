@@ -230,6 +230,20 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.MessageTypeBindRole{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MessageTypeBindRole{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.MessageList{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MessageList{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -482,6 +496,177 @@ func InitConfig() {
 
 }
 
+func initTableData() {
+	glob.GDb.Model(models.Role{}).Create(&models.Role{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		Name:        "超级管理员",
+		Description: "超级管理员",
+		CanDel:      false,
+	})
+	glob.GDb.Model(models.Role{}).Create(&models.Role{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Name:        "生产管理员",
+		Description: "负责完成生产计划的定制",
+		CanDel:      false,
+	})
+	glob.GDb.Model(models.Role{}).Create(&models.Role{
+		Model: gorm.Model{
+			ID: 3,
+		},
+		Name:        "生产人员",
+		Description: "负责完成生产",
+		CanDel:      false,
+	})
+	glob.GDb.Model(models.Role{}).Create(&models.Role{
+		Model: gorm.Model{
+			ID: 4,
+		},
+		Name:        "维修员",
+		Description: "负责现场维修",
+		CanDel:      false,
+	})
+	glob.GDb.Model(models.Role{}).Create(&models.Role{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		Name:        "售后员",
+		Description: "负责处理售后问题",
+		CanDel:      false,
+	})
+
+	// 生产管理员 消息类型
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		MessageType: int(glob.StartNotification),
+		RoleId:      2,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		MessageType: int(glob.DueSoonNotification),
+		RoleId:      2,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 3,
+		},
+		MessageType: int(glob.DueNotification),
+		RoleId:      2,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 4,
+		},
+		MessageType: int(glob.ProductionStartNotification),
+		RoleId:      2,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		MessageType: int(glob.ProductionCompleteNotification),
+		RoleId:      2,
+	})
+
+	// 生产人员 消息类型
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 6,
+		},
+		MessageType: int(glob.StartNotification),
+		RoleId:      3,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 7,
+		},
+		MessageType: int(glob.DueSoonNotification),
+		RoleId:      3,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 8,
+		},
+		MessageType: int(glob.DueNotification),
+		RoleId:      3,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 9,
+		},
+		MessageType: int(glob.ProductionStartNotification),
+		RoleId:      3,
+	})
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 10,
+		},
+		MessageType: int(glob.ProductionCompleteNotification),
+		RoleId:      3,
+	})
+
+	//维修员 消息类型
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 11,
+		},
+		MessageType: int(glob.MaintenanceNotification),
+		RoleId:      4,
+	})
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 12,
+		},
+		MessageType: int(glob.MaintenanceStartNotification),
+		RoleId:      4,
+	})
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 13,
+		},
+		MessageType: int(glob.MaintenanceEndNotification),
+		RoleId:      4,
+	})
+	//售后员 消息类型
+
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 14,
+		},
+		MessageType: int(glob.MaintenanceNotification),
+		RoleId:      5,
+	})
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 15,
+		},
+		MessageType: int(glob.MaintenanceStartNotification),
+		RoleId:      5,
+	})
+	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+		Model: gorm.Model{
+			ID: 16,
+		},
+		MessageType: int(glob.MaintenanceEndNotification),
+		RoleId:      5,
+	})
+
+}
 func InitAll(r *gin.RouterGroup) {
 	InitConfig()
 	initLog()
@@ -489,6 +674,7 @@ func InitAll(r *gin.RouterGroup) {
 	initDb()
 	glob.GLog.Info("数据库已链接")
 	initTable()
+	initTableData()
 	glob.GLog.Info("数据库表已生成")
 	initGlobalRedisClient()
 	glob.GLog.Info("redis 客户端连接成功")
