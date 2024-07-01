@@ -2,12 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 	"igp/docs"
 	"igp/glob"
 	"igp/initialize"
+	"igp/router"
 	"igp/servlet"
 	"igp/task"
 	"net/http"
@@ -48,12 +50,20 @@ func main() {
 
 	r := gin.Default()
 
+	group := r.Group("/")
+
+	group.Use(CORSMiddleware())
+	group.Use(ExceptionMiddleware)
+
 	r.Use(CORSMiddleware())
 	r.Use(ExceptionMiddleware)
-	initialize.InitAll(r)
+	r.POST("/login", router.Login)
+
+	initialize.InitAll(group)
 	task.InitTask()
 
 	docs.SwaggerInfo.BasePath = "/"
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	r.GET("/beat", Beat)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	err := r.Run(":" + strconv.Itoa(glob.GConfig.NodeInfo.Port))
