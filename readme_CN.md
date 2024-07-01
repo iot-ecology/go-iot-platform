@@ -2,6 +2,9 @@
 
 Go IoT 平台，这是一个高效、可扩展的物联网解决方案，使用 Go 语言开发。本平台专注于提供稳定、可靠的 MQTT 客户端管理，以及对 MQTT上报数据的全面处理和分析。
 
+![logo](readme/o1.png)
+
+
 如果可以请为我投票：
 <a href="https://www.producthunt.com/posts/go-iot-platform?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-go&#0045;iot&#0045;platform" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=465692&theme=light" alt="Go&#0032;IoT&#0032;Platform - GoIoT&#0058;&#0032;Efficient&#0044;&#0032;scalable&#0032;MQTT&#0032;IoT&#0032;platform&#0032;in&#0032;Go&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
