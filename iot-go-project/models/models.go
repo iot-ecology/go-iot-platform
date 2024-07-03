@@ -217,8 +217,9 @@ type UserRole struct {
 }
 type Dept struct {
 	gorm.Model `structs:"-"`
-	Name       string `json:"name" structs:"name"`                     // 部门名
-	ParentId   uint   `json:"parent_id,omitempty" structs:"parent_id"` // 父部门ID
+	Name       string `json:"name" structs:"name"`                                  // 部门名
+	ParentId   uint   `json:"parent_id,omitempty" structs:"parent_id"`              // 父部门ID
+	ParentName string `json:"parent_name,omitempty" gorm:"-" structs:"parent_name"` // 父部门名称
 }
 
 type UserBindDeviceInfo struct {

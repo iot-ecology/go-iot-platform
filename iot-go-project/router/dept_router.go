@@ -96,6 +96,8 @@ func (api *DeptApi) UpdateDept(c *gin.Context) {
 // @Tags Depts
 // @Accept json
 // @Produce json
+// @Param name query string false 部门名称
+// @Param biz query int false 上级id
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Dept}} "部门"
@@ -104,6 +106,7 @@ func (api *DeptApi) UpdateDept(c *gin.Context) {
 // @Router /Dept/page [get]
 func (api *DeptApi) PageDept(c *gin.Context) {
 	var name = c.Query("name")
+	var pid = c.Query("pid")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -118,7 +121,7 @@ func (api *DeptApi) PageDept(c *gin.Context) {
 		return
 	}
 
-	data, err := deptBiz.PageData(name, parseUint, u)
+	data, err := deptBiz.PageData(name, pid, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
