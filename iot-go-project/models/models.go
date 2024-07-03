@@ -252,3 +252,21 @@ type MessageList struct {
 	MessageTypeId int    `json:"message_type_id" structs:"message_type_id"` // 消息类型ID
 	RefId         string `json:"ref_id" structs:"ref_id"`                   // 关联的ID
 }
+
+// SimCard 表示物联网卡的数据模型
+type SimCard struct {
+	gorm.Model   `structs:"-"`
+	AccessNumber string    `gorm:"column:access_number;type:varchar(20);not null" json:"access_number"` //物联网卡的接入号
+	ICCID        string    `gorm:"column:iccid;type:varchar(20);not null" json:"iccid"`                 // 物联网卡的集成电路卡识别码，唯一标识
+	IMSI         string    `gorm:"column:imsi;type:varchar(15);not null" json:"imsi"`                   // 物联网卡的国际移动用户识别码，唯一标识
+	Operator     string    `gorm:"column:operator;type:varchar(50);not null" json:"operator"`           //物联网卡的运营商名称
+	Expiration   time.Time `gorm:"column:expiration;type:datetime;not null" json:"expiration"`          // 物联网卡的到期时间
+}
+
+// SimUseHistory 表示物联网卡的使用历史记录
+type SimUseHistory struct {
+	gorm.Model   `structs:"-"`
+	SimId        uint   `json:"sim_id" structs:"sim_id"`                 // 物联网卡ID
+	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Description  string `json:"description" structs:"description"`       // 描述
+}

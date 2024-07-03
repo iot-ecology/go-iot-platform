@@ -28,3 +28,10 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 
 	return &pagination, nil
 }
+
+func (biz *DeviceInfoBiz) FindById(id uint) *models.DeviceInfo {
+	var dt models.DeviceInfo
+	db := glob.GDb
+	db.Where("id = ?", id).Find(&dt)
+	return &dt
+}

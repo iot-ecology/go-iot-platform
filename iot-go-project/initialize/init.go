@@ -50,6 +50,7 @@ var (
 	shipmentRecordApi         = router.ShipmentRecordApi{}
 	loginApi                  = router.LoginApi{}
 	messageListApi            = router.MessageListApi{}
+	simCardApi                = router.SimCardApi{}
 )
 
 func initTable() {
@@ -244,6 +245,20 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.SimCard{}) {
+
+		err := glob.GDb.AutoMigrate(&models.SimCard{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.SimUseHistory{}) {
+
+		err := glob.GDb.AutoMigrate(&models.SimUseHistory{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -390,6 +405,13 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/ProductionPlan/:id", productionPlanApi.ByIdProductionPlan)
 	r.GET("/ProductionPlan/page", productionPlanApi.PageProductionPlan)
 	r.POST("/ProductionPlan/delete/:id", productionPlanApi.DeleteProductionPlan)
+
+	r.POST("/SimCard/create", simCardApi.CreateSimCard)
+	r.POST("/SimCard/update", simCardApi.UpdateSimCard)
+	r.GET("/SimCard/page", simCardApi.PageSimCard)
+	r.POST("/SimCard/delete/:id", simCardApi.DeleteSimCard)
+	r.GET("/SimCard/:id", simCardApi.ByIdSimCard)
+	r.POST("/SimCard/BindDeviceInfo", simCardApi.BindDeviceInfo)
 
 	r.POST("/RepairRecord/create", repairRecordApi.CreateRepairRecord)
 	r.POST("/RepairRecord/update", repairRecordApi.UpdateRepairRecord)
