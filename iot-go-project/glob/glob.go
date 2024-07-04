@@ -39,6 +39,7 @@ var (
 	MaintenanceStartNotification MessageType = 7
 	// MaintenanceEndNotification 维修结束通知
 	MaintenanceEndNotification MessageType = 8
+	SimCardExpireTime          MessageType = 9
 )
 
 func (mt *MessageType) String() string {
@@ -59,6 +60,8 @@ func (mt *MessageType) String() string {
 		return "Maintenance_Start_Notification"
 	case MaintenanceEndNotification:
 		return "Maintenance_End_Notification"
+	case SimCardExpireTime:
+		return "Sim_Card_Expire_Time"
 
 	default:
 		return "未知消息类型"

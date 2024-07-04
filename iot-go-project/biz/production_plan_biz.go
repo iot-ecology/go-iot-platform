@@ -17,12 +17,12 @@ type ProductionPlanBiz struct{}
 // BeforeCreate 创建生产计划后的任务
 func (biz *ProductionPlanBiz) BeforeCreate(param models.ProductionPlan) {
 	// 根据结束时间发送 计划到期通知
-	set_expire_key(glob.StartNotification, param)
-	set_expire_key(glob.DueSoonNotification, param)
-	set_expire_key(glob.DueNotification, param)
+	setExpireKeyWithProductionPlan(glob.StartNotification, param)
+	setExpireKeyWithProductionPlan(glob.DueSoonNotification, param)
+	setExpireKeyWithProductionPlan(glob.DueNotification, param)
 }
 
-// set_expire_key 根据传入的消息类型和参数设置 Redis 中的键的过期时间
+// setExpireKeyWithProductionPlan 根据传入的消息类型和参数设置 Redis 中的键的过期时间
 //
 // 参数：
 //
@@ -32,7 +32,7 @@ func (biz *ProductionPlanBiz) BeforeCreate(param models.ProductionPlan) {
 // 返回值：
 //
 //	无返回值
-func set_expire_key(mt glob.MessageType, param models.ProductionPlan) {
+func setExpireKeyWithProductionPlan(mt glob.MessageType, param models.ProductionPlan) {
 	id := strconv.Itoa(int(param.ID))
 	key := mt.String() + ":" + id
 	glob.GRedis.SetNX(context.Background(), key, id, 0)
