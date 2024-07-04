@@ -22,7 +22,9 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/router"
+	"igp/router/transmit"
 	"log"
+	"net/url"
 	"os"
 	"syscall"
 	"time"
@@ -51,6 +53,7 @@ var (
 	loginApi                  = router.LoginApi{}
 	messageListApi            = router.MessageListApi{}
 	simCardApi                = router.SimCardApi{}
+	mysqlTransmitApi          = transmit.MySQLTransmitApi{}
 )
 
 func initTable() {
@@ -259,6 +262,13 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.MySQLTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MySQLTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -283,7 +293,9 @@ func initDb() {
 }
 
 func initMongo() {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", glob.GConfig.MongoConfig.Username, glob.GConfig.MongoConfig.Password, glob.GConfig.MongoConfig.Host, glob.GConfig.MongoConfig.Port)
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username),
+		url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host,
+		glob.GConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
 		log.Fatal(err)
@@ -375,6 +387,12 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/dashboard/page", dashboardApi.PageDashboard)
 	r.POST("/dashboard/delete/:id", dashboardApi.DeleteDashboard)
 
+	r.POST("/MySQLTransmit/create", mysqlTransmitApi.CreateMySQLTransmit)
+	r.POST("/MySQLTransmit/update", mysqlTransmitApi.UpdateMySQLTransmit)
+	r.GET("/MySQLTransmit/:id", mysqlTransmitApi.ByIdMySQLTransmit)
+	r.GET("/MySQLTransmit/page", mysqlTransmitApi.PageMySQLTransmit)
+	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
+
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
 	r.GET("/product/:id", productApi.ByIdProduct)
@@ -441,7 +459,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/User/:id", userApi.ByIdUser)
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
-	r.POST("/User/QueryBindRole", userApi.QueryBindRole)
+	r.GET("/User/QueryBindRole", userApi.QueryBindRole)
 	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
 	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 

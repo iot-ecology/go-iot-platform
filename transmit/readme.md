@@ -6,4 +6,6 @@
    4. MONGO
 2. 消息队列
    3. RABBIT
-   4. 
+   4. RocketMQ
+   5. Kafka
+   6. Pulsar

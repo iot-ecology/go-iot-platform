@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"igp/biz"
 	"igp/glob"
@@ -82,7 +83,9 @@ func (api *SimCardApi) UpdateSimCard(c *gin.Context) {
 	newV.IMSI = req.IMSI
 	newV.Operator = req.Operator
 	newV.Expiration = req.Expiration
-	result = glob.GDb.Model(&newV).Updates(newV)
+
+	m := structs.Map(newV)
+	result = glob.GDb.Table("sim_cards").Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"igp/biz"
@@ -79,7 +80,10 @@ func (api *RoleApi) UpdateRole(c *gin.Context) {
 	var newV models.Role
 	newV = old
 	newV.Name = req.Name
-	result = glob.GDb.Model(&newV).Updates(newV)
+	newV.Description = req.Description
+
+	m := structs.Map(newV)
+	result = glob.GDb.Table("roles").Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 

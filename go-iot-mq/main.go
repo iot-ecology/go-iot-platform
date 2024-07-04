@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -221,7 +222,10 @@ var GMongoClient *mongo.Client
 
 // initMongo 函数用于初始化 MongoDB 连接
 func initMongo() {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", globalConfig.MongoConfig.Username, globalConfig.MongoConfig.Password, globalConfig.MongoConfig.Host, globalConfig.MongoConfig.Port)
+
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(globalConfig.MongoConfig.Username),
+		url.QueryEscape(globalConfig.MongoConfig.Password), globalConfig.MongoConfig.Host,
+		globalConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
 		log.Fatal(err)

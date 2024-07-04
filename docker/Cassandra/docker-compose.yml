@@ -1,0 +1,16 @@
+version: '3'  #choose version as per your need
+
+services:
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-container
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
+    volumes:
+      - ./dataa:/var/lib/cassandra
+
+volumes:
+  cassandra-data:

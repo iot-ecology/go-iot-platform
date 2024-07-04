@@ -97,7 +97,7 @@ func (api *DeptApi) UpdateDept(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name query string false "部门名称"
-// @Param biz query int false "上级id"
+// @Param pid query int false "上级id"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Dept}} "部门"
@@ -183,7 +183,7 @@ func (api *DeptApi) ByIdDept(c *gin.Context) {
 // @Produce   application/json
 // @Router    /Dept/subs [get]
 func (api *DeptApi) FindByIdSubs(c *gin.Context) {
-	param := c.Param("id")
+	param := c.Query("id")
 	var subDepts []models.Dept
 	// 使用手动查询来找到所有父ID为parentID的部门
 	result := glob.GDb.Model(&models.Dept{}).Where("parent_id = ?", param).Find(&subDepts)
