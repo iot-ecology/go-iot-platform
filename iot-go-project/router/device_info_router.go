@@ -113,6 +113,9 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Tags DeviceInfos
 // @Accept json
 // @Produce json
+// @Param sn query string false "SN"
+// @Param manufacturingDateStart query string false "制造日期开始"
+// @Param manufacturingDateEnd query string false "制造日期结束"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.DeviceInfo}} "设备详情"
@@ -120,7 +123,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Failure 500 {string} string "查询异常"
 // @Router /DeviceInfo/page [get]
 func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
-	var name = c.Query("sn")
+	var sn = c.Query("sn")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -135,7 +138,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := deviceInfoBiz.PageData(name, parseUint, u)
+	data, err := deviceInfoBiz.PageData(sn, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

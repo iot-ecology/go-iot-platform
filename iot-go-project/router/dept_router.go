@@ -96,8 +96,8 @@ func (api *DeptApi) UpdateDept(c *gin.Context) {
 // @Tags Depts
 // @Accept json
 // @Produce json
-// @Param name query string false 部门名称
-// @Param biz query int false 上级id
+// @Param name query string false "部门名称"
+// @Param biz query int false "上级id"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Dept}} "部门"

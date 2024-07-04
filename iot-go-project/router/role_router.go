@@ -95,6 +95,7 @@ func (api *RoleApi) UpdateRole(c *gin.Context) {
 // @Tags Roles
 // @Accept json
 // @Produce json
+// @Param name query string false "名称"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Role}} "面板"

@@ -100,7 +100,7 @@ func (api *SimCardApi) UpdateSimCard(c *gin.Context) {
 // @Produce json
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
-// @Param AccessNumber query string false 接入号
+// @Param AccessNumber query string false "接入号"
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.SimCard}} "SIM卡"
 // @Failure 400 {string} string "请求参数错误"
 // @Failure 500 {string} string "查询异常"
