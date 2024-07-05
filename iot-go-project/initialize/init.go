@@ -262,9 +262,59 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+
 	if !glob.GDb.Migrator().HasTable(&models.MySQLTransmit{}) {
 
 		err := glob.GDb.AutoMigrate(&models.MySQLTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.MySQLTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MySQLTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.MongoTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MongoTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.MongoTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.MongoTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.InfluxdbTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.InfluxdbTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.InfluxdbTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.InfluxdbTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ClickhouseTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ClickhouseTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.ClickhouseTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.ClickhouseTransmitBind{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -497,7 +547,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
 
 	r.POST("/file/update", fileApi.UpdateFile)
-	r.POST("/file/download", fileApi.DownloadFile)
+	r.GET("/file/download", fileApi.DownloadFile)
 
 	r.POST("/userinfo", loginApi.UserInfo)
 
@@ -797,6 +847,8 @@ func initTableData() {
 }
 func InitAll(r *gin.RouterGroup) {
 	InitConfig()
+	createFileUpload()
+
 	initLog()
 	glob.GLog.Info("日志初始化完成")
 	initDb()
@@ -853,5 +905,24 @@ func CreateRabbitQueue(queueName string) {
 	)
 	if err != nil {
 		zap.S().Fatalf("创建queue异常 %s", queueName)
+	}
+}
+
+func createFileUpload() {
+	// 设置文件夹路径
+	dirPath := "./fileupdate"
+
+	// 检查文件夹是否存在
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// 文件夹不存在，创建文件夹
+		err := os.MkdirAll(dirPath, 0755) // 0755是文件夹权限设置，可根据需要调整
+		if err != nil {
+			fmt.Println("创建文件夹失败：", err)
+			return
+		}
+		fmt.Println("文件夹已创建：", dirPath)
+	} else {
+		// 文件夹已存在
+		fmt.Println("文件夹已存在：", dirPath)
 	}
 }

@@ -3,9 +3,11 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"github.com/dop251/goja"
 	"go.uber.org/zap"
 	"net/url"
 	"sync"
+	"transmit/common"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -58,4 +60,41 @@ func GetMongoDBClient(Host, Username, Password, Db string, Port int, id uint) (*
 	mongoClientMap[key] = newClient
 	zap.S().Infof("New MongoDB client for database '%s' with id %d has been initiated.", Db, id)
 	return newClient, nil
+}
+
+type MongoOp struct {
+}
+
+func (op *MongoOp) RunScript(param []common.DataRowList, script string) []map[string]interface{} {
+	vm := goja.New()
+	_, err := vm.RunString(script)
+	if err != nil {
+		zap.S().Error("JS代码有问题！")
+		return nil
+	}
+	var fn func(string2 []common.DataRowList) []map[string]interface{}
+	err = vm.ExportTo(vm.Get("main"), &fn)
+	if err != nil {
+		zap.S().Error("Js函数映射到 Go 函数失败！")
+		return nil
+	}
+	a := fn(param)
+	return a
+}
+
+func (op *MongoOp) HandleDataRowLists(
+
+	Database, Collection, Script string, dataRowList []common.DataRowList, client *mongo.Client) error {
+	res := op.RunScript(dataRowList, Script)
+	var toInsert []interface{}
+
+	for _, v := range res {
+		toInsert = append(toInsert, v)
+	}
+	_, err := client.Database(Database).Collection(Collection).InsertMany(context.TODO(), toInsert)
+
+	if err != nil {
+		zap.S().Errorf("插入数据失败！%+v", err)
+	}
+	return nil
 }

@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -21,10 +21,10 @@ func (*FileApi) UpdateFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println(file.Filename)
-
+	zap.S().Infof(file.Filename)
+	uuidStr := uuid.New().String()
 	// 定义文件保存的路径
-	dst := "./fileupdate/" + file.Filename
+	dst := "./fileupdate/" + uuidStr + "_" + file.Filename
 
 	// 打开上传的文件
 	fileReader, err := file.Open()

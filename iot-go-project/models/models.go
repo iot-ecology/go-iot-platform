@@ -231,13 +231,14 @@ type UserBindDeviceInfo struct {
 type DeviceBindMqttClient struct {
 	gorm.Model   `structs:"-"`
 	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	MqttClientId uint `json:"mqtt_client_id"`                          // MQTT客户端表的外键ID
+	MqttClientId uint `json:"mqtt_client_id" structs:"mqtt_client_id"` // MQTT客户端表的外键ID
+
 }
 
 type DeviceGroupBindMqttClient struct {
 	gorm.Model    `structs:"-"`
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
-	MqttClientId  uint `json:"mqtt_client_id"`                            // MQTT客户端表的外键ID
+	MqttClientId  uint `json:"mqtt_client_id" structs:"mqtt_client_id"`   // MQTT客户端表的外键ID
 }
 
 type MessageTypeBindRole struct {
@@ -257,11 +258,11 @@ type MessageList struct {
 // SimCard 表示物联网卡的数据模型
 type SimCard struct {
 	gorm.Model   `structs:"-"`
-	AccessNumber string    `gorm:"column:access_number;type:varchar(20);not null" json:"access_number"` //物联网卡的接入号
-	ICCID        string    `gorm:"column:iccid;type:varchar(20);not null" json:"iccid"`                 // 物联网卡的集成电路卡识别码，唯一标识
-	IMSI         string    `gorm:"column:imsi;type:varchar(15);not null" json:"imsi"`                   // 物联网卡的国际移动用户识别码，唯一标识
-	Operator     string    `gorm:"column:operator;type:varchar(50);not null" json:"operator"`           //物联网卡的运营商名称
-	Expiration   time.Time `gorm:"column:expiration;type:datetime;not null" json:"expiration"`          // 物联网卡的到期时间
+	AccessNumber string    `gorm:"column:access_number;type:varchar(20);not null" json:"access_number" structs:"access_number"` //物联网卡的接入号
+	ICCID        string    `gorm:"column:iccid;type:varchar(20);not null" json:"iccid" structs:"iccid"`                         // 物联网卡的集成电路卡识别码，唯一标识
+	IMSI         string    `gorm:"column:imsi;type:varchar(15);not null" json:"imsi" structs:"imsi"`                            // 物联网卡的国际移动用户识别码，唯一标识
+	Operator     string    `gorm:"column:operator;type:varchar(50);not null" json:"operator" structs:"operator"`                //物联网卡的运营商名称
+	Expiration   time.Time `gorm:"column:expiration;type:datetime;not null" json:"expiration" structs:"expiration"`             // 物联网卡的到期时间
 }
 
 // SimUseHistory 表示物联网卡的使用历史记录

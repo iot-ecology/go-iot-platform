@@ -2,11 +2,15 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
+	"github.com/dop251/goja"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+	"transmit/common"
 )
 
 // 全局map，用于存储id和数据库连接的映射
@@ -49,4 +53,88 @@ func InitMySQLConnection(username, host, password, dbname string, port int, id u
 	dbMap[id] = DB
 	zap.S().Infof("New MySQL connection pool for id %d has been initiated.", id)
 	return DB, nil
+}
+
+type MysqlOp struct{}
+
+func (op *MysqlOp) HandleDataRowLists(table, Script string, dataRowList []common.DataRowList, client *sql.DB) error {
+	res := op.RunScript(dataRowList, Script)
+
+	var sqlStatements []string
+	for _, re := range res {
+		sqlStatements = append(sqlStatements, op.Save(re, table))
+	}
+
+	tx, err := client.Begin()
+	if err != nil {
+		zap.S().Errorf("Begin transaction failed, err: %v", err)
+	}
+
+	for _, statement := range sqlStatements {
+		_, err = tx.Exec(statement)
+		if err != nil {
+			err := tx.Rollback()
+			if err != nil {
+				zap.S().Errorf("Rollback transaction failed, err: %v", err)
+			}
+			zap.S().Errorf("Exec sql failed, err: %v", err)
+		}
+	}
+	// 提交事务
+	err = tx.Commit()
+	if err != nil {
+		zap.S().Errorf("Commit transaction failed, err: %v", err)
+	}
+
+	return nil
+}
+
+func (op *MysqlOp) Save(dt []MysqlParam, table string) string {
+	var fields []string
+	var valueStrs []string
+	for _, param := range dt {
+		fields = append(fields, "\""+param.FieldName+"\"")        // 使用反引号包围字段名
+		valueStrs = append(valueStrs, buildValueStr(param.Value)) // 使用自定义函数处理值的格式化
+	}
+
+	fieldStr := strings.Join(fields, ", ")
+	valueStr := strings.Join(valueStrs, ", ")
+
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s);", table, fieldStr, valueStr)
+	return query
+}
+func buildValueStr(value interface{}) string {
+	switch v := value.(type) {
+	case string:
+		return "'" + v + "'"
+	case int, int64, float64, bool:
+		return fmt.Sprintf("%v", value)
+	default:
+		// 对于其他类型，这里可以添加更多的处理逻辑
+		return "NULL"
+	}
+}
+
+func (op *MysqlOp) RunScript(dataRowList []common.DataRowList, script string) [][]MysqlParam {
+
+	vm := goja.New()
+	_, err := vm.RunString(script)
+	if err != nil {
+		zap.S().Errorf("JS代码有问题！")
+		return nil
+	}
+	var fn func(string2 []common.DataRowList) [][]MysqlParam
+	err = vm.ExportTo(vm.Get("main"), &fn)
+	if err != nil {
+		zap.S().Errorf("Js函数映射到 Go 函数失败！")
+		return nil
+	}
+	a := fn(dataRowList)
+	return a
+
+}
+
+type MysqlParam struct {
+	FieldName string
+	Value     interface{}
 }
