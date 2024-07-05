@@ -8,6 +8,8 @@ import (
 
 type DeviceInfoBiz struct{}
 
+var productBiz = ProductBiz{}
+
 func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var dt []models.DeviceInfo
@@ -22,6 +24,9 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&dt)
 
+	for i, info := range dt {
+		dt[i].ProductName = productBiz.FindById(info.ProductId).Name
+	}
 	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size

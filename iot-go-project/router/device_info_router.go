@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"igp/biz"
@@ -28,6 +29,7 @@ var deviceInfoBiz = biz.DeviceInfoBiz{}
 func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 	if err := c.ShouldBindJSON(&DeviceInfo); err != nil {
+
 		servlet.Error(c, err.Error())
 		return
 	}
@@ -45,11 +47,16 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		return
 	}
 	if !DeviceInfo.ManufacturingDate.IsZero() {
-		DeviceInfo.WarrantyExpiry = DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		DeviceInfo.WarrantyExpiry = &WarrantyExpiry
 	}
-	result = glob.GDb.Create(&DeviceInfo)
+
+	m := structs.Map(DeviceInfo)
+
+	result = glob.GDb.Model(models.DeviceInfo{}).Create(m)
 
 	if result.Error != nil {
+		zap.S().Errorw("创建 DeviceInfo 失败", "error", result.Error)
 		servlet.Error(c, result.Error.Error())
 		return
 	}
@@ -95,7 +102,8 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 		return
 	}
 	if !newV.ManufacturingDate.IsZero() {
-		newV.WarrantyExpiry = newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		newV.WarrantyExpiry = &WarrantyExpiry
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 

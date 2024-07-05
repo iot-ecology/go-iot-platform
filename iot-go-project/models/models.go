@@ -111,13 +111,21 @@ type Product struct {
 
 // DeviceInfo 设备信息
 type DeviceInfo struct {
-	ProductId         uint      `json:"product_id" structs:"product_id"`                 // 产品ID
-	SN                string    `json:"sn" structs:"sn"`                                 // 设备编号
-	ManufacturingDate time.Time `json:"manufacturing_date" structs:"manufacturing_date"` // 制造日期
-	ProcurementDate   time.Time `json:"procurement_date" structs:"procurement_date"`     // 采购日期
-	Source            int       `json:"source" structs:"source"`                         // 设备来源,1: 内部,2: 外源
-	WarrantyExpiry    time.Time `json:"warranty_expiry" structs:"warranty_expiry"`       // 保修截止日期
+	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
+	ProductName       string     `gorm:"-" json:"product_name" structs:"product_name"`                                                  // 产品名称
+	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
+	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
+	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
+	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
 	gorm.Model        `structs:"-"`
+}
+
+func (d *DeviceInfo) BeforeSave(tx *gorm.DB) (err error) {
+	if d.ProcurementDate.IsZero() {
+		gorm.Expr("NULL")
+	}
+	return
 }
 
 // DeviceGroup 设备组

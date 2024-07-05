@@ -28,3 +28,14 @@ func (biz *ProductBiz) PageData(name string, page, size int) (*servlet.Paginatio
 
 	return &pagination, nil
 }
+
+func (biz *ProductBiz) FindById(id uint) *models.Product {
+
+	var Product models.Product
+
+	result := glob.GDb.First(&Product, id)
+	if result.Error != nil {
+		return nil
+	}
+	return &Product
+}

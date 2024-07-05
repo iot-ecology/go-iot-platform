@@ -120,14 +120,14 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 
 			// 创建新的设备
 			for range plan.Quantity {
-
+				date := now.AddDate(0, 0, product.WarrantyPeriod)
 				// 创建新的设备
 				info := models.DeviceInfo{
 					ProductId:         plan.ProductID,
 					SN:                uuid.New().String(), // fixme： 生成设备SN
-					ManufacturingDate: now,
+					ManufacturingDate: &now,
 					Source:            1,
-					WarrantyExpiry:    now.AddDate(0, 0, product.WarrantyPeriod),
+					WarrantyExpiry:    &date,
 				}
 
 				create := tx.Model(&models.DeviceInfo{}).Create(&info)
