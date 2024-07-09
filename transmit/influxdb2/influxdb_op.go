@@ -61,6 +61,7 @@ func (op *InfluxDbOp) Save(dt common.DataRowList, api api.WriteAPI, measurement 
 
 }
 
+// 注意事项： 每个数据要会处理为数字类型的字符串。
 func (op *InfluxDbOp) RunScript(dataRowList []common.DataRowList, script string) []common.DataRowList {
 
 	vm := goja.New()

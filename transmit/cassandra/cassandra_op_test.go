@@ -47,7 +47,6 @@ func TestGet(t *testing.T) {
 		return
 	}
 
-	// 打印JSON字符串
 	fmt.Println(string(jsonData))
 
 	script := `function main(jsonData) {
