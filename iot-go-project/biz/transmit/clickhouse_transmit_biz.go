@@ -66,12 +66,12 @@ func (biz *ClickhouseTransmitBiz) toByte(req models.ClickhouseTransmitBind) []by
 	return jsonData
 }
 
-// changeEnable 修改启用状态
+// ChangeEnable 修改启用状态
 func (biz *ClickhouseTransmitBiz) ChangeEnable(req models.ClickhouseTransmitBind) {
 	glob.GRedis.LRem(context.Background(), "transmit:clickhouse:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
-// mockScript 模拟执行脚本
+// MockScript 模拟执行脚本
 func (biz *ClickhouseTransmitBiz) MockScript(dataRowList []common.DataRowList,
 	script string) [][]clickhouse.ClickhouseParam {
 	return clickhouseOp.RunScript(dataRowList, script)

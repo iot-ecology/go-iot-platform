@@ -64,14 +64,14 @@ func (biz *InfluxdbTransmitBiz) toByte(req models.InfluxdbTransmitBind) []byte {
 	return jsonData
 }
 
-// changeEnable 修改启用状态
+// ChangeEnable 修改启用状态
 func (biz *InfluxdbTransmitBiz) ChangeEnable(req models.InfluxdbTransmitBind) {
 	glob.GRedis.LRem(context.Background(), "transmit:influxdb:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
 var InfluxdbOp = influxdb2.InfluxDbOp{}
 
-// mockScript 模拟执行脚本
+// MockScript 模拟执行脚本
 func (biz *InfluxdbTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) []common.DataRowList {
 	return InfluxdbOp.RunScript(dataRowList, script)
 

@@ -64,14 +64,14 @@ func (biz *MySQLTransmitBiz) toByte(req models.MySQLTransmitBind) []byte {
 	return jsonData
 }
 
-// changeEnable 修改启用状态
+// ChangeEnable 修改启用状态
 func (biz *MySQLTransmitBiz) ChangeEnable(req models.MySQLTransmitBind) {
 	glob.GRedis.LRem(context.Background(), "transmit:mysql:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
 var mysqlOp = mysql.MysqlOp{}
 
-// mockScript 模拟执行脚本
+// MockScript 模拟执行脚本
 func (biz *MySQLTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) [][]mysql.MysqlParam {
 	return mysqlOp.RunScript(dataRowList, script)
 }

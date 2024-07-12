@@ -64,14 +64,14 @@ func (biz *MongoTransmitBiz) toByte(req models.MongoTransmitBind) []byte {
 	return jsonData
 }
 
-// changeEnable 修改启用状态
+// ChangeEnable 修改启用状态
 func (biz *MongoTransmitBiz) ChangeEnable(req models.MongoTransmitBind) {
 	glob.GRedis.LRem(context.Background(), "transmit:mongo:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
 var mongoOp = mongo.MongoOp{}
 
-// mockScript 模拟执行脚本
+// MockScript 模拟执行脚本
 func (biz *MongoTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) []map[string]interface{} {
 	return mongoOp.RunScript(dataRowList, script)
 }
