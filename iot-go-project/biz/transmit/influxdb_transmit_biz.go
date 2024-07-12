@@ -6,7 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"igp/servlet/transmit"
+	"iot-transmit/cache"
 	"iot-transmit/common"
 	"iot-transmit/influxdb2"
 	"strconv"
@@ -47,8 +47,8 @@ func (biz *InfluxdbTransmitBiz) toByte(req models.InfluxdbTransmitBind) []byte {
 
 	glob.GDb.First(&ref, req.InfluxdbTransmitId)
 
-	v := transmit.InfluxTransmitCache{
-		ID:          req.ID,
+	v := cache.InfluxTransmitCache{
+		ID:          "influxdb-" + strconv.Itoa(int(req.ID)),
 		Host:        ref.Host,
 		Port:        ref.Port,
 		Token:       ref.Token,

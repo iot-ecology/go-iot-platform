@@ -6,7 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"igp/servlet/transmit"
+	"iot-transmit/cache"
 	"iot-transmit/common"
 	"iot-transmit/mysql"
 	"strconv"
@@ -47,8 +47,8 @@ func (biz *MySQLTransmitBiz) toByte(req models.MySQLTransmitBind) []byte {
 
 	glob.GDb.First(&mysqlInfo, req.MySQLTransmitId)
 
-	v := transmit.MySQLTransmitCache{
-		ID:       req.ID,
+	v := cache.MySQLTransmitCache{
+		ID:       "mysql-" + strconv.Itoa(int(req.ID)),
 		Host:     mysqlInfo.Host,
 		Port:     mysqlInfo.Port,
 		Username: mysqlInfo.Username,

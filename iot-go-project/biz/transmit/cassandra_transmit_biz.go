@@ -6,7 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"igp/servlet/transmit"
+	"iot-transmit/cache"
 	"iot-transmit/cassandra"
 	"iot-transmit/common"
 	"strconv"
@@ -47,8 +47,8 @@ func (biz *CassandraTransmitBiz) toByte(req models.CassandraTransmitBind) []byte
 
 	glob.GDb.First(&ref, req.CassandraTransmitId)
 
-	v := transmit.CassandraTransmitCache{
-		ID:       req.ID,
+	v := cache.CassandraTransmitCache{
+		ID:       "cassandra-" + strconv.Itoa(int(req.CassandraTransmitId)),
 		Host:     ref.Host,
 		Port:     ref.Port,
 		Username: ref.Username,

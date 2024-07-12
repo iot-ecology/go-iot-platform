@@ -6,7 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"igp/servlet/transmit"
+	"iot-transmit/cache"
 	"iot-transmit/clickhouse"
 	"iot-transmit/common"
 	"strconv"
@@ -49,8 +49,8 @@ func (biz *ClickhouseTransmitBiz) toByte(req models.ClickhouseTransmitBind) []by
 
 	glob.GDb.First(&ref, req.ClickhouseTransmitId)
 
-	v := transmit.ClickhouseTransmitCache{
-		ID:       req.ID,
+	v := cache.ClickhouseTransmitCache{
+		ID:       "clickhouse-" + strconv.Itoa(int(req.ID)),
 		Host:     ref.Host,
 		Port:     ref.Port,
 		Username: ref.Username,

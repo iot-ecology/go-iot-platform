@@ -42,7 +42,7 @@ importers:
         specifier: ^1.11.9
         version: 1.11.11
       echarts:
-        specifier: ^5.4.3
+        specifier: 5.5.0
         version: 5.5.0
       lodash-es:
         specifier: ^4.17.21
@@ -71,15 +71,15 @@ importers:
       vue-draggable-plus:
         specifier: 0.4.1
         version: 0.4.1(@types/sortablejs@1.15.8)
+      vue-i18n:
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.27(typescript@5.1.6))
       vue-router:
         specifier: ^4.2.4
         version: 4.3.2(vue@3.4.27(typescript@5.1.6))
       vue-virtual-scroller:
         specifier: 2.0.0-beta.8
         version: 2.0.0-beta.8(vue@3.4.27(typescript@5.1.6))
-      vue3-virtual-scroller:
-        specifier: 0.2.3
-        version: 0.2.3(rollup@3.29.4)(vue@3.4.27(typescript@5.1.6))
       vxe-table:
         specifier: ^4.5.13
         version: 4.6.16(vue@3.4.27(typescript@5.1.6))
@@ -93,6 +93,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^18.1.0
         version: 18.6.3
+      '@types/echarts':
+        specifier: ^4.9.18
+        version: 4.9.22
       '@types/lodash-es':
         specifier: ^4.17.8
         version: 4.17.12
@@ -489,6 +492,18 @@ packages:
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
 
+  '@intlify/core-base@9.13.1':
+    resolution: {integrity: sha512-+bcQRkJO9pcX8d0gel9ZNfrzU22sZFSA0WVhfXrf5jdJOS24a+Bp8pozuS9sBI9Hk/tGz83pgKfmqcn/Ci7/8w==}
+    engines: {node: '>= 16'}
+
+  '@intlify/message-compiler@9.13.1':
+    resolution: {integrity: sha512-SKsVa4ajYGBVm7sHMXd5qX70O2XXjm55zdZB3VeMFCvQyvLew/dLvq3MqnaIsTMF1VkkOb9Ttr6tHcMlyPDL9w==}
+    engines: {node: '>= 16'}
+
+  '@intlify/shared@9.13.1':
+    resolution: {integrity: sha512-u3b6BKGhE6j/JeRU6C/RL2FgyJfy6LakbtfeVF8fJXURpZZTzfh3e05J0bu0XPw447Q6/WUp3C4ajv4TMS4YsQ==}
+    engines: {node: '>= 16'}
+
   '@jridgewell/sourcemap-codec@1.4.15':
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
 
@@ -520,17 +535,6 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@rollup/plugin-json@4.1.0':
-    resolution: {integrity: sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==}
-    peerDependencies:
-      rollup: ^1.20.0 || ^2.0.0
-
-  '@rollup/pluginutils@3.1.0':
-    resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
-    engines: {node: '>= 8.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0
-
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
     engines: {node: '>= 8.0.0'}
@@ -551,11 +555,11 @@ packages:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
 
+  '@types/echarts@4.9.22':
+    resolution: {integrity: sha512-7Fo6XdWpoi8jxkwP7BARUOM7riq8bMhmsCtSG8gzUcJmFhLo387tihoBYS/y5j7jl3PENT5RxeWZdN9RiwO7HQ==}
+
   '@types/eslint@8.56.10':
     resolution: {integrity: sha512-Shavhk87gCtY2fhXDctcfS3e6FdxWkCx1iUZ9eEUbh7rTqlZT0/IzOkCOVt0fCjcFuZ9FPYfuezTBImfHCDBGQ==}
-
-  '@types/estree@0.0.39':
-    resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -595,6 +599,9 @@ packages:
 
   '@types/web-bluetooth@0.0.20':
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
+
+  '@types/zrender@4.0.6':
+    resolution: {integrity: sha512-1jZ9bJn2BsfmYFPBHtl5o3uV+ILejAtGrDcYSpT4qaVKEI/0YY+arw3XHU04Ebd8Nca3SQ7uNcLaqiL+tTFVMg==}
 
   '@typescript-eslint/eslint-plugin@5.62.0':
     resolution: {integrity: sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==}
@@ -1519,9 +1526,6 @@ packages:
   estraverse@5.3.0:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
-
-  estree-walker@1.0.1:
-    resolution: {integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==}
 
   estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
@@ -2738,9 +2742,6 @@ packages:
   scroll-into-view-if-needed@2.2.31:
     resolution: {integrity: sha512-dGCXy99wZQivjmjIqihaBQNjryrz5rueJY7eHfTdyWEiR4ttYpsajb14rn9s5d4DY4EcY6+4+U/maARBXJedkA==}
 
-  scrollparent@2.1.0:
-    resolution: {integrity: sha512-bnnvJL28/Rtz/kz2+4wpBjHzWoEzXhVg/TE8BeVGJHUqE8THNIRnDxDWMktwM+qahvlRdvlLdsQfYe+cuqfZeA==}
-
   select@1.1.2:
     resolution: {integrity: sha512-OwpTSOfy6xSs1+pwcNrv0RBMOzI39Lp3qQKUTPVVPRjCdNa5JH/oPRiqsesIskK8TVgmRiHwO4KXlV2Li9dANA==}
 
@@ -3241,6 +3242,12 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
+  vue-i18n@9.13.1:
+    resolution: {integrity: sha512-mh0GIxx0wPtPlcB1q4k277y0iKgo25xmDPWioVVYanjPufDBpvu5ySTjP5wOrSvlYQ2m1xI+CFhGdauv/61uQg==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      vue: ^3.0.0
+
   vue-observe-visibility@2.0.0-alpha.1:
     resolution: {integrity: sha512-flFbp/gs9pZniXR6fans8smv1kDScJ8RS7rEpMjhVabiKeq7Qz3D9+eGsypncjfIyyU84saU88XZ0zjbD6Gq/g==}
     peerDependencies:
@@ -3275,21 +3282,6 @@ packages:
     resolution: {integrity: sha512-b8/f5NQ5nIEBRTNi6GcPItE4s7kxNHw2AIHLtDp+2QvqdTjVN0FgONwX9cr53jWRgnu+HRLPaWDOR2JPI5MTfQ==}
     peerDependencies:
       vue: ^3.2.0
-
-  vue3-observe-visibility2@0.0.3:
-    resolution: {integrity: sha512-yJL0G5RrI/uXdDrs+0fdlk/dYKhKBRZtkwJO0ar44NTIX+Rnw63iHgTz+p00M+yp6Avm1Q+o6y82h0hkTzmpHg==}
-    peerDependencies:
-      vue: ^3.0.0
-
-  vue3-resize@0.2.0:
-    resolution: {integrity: sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==}
-    peerDependencies:
-      vue: ^3.0.0
-
-  vue3-virtual-scroller@0.2.3:
-    resolution: {integrity: sha512-iPBi0FocZGxVar46iLYzLMfdTMe/O3X8h1iTc21aPhAaGRyMMAZ64AN7Dn6FA+qYFam5f3wHIUktAnpgCFtNuw==}
-    peerDependencies:
-      vue: ^3.0.0
 
   vue@3.4.27:
     resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}
@@ -3710,6 +3702,18 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
+  '@intlify/core-base@9.13.1':
+    dependencies:
+      '@intlify/message-compiler': 9.13.1
+      '@intlify/shared': 9.13.1
+
+  '@intlify/message-compiler@9.13.1':
+    dependencies:
+      '@intlify/shared': 9.13.1
+      source-map-js: 1.2.0
+
+  '@intlify/shared@9.13.1': {}
+
   '@jridgewell/sourcemap-codec@1.4.15': {}
 
   '@lezer/common@1.2.1': {}
@@ -3742,18 +3746,6 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@rollup/plugin-json@4.1.0(rollup@3.29.4)':
-    dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@3.29.4)
-      rollup: 3.29.4
-
-  '@rollup/pluginutils@3.1.0(rollup@3.29.4)':
-    dependencies:
-      '@types/estree': 0.0.39
-      estree-walker: 1.0.1
-      picomatch: 2.3.1
-      rollup: 3.29.4
-
   '@rollup/pluginutils@4.2.1':
     dependencies:
       estree-walker: 2.0.2
@@ -3774,12 +3766,14 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
+  '@types/echarts@4.9.22':
+    dependencies:
+      '@types/zrender': 4.0.6
+
   '@types/eslint@8.56.10':
     dependencies:
       '@types/estree': 1.0.5
       '@types/json-schema': 7.0.15
-
-  '@types/estree@0.0.39': {}
 
   '@types/estree@1.0.5': {}
 
@@ -3812,6 +3806,8 @@ snapshots:
       '@types/node': 20.12.12
 
   '@types/web-bluetooth@0.0.20': {}
+
+  '@types/zrender@4.0.6': {}
 
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.6))(eslint@8.57.0)(typescript@5.1.6)':
     dependencies:
@@ -5018,8 +5014,6 @@ snapshots:
   estraverse@4.3.0: {}
 
   estraverse@5.3.0: {}
-
-  estree-walker@1.0.1: {}
 
   estree-walker@2.0.2: {}
 
@@ -6243,8 +6237,6 @@ snapshots:
     dependencies:
       compute-scroll-into-view: 1.0.20
 
-  scrollparent@2.1.0: {}
-
   select@1.1.2: {}
 
   semver@5.7.2: {}
@@ -6794,6 +6786,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  vue-i18n@9.13.1(vue@3.4.27(typescript@5.1.6)):
+    dependencies:
+      '@intlify/core-base': 9.13.1
+      '@intlify/shared': 9.13.1
+      '@vue/devtools-api': 6.6.1
+      vue: 3.4.27(typescript@5.1.6)
+
   vue-observe-visibility@2.0.0-alpha.1(vue@3.4.27(typescript@5.1.6)):
     dependencies:
       vue: 3.4.27(typescript@5.1.6)
@@ -6830,24 +6829,6 @@ snapshots:
       vue: 3.4.27(typescript@5.1.6)
       vue-observe-visibility: 2.0.0-alpha.1(vue@3.4.27(typescript@5.1.6))
       vue-resize: 2.0.0-alpha.1(vue@3.4.27(typescript@5.1.6))
-
-  vue3-observe-visibility2@0.0.3(vue@3.4.27(typescript@5.1.6)):
-    dependencies:
-      vue: 3.4.27(typescript@5.1.6)
-
-  vue3-resize@0.2.0(vue@3.4.27(typescript@5.1.6)):
-    dependencies:
-      vue: 3.4.27(typescript@5.1.6)
-
-  vue3-virtual-scroller@0.2.3(rollup@3.29.4)(vue@3.4.27(typescript@5.1.6)):
-    dependencies:
-      '@rollup/plugin-json': 4.1.0(rollup@3.29.4)
-      scrollparent: 2.1.0
-      vue: 3.4.27(typescript@5.1.6)
-      vue3-observe-visibility2: 0.0.3(vue@3.4.27(typescript@5.1.6))
-      vue3-resize: 0.2.0(vue@3.4.27(typescript@5.1.6))
-    transitivePeerDependencies:
-      - rollup
 
   vue@3.4.27(typescript@5.1.6):
     dependencies:

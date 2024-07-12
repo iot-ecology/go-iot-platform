@@ -6,7 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"igp/servlet/transmit"
+	"iot-transmit/cache"
 	"iot-transmit/common"
 	"iot-transmit/mongo"
 	"strconv"
@@ -46,8 +46,9 @@ func (biz *MongoTransmitBiz) toByte(req models.MongoTransmitBind) []byte {
 
 	glob.GDb.First(&ref, req.MongoTransmitId)
 
-	v := transmit.MongoTransmitCache{
-		ID:         req.ID,
+	v := cache.MongoTransmitCache{
+		ID: "mongo-" + strconv.Itoa(int(req.ID)),
+
 		Host:       ref.Host,
 		Port:       ref.Port,
 		Username:   ref.Username,

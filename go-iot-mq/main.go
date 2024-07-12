@@ -91,6 +91,14 @@ func main() {
 		cus.Handle(waring_delay_handler, HandlerWaringDelay, 1, "waring_delay_handler", "")
 	}
 
+	if globalConfig.NodeInfo.Type == "transmit_handler" {
+		transmit_handler, err := cus.AnnounceQueue("transmit_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(transmit_handler, HandlerTransmit, 1, "transmit_handler", "")
+	}
+
 }
 
 func startHttp() {

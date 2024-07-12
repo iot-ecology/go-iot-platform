@@ -1,7 +1,7 @@
-package transmit
+package cache
 
 type MySQLTransmitCache struct {
-	ID       uint   `json:"ID"`
+	ID       string `json:"ID"`
 	Host     string `json:"host"`
 	Port     int    `json:"port" `
 	Username string `json:"username" `
@@ -12,7 +12,7 @@ type MySQLTransmitCache struct {
 }
 
 type MongoTransmitCache struct {
-	ID         uint   `json:"ID"`
+	ID         string `json:"ID"`
 	Host       string `json:"host"`
 	Port       int    `json:"port" `
 	Username   string `json:"username" `
@@ -23,7 +23,7 @@ type MongoTransmitCache struct {
 }
 
 type InfluxTransmitCache struct {
-	ID          uint   `json:"ID"`
+	ID          string `json:"ID"`
 	Host        string `json:"host"`
 	Port        int    `json:"port" `
 	Token       string `json:"token"`
@@ -34,7 +34,7 @@ type InfluxTransmitCache struct {
 }
 
 type ClickhouseTransmitCache struct {
-	ID       uint   `json:"ID"`
+	ID       string `json:"ID"`
 	Host     string `json:"host" `
 	Port     int    `json:"port" `
 	Username string `json:"username" `
@@ -45,7 +45,7 @@ type ClickhouseTransmitCache struct {
 }
 
 type CassandraTransmitCache struct {
-	ID       uint   `json:"ID"`
+	ID       string `json:"ID"`
 	Host     string `json:"host" `
 	Port     int    `json:"port" `
 	Username string `json:"username" `
