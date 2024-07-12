@@ -51,11 +51,12 @@ func main() {
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
 	CreateRabbitQueue("waring_handler")
+	CreateRabbitQueue("transmit_handler")
 	CreateRabbitQueue("waring_delay_handler")
 	initMongo()
 	failOnError(err, "Failed to open a channel")
 	go startHttp()
-	cus := NewConsumer("", "amqp://guest:guest@localhost:5672", "", "", "")
+	cus := NewConsumer("", genUrl(globalConfig.MQConfig), "", "", "")
 	err = cus.Connect()
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
