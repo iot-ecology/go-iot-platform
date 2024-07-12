@@ -2,18 +2,34 @@ package cache
 
 import (
 	"context"
-	"github.com/goccy/go-json"
+	"encoding/json"
 	"github.com/redis/go-redis/v9"
+	"iot-transmit/clickhouse"
+	"iot-transmit/common"
 )
 
 type TransmitCacheBiz struct {
 }
 
-func (biz *TransmitCacheBiz) Run(redis *redis.Client, mqttClientId string) {
-	biz.findMysql(redis, mqttClientId)
+var (
+	clickhouseOp = clickhouse.ClickhouseOp{}
+)
+
+func (biz *TransmitCacheBiz) Run(redis *redis.Client, mqttClientId string, dataRowList []common.DataRowList) {
+	var mysqlCache = biz.findMysql(redis, mqttClientId)
+	for _, cache := range mysqlCache {
+		println(cache.Script)
+	}
 	biz.findMongo(redis, mqttClientId)
 	biz.findCassandra(redis, mqttClientId)
-	biz.findClickhouse(redis, mqttClientId)
+	var clickhouseCache = biz.findClickhouse(redis, mqttClientId)
+	for _, cache := range clickhouseCache {
+		println(cache.Script)
+		house1, _ := clickhouse.GetClickHouse(mqttClientId, []string{"127.0.0.1:9000"}, cache.Database,
+			cache.Username, cache.Password)
+
+		clickhouseOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, house1)
+	}
 	biz.findInfluxdb(redis, mqttClientId)
 
 }

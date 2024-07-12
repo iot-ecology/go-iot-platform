@@ -12,7 +12,7 @@ var clickhouseOp = ClickhouseOp{}
 
 func TestGet(t *testing.T) {
 
-	house1, _ := GetClickHouse(1, []string{"127.0.0.1:9000"}, "default", "default", "")
+	house1, _ := GetClickHouse("1", []string{"127.0.0.1:9000"}, "default", "default", "")
 	//house2, _ := GetClickHouse(1, []string{"127.0.0.1:9000"}, "default", "default", "")
 
 	//if house1 == house2 {

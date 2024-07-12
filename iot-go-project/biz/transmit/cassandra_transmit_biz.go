@@ -48,7 +48,7 @@ func (biz *CassandraTransmitBiz) toByte(req models.CassandraTransmitBind) []byte
 	glob.GDb.First(&ref, req.CassandraTransmitId)
 
 	v := cache.CassandraTransmitCache{
-		ID:       "cassandra-" + strconv.Itoa(int(req.CassandraTransmitId)),
+		ID:       "cassandra-" + strconv.Itoa(int(req.ID)),
 		Host:     ref.Host,
 		Port:     ref.Port,
 		Username: ref.Username,

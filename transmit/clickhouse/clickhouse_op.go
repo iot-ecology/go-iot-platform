@@ -15,13 +15,13 @@ import (
 )
 
 // 全局map，用于存储id和ClickHouse连接的映射
-var clickHouseClientMap = make(map[uint]driver.Conn)
+var clickHouseClientMap = make(map[string]driver.Conn)
 
 // 用于同步的互斥锁
 var mu sync.Mutex
 
 // GetClickHouse 创建或获取ClickHouse连接
-func GetClickHouse(id uint, addr []string, database, username, password string) (driver.Conn, error) {
+func GetClickHouse(id string, addr []string, database, username, password string) (driver.Conn, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -33,7 +33,8 @@ func GetClickHouse(id uint, addr []string, database, username, password string) 
 			// 如果连接出现问题，则移除并重新创建
 			delete(clickHouseClientMap, id)
 		} else {
-			fmt.Printf("Reusing existing ClickHouse connection for id: %d.\n", id)
+			fmt.Printf("存在啦直接获取^_^")
+			fmt.Printf("Reusing existing ClickHouse connection for id: %s.\n", id)
 			return session, nil
 		}
 	}
