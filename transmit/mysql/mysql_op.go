@@ -6,11 +6,11 @@ import (
 	"github.com/dop251/goja"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
+	"iot-transmit/common"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"transmit/common"
 )
 
 // 全局map，用于存储id和数据库连接的映射

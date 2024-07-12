@@ -3,9 +3,9 @@ package influxdb2
 import (
 	"encoding/json"
 	"fmt"
+	"iot-transmit/common"
 	"testing"
 	"time"
-	"transmit/common"
 )
 
 var influxdbOp = InfluxDbOp{}

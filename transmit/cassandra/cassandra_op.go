@@ -5,10 +5,10 @@ import (
 	"github.com/dop251/goja"
 	"github.com/gocql/gocql"
 	"go.uber.org/zap"
+	"iot-transmit/common"
 	"strings"
 	"sync"
 	"time"
-	"transmit/common"
 )
 
 var cassandraClientMap = make(map[uint]*gocql.Session) // 存储id和Cassandra会话的映射

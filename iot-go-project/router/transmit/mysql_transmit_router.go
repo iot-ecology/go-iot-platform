@@ -170,3 +170,20 @@ func (api *MySQLTransmitApi) ByIdMySQLTransmit(c *gin.Context) {
 
 	servlet.Resp(c, MySQLTransmit)
 }
+
+// MockScript
+// @Tags      MySQLTransmits
+// @Summary   模拟脚本
+// @Param MySQLTransmit body servlet.TransmitScriptParam true "执行参数"
+// @Produce   application/json
+// @Router    /MySQLTransmit/mockScript [post]
+func (api *MySQLTransmitApi) MockScript(c *gin.Context) {
+	var req servlet.TransmitScriptParam
+	if err := c.ShouldBindJSON(&req); err != nil {
+
+		servlet.Error(c, err.Error())
+		return
+	}
+	script := mySQLTransmit.MockScript(req.DataRowList, req.Script)
+	servlet.Resp(c, script)
+}

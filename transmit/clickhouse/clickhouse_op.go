@@ -7,11 +7,11 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/dop251/goja"
 	"go.uber.org/zap"
+	"iot-transmit/common"
 	"net"
 	"strings"
 	"sync"
 	"time"
-	"transmit/common"
 )
 
 // 全局map，用于存储id和ClickHouse连接的映射

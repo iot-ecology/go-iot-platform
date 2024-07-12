@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"iot-transmit/common"
 	"net/http"
 	"strings"
 	"time"
@@ -304,4 +305,9 @@ type SimUseHistoryResp struct {
 	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
 	Description  string `json:"description" structs:"description"`       // 描述
 	SN           string `json:"sn" structs:"sn"`                         // 序列号
+}
+
+type TransmitScriptParam struct {
+	DataRowList []common.DataRowList `json:"data_row_list"`
+	Script      string               `json:"script"`
 }

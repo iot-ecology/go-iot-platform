@@ -3,9 +3,9 @@ package clickhouse
 import (
 	"encoding/json"
 	"fmt"
+	"iot-transmit/common"
 	"testing"
 	"time"
-	"transmit/common"
 )
 
 var clickhouseOp = ClickhouseOp{}
@@ -84,6 +84,7 @@ func TestGet(t *testing.T) {
     return c;
 }
 `
+	print(script)
 	clickhouseOp.HandleDataRowLists("NewTable", script, dataRowList, house1)
 
 }

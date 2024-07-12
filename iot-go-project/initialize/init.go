@@ -54,6 +54,10 @@ var (
 	messageListApi            = router.MessageListApi{}
 	simCardApi                = router.SimCardApi{}
 	mysqlTransmitApi          = transmit.MySQLTransmitApi{}
+	mongoTransmitApi          = transmit.MongoTransmitApi{}
+	influxdbTransmitApi       = transmit.InfluxdbTransmitApi{}
+	clickTransmitApi          = transmit.ClickhouseTransmitApi{}
+	cassandraTransmitApi      = transmit.CassandraTransmitApi{}
 )
 
 func initTable() {
@@ -442,6 +446,35 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/MySQLTransmit/:id", mysqlTransmitApi.ByIdMySQLTransmit)
 	r.GET("/MySQLTransmit/page", mysqlTransmitApi.PageMySQLTransmit)
 	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
+	r.POST("/MySQLTransmit/mockScript", mysqlTransmitApi.MockScript)
+
+	r.POST("/MongoTransmitApi/create", mongoTransmitApi.CreateMongoTransmit)
+	r.POST("/MongoTransmitApi/update", mongoTransmitApi.UpdateMongoTransmit)
+	r.GET("/MongoTransmitApi/:id", mongoTransmitApi.ByIdMongoTransmit)
+	r.GET("/MongoTransmitApi/page", mongoTransmitApi.PageMongoTransmit)
+	r.POST("/MongoTransmitApi/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
+	r.POST("/MongoTransmitApi/mockScript", mongoTransmitApi.MockScript)
+
+	r.POST("/InfluxdbTransmitApi/create", influxdbTransmitApi.CreateInfluxdbTransmit)
+	r.POST("/InfluxdbTransmitApi/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
+	r.GET("/InfluxdbTransmitApi/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
+	r.GET("/InfluxdbTransmitApi/page", influxdbTransmitApi.PageInfluxdbTransmit)
+	r.POST("/InfluxdbTransmitApi/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
+	r.POST("/InfluxdbTransmitApi/mockScript", influxdbTransmitApi.MockScript)
+
+	r.POST("/ClickTransmitApi/create", clickTransmitApi.CreateClickhouseTransmit)
+	r.POST("/ClickTransmitApi/update", clickTransmitApi.UpdateClickhouseTransmit)
+	r.GET("/ClickTransmitApi/:id", clickTransmitApi.ByIdClickhouseTransmit)
+	r.GET("/ClickTransmitApi/page", clickTransmitApi.PageClickhouseTransmit)
+	r.POST("/ClickTransmitApi/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
+	r.POST("/ClickTransmitApi/mockScript", clickTransmitApi.MockScript)
+
+	r.POST("/CassandraTransmitApi/create", cassandraTransmitApi.CreateCassandraTransmit)
+	r.POST("/CassandraTransmitApi/update", cassandraTransmitApi.UpdateCassandraTransmit)
+	r.GET("/CassandraTransmitApi/:id", cassandraTransmitApi.ByIdCassandraTransmit)
+	r.GET("/CassandraTransmitApi/page", cassandraTransmitApi.PageCassandraTransmit)
+	r.POST("/CassandraTransmitApi/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
+	r.POST("/CassandraTransmitApi/mockScript", cassandraTransmitApi.MockScript)
 
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
@@ -588,7 +621,7 @@ func InitConfig() {
 
 func initTableData() {
 
-	glob.GDb.Model(models.User{}).Create(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -598,7 +631,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).Create(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -608,7 +641,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).Create(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -618,7 +651,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).Create(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -627,7 +660,7 @@ func initTableData() {
 		Email:    "",
 		Status:   "active",
 	})
-	glob.GDb.Model(models.User{}).Create(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -637,7 +670,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -645,7 +678,7 @@ func initTableData() {
 		RoleId: 1,
 	})
 
-	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -653,21 +686,21 @@ func initTableData() {
 		RoleId: 2,
 	})
 
-	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
 		Model: gorm.Model{
 			ID: 3,
 		},
 		UserId: 3,
 		RoleId: 3,
 	})
-	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
 		Model: gorm.Model{
 			ID: 4,
 		},
 		UserId: 4,
 		RoleId: 4,
 	})
-	glob.GDb.Model(models.UserRole{}).Create(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -675,7 +708,7 @@ func initTableData() {
 		RoleId: 5,
 	})
 
-	glob.GDb.Model(models.Role{}).Create(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -683,7 +716,7 @@ func initTableData() {
 		Description: "超级管理员",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).Create(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -691,7 +724,7 @@ func initTableData() {
 		Description: "负责完成生产计划的定制",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).Create(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -699,7 +732,7 @@ func initTableData() {
 		Description: "负责完成生产",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).Create(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -707,7 +740,7 @@ func initTableData() {
 		Description: "负责现场维修",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).Create(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -717,7 +750,7 @@ func initTableData() {
 	})
 
 	// 生产管理员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -725,7 +758,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -733,7 +766,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -741,7 +774,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -749,7 +782,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -758,7 +791,7 @@ func initTableData() {
 	})
 
 	// 生产人员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 6,
 		},
@@ -766,7 +799,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 7,
 		},
@@ -774,7 +807,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 8,
 		},
@@ -782,7 +815,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 9,
 		},
@@ -790,7 +823,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 10,
 		},
@@ -799,21 +832,21 @@ func initTableData() {
 	})
 
 	//维修员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 11,
 		},
 		MessageType: int(glob.MaintenanceNotification),
 		RoleId:      4,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 12,
 		},
 		MessageType: int(glob.MaintenanceStartNotification),
 		RoleId:      4,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 13,
 		},
@@ -822,21 +855,21 @@ func initTableData() {
 	})
 	//售后员 消息类型
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 14,
 		},
 		MessageType: int(glob.MaintenanceNotification),
 		RoleId:      5,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 15,
 		},
 		MessageType: int(glob.MaintenanceStartNotification),
 		RoleId:      5,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).Create(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 16,
 		},

@@ -3,9 +3,9 @@ package cassandra
 import (
 	"encoding/json"
 	"fmt"
+	"iot-transmit/common"
 	"testing"
 	"time"
-	"transmit/common"
 )
 
 var cassandraOp = CassandraOp{}

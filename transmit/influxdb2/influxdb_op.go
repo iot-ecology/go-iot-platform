@@ -6,9 +6,9 @@ import (
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"go.uber.org/zap"
+	"iot-transmit/common"
 	"sync"
 	"time"
-	"transmit/common"
 )
 
 var influxClientMap = make(map[uint]influxdb2.Client)
