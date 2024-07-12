@@ -11,10 +11,10 @@ import (
 	"time"
 )
 
-var influxClientMap = make(map[uint]influxdb2.Client)
+var influxClientMap = make(map[string]influxdb2.Client)
 var mu sync.Mutex
 
-func GetInfluxDb(host, token string, port int, id uint) influxdb2.Client {
+func GetInfluxDb(host, token string, port int, id string) influxdb2.Client {
 	mu.Lock()
 	defer mu.Unlock()
 

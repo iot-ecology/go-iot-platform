@@ -11,10 +11,10 @@ import (
 	"time"
 )
 
-var cassandraClientMap = make(map[uint]*gocql.Session) // 存储id和Cassandra会话的映射
-var mu sync.Mutex                                      // 用于同步的互斥锁
+var cassandraClientMap = make(map[string]*gocql.Session) // 存储id和Cassandra会话的映射
+var mu sync.Mutex                                        // 用于同步的互斥锁
 
-func GetCassandra(ips []string, username, password string, id uint) (*gocql.Session, error) {
+func GetCassandra(ips []string, username, password string, id string) (*gocql.Session, error) {
 	mu.Lock()
 	defer mu.Unlock()
 

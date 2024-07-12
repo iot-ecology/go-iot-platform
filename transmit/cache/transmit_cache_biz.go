@@ -3,9 +3,15 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
+	"iot-transmit/cassandra"
 	"iot-transmit/clickhouse"
 	"iot-transmit/common"
+	"iot-transmit/influxdb2"
+	"iot-transmit/mongo"
+	"iot-transmit/mysql"
 )
 
 type TransmitCacheBiz struct {
@@ -13,24 +19,65 @@ type TransmitCacheBiz struct {
 
 var (
 	clickhouseOp = clickhouse.ClickhouseOp{}
+	mysqlOp      = mysql.MysqlOp{}
+	mongoOp      = mongo.MongoOp{}
+	cassandraOp  = cassandra.CassandraOp{}
+	influxdbOp   = influxdb2.InfluxDbOp{}
 )
 
 func (biz *TransmitCacheBiz) Run(redis *redis.Client, mqttClientId string, dataRowList []common.DataRowList) {
 	var mysqlCache = biz.findMysql(redis, mqttClientId)
 	for _, cache := range mysqlCache {
-		println(cache.Script)
+		connection, err := mysql.InitMySQLConnection(cache.Username, cache.Host, cache.Password, cache.Database, cache.Port, cache.ID)
+		if err != nil {
+			zap.S().Errorf("mysql 连接异常", zap.Error(err))
+		}
+		err = mysqlOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, connection)
+		if err != nil {
+			zap.S().Errorf("mysql 执行异常", zap.Error(err))
+		}
 	}
-	biz.findMongo(redis, mqttClientId)
-	biz.findCassandra(redis, mqttClientId)
+
+	var mongoCache = biz.findMongo(redis, mqttClientId)
+	for _, cache := range mongoCache {
+		client, err := mongo.GetMongoDBClient(cache.Host, cache.Username, cache.Password, cache.Database, cache.Port, cache.ID)
+		if err != nil {
+			zap.S().Errorf("mongo 连接异常", zap.Error(err))
+		}
+		err = mongoOp.HandleDataRowLists(cache.Database, cache.Collection, cache.Script, dataRowList, client)
+		if err != nil {
+			zap.S().Errorf("mongo 执行异常", zap.Error(err))
+		}
+	}
+
+	var cassandraCache = biz.findCassandra(redis, mqttClientId)
+	for _, cache := range cassandraCache {
+		getCassandra, err := cassandra.GetCassandra([]string{fmt.Sprintf("%s:%d", cache.Host, cache.Port)}, cache.Username, cache.Password, cache.ID)
+		if err != nil {
+			zap.S().Errorf("cassandra 连接异常", zap.Error(err))
+		}
+		cassandraOp.HandleDataRowLists(cache.Database, cache.Table, cache.Script, dataRowList, getCassandra)
+	}
+
 	var clickhouseCache = biz.findClickhouse(redis, mqttClientId)
 	for _, cache := range clickhouseCache {
 		println(cache.Script)
-		house1, _ := clickhouse.GetClickHouse(mqttClientId, []string{"127.0.0.1:9000"}, cache.Database,
-			cache.Username, cache.Password)
+		house1, _ := clickhouse.GetClickHouse(mqttClientId, []string{fmt.Sprintf("%s:%d", cache.Host, cache.Port)}, cache.Database, cache.Username, cache.Password)
 
-		clickhouseOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, house1)
+		err := clickhouseOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, house1)
+		if err != nil {
+			zap.S().Errorf("clickhouse 执行异常", zap.Error(err))
+		}
 	}
-	biz.findInfluxdb(redis, mqttClientId)
+
+	var influxdbCache = biz.findInfluxdb(redis, mqttClientId)
+	for _, cache := range influxdbCache {
+		db := influxdb2.GetInfluxDb(cache.Host, cache.Token, cache.Port, cache.ID)
+		err := influxdbOp.HandleDataRowLists(cache.Bucket, cache.Org, cache.Measurement, cache.Script, dataRowList, db)
+		if err != nil {
+			zap.S().Errorf("influxdb 执行异常", zap.Error(err))
+		}
+	}
 
 }
 

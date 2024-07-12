@@ -14,12 +14,12 @@ import (
 )
 
 // 全局map，用于存储id和数据库连接的映射
-var dbMap = make(map[uint]*sql.DB)
+var dbMap = make(map[string]*sql.DB)
 
 // 用于同步的互斥锁，防止并发访问map时发生冲突
 var mu sync.Mutex
 
-func InitMySQLConnection(username, host, password, dbname string, port int, id uint) (*sql.DB, error) {
+func InitMySQLConnection(username, host, password, dbname string, port int, id string) (*sql.DB, error) {
 	mu.Lock()         // 进入临界区前加锁
 	defer mu.Unlock() // 确保在函数返回时释放锁
 

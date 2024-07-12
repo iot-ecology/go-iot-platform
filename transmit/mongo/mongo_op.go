@@ -14,13 +14,13 @@ import (
 )
 
 // 全局map，用于存储id和MongoDB客户端的映射
-var mongoClientMap = make(map[uint]*mongo.Client)
+var mongoClientMap = make(map[string]*mongo.Client)
 
 // 用于同步的互斥锁
 var mu sync.Mutex
 
 // GetMongoDBClient 根据提供的参数获取或创建MongoDB客户端
-func GetMongoDBClient(Host, Username, Password, Db string, Port int, id uint) (*mongo.Client, error) {
+func GetMongoDBClient(Host, Username, Password, Db string, Port int, id string) (*mongo.Client, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
