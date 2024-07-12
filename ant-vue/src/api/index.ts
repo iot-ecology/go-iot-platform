@@ -13,7 +13,7 @@ export async function MqttCreate(data: any) {
 }
 
 export async function MqttSetScript(data: any) {
-  return await axios.post(`${url}/mqtt/set-script1`, data);
+  return await axios.post(`${url}/mqtt/set-script`, data);
 }
 
 export async function MqttCheckScript(data: any) {
