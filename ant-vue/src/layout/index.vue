@@ -7,7 +7,7 @@
           <!-- 隐藏的路由 -->
           <template v-if="menu.meta?.hidden" />
           <!-- 单路由 -->
-          <template v-else-if="menu.children?.length">
+          <template v-else-if="!menu.children?.length">
             <a-menu-item :key="menu.path">
               <a-tooltip placement="right">
                 <template #title>
@@ -18,13 +18,13 @@
             </a-menu-item>
           </template>
           <!-- 有子路由 -->
-          <!--          <template v-else>-->
-          <!--            <a-sub-menu :key="menu.path" :title="menu.meta.title">-->
-          <!--              <a-menu-item v-for="subMenu in menu.children" :key="subMenu.path">-->
-          <!--                {{ subMenu.meta?.title }}-->
-          <!--              </a-menu-item>-->
-          <!--            </a-sub-menu>-->
-          <!--          </template>-->
+           <template v-else>
+             <a-sub-menu :key="menu.path" :title="getMetaTitle(menu.meta.title)">
+                <a-menu-item v-for="subMenu in menu.children" :key="subMenu.path">
+                   {{ getMetaTitle(subMenu.meta?.title) }}
+                </a-menu-item>
+            </a-sub-menu>
+          </template>
         </template>
       </a-menu>
     </div>
@@ -62,10 +62,12 @@ interface MenuState {
 }
 const menuState = reactive<MenuState>({
   menus: routes,
-  openKeys: [routerStore.routerPath],
+  openKeys: [routerStore.routerParent],
   selectedKeys: [routerStore.routerPath],
 });
 const count = computed(() =>routerStore.routerPath);
+const count1 = computed(() =>routerStore.routerParent);
+console.log(count1,count)
 const onChoiceLanguage = async (lang: string)=>{
   language.value = lang
   locale.value = lang;
@@ -73,19 +75,24 @@ const onChoiceLanguage = async (lang: string)=>{
 // 使用 watch 监听 count 的变化
 watch(count, (newCount) => {
   if(newCount) {
-    menuState.openKeys = [newCount]
+    menuState.openKeys = [routerStore.routerParent]
     menuState.selectedKeys = [newCount]
+    console.log(menuState.openKeys,menuState.selectedKeys)
   }
 });
 
 // 菜单点击回调
 const handleMenuClick: MenuClickEventHandler = (menuInfo) => {
-  const key = menuInfo.keyPath?.[0];
+  console.log(menuInfo);
+  const key1 = menuInfo.keyPath?.[0];
+  const key = menuInfo.keyPath?.[1];
+  console.log(key1,key)
   routerStore.setRouterName(key)
+  routerStore.setRouterParent(key1)
   const menuKey = menuInfo.key as string;
   const isUrl = menuKey.match(/^https?/);
   if (typeof key === "string") {
-    menuState.openKeys = [key];
+    menuState.openKeys = [key1];
   }
   if (isUrl) {
     window.open(menuKey);
