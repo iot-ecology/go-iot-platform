@@ -102,3 +102,36 @@ type CassandraTransmitBind struct {
 	Enable              bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                           // 是否启用
 
 }
+
+type RabbitmqTransmit struct {
+	gorm.Model `structs:"-"`
+	Name       string `structs:"name" json:"name" gorm:"column:name;type:varchar(255);"`
+	Host       string `json:"host" gorm:"column:host;type:varchar(255);"`
+	Port       int    `json:"port" gorm:"column:port;type:int(10);"`
+	Username   string `json:"username" gorm:"column:username;type:varchar(255);"`
+	Password   string `json:"password" gorm:"column:password;type:varchar(255);"`
+}
+
+type RabbitmqTransmitBind struct {
+	gorm.Model         `structs:"-"`
+	MqttClientId       int    `json:"mqtt_client_id"`                                                        // MQTT客户端表的外键ID
+	RabbitmqTransmitId uint   `json:"rabbitmq_transmit_id" gorm:"column:rabbitmq_transmit_id;type:int(10);"` // 传输表
+	Exchange           string `json:"exchange" gorm:"column:exchange;type:varchar(255);"`                    // 交换机
+	RoutingKey         string `json:"routing_key" gorm:"column:routing_key;type:varchar(255);"`              // 路由键
+	Script             string `json:"script" gorm:"column:script"`                                           // 转换insert语句的脚本
+	Enable             bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                         // 是否启用
+
+}
+
+type KafkaTransmit struct {
+	gorm.Model `structs:"-"`
+	Name       string `structs:"name" json:"name" gorm:"column:name;type:varchar(255);"`
+	Host       string `json:"host" gorm:"column:host;type:varchar(255);"`
+	Port       int    `json:"port" gorm:"column:port;type:int(10);"`
+}
+type KafakaTransmitBind struct {
+	gorm.Model      `structs:"-"`
+	MqttClientId    int    `json:"mqtt_client_id"`                                                  // MQTT客户端表的外键ID
+	KafkaTransmitId uint   `json:"kafka_transmit_id" gorm:"column:kafka_transmit_id;type:int(10);"` // 传输表
+	Topic           string `json:"topic" gorm:"column:topic;type:varchar(255);"`                    // topic
+}
