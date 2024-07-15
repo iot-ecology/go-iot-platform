@@ -95,7 +95,7 @@ watch(locale, () => {
 });
 const getNode = async () => {
   const { data } = await MqttNodeUsingStatus();
-  list.value = JSON.parse(data.data).data;
+  list.value = data.data? JSON.parse(data.data)?.data : [];
 };
 const onSet = (item: any) => {
   const option = {
