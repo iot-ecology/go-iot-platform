@@ -4,7 +4,11 @@ go 1.22.4
 
 require iot-transmit v0.0.0
 
+require iot-notice v0.0.0
+
 replace iot-transmit => ../transmit
+
+replace iot-notice => ../notice
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -25,7 +29,7 @@ require (
 	go.uber.org/zap v1.27.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.6
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.11
 )
 
 require (

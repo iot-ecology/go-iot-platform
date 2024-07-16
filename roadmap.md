@@ -20,8 +20,8 @@
   - [ ] rabbit
   - [ ] rocket
 - 开源结合
-  - [ ] flink 
-  - [ ] kafka stream 
+  - [ ] Flink 
+  - [ ] Kafka Stream 
   - [ ] Spark
 - AI 结合
   - [ ] 时序预测
