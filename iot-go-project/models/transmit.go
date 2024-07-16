@@ -135,3 +135,21 @@ type KafakaTransmitBind struct {
 	KafkaTransmitId uint   `json:"kafka_transmit_id" gorm:"column:kafka_transmit_id;type:int(10);"` // 传输表
 	Topic           string `json:"topic" gorm:"column:topic;type:varchar(255);"`                    // topic
 }
+
+
+
+// DingDing 钉钉通知渠道  加签模式
+type DingDing struct {
+	gorm.Model
+	Name        string `json:"name" structs:"name"`
+	AccessToken string `json:"access_token" structs:"access_token"`
+	Secret      string `json:"secret" structs:"secret"`
+	Content     string `json:"content" structs:"content"` // 模板内容
+}
+
+// DingDingBindProduct 钉钉通知渠道绑定产品
+type DingDingBindProduct struct {
+	gorm.Model
+	DingDingId int `json:"ding_ding_id" structs:"ding_ding_id"`
+	ProductId  int `json:"product_id" structs:"product_id"`
+}

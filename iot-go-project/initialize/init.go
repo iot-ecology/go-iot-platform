@@ -23,8 +23,6 @@ import (
 	"igp/models"
 	"igp/router"
 	"igp/router/transmit"
-	notice "iot-notice/models"
-	notice_router "iot-notice/router"
 	"log"
 	"net/url"
 	"os"
@@ -325,9 +323,9 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&notice.DingDing{}) {
+	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
 
-		err := glob.GDb.AutoMigrate(&notice.DingDing{})
+		err := glob.GDb.AutoMigrate(&models.DingDing{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -419,7 +417,6 @@ func initLog() {
 
 func initRouter(r *gin.RouterGroup) {
 	r.Use(router.JwtCheck())
-	notice_router.InitRouter(r)
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
