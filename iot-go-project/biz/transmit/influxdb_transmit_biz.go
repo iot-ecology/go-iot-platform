@@ -66,6 +66,7 @@ func (biz *InfluxdbTransmitBiz) toByte(req models.InfluxdbTransmitBind) []byte {
 
 // ChangeEnable 修改启用状态
 func (biz *InfluxdbTransmitBiz) ChangeEnable(req models.InfluxdbTransmitBind) {
+	glob.GDb.Model(models.InfluxdbTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
 	glob.GRedis.LRem(context.Background(), "transmit:influxdb:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
