@@ -1,0 +1,39 @@
+# 开发路线
+- [x] MQTT 客户端集群方案
+- [x] 数据解析（JavaScript）
+- [ ] 数据解析 (Lua)
+- [ ] 数据解析（Python）
+- [x] 数据存储（influxdb）
+- [x] 数据报警（区间比较、脚本比较）
+- 数据利用
+  - [ ] 折线图+柱状图的可配置化展示
+  - [ ] 基于JavaScript的统计功能（低代码）
+- [ ] 系统内通知
+- [ ] 系统外通知（微信公众号、钉钉、邮件）
+- 数据转发
+  - [ ] kafka
+  - [ ] influxdb 
+  - [ ] cassandra 
+  - [ ] clickhouse 
+  - [ ] mongo 
+  - [ ] mysql
+  - [ ] rabbit
+  - [ ] rocket
+- 开源结合
+  - [ ] flink 
+  - [ ] kafka stream 
+  - [ ] Spark
+- AI 结合
+  - [ ] 时序预测
+- 标准协议对接
+  - [ ] JT808
+  - [ ] OCPP
+- 运营管理
+  - [ ] 用户模块
+  - [ ] 运维模块
+- 通讯协议对接
+  - [x] MQTT
+  - [ ] HTTP
+  - [ ] WEBSOCKET
+  - [ ] MODBUS
+- [ ] 硬件版本管理(OTA)
