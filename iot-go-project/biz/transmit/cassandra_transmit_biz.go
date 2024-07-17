@@ -24,7 +24,7 @@ func (biz *CassandraTransmitBiz) PageData(name string, page, size int) (*servlet
 		db = db.Where("name like ?", "%"+name+"%")
 	}
 
-	db.Model(&models.InfluxdbTransmit{}).Count(&pagination.Total) // 计算总记录数
+	db.Model(&models.CassandraTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&CassandraTransmit)
 
@@ -66,14 +66,15 @@ func (biz *CassandraTransmitBiz) toByte(req models.CassandraTransmitBind) []byte
 
 // ChangeEnable 修改启用状态
 func (biz *CassandraTransmitBiz) ChangeEnable(req models.CassandraTransmitBind) {
+	glob.GDb.Model(models.CassandraTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
+
 	glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
 var CassandraOp = cassandra.CassandraOp{}
 
 // MockScript 模拟执行脚本
-func (biz *CassandraTransmitBiz) MockScript(dataRowList []common.DataRowList,
-	script string) [][]cassandra.CassandraParam {
+func (biz *CassandraTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) [][]cassandra.CassandraParam {
 
 	return CassandraOp.RunScript(dataRowList, script)
 }

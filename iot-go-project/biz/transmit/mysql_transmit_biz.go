@@ -66,6 +66,7 @@ func (biz *MySQLTransmitBiz) toByte(req models.MySQLTransmitBind) []byte {
 
 // ChangeEnable 修改启用状态
 func (biz *MySQLTransmitBiz) ChangeEnable(req models.MySQLTransmitBind) {
+	glob.GDb.Model(models.MySQLTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
 	glob.GRedis.LRem(context.Background(), "transmit:mysql:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 

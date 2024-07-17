@@ -24,7 +24,7 @@ func (biz *ClickhouseTransmitBiz) PageData(name string, page, size int) (*servle
 		db = db.Where("name like ?", "%"+name+"%")
 	}
 
-	db.Model(&models.InfluxdbTransmit{}).Count(&pagination.Total) // 计算总记录数
+	db.Model(&models.ClickhouseTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&ClickhouseTransmit)
 
@@ -68,6 +68,7 @@ func (biz *ClickhouseTransmitBiz) toByte(req models.ClickhouseTransmitBind) []by
 
 // ChangeEnable 修改启用状态
 func (biz *ClickhouseTransmitBiz) ChangeEnable(req models.ClickhouseTransmitBind) {
+	glob.GDb.Model(models.ClickhouseTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
 	glob.GRedis.LRem(context.Background(), "transmit:clickhouse:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 

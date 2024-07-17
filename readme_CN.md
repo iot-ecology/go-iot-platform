@@ -1,62 +1,49 @@
-# Go IoT 平台
+# Go IoT 
 
-Go IoT 平台，这是一个高效、可扩展的物联网解决方案，使用 Go 语言开发。本平台专注于提供稳定、可靠的 MQTT 客户端管理，以及对 MQTT上报数据的全面处理和分析。
-
-![logo](readme/o1.png)
+Go IoT 是基于Gin 的开源分布式物联网（IOT）开发平台，用于快速开发，部署物联设备接入项目，是一套涵盖数据生产、数据使用和数据展示的解决方案。
 
 
-如果可以请为我投票：
-<a href="https://www.producthunt.com/posts/go-iot-platform?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-go&#0045;iot&#0045;platform" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=465692&theme=light" alt="Go&#0032;IoT&#0032;Platform - GoIoT&#0058;&#0032;Efficient&#0044;&#0032;scalable&#0032;MQTT&#0032;IoT&#0032;platform&#0032;in&#0032;Go&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
-## 特点
-
-- **MQTT 客户端管理**：维持大量 MQTT 客户端的稳定连接。
-- **数据存储**：安全存储 MQTT 上报的数据。
-- **报警分析**：对上报数据进行实时监控和报警分析。
-- **数据可视化**：提供直观的数据展示，帮助用户快速理解数据。
-- **离线计算**：支持对历史数据进行深入的离线分析和处理。
-
-## 界面截图
-
-| 说明        | 截图                                                             |
-|-----------|----------------------------------------------------------------|
-| MQTT客户端列表 | ![image-20240524123513247](readme/image-20240524123513247.png) |
-| 新增MQTT客户端 | ![image-20240524123533112](readme/image-20240524123533112.png) |
-| 解析脚本      | ![image-20240524123606435](readme/image-20240524123606435.png) |
-| 模拟发送      | ![image-20240524123618542](readme/image-20240524123618542.png) |
-| 信号配置列表    | ![image-20240524123658849](readme/image-20240524123658849.png) |
-| 信号报警配置列表  | ![image-20240524123718443](readme/image-20240524123718443.png) |
-| 数据可视化     | ![image-20240524123729546](readme/image-20240524123729546.png) |
-| 数据可视化     | ![image-20240524123805587](readme/image-20240524123805587.png) |
-| 数据可视化     | ![image-20240524123820684](readme/image-20240524123820684.png) |
-
-## 目录
-- [go-iot](./go-iot): MQTT客户端管理服务
-- [go-iot-mq](./go-iot-mq): rabbit 消息队列处理服务
-- [iot-go-project](./iot-go-project): 管理后台服务
-- [ant-vue](./ant-vue): 基于ant-vue开发的后台管理系统
+> :rocket: 非常欢迎广大兴趣爱好者的加入，你的 Star 是我们开发的动力 ！
 
 
 
-## 文档
+## 架构设计
 
-详细的部署指南可以在[deploy](./deploy)文件夹中找到
+![架构图](./readme/架构图.png)
 
-相关设计实现文档可以在[docs](./docs)文件夹中找到
+- 数据层：负责进行物联数据的采集、预处理、转发和存储，为应用层提供数据服务。
+- 管理层：用于提供物联网平台的管理功能，包括设备管理、人员管理、安装管理、产品管理、SIM卡管理（物联网卡管理）、解析脚本管理、发货管理等。
+- 应用层：用于提供快速的业务实现，以配置化的方式快速建设基础业务。
 
-使用手册可以在[operation](./operation)文件夹中找到
-## 贡献
 
-我们欢迎任何形式的贡献，包括但不限于：
 
-- 报告问题
-- 提交 Pull Request
-- 改进文档
+## 数据流转
 
-## 致谢
 
-感谢所有贡献者和用户对 Go IoT 平台的支持！
 
+
+
+![网络图](./readme/网络-数据结构图.png)
+
+
+
+数据从设备上使用MQTT协议将数据推送给MQTT服务集群。 
+- MQTT客户端的集群程序在[go-mqtt-manager](./go-iot)中，它是一个基于Redis实现的支持负载均衡、故障转移、高可用的MQTT客户端集群。
+- pre_handler队列: 用于对设备上报的数据进行预处理，包括数据过滤、数据转换等（预处理脚本使用JavaScript进行编写）。
+- waring_handler队列: 用于对**预处理后**的数据进行告警处理。区别于waring_delay_handler队列，它只能完成单一信号单次的区间判断。
+- waring_delay_handler队列: 用于对**预处理后**的数据进行告警处理。区别于waring_handler队列，它能够完成的报警模式更加多样化，但是这需要编写报警判断脚本（使用JavaScript进行实现）。
+- transmit_handler队列: 用于将**预处理后**的数据转发到cassandra、clickhouse、influxdb2、mongo、mysql、kafka、rabbit等
+- 定时任务队列集群：这是使用Redis+RabbitMQ实现的定时任务，他能够完成用户定义的复杂计算任务（基于JavaScript编写任务）。
+
+## 开源贡献
+- 从`dev`分支拉取代码`checkout`一个新的分支(注意: 务必保持`dev`分支的最新状态)
+- 分支命名格式: `feat-功能名称` 
+- 在新分支上编辑文档, 代码, 并提交
+- 提交 PR 合并到 dev 分支, 等待作者合并即可
+
+## 开源协议
+
+Go IoT 遵循 [Apache2](./LICENSE) 开源协议发布。允许商业使用, 但务必保留类作者, Copyright 信息。
 ## 联系方式
 
 如有任何问题，可以通过以下方式联系我们：

@@ -66,6 +66,7 @@ func (biz *MongoTransmitBiz) toByte(req models.MongoTransmitBind) []byte {
 
 // ChangeEnable 修改启用状态
 func (biz *MongoTransmitBiz) ChangeEnable(req models.MongoTransmitBind) {
+	glob.GDb.Model(models.MongoTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
 	glob.GRedis.LRem(context.Background(), "transmit:mongo:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
 }
 
