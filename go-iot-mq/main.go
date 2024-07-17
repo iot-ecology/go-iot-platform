@@ -51,6 +51,7 @@ func main() {
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
 	CreateRabbitQueue("waring_handler")
+	CreateRabbitQueue("message_channel")
 	CreateRabbitQueue("transmit_handler")
 	CreateRabbitQueue("waring_delay_handler")
 	initMongo()

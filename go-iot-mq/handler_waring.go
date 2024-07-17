@@ -6,6 +6,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
+	"iot-notice/models"
 	"strconv"
 	"time"
 )
@@ -116,6 +117,30 @@ func handlerWaringOnce(msg DataRowList) {
 					})
 				}
 			}
+
+
+			// fixme: 将报警元数据分发到不同的数据推送通道。
+			mt :=	models.MessageTemplate{
+				GeneratorTime: msg.Time,
+				DeviceUid:    uid,
+				SignalId:      config.SignalId,
+				MqttClientId:  uid,
+				SignalName:    row.Name,
+				SignalValue:   floatValue,
+				Min:           config.Min,
+				Max:           config.Max,
+				Unit:          config.Unit,
+				InOrOut:       config.InOrOut,
+			}
+
+			jsonData, err := json.Marshal(mt)
+			if err != nil {
+				zap.S().Errorf("消息模板 %s", err)
+				return
+			}
+			PushToQueue("message_channel", jsonData)
+
+
 		}
 
 	}
@@ -163,6 +188,7 @@ func getMqttClientMappingSignalWarningConfig(mqttClientId string) map[string][]S
 			if err != nil {
 				continue // 如果反序列化失败，跳过当前警告配置
 			}
+			swc.Unit = signal.Unit
 			swcs = append(swcs, swc)
 		}
 

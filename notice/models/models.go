@@ -1,25 +1,25 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"strconv"
 	"strings"
 )
 
 // MessageTemplate 推送模板
 type MessageTemplate struct {
-	gorm.Model
 	Content      string  `json:"content" structs:"content"`
+	DeviceUid string `json:"device_uid" structs:"device_uid"`
+
+	GeneratorTime int64 `json:"generator_time" structs:"generator_time"` // 数据生产时间
 	DeviceName   string  `json:"device_name" structs:"device_name"`
 	SignalId     int     `json:"signal_id" structs:"signal_id"`           // 信号表的外键ID
-	MqttClientId int     `json:"mqtt_client_id" structs:"mqtt_client_id"` // MQTT客户端表的外键ID
+	MqttClientId string     `json:"mqtt_client_id" structs:"mqtt_client_id"` // MQTT客户端表的外键ID
 	SignalName   string  `json:"signal_name" structs:"signal_name"`
 	SignalValue  float64 `json:"signal_value" structs:"signal_value"`
 	Min          float64 `json:"min" structs:"min"` // 范围,小值
 	Max          float64 `json:"max" structs:"max"` // 范围,大值
 	Unit         string  `json:"unit" structs:"unit"`
 	InOrOut      int     `gorm:"in_or_out"  json:"in_or_out" structs:"in_or_out"` //范围内报警,范围外报警 1 范围内报警 0 范围外报警
-
 }
 
 func (template *MessageTemplate) Format() string {

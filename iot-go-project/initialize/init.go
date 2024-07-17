@@ -22,6 +22,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/router"
+	"igp/router/notice"
 	"igp/router/transmit"
 	"log"
 	"net/url"
@@ -58,6 +59,10 @@ var (
 	influxdbTransmitApi       = transmit.InfluxdbTransmitApi{}
 	clickTransmitApi          = transmit.ClickhouseTransmitApi{}
 	cassandraTransmitApi      = transmit.CassandraTransmitApi{}
+
+
+	feishuApi = notice.FeiShuApi{}
+	dingdingApi = notice.DingDingApi{}
 )
 
 func initTable() {
@@ -592,6 +597,27 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/userinfo", loginApi.UserInfo)
 
 	r.GET("/MessageList/page", messageListApi.PageMessageList)
+
+
+
+
+
+
+	r.POST("/DingDing/create", dingdingApi.CreateDingDing)
+	r.POST("/DingDing/update", dingdingApi.UpdateDingDing)
+	r.GET("/DingDing/:id", dingdingApi.ByIdDingDing)
+	r.GET("/DingDing/page", dingdingApi.PageDingDing)
+	r.POST("/DingDing/delete/:id", dingdingApi.DeleteDingDing)
+	r.POST("/DingDing/bind", dingdingApi.Bind)
+
+
+
+	r.POST("/FeiShu/create", feishuApi.CreateFeiShu)
+	r.POST("/FeiShu/update", feishuApi.UpdateFeiShu)
+	r.GET("/FeiShu/:id", feishuApi.ByIdFeiShu)
+	r.GET("/FeiShu/page", feishuApi.PageFeiShu)
+	r.POST("/FeiShu/delete/:id", feishuApi.DeleteFeiShu)
+	r.POST("/FeiShu/bind", feishuApi.Bind)
 
 }
 func initGlobalRedisClient() {

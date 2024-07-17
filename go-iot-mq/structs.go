@@ -80,6 +80,7 @@ type Signal struct {
 	Name         string `json:"name"`           // 信号的名称，用于标识不同的信号
 	Type         string `json:"type"`           // 信号的数据类型，如整数、字符串等
 	ID           int    `json:"ID"`
+	Unit           string `json:"unit" structs:"unit"`             // 单位
 	CacheSize    int64  `json:"cache_size"` // 缓存大小
 }
 
@@ -88,6 +89,8 @@ type SignalWaringConfig struct {
 	Min      float64 `json:"min"`       // 范围,小值
 	Max      float64 `json:"max"`       // 范围,大值
 	InOrOut  int     `json:"in_or_out"` //  1 范围内报警 0 范围外报警
+	Unit           string `json:"unit" structs:"unit"`             // 单位
+
 	ID       int     `json:"ID"`
 }
 
