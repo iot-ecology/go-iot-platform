@@ -612,12 +612,12 @@ func initRouter(r *gin.RouterGroup) {
 
 
 
-	r.POST("/FeiShu/create", feishuApi.CreateFeiShu)
-	r.POST("/FeiShu/update", feishuApi.UpdateFeiShu)
-	r.GET("/FeiShu/:id", feishuApi.ByIdFeiShu)
-	r.GET("/FeiShu/page", feishuApi.PageFeiShu)
-	r.POST("/FeiShu/delete/:id", feishuApi.DeleteFeiShu)
-	r.POST("/FeiShu/bind", feishuApi.Bind)
+	r.POST("/FeiShuId/create", feishuApi.CreateFeiShu)
+	r.POST("/FeiShuId/update", feishuApi.UpdateFeiShu)
+	r.GET("/FeiShuId/:id", feishuApi.ByIdFeiShu)
+	r.GET("/FeiShuId/page", feishuApi.PageFeiShu)
+	r.POST("/FeiShuId/delete/:id", feishuApi.DeleteFeiShu)
+	r.POST("/FeiShuId/bind", feishuApi.Bind)
 
 }
 func initGlobalRedisClient() {

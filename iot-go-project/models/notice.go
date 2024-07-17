@@ -31,6 +31,6 @@ type FeiShu struct {
 // FeiShuBindProduct 飞书通知渠道绑定产品
 type FeiShuBindProduct struct {
 	gorm.Model
-	FeiShu int `json:"feishu_id" structs:"feishu_id"`
-	ProductId  int `json:"product_id" structs:"product_id"`
+	FeiShuId  int `json:"feishu_id" structs:"feishu_id"`
+	ProductId int `json:"product_id" structs:"product_id"`
 }

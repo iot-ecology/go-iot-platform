@@ -214,3 +214,19 @@ func (iqc *InfluxQueryConfig) GenerateFluxReduce() string {
 			|> %s()
 	`, iqc.Bucket, timeRange, filterClause, iqc.Measurement, iqc.Reduce)
 }
+
+
+type DingDing struct {
+	Name        string `json:"name" structs:"name"`
+	AccessToken string `json:"access_token" structs:"access_token"`
+	Secret      string `json:"secret" structs:"secret"`
+	Content     string `json:"content" structs:"content"` // 模板内容
+}
+
+
+type FeiShu struct {
+	Name        string `json:"name" structs:"name"`
+	AccessToken string `json:"access_token" structs:"access_token"`
+	Secret      string `json:"secret" structs:"secret"`
+	Content     string `json:"content" structs:"content"` // 模板内容
+}

@@ -1,6 +1,8 @@
 package notice
 
 import (
+	"context"
+	"encoding/json"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"igp/biz/notice"
@@ -44,6 +46,11 @@ func (api *DingDingApi) CreateDingDing(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+
+	jsonData, _ := json.Marshal(DingDing)
+
+	glob.GRedis.HSet(context.Background(), "message_channel_info:dingding", strconv.Itoa(int(DingDing.ID)), jsonData)
+
 	// 返回创建成功的钉钉通道
 	servlet.Resp(c, DingDing)
 }
@@ -88,6 +95,9 @@ func (api *DingDingApi) UpdateDingDing(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	jsonData, _ := json.Marshal(newV)
+
+	glob.GRedis.HSet(context.Background(), "message_channel_info:dingding", strconv.Itoa(int(newV.ID)), jsonData)
 	servlet.Resp(c, old)
 }
 
@@ -151,6 +161,7 @@ func (api *DingDingApi) DeleteDingDing(c *gin.Context) {
 		return
 	}
 
+	glob.GRedis.HDel(context.Background(), "message_channel_info:dingding", strconv.Itoa(int(DingDing.ID)))
 	servlet.Resp(c, "删除成功")
 }
 
@@ -182,7 +193,7 @@ func (api *DingDingApi) ByIdDingDing(c *gin.Context) {
 // @Produce   application/json
 // @Router    /DingDing/bind [post]
 func (api *DingDingApi) Bind(c *gin.Context) {
-	var req = []models.DingDingBindProduct{}
+	var req  []models.DingDingBindProduct
 	if err := c.ShouldBindJSON(&req); err != nil {
 
 		servlet.Error(c, err.Error())

@@ -138,7 +138,7 @@ func handlerWaringOnce(msg DataRowList) {
 				zap.S().Errorf("消息模板 %s", err)
 				return
 			}
-			PushToQueue("message_channel", jsonData)
+			PushToQueue("waring_notice", jsonData)
 
 
 		}

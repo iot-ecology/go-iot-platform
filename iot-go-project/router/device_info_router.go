@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -244,6 +245,10 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
+	var  toDel  []models.DeviceBindMqttClient
+
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
 
@@ -272,6 +277,25 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	if err := tx.Commit().Error; err != nil {
 		servlet.Error(c, "Failed to commit transaction")
 		return
+	}
+
+	// redis 中建立 mqtt_client_id 与 device_info_id 的映射
+
+
+	var DeviceInfo models.DeviceInfo
+
+	first := tx.First(&DeviceInfo, param.DeviceId)
+	if first.Error != nil {
+		servlet.Error(c, "DeviceInfo not found")
+		return
+	}
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(int(client.MqttClientId)))
+	}
+
+	for _, item := range param.MqttClientId {
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(item), DeviceInfo.ProductId)
 	}
 
 	servlet.Resp(c, "绑定成功")

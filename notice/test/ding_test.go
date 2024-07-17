@@ -16,7 +16,7 @@ func TestMessageTemplate(t *testing.T) {
 			"}}~{{max}}{{unit}}",
 		DeviceName:   "测试设备",
 		SignalId:     1,
-		MqttClientId: 1,
+		MqttClientId: "1",
 		SignalName:   "温度",
 		SignalValue:  10,
 		Min:          0,

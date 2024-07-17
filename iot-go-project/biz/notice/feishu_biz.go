@@ -1,10 +1,12 @@
 package notice
 
 import (
+	"context"
 	"go.uber.org/zap"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"strconv"
 )
 
 type FeiShuBiz struct{}
@@ -39,6 +41,9 @@ func (biz *FeiShuBiz) Bind(req []models.FeiShuBindProduct) bool {
 		return false
 
 	}
+	var toDelete []models.FeiShuBindProduct
+	tx.Where("product_id = ?", param.ProductId).Find(&toDelete)
+
 
 	result := tx.Where("product_id = ?", param.ProductId).Delete(models.FeiShuBindProduct{})
 	if result.Error != nil {
@@ -57,6 +62,15 @@ func (biz *FeiShuBiz) Bind(req []models.FeiShuBindProduct) bool {
 	if err := tx.Commit().Error; err != nil {
 		return false
 
+	}
+
+	for _, product := range toDelete {
+		glob.GRedis.Del(context.Background(),"message_channel_bind:feishu:" +strconv.Itoa(product.ProductId))
+	}
+
+	for _, product := range req {
+		glob.GRedis.LPush(context.Background(),"message_channel_bind:feishu:" +strconv.Itoa(product.ProductId),
+			product.FeiShuId)
 	}
 	return true
 
