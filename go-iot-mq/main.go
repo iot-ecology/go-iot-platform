@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -50,11 +51,13 @@ func main() {
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
 	CreateRabbitQueue("waring_handler")
+	CreateRabbitQueue("waring_notice")
+	CreateRabbitQueue("transmit_handler")
 	CreateRabbitQueue("waring_delay_handler")
 	initMongo()
 	failOnError(err, "Failed to open a channel")
 	go startHttp()
-	cus := NewConsumer("", "amqp://guest:guest@localhost:5672", "", "", "")
+	cus := NewConsumer("", genUrl(globalConfig.MQConfig), "", "", "")
 	err = cus.Connect()
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
@@ -87,6 +90,21 @@ func main() {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
 		cus.Handle(waring_delay_handler, HandlerWaringDelay, 1, "waring_delay_handler", "")
+	}
+
+	if globalConfig.NodeInfo.Type == "transmit_handler" {
+		transmit_handler, err := cus.AnnounceQueue("transmit_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(transmit_handler, HandlerTransmit, 1, "transmit_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "waring_notice" {
+		waring_notice, err := cus.AnnounceQueue("waring_notice", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(waring_notice, HandlerNotice, 1, "waring_notice", "")
 	}
 
 }
@@ -221,7 +239,8 @@ var GMongoClient *mongo.Client
 
 // initMongo 函数用于初始化 MongoDB 连接
 func initMongo() {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", globalConfig.MongoConfig.Username, globalConfig.MongoConfig.Password, globalConfig.MongoConfig.Host, globalConfig.MongoConfig.Port)
+
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(globalConfig.MongoConfig.Username), url.QueryEscape(globalConfig.MongoConfig.Password), globalConfig.MongoConfig.Host, globalConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
 		log.Fatal(err)

@@ -4,6 +4,7 @@ export const useRouterNameStore = defineStore({
   id: "routerPath",
   state: () => {
     return {
+      routerParent:"sub1",
       routerPath: "/mqtt-management",
     };
   },
@@ -15,11 +16,14 @@ export const useRouterNameStore = defineStore({
     setRouterName(item: string | any) {
       this.routerPath = item;
     },
+    setRouterParent(item: string | any) {
+      this.routerParent = item;
+    },
   },
   persist: [
     {
       key: "project_template_router",
-      paths: ["routerPath"],
+      paths: ["routerParent","routerPath"],
       storage: localStorage,
     },
   ],

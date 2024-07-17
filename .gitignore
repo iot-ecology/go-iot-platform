@@ -6,3 +6,7 @@ ppt/
 /docker/rabbitmq/data
 /docker/mongo/database
 fileupdate/
+/docker/Cassandra/dataa/
+/docker/RocketMQ/data/
+/docker/clickhouse/data/
+/docker/clickhouse/log/

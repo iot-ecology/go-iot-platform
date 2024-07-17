@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"igp/biz"
@@ -79,7 +80,10 @@ func (api *RoleApi) UpdateRole(c *gin.Context) {
 	var newV models.Role
 	newV = old
 	newV.Name = req.Name
-	result = glob.GDb.Model(&newV).Updates(newV)
+	newV.Description = req.Description
+
+	m := structs.Map(newV)
+	result = glob.GDb.Table("roles").Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 
@@ -95,6 +99,7 @@ func (api *RoleApi) UpdateRole(c *gin.Context) {
 // @Tags Roles
 // @Accept json
 // @Produce json
+// @Param name query string false "名称"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Role}} "面板"

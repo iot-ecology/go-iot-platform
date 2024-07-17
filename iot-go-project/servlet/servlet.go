@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"iot-transmit/common"
 	"net/http"
 	"strings"
 	"time"
@@ -33,8 +34,8 @@ type MqttScript struct {
 
 }
 type DataRowList struct {
-	Time      int64  `json:"time"` // 秒级时间戳
-	DeviceUid string `json:"device_uid"`
+	Time      int64  `json:"time"`       // 秒级时间戳
+	DeviceUid string `json:"device_uid"` // 是MqttClient的ID
 
 	DataRows []DataRow `json:"data"`
 	Nc       string    `json:"nc"`
@@ -296,4 +297,17 @@ type DeviceGroupBindMqttClientParam struct {
 type LoginParam struct {
 	UserName string `json:"user_name" form:"user_name"` // 用户名
 	Password string `json:"password" form:"password"`   // 密码
+}
+
+type SimUseHistoryResp struct {
+	ID           uint   `json:"id" structs:"id"`                         // 历史记录ID
+	SimId        uint   `json:"sim_id" structs:"sim_id"`                 // 物联网卡ID
+	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Description  string `json:"description" structs:"description"`       // 描述
+	SN           string `json:"sn" structs:"sn"`                         // 序列号
+}
+
+type TransmitScriptParam struct {
+	DataRowList []common.DataRowList `json:"data_row_list"`
+	Script      string               `json:"script"`
 }

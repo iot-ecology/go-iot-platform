@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"igp/biz"
 	"igp/glob"
@@ -77,8 +78,19 @@ func (api *ProductApi) UpdateProduct(c *gin.Context) {
 
 	var newV models.Product
 	newV = old
-	newV.Name = req.Name
-	result = glob.GDb.Model(&newV).Updates(newV)
+	newV.Description = req.Description
+	newV.SKU = req.SKU
+	newV.Price = req.Price
+	newV.Cost = req.Cost
+	newV.Quantity = req.Quantity
+	newV.MinimumStock = req.MinimumStock
+	newV.WarrantyPeriod = req.WarrantyPeriod
+	newV.Status = req.Status
+	newV.Tags = req.Tags
+	newV.ImageURL = req.ImageURL
+
+	m := structs.Map(newV)
+	result = glob.GDb.Model(models.Product{}).Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 

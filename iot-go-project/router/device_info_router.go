@@ -1,6 +1,8 @@
 package router
 
 import (
+	"context"
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"igp/biz"
@@ -28,6 +30,7 @@ var deviceInfoBiz = biz.DeviceInfoBiz{}
 func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 	if err := c.ShouldBindJSON(&DeviceInfo); err != nil {
+
 		servlet.Error(c, err.Error())
 		return
 	}
@@ -45,11 +48,16 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		return
 	}
 	if !DeviceInfo.ManufacturingDate.IsZero() {
-		DeviceInfo.WarrantyExpiry = DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		DeviceInfo.WarrantyExpiry = &WarrantyExpiry
 	}
-	result = glob.GDb.Create(&DeviceInfo)
+
+	m := structs.Map(DeviceInfo)
+
+	result = glob.GDb.Model(models.DeviceInfo{}).Create(m)
 
 	if result.Error != nil {
+		zap.S().Errorw("创建 DeviceInfo 失败", "error", result.Error)
 		servlet.Error(c, result.Error.Error())
 		return
 	}
@@ -95,7 +103,8 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 		return
 	}
 	if !newV.ManufacturingDate.IsZero() {
-		newV.WarrantyExpiry = newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		newV.WarrantyExpiry = &WarrantyExpiry
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 
@@ -113,6 +122,9 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Tags DeviceInfos
 // @Accept json
 // @Produce json
+// @Param sn query string false "SN"
+// @Param manufacturingDateStart query string false "制造日期开始"
+// @Param manufacturingDateEnd query string false "制造日期结束"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.DeviceInfo}} "设备详情"
@@ -120,7 +132,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Failure 500 {string} string "查询异常"
 // @Router /DeviceInfo/page [get]
 func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
-	var name = c.Query("sn")
+	var sn = c.Query("sn")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -135,7 +147,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := deviceInfoBiz.PageData(name, parseUint, u)
+	data, err := deviceInfoBiz.PageData(sn, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -233,6 +245,10 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
+	var  toDel  []models.DeviceBindMqttClient
+
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
 
@@ -261,6 +277,25 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	if err := tx.Commit().Error; err != nil {
 		servlet.Error(c, "Failed to commit transaction")
 		return
+	}
+
+	// redis 中建立 mqtt_client_id 与 device_info_id 的映射
+
+
+	var DeviceInfo models.DeviceInfo
+
+	first := tx.First(&DeviceInfo, param.DeviceId)
+	if first.Error != nil {
+		servlet.Error(c, "DeviceInfo not found")
+		return
+	}
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(int(client.MqttClientId)))
+	}
+
+	for _, item := range param.MqttClientId {
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(item), DeviceInfo.ProductId)
 	}
 
 	servlet.Resp(c, "绑定成功")

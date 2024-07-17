@@ -11,8 +11,8 @@ type MQTTMessage struct {
 }
 
 type DataRowList struct {
-	Time      int64     `json:"time"` // 秒级时间戳
-	DeviceUid string    `json:"device_uid"`
+	Time      int64     `json:"time"`       // 秒级时间戳
+	DeviceUid string    `json:"device_uid"` // 是MqttClient的ID
 	DataRows  []DataRow `json:"data"`
 	Nc        string    `json:"nc"`
 }
@@ -80,6 +80,7 @@ type Signal struct {
 	Name         string `json:"name"`           // 信号的名称，用于标识不同的信号
 	Type         string `json:"type"`           // 信号的数据类型，如整数、字符串等
 	ID           int    `json:"ID"`
+	Unit           string `json:"unit" structs:"unit"`             // 单位
 	CacheSize    int64  `json:"cache_size"` // 缓存大小
 }
 
@@ -88,6 +89,8 @@ type SignalWaringConfig struct {
 	Min      float64 `json:"min"`       // 范围,小值
 	Max      float64 `json:"max"`       // 范围,大值
 	InOrOut  int     `json:"in_or_out"` //  1 范围内报警 0 范围外报警
+	Unit           string `json:"unit" structs:"unit"`             // 单位
+
 	ID       int     `json:"ID"`
 }
 
@@ -210,4 +213,20 @@ func (iqc *InfluxQueryConfig) GenerateFluxReduce() string {
 			|> filter(fn: (r) => r["_measurement"] == "%s")
 			|> %s()
 	`, iqc.Bucket, timeRange, filterClause, iqc.Measurement, iqc.Reduce)
+}
+
+
+type DingDing struct {
+	Name        string `json:"name" structs:"name"`
+	AccessToken string `json:"access_token" structs:"access_token"`
+	Secret      string `json:"secret" structs:"secret"`
+	Content     string `json:"content" structs:"content"` // 模板内容
+}
+
+
+type FeiShu struct {
+	Name        string `json:"name" structs:"name"`
+	AccessToken string `json:"access_token" structs:"access_token"`
+	Secret      string `json:"secret" structs:"secret"`
+	Content     string `json:"content" structs:"content"` // 模板内容
 }

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"igp/biz"
@@ -79,7 +80,10 @@ func (api *UserApi) UpdateUser(c *gin.Context) {
 	var newV models.User
 	newV = old
 	newV.Password = req.Password
-	result = glob.GDb.Model(&newV).Updates(newV)
+	newV.Email = req.Email
+
+	m := structs.Map(newV)
+	result = glob.GDb.Table("users").Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 
@@ -245,11 +249,10 @@ func (api *UserApi) BindRole(c *gin.Context) {
 // QueryBindRole
 // @Tags      Users
 // @Summary   查询绑定角色
-// @Param user_id path int true "主键"
-// @Produce   application/json
-// @Router    /User/QueryBindRole [post]
+// @Param user_id query string false "用户id"
+// @Router    /User/QueryBindRole [get]
 func (api *UserApi) QueryBindRole(c *gin.Context) {
-	param := c.Param("user_id")
+	param := c.Query("user_id")
 
 	var userRoles []models.UserRole
 

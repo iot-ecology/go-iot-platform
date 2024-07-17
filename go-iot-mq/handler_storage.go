@@ -75,6 +75,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
+		PushToQueue("transmit_handler", jsonData)
 	} else {
 		zap.S().Infof("执行脚本为空")
 	}
