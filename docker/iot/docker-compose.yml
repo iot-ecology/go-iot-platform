@@ -1,0 +1,13 @@
+services:
+  iotgomq:
+    image: go-iot-mq:latest
+    ports:
+      - 8001:19000
+  iotgoproject:
+    image: go-iot-project:latest
+    ports:
+      - 8002:8080
+  iotgomqtt:
+    image: go-iot-mqtt:latest
+    ports:
+      - 8003:8081
