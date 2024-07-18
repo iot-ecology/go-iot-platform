@@ -10,7 +10,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -112,7 +111,6 @@ func HandlerLastTime(data []DataRowList) {
 	}
 
 	if lastTime != fmt.Sprintf("%d", now) {
-		// 进入时间比较
 		val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
 		if val == "" {
 			return
@@ -122,15 +120,7 @@ func HandlerLastTime(data []DataRowList) {
 		if withRedis == nil {
 			return
 		}
-		lastTimeInt, err := strconv.ParseInt(lastTime, 10, 64)
-		if err != nil {
-			log.Printf("解析上次推送时间失败：%+v", err)
-			return
-		}
-		if (now-lastTimeInt) >= int64(withRedis.PushInterval) {
-			// 执行推送逻辑
-			log.Printf("执行推送逻辑：设备 UID = %s", deviceUid)
-		}
+		globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
 	}
 
 }

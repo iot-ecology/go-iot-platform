@@ -78,6 +78,13 @@ func InitRedisExpireHandler(client *redis.Client) {
 			model.EnContent = "Your SIM will expire in 3 more days, please handle it promptly!"
 			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
+		if strings.HasPrefix(msg.Payload, glob.DeviceOffMessage.String()) {
+			model.Content = "设备离线通知"
+			parts := strings.Split(msg.Payload, ":")
+			deviceId := parts[len(parts)-1]
+			zap.S().Infof("Device Off: %s", deviceId)
+			glob.GDb.Model(&models.MessageList{}).Create(model)
+		}
 
 	}
 }
