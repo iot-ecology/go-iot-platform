@@ -83,6 +83,8 @@ func InitRedisExpireHandler(client *redis.Client) {
 			parts := strings.Split(msg.Payload, ":")
 			deviceId := parts[len(parts)-1]
 			zap.S().Infof("Device Off: %s", deviceId)
+			val := glob.GRedis.Get(context.Background(), "last_push_time:"+deviceId).Val()
+			zap.S().Infof("Last Push Time: %s", val)
 			glob.GDb.Model(&models.MessageList{}).Create(model)
 		}
 
