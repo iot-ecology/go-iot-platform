@@ -1,0 +1,30 @@
+version: "3"
+services:
+  iotdb-service:
+    image: apache/iotdb:1.3.0-standalone
+    hostname: iotdb-service
+    container_name: iotdb-service
+    ports:
+      - "6667:6667"
+    environment:
+      - cn_internal_address=iotdb-service
+      - cn_internal_port=10710
+      - cn_consensus_port=10720
+      - cn_seed_config_node=iotdb-service:10710
+      - dn_rpc_address=iotdb-service
+      - dn_internal_address=iotdb-service
+      - dn_rpc_port=6667
+      - dn_mpp_data_exchange_port=10740
+      - dn_schema_region_consensus_port=10750
+      - dn_data_region_consensus_port=10760
+      - dn_seed_config_node=iotdb-service:10710
+    volumes:
+      - ./data:/iotdb/data
+      - ./logs:/iotdb/logs
+    networks:
+      iotdb:
+        ipv4_address: 172.18.0.6
+
+networks:
+  iotdb:
+    driver: bridge

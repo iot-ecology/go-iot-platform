@@ -23,6 +23,7 @@
   - [ ] Flink 
   - [ ] Kafka Stream 
   - [ ] Spark
+  - [ ] doris
 - AI 结合
   - [ ] 时序预测
 - 标准协议对接
