@@ -8,7 +8,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: mysql
-      MYSQL_USER: iot
+      MYSQL_USER: app
       MYSQL_PASSWORD: iot123456
       TZ: "Asia/Shanghai"
     volumes:
