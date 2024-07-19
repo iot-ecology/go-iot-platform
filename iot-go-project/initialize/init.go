@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -27,7 +26,6 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"syscall"
 	"time"
 )
 
@@ -60,8 +58,7 @@ var (
 	clickTransmitApi          = transmit.ClickhouseTransmitApi{}
 	cassandraTransmitApi      = transmit.CassandraTransmitApi{}
 
-
-	feishuApi = notice.FeiShuApi{}
+	feishuApi   = notice.FeiShuApi{}
 	dingdingApi = notice.DingDingApi{}
 )
 
@@ -408,12 +405,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer func(lg *zap.Logger) {
-		err := lg.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			zap.S().Errorf("日志同步失败 %+v", err)
-		}
-	}(lg)
+	//defer func(lg *zap.Logger) {
+	//	err := lg.Sync()
+	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	//		zap.S().Errorf("日志同步失败 %+v", err)
+	//	}
+	//}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -598,19 +595,12 @@ func initRouter(r *gin.RouterGroup) {
 
 	r.GET("/MessageList/page", messageListApi.PageMessageList)
 
-
-
-
-
-
 	r.POST("/DingDing/create", dingdingApi.CreateDingDing)
 	r.POST("/DingDing/update", dingdingApi.UpdateDingDing)
 	r.GET("/DingDing/:id", dingdingApi.ByIdDingDing)
 	r.GET("/DingDing/page", dingdingApi.PageDingDing)
 	r.POST("/DingDing/delete/:id", dingdingApi.DeleteDingDing)
 	r.POST("/DingDing/bind", dingdingApi.Bind)
-
-
 
 	r.POST("/FeiShuId/create", feishuApi.CreateFeiShu)
 	r.POST("/FeiShuId/update", feishuApi.UpdateFeiShu)
