@@ -43,6 +43,8 @@ services:
       context: ../../
       dockerfile: deploy/IotGoProject.Dockerfile
     image: go-iot-project:latest
+    volumes:
+      - ./iot-project/config/app-local.yml:/app/app-local.yml
     ports:
       - 8005:8080
     networks:
@@ -53,6 +55,8 @@ services:
       dockerfile: deploy/IotMQTT.Dockerfile
     image: go-iot-mqtt:latest
     entrypoint: ["/app/main", "-config", "/app/app-local.yml"]
+    volumes:
+      - ./mqtt/config/app-local.yml:/app/app-local.yml
     ports:
       - 8006:8081
     networks:
@@ -62,6 +66,8 @@ services:
     ports:
       - 8007:8081
     entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
+    volumes:
+      - ./mqtt/config/app-local2.yml:/app/app-local2.yml
     networks:
       - iot-net
   iotgomqtt3:
@@ -69,6 +75,8 @@ services:
     ports:
       - 8008:8081
     entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
+    volumes:
+      - ./mqtt/config/app-local3.yml:/app/app-local3.yml
     networks:
       - iot-net
 networks:
