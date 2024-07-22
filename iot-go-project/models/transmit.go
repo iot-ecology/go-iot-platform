@@ -129,11 +129,14 @@ type KafkaTransmit struct {
 	Host       string `json:"host" gorm:"column:host;type:varchar(255);"`
 	Port       int    `json:"port" gorm:"column:port;type:int(10);"`
 }
-type KafakaTransmitBind struct {
+type KafkaTransmitBind struct {
 	gorm.Model      `structs:"-"`
 	MqttClientId    int    `json:"mqtt_client_id"`                                                  // MQTT客户端表的外键ID
 	KafkaTransmitId uint   `json:"kafka_transmit_id" gorm:"column:kafka_transmit_id;type:int(10);"` // 传输表
 	Topic           string `json:"topic" gorm:"column:topic;type:varchar(255);"`                    // topic
+	Script             string `json:"script" gorm:"column:script"`                                           // 转换insert语句的脚本
+	Enable             bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                         // 是否启用
+
 }
 
 
