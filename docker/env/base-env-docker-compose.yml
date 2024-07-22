@@ -4,7 +4,7 @@ services:
   influxdb:
     image: influxdb:2.6-alpine
     env_file:
-      - influxv2.env
+      - ./influx/influxv2.env
     volumes:
       # Mount for influxdb data directory and configuration
       - influxdbv2:/var/lib/influxdb2:rw
@@ -13,12 +13,12 @@ services:
     networks:
       - iot-net
   telegraf:
-    image: telegraf:1.25-alpine
+    image: telegraf:1.25
     depends_on:
       - influxdb
     volumes:
       # Mount for telegraf config
-      - influx/telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./influx/telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
     env_file:
       - influx/influxv2.env
     networks:
@@ -29,7 +29,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./database:/data/db
+      - ./mongo/database:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
@@ -75,12 +75,12 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: mysql
+      MYSQL_DATABASE: iot
       MYSQL_USER: app
       MYSQL_PASSWORD: iot123456
       TZ: "Asia/Shanghai"
     volumes:
-      - mysql/data:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql
     ports:
       - "3306:3306"
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --binlog-format=ROW
@@ -93,10 +93,10 @@ services:
       - 5672:5672
       - 15672:15672
     volumes:
-      - rabbitmq/data/:/var/lib/rabbitmq/
-      - rabbitmq/log/:/var/log/rabbitmq
-      - rabbitmq/plugins:/usr/lib/rabbitmq/plugins
-      - rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:rw
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+      - ./rabbitmq/plugins:/usr/lib/rabbitmq/plugins
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:rw
     environment:
       - RABBITMQ_PLUGINS_DIR=/opt/rabbitmq/plugins:/usr/lib/rabbitmq/plugins
     networks:
@@ -109,7 +109,7 @@ services:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
-      - redis/data:/data
+      - ./redis/data:/data
     networks:
       - iot-net
 volumes:

@@ -19,8 +19,8 @@ influx_config:
   bucket: buc
 
 mysql_config:
-  username: root
-  password: root123@
+  username: app
+  password: iot123456
   host: 192.168.7.41
   port: 3306
   dbname: iot

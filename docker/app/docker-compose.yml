@@ -1,54 +1,4 @@
 services:
-  iotgomq-pre_handler:
-    build:
-      context: ../../
-      dockerfile: deploy/IotGoMQ.Dockerfile
-    image: go-iot-mq:latest
-    ports:
-      - 8001:19000
-    volumes:
-       - ./mq/config/app-local-pre_handler.yml:/app/app-local-pre_handler.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-pre_handler.yml"]
-    networks:
-      - iot-net
-  iotgomq-calc_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8002:19000
-    volumes:
-       - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
-    networks:
-      - iot-net
-  iotgomq-waring_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8003:19000
-    volumes:
-       - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
-    networks:
-      - iot-net
-  iotgomq-wd_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8004:19000
-    volumes:
-       - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
-    networks:
-      - iot-net
-  iotgoproject:
-    build:
-      context: ../../
-      dockerfile: deploy/IotGoProject.Dockerfile
-    image: go-iot-project:latest
-    volumes:
-      - ./iot-project/config/app-local.yml:/app/app-local.yml
-    ports:
-      - 8005:8080
-    networks:
-      - iot-net
   iotgomqtt1:
     build:
       context: ../../
@@ -77,6 +27,73 @@ services:
     entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
     volumes:
       - ./mqtt/config/app-local3.yml:/app/app-local3.yml
+    networks:
+      - iot-net
+  iotgomq-pre_handler:
+    build:
+      context: ../../
+      dockerfile: deploy/IotGoMQ.Dockerfile
+    image: go-iot-mq:latest
+    ports:
+      - 8001:19000
+    volumes:
+       - ./mq/config/app-local-pre_handler.yml:/app/app-local-pre_handler.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-pre_handler.yml"]
+    depends_on:
+      - iotgomqtt1
+    networks:
+      - iot-net
+  iotgomq-calc_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8002:19000
+    volumes:
+       - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
+    depends_on:
+      - iotgomq-pre_handler
+    networks:
+      - iot-net
+  iotgomq-waring_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8003:19000
+    volumes:
+       - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
+    depends_on:
+      - iotgomq-calc_handler
+    networks:
+      - iot-net
+  iotgomq-wd_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8004:19000
+    volumes:
+       - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
+    depends_on:
+      - iotgomq-calc_handler
+    networks:
+      - iot-net
+  iotgoproject:
+    build:
+      context: ../../
+      dockerfile: deploy/IotGoProject.Dockerfile
+    image: go-iot-project:latest
+    volumes:
+      - ./iot-project/config/app-local.yml:/app/app-local.yml
+    ports:
+      - 8005:8080
+    networks:
+      - iot-net
+  iot-admin-vue:
+    build:
+      context: ../../
+      dockerfile: deploy/IotAdminVue.Dockerfile
+    image: go-iot-admin-vue:latest
+    ports:
+      - 8080:80
     networks:
       - iot-net
 networks:
