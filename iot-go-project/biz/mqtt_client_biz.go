@@ -8,6 +8,7 @@ import (
 	"igp/models"
 	"igp/servlet"
 	"log"
+	"strconv"
 )
 
 type MqttClientBiz struct{}
@@ -102,6 +103,7 @@ func (s *MqttClientBiz) PageMqttData(name string, page, size int) (*servlet.Pagi
 	}
 	for i, client := range mqttClients {
 		mqttClients[i].Start = contains(cc, client.ClientId)
+		mqttClients[i].LastPushTime = glob.GRedis.Get(context.Background(), "last_push_time:"+strconv.Itoa(int(client.ID))).Val()
 	}
 
 	pagination.Data = mqttClients

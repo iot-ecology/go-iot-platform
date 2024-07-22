@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 	"strings"
+	"time"
 )
 
 type MQTTMessage struct {
@@ -229,4 +231,15 @@ type FeiShu struct {
 	AccessToken string `json:"access_token" structs:"access_token"`
 	Secret      string `json:"secret" structs:"secret"`
 	Content     string `json:"content" structs:"content"` // 模板内容
+}
+type DeviceInfo struct {
+	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
+	ProductName       string     `gorm:"-" json:"product_name" structs:"product_name"`                                                  // 产品名称
+	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
+	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
+	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
+	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
+	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                          // 推送间隔（秒）
+	gorm.Model        `structs:"-"`
 }

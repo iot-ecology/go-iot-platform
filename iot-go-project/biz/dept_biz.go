@@ -36,6 +36,8 @@ func (biz *DeptBiz) PageData(name, pid string, page, size int) (*servlet.Paginat
 		if err == nil {
 			dashboards[i].ParentName = id.Name
 		}
+
+
 	}
 	pagination.Data = dashboards
 	pagination.Page = page
