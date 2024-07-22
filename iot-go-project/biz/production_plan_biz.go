@@ -70,18 +70,18 @@ func (biz *ProductionPlanBiz) PageData(name string, page, size int) (*servlet.Pa
 }
 
 func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.ProductionPlanChangeParam) bool {
-	var ProductionPlan models.ProductionPlan
+	var productionPlan models.ProductionPlan
 
-	result := glob.GDb.First(&ProductionPlan, param.ID)
+	result := glob.GDb.First(&productionPlan, param.ID)
 
 	if result.Error != nil {
 		return false
 	}
 
-	if ProductionPlan.Status == "准备中" && param.Status == "已完成" {
+	if productionPlan.Status == "准备中" && param.Status == "已完成" {
 		return false
 	}
-	if ProductionPlan.Status == "进行中" && param.Status == "准备中" {
+	if productionPlan.Status == "进行中" && param.Status == "准备中" {
 		return false
 	}
 	tx := glob.GDb.Begin()
@@ -89,7 +89,7 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 		return false
 	}
 
-	update := tx.Model(&ProductionPlan).Update("status", param.Status)
+	update := tx.Model(&productionPlan).Update("status", param.Status)
 	if update.Error != nil {
 		tx.Rollback()
 		return false
@@ -99,7 +99,7 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 
 		var pp []models.ProductPlan
 
-		tx.Where("production_plan_id = ?", ProductionPlan.ID).Find(pp)
+		tx.Where("production_plan_id = ?", productionPlan.ID).Find(pp)
 
 		for _, plan := range pp {
 			// 更新产品库存

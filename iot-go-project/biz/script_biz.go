@@ -6,9 +6,9 @@ import (
 	"igp/servlet"
 )
 
-type ScirptBiz struct{}
+type ScriptBiz struct{}
 
-func (biz *ScirptBiz) CheckScript(param string, script string) *[]servlet.DataRowList {
+func (biz *ScriptBiz) CheckScript(param string, script string) *[]servlet.DataRowList {
 
 	vm := goja.New()
 	_, err := vm.RunString(script)

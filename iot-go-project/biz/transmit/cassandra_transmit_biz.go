@@ -16,7 +16,7 @@ type CassandraTransmitBiz struct{}
 
 func (biz *CassandraTransmitBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var CassandraTransmit []models.CassandraTransmit
+	var cassandraTransmit []models.CassandraTransmit
 
 	db := glob.GDb
 
@@ -26,9 +26,9 @@ func (biz *CassandraTransmitBiz) PageData(name string, page, size int) (*servlet
 
 	db.Model(&models.CassandraTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&CassandraTransmit)
+	db.Offset(offset).Limit(size).Find(&cassandraTransmit)
 
-	pagination.Data = CassandraTransmit
+	pagination.Data = cassandraTransmit
 	pagination.Page = page
 	pagination.Size = size
 

@@ -16,7 +16,7 @@ type MongoTransmitBiz struct{}
 
 func (biz *MongoTransmitBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var MongoTransmits []models.MongoTransmit
+	var mongoTransmits []models.MongoTransmit
 
 	db := glob.GDb
 
@@ -26,9 +26,9 @@ func (biz *MongoTransmitBiz) PageData(name string, page, size int) (*servlet.Pag
 
 	db.Model(&models.MongoTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&MongoTransmits)
+	db.Offset(offset).Limit(size).Find(&mongoTransmits)
 
-	pagination.Data = MongoTransmits
+	pagination.Data = mongoTransmits
 	pagination.Page = page
 	pagination.Size = size
 

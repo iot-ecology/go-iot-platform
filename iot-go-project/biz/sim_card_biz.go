@@ -12,7 +12,7 @@ type SimCardBiz struct{}
 
 func (biz *SimCardBiz) PageData(accessNumber string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var dashboards []models.SimCard
+	var dt []models.SimCard
 
 	db := glob.GDb
 	if accessNumber != "" {
@@ -20,9 +20,9 @@ func (biz *SimCardBiz) PageData(accessNumber string, page, size int) (*servlet.P
 	}
 	db.Model(&models.SimCard{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&dashboards)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	pagination.Data = dashboards
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 
