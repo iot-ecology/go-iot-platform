@@ -18,6 +18,5 @@ func main() {
 	// Wait forever
 	for {
 		time.Sleep(1 * time.Second)
-		client()
 	}
 }
