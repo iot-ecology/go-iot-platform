@@ -29,6 +29,8 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 
 	for i, info := range dt {
 		dt[i].ProductName = productBiz.FindById(info.ProductId).Name
+
+
 	}
 	pagination.Data = dt
 	pagination.Page = page
@@ -36,6 +38,8 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 
 	return &pagination, nil
 }
+//mqttClients[i].LastPushTime = glob.GRedis.Get(context.Background(), "last_push_time:"+strconv.Itoa(int(client.ID))).Val()
+
 
 func (biz *DeviceInfoBiz) FindById(id uint) *models.DeviceInfo {
 	redis := biz.FindByIdWithRedis(id)

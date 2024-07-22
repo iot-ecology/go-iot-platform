@@ -111,18 +111,30 @@ func HandlerLastTime(data []DataRowList) {
 	}
 
 	if lastTime != fmt.Sprintf("%d", now) {
-		val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
-		if val == "" {
-			return
+
+		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0,
+			-1).Val()
+
+		for _, s := range val {
+			handlerOne(s)
 		}
-		parseUint, _ := strconv.ParseUint(val, 10, 64)
-		withRedis := FindByIdWithRedis(parseUint)
-		if withRedis == nil {
-			return
-		}
-		globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
+
 	}
 
+}
+
+func handlerOne( deviceUid string) bool {
+	val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
+	if val == "" {
+		return true
+	}
+	parseUint, _ := strconv.ParseUint(val, 10, 64)
+	withRedis := FindByIdWithRedis(parseUint)
+	if withRedis == nil {
+		return true
+	}
+	globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
+	return false
 }
 func  FindByIdWithRedis(id uint64) *DeviceInfo {
 	val := globalRedisClient.HGet(context.Background(), "struct:device_info", strconv.Itoa(int(id))).Val()

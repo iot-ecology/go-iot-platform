@@ -306,7 +306,7 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	}
 
 	for _, item := range param.MqttClientId {
-		glob.GRedis.Set(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID, 0)
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
 
 	}
 

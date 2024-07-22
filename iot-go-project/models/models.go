@@ -13,7 +13,7 @@ type MqttClient struct {
 	Password string `json:"password"`  // 密码
 	Subtopic string `json:"subtopic"`  // 订阅的主题
 	Start    bool   `json:"start"`     // 是否启动
-
+LastPushTime string `json:"last_push_time" gorm:"-"` // 最后推送时间
 	Script     string `json:"script" gorm:"type:text"` // 数据处理脚本
 	gorm.Model `structs:"-"`
 }
