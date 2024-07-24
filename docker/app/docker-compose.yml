@@ -83,6 +83,7 @@ services:
     image: go-iot-project:latest
     volumes:
       - ./iot-project/config/app-local.yml:/app/app-local.yml
+      - ./iot-project/fileupdate:/app/fileupdate
     ports:
       - 8005:8080
     networks:
