@@ -125,7 +125,7 @@ func StorageDataRowList(dt DataRowList) {
 					zap.S().Infof("计算后的i的值为1")
 				} else {
 					zap.S().Infof("开始移除之前的元素")
-					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i).Err()
+					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i-1).Err()
 					if err != nil {
 						// 处理错误
 						zap.S().Errorf("移除 ZSet 元素异常：%+v", err)
