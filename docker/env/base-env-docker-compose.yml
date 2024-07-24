@@ -30,9 +30,11 @@ services:
       - 27017:27017
     volumes:
       - ./mongo/database:/data/db
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
+      - TZ=Asia/Shanghai
     networks:
       - iot-net
   mongo-express:
