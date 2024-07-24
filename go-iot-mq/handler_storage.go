@@ -110,7 +110,7 @@ func StorageDataRowList(dt DataRowList) {
 			p.AddField(strconv.Itoa(signal2[row.Name].ID), row.Value)
 
 		}
-		zap.S().Infof("当前信号的的CacheSize:%+v", signal2[row.Name].CacheSize)
+		zap.S().Infof("当前信号的的CacheSize:%+v=============rowName:%+v", signal2[row.Name].CacheSize, row.Name)
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
@@ -134,6 +134,7 @@ func StorageDataRowList(dt DataRowList) {
 			} else {
 				zap.S().Infof("当前大小未超过配置大小,写入缓存")
 				// 写入缓存
+				// 根据zset的特效,如果value一致的话,则会修改score,此处体现为修改了该值的时间,也就是说最新的值和之前的值相同的话只会保留最新时间的这一份
 				err := globalRedisClient.ZAdd(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
 				if err != nil {
 					// 处理错误
