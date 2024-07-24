@@ -418,7 +418,8 @@ func initLog() {
 }
 
 func initRouter(r *gin.RouterGroup) {
-	r.Use(router.JwtCheck())
+	// todo 暂时屏蔽
+	//r.Use(router.JwtCheck())
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
