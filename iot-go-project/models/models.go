@@ -6,16 +6,16 @@ import (
 )
 
 type MqttClient struct {
-	Host     string `json:"host"`      // 主机
-	Port     int    `json:"port"`      // 端口
-	ClientId string `json:"client_id"` // 客户端id
-	Username string `json:"username"`  // 账号
-	Password string `json:"password"`  // 密码
-	Subtopic string `json:"subtopic"`  // 订阅的主题
-	Start    bool   `json:"start"`     // 是否启动
-LastPushTime string `json:"last_push_time" gorm:"-"` // 最后推送时间
-	Script     string `json:"script" gorm:"type:text"` // 数据处理脚本
-	gorm.Model `structs:"-"`
+	Host         string `json:"host"`                    // 主机
+	Port         int    `json:"port"`                    // 端口
+	ClientId     string `json:"client_id"`               // 客户端id
+	Username     string `json:"username"`                // 账号
+	Password     string `json:"password"`                // 密码
+	Subtopic     string `json:"subtopic"`                // 订阅的主题
+	Start        bool   `json:"start"`                   // 是否启动
+	LastPushTime string `json:"last_push_time" gorm:"-"` // 最后推送时间
+	Script       string `json:"script" gorm:"type:text"` // 数据处理脚本
+	gorm.Model   `structs:"-"`
 }
 
 type Signal struct {
@@ -118,7 +118,7 @@ type DeviceInfo struct {
 	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
 	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
 	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
-	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                          // 推送间隔（秒）
+	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                         // 推送间隔（秒）
 	ErrorRate         float64    `json:"error_rate" structs:"error_rate"`                                                               // 推送时间误差（秒）
 	gorm.Model        `structs:"-"`
 }
@@ -242,7 +242,19 @@ type DeviceBindMqttClient struct {
 	gorm.Model   `structs:"-"`
 	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
 	MqttClientId uint `json:"mqtt_client_id" structs:"mqtt_client_id"` // MQTT客户端表的外键ID
+}
 
+type DeviceBindTcpHandler struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	TcpHandlerId uint `json:"tcp_handler_id" structs:"tcp_handler_id"` // TCP处理器的ID
+}
+
+// TcpHandler 表示TCP数据处理器
+type TcpHandler struct {
+	gorm.Model `structs:"-"`
+	Name       string `json:"name" structs:"name"`     // 处理器名
+	Script     string `json:"script" structs:"script"` // 处理器脚本
 }
 
 type DeviceGroupBindMqttClient struct {

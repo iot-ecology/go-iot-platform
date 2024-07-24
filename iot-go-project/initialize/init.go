@@ -60,9 +60,10 @@ var (
 	clickTransmitApi          = transmit.ClickhouseTransmitApi{}
 	cassandraTransmitApi      = transmit.CassandraTransmitApi{}
 
-
-	feishuApi = notice.FeiShuApi{}
+	feishuApi   = notice.FeiShuApi{}
 	dingdingApi = notice.DingDingApi{}
+
+	tcpHandlerApi = router.TcpHandlerApi{}
 )
 
 func initTable() {
@@ -335,6 +336,13 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.TcpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.TcpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -359,9 +367,7 @@ func initDb() {
 }
 
 func initMongo() {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username),
-		url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host,
-		glob.GConfig.MongoConfig.Port)
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username), url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host, glob.GConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
 		log.Fatal(err)
@@ -511,6 +517,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
 	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
 	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
+	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
 	r.POST("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
@@ -598,11 +605,6 @@ func initRouter(r *gin.RouterGroup) {
 
 	r.GET("/MessageList/page", messageListApi.PageMessageList)
 
-
-
-
-
-
 	r.POST("/DingDing/create", dingdingApi.CreateDingDing)
 	r.POST("/DingDing/update", dingdingApi.UpdateDingDing)
 	r.GET("/DingDing/:id", dingdingApi.ByIdDingDing)
@@ -610,14 +612,18 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DingDing/delete/:id", dingdingApi.DeleteDingDing)
 	r.POST("/DingDing/bind", dingdingApi.Bind)
 
-
-
 	r.POST("/FeiShuId/create", feishuApi.CreateFeiShu)
 	r.POST("/FeiShuId/update", feishuApi.UpdateFeiShu)
 	r.GET("/FeiShuId/:id", feishuApi.ByIdFeiShu)
 	r.GET("/FeiShuId/page", feishuApi.PageFeiShu)
 	r.POST("/FeiShuId/delete/:id", feishuApi.DeleteFeiShu)
 	r.POST("/FeiShuId/bind", feishuApi.Bind)
+
+	r.POST("/TcpHandler/create", tcpHandlerApi.CreateTcpHandler)
+	r.POST("/TcpHandler/update", tcpHandlerApi.UpdateTcpHandler)
+	r.GET("/TcpHandler/:id", tcpHandlerApi.ByIdTcpHandler)
+	r.GET("/TcpHandler/page", tcpHandlerApi.PageTcpHandler)
+	r.POST("/TcpHandler/delete/:id", tcpHandlerApi.DeleteTcpHandler)
 
 }
 func initGlobalRedisClient() {

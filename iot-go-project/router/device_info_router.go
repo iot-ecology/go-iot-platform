@@ -233,7 +233,7 @@ func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 // @Summary   绑定mqtt客户端
 // @Accept json
 // @Produce json
-// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
+// @Param DeviceGroup body servlet.DeviceBindMqttClientParam true "绑定参数"
 // @Router    /DeviceInfo/BindMqtt [post]
 func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	var param servlet.DeviceBindMqttClientParam
@@ -307,6 +307,95 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 
 	for _, item := range param.MqttClientId {
 		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
+
+	}
+
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
+
+
+// BindTcp
+// @Tags      DeviceInfos
+// @Summary   绑定tcp处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body servlet.DeviceBindTcpParam true "绑定参数"
+// @Router    /DeviceInfo/BindTcp [post]
+func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
+	var param servlet.DeviceBindTcpParam
+	if err := c.ShouldBindJSON(&param); err != nil {
+
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	// 开启事务
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+	var toDel []models.DeviceBindTcpHandler
+
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+
+	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
+
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var deviceBindTcpHandlers []models.DeviceBindTcpHandler
+	for _, tcpId := range param.TcpHandlerId {
+		deviceBindTcpHandlers = append(deviceBindTcpHandlers, models.DeviceBindTcpHandler{
+			DeviceInfoId: uint(param.DeviceId),
+			TcpHandlerId: uint(tcpId),
+		})
+	}
+
+	result = tx.Model(&models.DeviceBindTcpHandler{}).CreateInBatches(deviceBindTcpHandlers, len(deviceBindTcpHandlers))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	// redis 中建立 tcp 与 device_info_id 的映射
+
+	var DeviceInfo models.DeviceInfo
+
+	first := tx.First(&DeviceInfo, param.DeviceId)
+	if first.Error != nil {
+		servlet.Error(c, "DeviceInfo not found")
+		return
+	}
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "tcp_bind_product:"+strconv.Itoa(int(client.TcpHandlerId)))
+	}
+
+	for _, item := range param.TcpHandlerId {
+		glob.GRedis.LPush(context.Background(), "tcp_bind_product:"+strconv.Itoa(item), DeviceInfo.ProductId)
+	}
+
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(int(client.TcpHandlerId)))
+	}
+
+	for _, item := range param.TcpHandlerId {
+		glob.GRedis.LPush(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
 
 	}
 

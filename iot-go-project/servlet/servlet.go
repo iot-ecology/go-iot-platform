@@ -287,6 +287,11 @@ type DeviceBindMqttClientParam struct {
 	DeviceId     int   `json:"device_id"`
 	MqttClientId []int `json:"mqtt_client_id"`
 }
+type DeviceBindTcpParam struct {
+	DeviceId     int   `json:"device_id"`
+	TcpHandlerId []int `json:"tcp_handler_id"`
+}
+
 
 type DeviceGroupBindMqttClientParam struct {
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID

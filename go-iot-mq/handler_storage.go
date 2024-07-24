@@ -1,3 +1,5 @@
+// 用于处理MQTT转发过来的数据
+
 package main
 
 import (
@@ -74,7 +76,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		zap.S().Infof("推送报警原始数据: %s", jsonData)
 		writeAPI.Flush()
-		HandlerLastTime(*data)
+		HandlerMqttLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
 		PushToQueue("transmit_handler", jsonData)
@@ -84,8 +86,8 @@ func HandlerDataStorageString(d amqp.Delivery) {
 
 }
 
-// HandlerLastTime 和上一次推送事件进行对比，判断是否超过阈值，如果超过则发送额外的消息通知
-func HandlerLastTime(data []DataRowList) {
+// HandlerMqttLastTime 和上一次推送事件进行对比，判断是否超过阈值，如果超过则发送额外的消息通知
+func HandlerMqttLastTime(data []DataRowList) {
 	if len(data) == 0 {
 		return
 	}
