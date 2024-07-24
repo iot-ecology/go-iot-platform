@@ -110,7 +110,7 @@ func StorageDataRowList(dt DataRowList) {
 			p.AddField(strconv.Itoa(signal2[row.Name].ID), row.Value)
 
 		}
-
+		zap.S().Infof("当前信号的的CacheSize:%+v", signal2[row.Name].CacheSize)
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
