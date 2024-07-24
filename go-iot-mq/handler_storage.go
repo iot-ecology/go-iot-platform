@@ -92,6 +92,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 //	无
 func StorageDataRowList(dt DataRowList) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid)
+	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
 	timeFromUnix := time.Unix(dt.Time, 0)
 	p := influxdb2.NewPointWithMeasurement(dt.DeviceUid).
 		AddField("storage_time", time.Now().Unix()).
@@ -112,7 +113,7 @@ func StorageDataRowList(dt DataRowList) {
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
-
+			zap.S().Infof("当前signal_delay_warning的大小: %+v", currentSize)
 			// 如果 ZSet 的大小已经达到或超过配置的缓存大小，则移除第一个元素
 			if currentSize >= signal2[row.Name].CacheSize {
 				// 移除 ZSet 中分数最低的元素，即最早的元素
