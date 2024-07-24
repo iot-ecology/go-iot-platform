@@ -20,7 +20,7 @@ services:
       # Mount for telegraf config
       - ./influx/telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
     env_file:
-      - influx/influxv2.env
+      - ./influx/influxv2.env
     networks:
       - iot-net
   mongodb:
