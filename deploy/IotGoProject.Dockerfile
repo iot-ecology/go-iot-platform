@@ -11,7 +11,7 @@ COPY ../notice ./notice
 COPY ../transmit ./transmit
 
 
-RUN cd iot-go-project && go mod tidy && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
+RUN cd iot-go-project && go mod tidy && swag init --parseDependency --parseInternal --parseDepth 5 --instanceName "swagger" && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
 RUN chmod +x /app/iot-go-project/main
 # 运行阶段指定 scratch 作为基础镜像
