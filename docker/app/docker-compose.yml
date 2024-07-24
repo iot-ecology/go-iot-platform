@@ -8,13 +8,13 @@ services:
     volumes:
       - ./mqtt/config/app-local.yml:/app/app-local.yml
     ports:
-      - 8006:8081
+      - 8006:8006
     networks:
       - iot-net
   iotgomqtt2:
     image: go-iot-mqtt:latest
     ports:
-      - 8007:8081
+      - 8007:8007
     entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
     volumes:
       - ./mqtt/config/app-local2.yml:/app/app-local2.yml
@@ -23,7 +23,7 @@ services:
   iotgomqtt3:
     image: go-iot-mqtt:latest
     ports:
-      - 8008:8081
+      - 8008:8008
     entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
     volumes:
       - ./mqtt/config/app-local3.yml:/app/app-local3.yml
