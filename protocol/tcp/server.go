@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
@@ -12,11 +13,9 @@ import (
 )
 
 type Server struct {
-	host        string
-	port        string
-	deviceIdMap map[string]*Client
-	remoteIpMap map[string]string
-	mu          sync.Mutex // 保护deviceIdMap的互斥锁
+	host string
+	port string
+	mu   sync.Mutex // 保护deviceIdMap的互斥锁
 }
 
 type Client struct {
@@ -30,10 +29,8 @@ type Config struct {
 
 func New(config *Config) *Server {
 	return &Server{
-		host:        config.Host,
-		port:        config.Port,
-		deviceIdMap: make(map[string]*Client),
-		remoteIpMap: make(map[string]string),
+		host: config.Host,
+		port: config.Port,
 	}
 }
 
@@ -64,10 +61,7 @@ func (server *Server) handleClient(client *Client) {
 		server.mu.Lock()
 		defer server.mu.Unlock()
 
-		// 更新或添加设备ID映射
-		s := server.remoteIpMap[client.conn.RemoteAddr().String()]
-		delete(server.deviceIdMap, s)
-		delete(server.remoteIpMap, client.conn.RemoteAddr().String())
+		RemoveUid(client.conn.RemoteAddr().String())
 		err := conn.Close()
 		if err != nil {
 
@@ -89,10 +83,10 @@ func (server *Server) handleMessage(client *Client, message string) {
 
 	// 判断这个客户端是否建立过uid映射，没有的话不处理数据
 
-	_, ok := server.remoteIpMap[client.conn.RemoteAddr().String()]
+	ok := getUid(client.conn.RemoteAddr().String())
 
-	if ok {
-		handlerData(server,message, client)
+	if ok != "" {
+		handlerData(server, message, client)
 	} else {
 
 		deviceId := handlerUid(message)
@@ -104,9 +98,8 @@ func (server *Server) handleMessage(client *Client, message string) {
 			server.mu.Lock()
 			defer server.mu.Unlock()
 
-			// 更新或添加设备ID映射
-			server.deviceIdMap[deviceId] = client
-			server.remoteIpMap[client.conn.RemoteAddr().String()] = deviceId
+			storageUid(deviceId, client.conn.RemoteAddr().String())
+
 			clientWrite(client, "成功识别设备编码.\n")
 
 			return
@@ -117,30 +110,47 @@ func (server *Server) handleMessage(client *Client, message string) {
 
 }
 
+func getUid(remoteAdd string) string {
+	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f", remoteAdd).Val()
+	return val
+}
+
+func storageUid(uid, remoteAdd string) {
+	globalRedisClient.HSet(context.Background(), "tcp_uid", uid, remoteAdd)
+	globalRedisClient.HSet(context.Background(), "tcp_uid_f", remoteAdd, uid)
+}
+func RemoveUid(remoteAdd string) {
+	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f", remoteAdd).Val()
+	if val == "" {
+		return
+	} else {
+		globalRedisClient.HDel(context.Background(), "tcp_uid", val)
+
+	}
+}
+
 type TcpMessage struct {
-	Uid string `json:"uid"`
+	Uid     string `json:"uid"`
 	Message string `json:"message"`
 }
 
 func handlerData(server *Server, message string, client *Client) {
-	println(message)
 
 	zap.S().Debugf("处理消息: %s  客户端: %s\n", message, client.conn.RemoteAddr().String())
 
-	s := server.remoteIpMap[client.conn.RemoteAddr().String()]
+	s := getUid(client.conn.RemoteAddr().String())
 
-	// 创建 MQTTMessage 实例并序列化为 JSON
-	mqttMsg := TcpMessage{
-		Uid: s,
-		Message:      message,
+	// 创建 TCPMessage 实例并序列化为 JSON
+	tcpMsg := TcpMessage{
+		Uid:     s,
+		Message: message,
 	}
-	jsonData, err := json.Marshal(mqttMsg)
+	jsonData, err := json.Marshal(tcpMsg)
 	if err != nil {
 		zap.S().Errorf("Error marshalling TCP message to JSON: %v", err)
 		return
 	}
 	PushToQueue("pre_tcp_handler", jsonData)
-
 
 	clientWrite(client, "数据已处理.\n")
 

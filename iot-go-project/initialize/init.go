@@ -358,13 +358,6 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&models.DeviceBindHTTPHandler{}) {
-
-		err := glob.GDb.AutoMigrate(&models.DeviceBindHTTPHandler{})
-		if err != nil {
-			zap.S().Errorf("数据库表创建失败 %+v", err)
-		}
-	}
 }
 
 func initDb() {
@@ -541,9 +534,11 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
 	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
 	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
+	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
 	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
 	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
+	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)

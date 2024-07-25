@@ -112,14 +112,14 @@ type Product struct {
 // DeviceInfo 设备信息
 type DeviceInfo struct {
 	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
-	ProductName       string     `gorm:"-" json:"product_name" structs:"product_name"`                                                  // 产品名称
+	ProductName       string     `gorm:"-" json:"product_name,omitempty" `                                                  // 产品名称
 	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
 	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
 	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
 	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
 	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
-	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                         // 推送间隔（秒）
-	ErrorRate         float64    `json:"error_rate" structs:"error_rate"`                                                               // 推送时间误差（秒）
+	PushInterval      int        `json:"push_interval,omitempty" structs:"push_interval"`                                                         // 推送间隔（秒）
+	ErrorRate         float64    `json:"error_rate,omitempty" structs:"error_rate"`                                                               // 推送时间误差（秒）
 	gorm.Model        `structs:"-"`
 }
 
@@ -260,6 +260,16 @@ type TcpHandler struct {
 
 
 type HttpHandler struct {
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Name       string `json:"name" structs:"name"`     // 处理器名
+	Username     string `json:"username" structs:"username"`             // 用户名
+	Password     string `json:"password" structs:"password"`             // 密码
+	Script       string `json:"script" structs:"script"`                 // 脚本
+	gorm.Model   `structs:"-"`
+}
+
+
+type CoapHandler struct {
 	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
 	Name       string `json:"name" structs:"name"`     // 处理器名
 	Username     string `json:"username" structs:"username"`             // 用户名
