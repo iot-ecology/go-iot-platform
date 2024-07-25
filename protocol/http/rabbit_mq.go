@@ -42,7 +42,7 @@ func InitRabbitCon() {
 
 	GRabbitMq = conn
 
-	CreateRabbitQueue("pre_tcp_handler")
+	CreateRabbitQueue("pre_http_handler")
 
 }
 func genUrl() string {

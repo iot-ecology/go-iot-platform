@@ -71,40 +71,59 @@ func main() {
 		cus.Handle(deliveries, HandlerDataStorage, 1, "pre_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_handler" {
-		waring_handler, err := cus.AnnounceQueue("waring_handler", "")
+		waringHandler, err := cus.AnnounceQueue("waring_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_handler, HandlerWaring, 1, "waring_handler", "")
+		cus.Handle(waringHandler, HandlerWaring, 1, "waring_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "calc_queue" {
-		calc_queue, err := cus.AnnounceQueue("calc_queue", "")
+		calcQueue, err := cus.AnnounceQueue("calc_queue", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(calc_queue, HandlerCalc, 1, "calc_queue", "")
+		cus.Handle(calcQueue, HandlerCalc, 1, "calc_queue", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_delay_handler" {
-		waring_delay_handler, err := cus.AnnounceQueue("waring_delay_handler", "")
+		waringDelayHandler, err := cus.AnnounceQueue("waring_delay_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_delay_handler, HandlerWaringDelay, 1, "waring_delay_handler", "")
+		cus.Handle(waringDelayHandler, HandlerWaringDelay, 1, "waring_delay_handler", "")
 	}
 
 	if globalConfig.NodeInfo.Type == "transmit_handler" {
-		transmit_handler, err := cus.AnnounceQueue("transmit_handler", "")
+		transmitHandler, err := cus.AnnounceQueue("transmit_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(transmit_handler, HandlerTransmit, 1, "transmit_handler", "")
+		cus.Handle(transmitHandler, HandlerTransmit, 1, "transmit_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_notice" {
-		waring_notice, err := cus.AnnounceQueue("waring_notice", "")
+		waringNotice, err := cus.AnnounceQueue("waring_notice", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_notice, HandlerNotice, 1, "waring_notice", "")
+		cus.Handle(waringNotice, HandlerNotice, 1, "waring_notice", "")
+	}
+
+
+
+	// 协议层处理
+	if globalConfig.NodeInfo.Type == "pre_tcp_handler" {
+		preTcpHandler, err := cus.AnnounceQueue("pre_tcp_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preTcpHandler, HandlerTcpDataStorage, 1, "pre_tcp_handler", "")
+	}
+
+	if globalConfig.NodeInfo.Type == "pre_http_handler" {
+		preHttpHandler, err := cus.AnnounceQueue("pre_http_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preHttpHandler, HandlerHttpDataStorage, 1, "pre_http_handler", "")
 	}
 
 }

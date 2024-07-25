@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-// TcpMessage 用于处理tcp转发后的数据
-type TcpMessage struct {
+// HttpMessage 用于处理tcp转发后的数据
+type HttpMessage struct {
 	Uid     string `json:"uid"`
 	Message string `json:"message"`
 }
 
-// HandlerTcpDataStorage 函数处理从AMQP通道接收到的TCP消息数据
+// HandlerHttpDataStorage 函数处理从AMQP通道接收到的HTTP消息数据
 // 参数：
 //
 //	messages <-chan amqp.Delivery：接收AMQP消息的通道
@@ -26,12 +26,12 @@ type TcpMessage struct {
 // 返回值：
 //
 //	无
-func HandlerTcpDataStorage(messages <-chan amqp.Delivery) {
+func HandlerHttpDataStorage(messages <-chan amqp.Delivery) {
 
 	go func() {
 
 		for d := range messages {
-			HandlerDataTcpStorageString(d)
+			HandlerDataHttpStorageString(d)
 			err := d.Ack(false)
 			if err != nil {
 				zap.S().Errorf("消息确认异常：%+v", err)
@@ -43,8 +43,8 @@ func HandlerTcpDataStorage(messages <-chan amqp.Delivery) {
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
 
-func HandlerDataTcpStorageString(d amqp.Delivery) {
-	var msg TcpMessage
+func HandlerDataHttpStorageString(d amqp.Delivery) {
+	var msg HttpMessage
 	err := json.Unmarshal(d.Body, &msg)
 	if err != nil {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
@@ -52,7 +52,7 @@ func HandlerDataTcpStorageString(d amqp.Delivery) {
 	}
 	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
 
-	script := GetScriptRedisForTcp(msg.Uid)
+	script := GetScriptRedisForHttp(msg.Uid)
 	if script != "" {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
@@ -68,7 +68,7 @@ func HandlerDataTcpStorageString(d amqp.Delivery) {
 		}
 		zap.S().Infof("推送报警原始数据: %s", jsonData)
 		writeAPI.Flush()
-		HandlerTcpLastTime(*data)
+		HandlerHttpLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
 		PushToQueue("transmit_handler", jsonData)
@@ -78,8 +78,8 @@ func HandlerDataTcpStorageString(d amqp.Delivery) {
 
 }
 
-// HandlerTcpLastTime 和上一次推送事件进行对比，判断是否超过阈值，如果超过则发送额外的消息通知
-func HandlerTcpLastTime(data []DataRowList) {
+// HandlerHttpLastTime 和上一次推送事件进行对比，判断是否超过阈值，如果超过则发送额外的消息通知
+func HandlerHttpLastTime(data []DataRowList) {
 	if len(data) == 0 {
 		return
 	}
@@ -106,18 +106,18 @@ func HandlerTcpLastTime(data []DataRowList) {
 
 	if lastTime != fmt.Sprintf("%d", now) {
 
-		val := globalRedisClient.LRange(context.Background(), "tcp_bind_device_info:"+deviceUid, 0, -1).Val()
+		val := globalRedisClient.LRange(context.Background(), "http_bind_device_info:"+deviceUid, 0, -1).Val()
 
 		for _, s := range val {
-			handlerTcpOne(s)
+			handlerHttpOne(s)
 		}
 
 	}
 
 }
 
-func handlerTcpOne(deviceUid string) bool {
-	val := globalRedisClient.Get(context.Background(), "tcp_bind_device_info:"+deviceUid).Val()
+func handlerHttpOne(deviceUid string) bool {
+	val := globalRedisClient.Get(context.Background(), "http_bind_device_info:"+deviceUid).Val()
 	if val == "" {
 		return true
 	}
@@ -130,7 +130,7 @@ func handlerTcpOne(deviceUid string) bool {
 	return false
 }
 
-// GetScriptRedisForTcp 根据tcp 的设备ID从Redis中获取对应的脚本
+// GetScriptRedisForHttp 根据 http 的设备ID从Redis中获取对应的脚本
 // 参数:
 //
 //	tcp id string - tcp id
@@ -138,7 +138,7 @@ func handlerTcpOne(deviceUid string) bool {
 // 返回值:
 //
 //	string - 对应的脚本
-func GetScriptRedisForTcp(tcpId string) string {
-	val := globalRedisClient.HGet(context.Background(), "struct:tcp", tcpId).Val()
+func GetScriptRedisForHttp(tcpId string) string {
+	val := globalRedisClient.HGet(context.Background(), "struct:Http", tcpId).Val()
 	return val
 }
