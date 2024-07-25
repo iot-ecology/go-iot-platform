@@ -50,7 +50,7 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	}
 	if !DeviceInfo.ManufacturingDate.IsZero() {
 		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
-		DeviceInfo.WarrantyExpiry = &WarrantyExpiry
+		DeviceInfo.WarrantyExpiry = WarrantyExpiry
 	}
 
 	m := structs.Map(DeviceInfo)
@@ -98,6 +98,13 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 
 	var newV models.DeviceInfo
 	newV = old
+	newV.Source = req.Source
+	newV.SN = req.SN
+	newV.ManufacturingDate = req.ManufacturingDate
+	newV.ProcurementDate = req.ProcurementDate
+	newV.WarrantyExpiry = req.WarrantyExpiry
+	newV.PushInterval = req.PushInterval
+	newV.ErrorRate = req.ErrorRate
 
 	var Product models.Product
 	result = glob.GDb.First(&Product, newV.ProductId)
@@ -107,16 +114,18 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	}
 	if !newV.ManufacturingDate.IsZero() {
 		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
-		newV.WarrantyExpiry = &WarrantyExpiry
+		newV.WarrantyExpiry = WarrantyExpiry
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 
-	deviceInfoBiz.SetRedis(newV)
-	if result.Error != nil {
 
+	if result.Error != nil {
+		zap.S().Errorw("更新 DeviceInfo 失败", "error", result.Error)
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	deviceInfoBiz.SetRedis(newV)
+
 	servlet.Resp(c, old)
 }
 

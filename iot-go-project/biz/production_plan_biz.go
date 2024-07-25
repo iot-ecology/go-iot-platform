@@ -125,9 +125,9 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 				info := models.DeviceInfo{
 					ProductId:         plan.ProductID,
 					SN:                uuid.New().String(), // fixme： 生成设备SN
-					ManufacturingDate: &now,
+					ManufacturingDate: now,
 					Source:            1,
-					WarrantyExpiry:    &date,
+					WarrantyExpiry:    date,
 				}
 
 				create := tx.Model(&models.DeviceInfo{}).Create(&info)

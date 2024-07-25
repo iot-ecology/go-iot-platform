@@ -18,7 +18,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/router"
@@ -960,7 +959,7 @@ func InitAll(r *gin.RouterGroup) {
 	initMongo()
 
 	initRouter(r)
-	go biz.InitRedisExpireHandler(glob.GRedis)
+	//go biz.InitRedisExpireHandler(glob.GRedis)
 	InitInfluxDbClient()
 }
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"iot-transmit/common"
 	"net/http"
 	"strings"
@@ -319,4 +320,26 @@ type SimUseHistoryResp struct {
 type TransmitScriptParam struct {
 	DataRowList []common.DataRowList `json:"data_row_list"`
 	Script      string               `json:"script"`
+}
+
+type DeviceInfoRes struct {
+	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
+
+	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
+
+	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
+
+	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
+
+	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
+
+	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
+
+	PushInterval      int        `json:"push_interval,omitempty" structs:"push_interval"`                                                         // 推送间隔（秒）
+
+	ErrorRate         float64    `json:"error_rate,omitempty" structs:"error_rate"`                                                               // 推送时间误差（秒）
+
+	gorm.Model        `structs:"-"`
+	ProductName       string     `gorm:"-" json:"product_name,omitempty" `                                                  // 产品名称
+
 }
