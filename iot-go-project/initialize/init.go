@@ -63,7 +63,8 @@ var (
 	feishuApi   = notice.FeiShuApi{}
 	dingdingApi = notice.DingDingApi{}
 
-	tcpHandlerApi = router.TcpHandlerApi{}
+	tcpHandlerApi  = router.TcpHandlerApi{}
+	httpHandlerApi = router.HttpHandlerApi{}
 )
 
 func initTable() {
@@ -343,6 +344,27 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindTcpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindTcpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.HttpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.HttpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindHTTPHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindHTTPHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
@@ -518,7 +540,10 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
 	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
 	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
-	r.POST("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
+	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
+	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
+	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
+	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -624,6 +649,12 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/TcpHandler/:id", tcpHandlerApi.ByIdTcpHandler)
 	r.GET("/TcpHandler/page", tcpHandlerApi.PageTcpHandler)
 	r.POST("/TcpHandler/delete/:id", tcpHandlerApi.DeleteTcpHandler)
+
+	r.POST("/HttpHandler/create", httpHandlerApi.CreateHttpHandler)
+	r.POST("/HttpHandler/update", httpHandlerApi.UpdateHttpHandler)
+	r.GET("/HttpHandler/:id", httpHandlerApi.ByIdHttpHandler)
+	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
+	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
 
 }
 func initGlobalRedisClient() {

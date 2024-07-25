@@ -136,7 +136,7 @@ func handlerData(server *Server, message string, client *Client) {
 	}
 	jsonData, err := json.Marshal(mqttMsg)
 	if err != nil {
-		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
+		zap.S().Errorf("Error marshalling TCP message to JSON: %v", err)
 		return
 	}
 	PushToQueue("pre_tcp_handler", jsonData)

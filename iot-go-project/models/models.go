@@ -250,12 +250,28 @@ type DeviceBindTcpHandler struct {
 	TcpHandlerId uint `json:"tcp_handler_id" structs:"tcp_handler_id"` // TCP处理器的ID
 }
 
+
 // TcpHandler 表示TCP数据处理器
 type TcpHandler struct {
 	gorm.Model `structs:"-"`
 	Name       string `json:"name" structs:"name"`     // 处理器名
 	Script     string `json:"script" structs:"script"` // 处理器脚本
 }
+
+type DeviceBindHTTPHandler struct {
+	gorm.Model   `structs:"-"`
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	HttpHandlerId uint `json:"http_handler_id" structs:"http_handler_id"` // HTTP处理器的ID
+}
+
+type HttpHandler struct {
+	Name       string `json:"name" structs:"name"`     // 处理器名
+	Username     string `json:"username" structs:"username"`             // 用户名
+	Password     string `json:"password" structs:"password"`             // 密码
+	Script       string `json:"script" structs:"script"`                 // 脚本
+	gorm.Model   `structs:"-"`
+}
+
 
 type DeviceGroupBindMqttClient struct {
 	gorm.Model    `structs:"-"`

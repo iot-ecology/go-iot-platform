@@ -291,6 +291,10 @@ type DeviceBindTcpParam struct {
 	DeviceId     int   `json:"device_id"`
 	TcpHandlerId []int `json:"tcp_handler_id"`
 }
+type DeviceBindHTTPParam struct {
+	DeviceId     int   `json:"device_id"`
+	HttpHandlerId []int `json:"http_handler_id"`
+}
 
 
 type DeviceGroupBindMqttClientParam struct {
