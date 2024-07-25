@@ -5,6 +5,8 @@ services:
       dockerfile: deploy/IotMQTT.Dockerfile
     image: go-iot-mqtt:latest
     entrypoint: ["/app/main", "-config", "/app/app-local.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./mqtt/config/app-local.yml:/app/app-local.yml
     ports:
@@ -16,6 +18,8 @@ services:
     ports:
       - 8007:8007
     entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./mqtt/config/app-local2.yml:/app/app-local2.yml
     networks:
@@ -25,6 +29,8 @@ services:
     ports:
       - 8008:8008
     entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./mqtt/config/app-local3.yml:/app/app-local3.yml
     networks:
@@ -39,6 +45,8 @@ services:
     volumes:
        - ./mq/config/app-local-pre_handler.yml:/app/app-local-pre_handler.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-pre_handler.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - iotgomqtt1
     networks:
@@ -50,6 +58,8 @@ services:
     volumes:
        - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - iotgomq-pre_handler
     networks:
@@ -61,6 +71,8 @@ services:
     volumes:
        - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - iotgomq-calc_handler
     networks:
@@ -72,6 +84,8 @@ services:
     volumes:
        - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
+    environment:
+      - TZ=Asia/Shanghai
     depends_on:
       - iotgomq-calc_handler
     networks:
@@ -84,6 +98,8 @@ services:
     volumes:
       - ./iot-project/config/app-local.yml:/app/app-local.yml
       - ./iot-project/fileupdate:/app/fileupdate
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - 8005:8080
     networks:
@@ -93,6 +109,8 @@ services:
       context: ../../
       dockerfile: deploy/IotAdminVue.Dockerfile
     image: go-iot-admin-vue:latest
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - 8080:80
     networks:

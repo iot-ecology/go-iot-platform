@@ -8,6 +8,8 @@ services:
     volumes:
       # Mount for influxdb data directory and configuration
       - influxdbv2:/var/lib/influxdb2:rw
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - "8086:8086"
     networks:
@@ -19,6 +21,8 @@ services:
     volumes:
       # Mount for telegraf config
       - ./influx/telegraf/mytelegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      - TZ=Asia/Shanghai
     env_file:
       - ./influx/influxv2.env
     networks:
@@ -47,6 +51,7 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
       - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
       - ME_CONFIG_MONGODB_SERVER=mongodb
+      - TZ=Asia/Shanghai
     networks:
       - iot-net
   emqx1:
@@ -56,6 +61,7 @@ services:
       - "EMQX_NODE_NAME=emqx@node1.emqx.io"
       - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
       - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io]"
+      - TZ=Asia/Shanghai
     healthcheck:
       test: [ "CMD", "/opt/emqx/bin/emqx ctl", "status" ]
       interval: 5s
@@ -101,6 +107,7 @@ services:
       - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:rw
     environment:
       - RABBITMQ_PLUGINS_DIR=/opt/rabbitmq/plugins:/usr/lib/rabbitmq/plugins
+      - TZ=Asia/Shanghai
     networks:
       - iot-net
 
@@ -110,6 +117,8 @@ services:
     ports:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./redis/data:/data
     networks:
