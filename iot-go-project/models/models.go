@@ -258,13 +258,9 @@ type TcpHandler struct {
 	Script     string `json:"script" structs:"script"` // 处理器脚本
 }
 
-type DeviceBindHTTPHandler struct {
-	gorm.Model   `structs:"-"`
-	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	HttpHandlerId uint `json:"http_handler_id" structs:"http_handler_id"` // HTTP处理器的ID
-}
 
 type HttpHandler struct {
+	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
 	Name       string `json:"name" structs:"name"`     // 处理器名
 	Username     string `json:"username" structs:"username"`             // 用户名
 	Password     string `json:"password" structs:"password"`             // 密码

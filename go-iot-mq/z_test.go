@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"strconv"
 	"testing"
 )
 
@@ -9,12 +11,16 @@ func TestA(t *testing.T) {
 	var config = RedisConfig{
 		Host:     "127.0.0.1",
 		Port:     6379,
-		Db:       0,
+		Db:       1,
 		Password: "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
 	}
 	InitGlobalRedisClient(config)
+	globalRedisClient.Set(context.Background(), "a", 1, 0)
+	jsonData, _ := json.Marshal(config)
 
-	globalRedisClient.ZRemRangeByScore(context.Background(), "aaa", "-inf", "0")
+	globalRedisClient.HSet(context.Background(), "auth:http",strconv.Itoa(int(1)), jsonData)
+
+
 }
 
 func TestMqCustomer(t *testing.T) {

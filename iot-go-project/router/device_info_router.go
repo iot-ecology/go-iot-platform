@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -238,7 +239,7 @@ func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 	param := c.Param("device_info_id")
 
-	var res []models.DeviceBindHTTPHandler
+	var res []models.DeviceBindTcpHandler
 
 	// 使用 Where 和 Find 方法查询记录
 	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
@@ -249,6 +250,7 @@ func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 	}
 	servlet.Resp(c, res)
 }
+
 // QueryBindTcp
 // @Tags      DeviceInfos
 // @Summary   查询绑定tcp客户端
@@ -449,79 +451,45 @@ func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 // @Param DeviceGroup body servlet.DeviceBindHTTPParam true "绑定参数"
 // @Router    /DeviceInfo/BindHTTP [post]
 func (api *DeviceInfoApi) BindHTTP(c *gin.Context) {
-	var param servlet.DeviceBindHTTPParam
+	var param models.HttpHandler
 	if err := c.ShouldBindJSON(&param); err != nil {
-
 		servlet.Error(c, err.Error())
 		return
 	}
 
-	// 开启事务
-	tx := glob.GDb.Begin()
-	if tx.Error != nil {
-		servlet.Error(c, "Failed to begin transaction")
-		return
-	}
-	var toDel []models.DeviceBindHTTPHandler
+	if param.ID != 0 {
+		var old models.HttpHandler
 
-	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+		result := glob.GDb.First(&old, param.ID)
+		if result.Error != nil {
 
-	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindHTTPHandler{})
-
-	if result.Error != nil {
-		// 如果出现错误，回滚事务
-		tx.Rollback()
-		servlet.Error(c, "Error occurred during deletion")
-		return
-	}
-
-	var deviceBindHTTPHandlers []models.DeviceBindHTTPHandler
-	for _, httpId := range param.HttpHandlerId {
-		deviceBindHTTPHandlers = append(deviceBindHTTPHandlers, models.DeviceBindHTTPHandler{
-			DeviceInfoId:  uint(param.DeviceId),
-			HttpHandlerId: uint(httpId),
-		})
-	}
-
-	result = tx.Model(&models.DeviceBindHTTPHandler{}).CreateInBatches(deviceBindHTTPHandlers, len(deviceBindHTTPHandlers))
-	if result.Error != nil {
-		tx.Rollback()
-		zap.S().Infoln("Error occurred during creation:", result.Error)
-		servlet.Error(c, "Error occurred during creation")
-		return
-	}
-	if err := tx.Commit().Error; err != nil {
-		servlet.Error(c, "Failed to commit transaction")
-		return
-	}
-
-	// redis 中建立 tcp 与 device_info_id 的映射
-
-	var DeviceInfo models.DeviceInfo
-
-	first := tx.First(&DeviceInfo, param.DeviceId)
-	if first.Error != nil {
-		servlet.Error(c, "DeviceInfo not found")
-		return
-	}
-
-	for _, client := range toDel {
-		glob.GRedis.Del(context.Background(), "tcp_bind_product:"+strconv.Itoa(int(client.HttpHandlerId)))
-	}
-
-	for _, item := range param.HttpHandlerId {
-		glob.GRedis.LPush(context.Background(), "tcp_bind_product:"+strconv.Itoa(item), DeviceInfo.ProductId)
-	}
-
-	for _, client := range toDel {
-		glob.GRedis.Del(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(int(client.HttpHandlerId)))
-	}
-
-	for _, item := range param.HttpHandlerId {
-		glob.GRedis.LPush(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
+			servlet.Error(c, "HttpHandler not found")
+			return
+		}
+		var newV models.HttpHandler
+		newV = old
+		newV.DeviceInfoId = param.DeviceInfoId
+		newV.Name = param.Name
+		newV.Username = param.Username
+		newV.Password = param.Password
+		newV.Script = param.Script
+		// 更新记录
+		result = glob.GDb.Model(&newV).Updates(newV)
+		setHttpHandlerRedis(newV)
+	} else {
+		// 新增
+		glob.GDb.Model(models.HttpHandler{}).Create(&param)
+		setHttpHandlerRedis(param)
 
 	}
+
+	glob.GRedis.LPush(context.Background(), "http_bind_device_info:"+strconv.Itoa(int(param.ID)), param.DeviceInfoId)
 
 	servlet.Resp(c, "绑定成功")
 
+}
+
+func setHttpHandlerRedis(config models.HttpHandler){
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:http",strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -38,7 +39,7 @@ func main() {
 
 	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
 	InitRabbitCon()
-
+	InitGlobalRedisClient(globalConfig.RedisConfig)
 	r := gin.Default()
 	initLog()
 	r.POST("/handler", HandlerMessage)
@@ -109,9 +110,20 @@ type HttpMessage struct {
 	Message string `json:"message"`
 }
 
+type Auth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func FindDeviceMappingUP(deviceId string) (string, string) {
 	// todo: 从redis中根据deviceId获取用户名和密码
-	return "guest", "guest"
+	val := globalRedisClient.HGet(context.Background(), "auth:http", deviceId).Val()
+	var auth Auth
+	err := json.Unmarshal([]byte(val), &auth)
+	if err != nil {
+		return "", ""
+	}
+	return auth.Username, auth.Password
 }
 
 func parseBasicAuth(authHeader string) (username, password string, ok bool) {
