@@ -9,7 +9,7 @@
           <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="openAddModalVisible">{{ $t('message.addition') }}</a-button>
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -243,7 +243,19 @@ watch(locale, () => {
   }
 });
 
+const openAddModalVisible = () => {
+  if (!form.calc_rule_id) {
+    message.error(`${t('message.pleaseCreateCalculateRule')}`);
+    return;
+  }
+  modalVisible.value = true;
+};
+
 const onAddData = () => {
+  if (!form.calc_rule_id) {
+    message.error(`${t('message.pleaseCreateCalculateRule')}`);
+    return;
+  }
   (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
