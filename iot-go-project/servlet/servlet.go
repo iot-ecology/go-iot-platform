@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"igp/ut"
 	"iot-transmit/common"
 	"net/http"
 	"strings"
@@ -35,11 +36,11 @@ type MqttScript struct {
 
 }
 type DataRowList struct {
-	Time      int64  `json:"time"`       // 秒级时间戳
-	DeviceUid string `json:"device_uid"` // 是MqttClient的ID
-	IdentificationCode string `json:"identification_code"` // 设备标识码
-	DataRows []DataRow `json:"data"`
-	Nc       string    `json:"nc"`
+	Time               int64     `json:"time"`                // 秒级时间戳
+	DeviceUid          string    `json:"device_uid"`          // 是MqttClient的ID
+	IdentificationCode string    `json:"identification_code"` // 设备标识码
+	DataRows           []DataRow `json:"data"`
+	Nc                 string    `json:"nc"`
 }
 type DataRow struct {
 	Name  string `json:"name"`
@@ -293,10 +294,9 @@ type DeviceBindTcpParam struct {
 	TcpHandlerId []int `json:"tcp_handler_id"`
 }
 type DeviceBindHTTPParam struct {
-	DeviceId     int   `json:"device_id"`
+	DeviceId      int   `json:"device_id"`
 	HttpHandlerId []int `json:"http_handler_id"`
 }
-
 
 type DeviceGroupBindMqttClientParam struct {
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
@@ -323,23 +323,15 @@ type TransmitScriptParam struct {
 }
 
 type DeviceInfoRes struct {
-	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
-
-	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
-
-	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
-
-	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
-
-	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
-
-	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
-
-	PushInterval      int        `json:"push_interval,omitempty" structs:"push_interval"`                                                         // 推送间隔（秒）
-
-	ErrorRate         float64    `json:"error_rate,omitempty" structs:"error_rate"`                                                               // 推送时间误差（秒）
-
-	gorm.Model        `structs:"-"`
-	ProductName       string     `gorm:"-" json:"product_name,omitempty" `                                                  // 产品名称
+	ProductId uint `json:"product_id" structs:"product_id"` // 产品ID
+	SN string `json:"sn" structs:"sn"` // 设备编号
+	ManufacturingDate ut.LocalTime `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
+	ProcurementDate ut.LocalTime `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"` // 采购日期
+	Source int `json:"source" structs:"source"` // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry ut.LocalTime `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"` // 保修截止日期
+	PushInterval int `json:"push_interval,omitempty" structs:"push_interval"` // 推送间隔（秒）
+	ErrorRate float64 `json:"error_rate,omitempty" structs:"error_rate"` // 推送时间误差（秒）
+	gorm.Model  `structs:"-"`
+	ProductName string `gorm:"-" json:"product_name,omitempty" ` // 产品名称
 
 }

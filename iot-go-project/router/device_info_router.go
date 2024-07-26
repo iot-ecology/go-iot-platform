@@ -53,6 +53,12 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		DeviceInfo.WarrantyExpiry = WarrantyExpiry
 	}
 
+	if DeviceInfo.Source == 2 {
+		DeviceInfo.ManufacturingDate = DeviceInfo.ProcurementDate
+		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		DeviceInfo.WarrantyExpiry = WarrantyExpiry
+	}
+
 	m := structs.Map(DeviceInfo)
 
 	result = glob.GDb.Model(models.DeviceInfo{}).Create(m)
@@ -98,6 +104,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 
 	var newV models.DeviceInfo
 	newV = old
+	newV.ProductId = req.ProductId
 	newV.Source = req.Source
 	newV.SN = req.SN
 	newV.ManufacturingDate = req.ManufacturingDate

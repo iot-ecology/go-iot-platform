@@ -15,6 +15,10 @@ func main() {
 	}
 	defer serv.Close()
 	// Wait forever
+	serv.RegisterFunctionHandler(1, func(s *mbserver.Server, f mbserver.Framer) ([]byte, *mbserver.Exception) {
+		log.Printf("Function 1 called\n")
+		return []byte{0x01, 0x02}, nil
+	})
 
 	for {
 		time.Sleep(1 * time.Second)

@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -34,10 +35,10 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 		resp = append(resp, servlet.DeviceInfoRes{
 			ProductId:         info.ProductId,
 			SN:                info.SN,
-			ManufacturingDate: &info.ManufacturingDate,
-			ProcurementDate:   &info.ProcurementDate,
+			ManufacturingDate: ut.LocalTime(info.ManufacturingDate) ,
+			ProcurementDate:   ut.LocalTime(info.ProcurementDate),
 			Source:            info.Source,
-			WarrantyExpiry:    &info.WarrantyExpiry,
+			WarrantyExpiry:    ut.LocalTime(info.WarrantyExpiry),
 			PushInterval:      info.PushInterval,
 			ErrorRate:         info.ErrorRate,
 			Model:             info.Model,
