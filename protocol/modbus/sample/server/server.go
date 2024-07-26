@@ -14,8 +14,8 @@ func main() {
 		log.Printf("%v\n", err)
 	}
 	defer serv.Close()
-
 	// Wait forever
+
 	for {
 		time.Sleep(1 * time.Second)
 	}

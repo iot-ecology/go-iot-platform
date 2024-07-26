@@ -111,14 +111,14 @@ type Product struct {
 
 // DeviceInfo 设备信息
 type DeviceInfo struct {
-	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
-	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
-	ManufacturingDate time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
-	ProcurementDate   time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date,omitempty"`     // 采购日期
-	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
-	WarrantyExpiry    time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
-	PushInterval      int        `json:"push_interval,omitempty" structs:"push_interval"`                                                         // 推送间隔（秒）
-	ErrorRate         float64    `json:"error_rate,omitempty" structs:"error_rate"`                                                               // 推送时间误差（秒）
+	ProductId         uint      `json:"product_id" structs:"product_id"`                                                                     // 产品ID
+	SN                string    `json:"sn" structs:"sn"`                                                                                     // 设备编号
+	ManufacturingDate time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"`       // 制造日期
+	ProcurementDate   time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date,omitempty"` // 采购日期
+	Source            int       `json:"source" structs:"source"`                                                                             // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`             // 保修截止日期
+	PushInterval      int       `json:"push_interval,omitempty" structs:"push_interval"`                                                     // 推送间隔（秒）
+	ErrorRate         float64   `json:"error_rate,omitempty" structs:"error_rate"`                                                           // 推送时间误差（秒）
 	gorm.Model        `structs:"-"`
 }
 
@@ -238,17 +238,19 @@ type UserBindDeviceInfo struct {
 }
 
 type DeviceBindMqttClient struct {
-	gorm.Model   `structs:"-"`
-	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	MqttClientId uint `json:"mqtt_client_id" structs:"mqtt_client_id"` // MQTT客户端表的外键ID
+	gorm.Model         `structs:"-"`
+	DeviceInfoId       uint   `json:"device_info_id" structs:"device_info_id"`           // 设备ID
+	MqttClientId       uint   `json:"mqtt_client_id" structs:"mqtt_client_id"`           // MQTT客户端表的外键ID
+	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
 }
 
 type DeviceBindTcpHandler struct {
-	gorm.Model   `structs:"-"`
-	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	TcpHandlerId uint `json:"tcp_handler_id" structs:"tcp_handler_id"` // TCP处理器的ID
-}
+	gorm.Model         `structs:"-"`
+	DeviceInfoId       uint   `json:"device_info_id" structs:"device_info_id"`           // 设备ID
+	TcpHandlerId       uint   `json:"tcp_handler_id" structs:"tcp_handler_id"`           // TCP处理器的ID
+	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
 
+}
 
 // TcpHandler 表示TCP数据处理器
 type TcpHandler struct {
@@ -257,26 +259,23 @@ type TcpHandler struct {
 	Script     string `json:"script" structs:"script"` // 处理器脚本
 }
 
-
 type HttpHandler struct {
-	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	Name       string `json:"name" structs:"name"`     // 处理器名
+	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Name         string `json:"name" structs:"name"`                     // 处理器名
 	Username     string `json:"username" structs:"username"`             // 用户名
 	Password     string `json:"password" structs:"password"`             // 密码
 	Script       string `json:"script" structs:"script"`                 // 脚本
 	gorm.Model   `structs:"-"`
 }
-
 
 type CoapHandler struct {
-	DeviceInfoId uint `json:"device_info_id" structs:"device_info_id"` // 设备ID
-	Name       string `json:"name" structs:"name"`     // 处理器名
+	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Name         string `json:"name" structs:"name"`                     // 处理器名
 	Username     string `json:"username" structs:"username"`             // 用户名
 	Password     string `json:"password" structs:"password"`             // 密码
 	Script       string `json:"script" structs:"script"`                 // 脚本
 	gorm.Model   `structs:"-"`
 }
-
 
 type DeviceGroupBindMqttClient struct {
 	gorm.Model    `structs:"-"`

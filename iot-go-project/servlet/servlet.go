@@ -97,12 +97,12 @@ type InfluxResponse struct {
 
 type InfluxQueryConfig struct {
 	Bucket      string            `json:"-"`
-	Measurement string            `json:"measurement"`
-	Fields      []string          `json:"fields"`
-	StartTime   int64             `json:"start_time"`
-	EndTime     int64             `json:"end_time"`
-	Aggregation AggregationConfig `json:"aggregation"`
-	Reduce      string            `json:"reduce"` // sum min max mean
+	Measurement string            `json:"measurement,omitempty"`
+	Fields      []string          `json:"fields,omitempty"`
+	StartTime   int64             `json:"start_time,omitempty"`
+	EndTime     int64             `json:"end_time,omitempty"`
+	Aggregation AggregationConfig `json:"aggregation,omitempty"`
+	Reduce      string            `json:"reduce,omitempty"` // sum min max mean
 }
 
 type AggregationConfig struct {

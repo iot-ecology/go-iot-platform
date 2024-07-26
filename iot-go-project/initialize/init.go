@@ -454,6 +454,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/mqtt/check-script", mqttApi.CheckScript)
 	r.POST("/mqtt/send", mqttApi.SendMqttMessage)
 	r.POST("/query/influxdb", influxdbApi.QueryInfluxdb)
+	r.POST("/query/QueryMeasurement", influxdbApi.QueryMeasurement)
 	r.POST("/query/str-influxdb", influxdbApi.QueryInfluxdbString)
 
 	r.POST("/signal/create", signalApi.CreateSignal)
