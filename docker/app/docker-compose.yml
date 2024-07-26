@@ -41,7 +41,7 @@ services:
       dockerfile: deploy/IotGoMQ.Dockerfile
     image: go-iot-mq:latest
     ports:
-      - 8001:19000
+      - 8001:29002
     volumes:
        - ./mq/config/app-local-pre_handler.yml:/app/app-local-pre_handler.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-pre_handler.yml"]
@@ -54,7 +54,7 @@ services:
   iotgomq-calc_handler:
     image: go-iot-mq:latest
     ports:
-      - 8002:19000
+      - 8002:29001
     volumes:
        - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
@@ -67,7 +67,7 @@ services:
   iotgomq-waring_handler:
     image: go-iot-mq:latest
     ports:
-      - 8003:19000
+      - 8003:29003
     volumes:
        - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
@@ -80,7 +80,7 @@ services:
   iotgomq-wd_handler:
     image: go-iot-mq:latest
     ports:
-      - 8004:19000
+      - 8004:29004
     volumes:
        - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
     entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
