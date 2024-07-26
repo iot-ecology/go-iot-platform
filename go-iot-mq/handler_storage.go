@@ -65,7 +65,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row)
+			StorageDataRowList(row,"mqtt")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -148,11 +148,11 @@ func FindByIdWithRedis(id uint64) *DeviceInfo {
 	return &res
 }
 
-func genMeasurement(dt DataRowList) string {
+func genMeasurement(dt DataRowList, protocol string) string {
 	if dt.DeviceUid == dt.IdentificationCode {
-		return "mqtt_" + dt.DeviceUid
+		return protocol + "_" + dt.DeviceUid
 	} else {
-		return "mqtt_" + dt.DeviceUid + dt.IdentificationCode
+		return protocol + "_" + dt.DeviceUid  +"_"+ dt.IdentificationCode
 	}
 }
 
@@ -164,11 +164,11 @@ func genMeasurement(dt DataRowList) string {
 // 返回值：
 //
 //	无
-func StorageDataRowList(dt DataRowList) {
+func StorageDataRowList(dt DataRowList,protocol string) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid)
 	timeFromUnix := time.Unix(dt.Time, 0)
 
-	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt)).
+	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt,protocol)).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
 		SetTime(timeFromUnix)
