@@ -198,19 +198,19 @@ func getNextTime(cronExpr string) int64 {
 // map[string]interface{}类型，表示计算的结果
 func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interface{} {
 
-	var ccc servlet.CalcCache
+	var calcCache servlet.CalcCache
 	result, err := glob.GRedis.HGet(context.Background(), "calc_cache", strconv.Itoa(id)).Result()
 	if err != nil {
 		zap.S().Errorf("转化异常 %+v", err)
 		return nil
 	}
-	err = json.Unmarshal([]byte(result), &ccc)
+	err = json.Unmarshal([]byte(result), &calcCache)
 	if err != nil {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return nil
 	}
 	var m = make(map[string]any)
-	for _, cache := range ccc.Param {
+	for _, cache := range calcCache.Param {
 
 		if "原始" == cache.Reduce {
 			var fd []string
@@ -280,21 +280,21 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			}
 		}
 	}
-	scriot := runCalcScriot(m, ccc.Script)
+	script := runCalcScript(m, calcCache.Script)
 
 	var old models.CalcRule
-	_ = glob.GDb.First(&old, ccc.ID)
+	_ = glob.GDb.First(&old, calcCache.ID)
 
 	var newV models.CalcRule
 	newV = old
-	marshal, _ := json.Marshal(scriot)
+	marshal, _ := json.Marshal(script)
 	newV.MockValue = string(marshal)
 	glob.GDb.Model(&newV).Updates(newV)
 
-	return scriot
+	return script
 }
 
-// runCalcScriot 函数执行传入的 JavaScript 脚本，并将计算结果以 map[string]interface{} 的形式返回
+// runCalcScript 函数执行传入的 JavaScript 脚本，并将计算结果以 map[string]interface{} 的形式返回
 //
 // 参数：
 // param: 类型为 map[string]float64，表示计算参数
@@ -302,7 +302,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 //
 // 返回值：
 // 类型为 map[string]interface{}，表示执行 JavaScript 脚本后的计算结果
-func runCalcScriot(param map[string]any, script string) map[string]interface{} {
+func runCalcScript(param map[string]any, script string) map[string]interface{} {
 	vm := goja.New()
 	_, err := vm.RunString(script)
 	if err != nil {

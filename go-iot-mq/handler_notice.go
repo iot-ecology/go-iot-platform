@@ -23,8 +23,10 @@ func HandlerNotice(messages <-chan amqp.Delivery) {
 				zap.S().Error("处理通知数据失败", zap.Error(err))
 			}
 
+			val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_product:"+data.DeviceUid, 0,
+				-1).Val()
+
 			// 检索钉钉通道
-			val := globalRedisClient.LRange(context.Background(), "message_channel_bind:dingding:"+data.DeviceUid, 0, -1).Val()
 
 			dingding_channel := globalRedisClient.HMGet(context.Background(), "message_channel:dingding", val...).Val()
 			for _, str := range dingding_channel {

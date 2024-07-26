@@ -16,7 +16,7 @@ type MySQLTransmitBiz struct{}
 
 func (biz *MySQLTransmitBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var MySQLTransmits []models.MySQLTransmit
+	var mySQLTransmits []models.MySQLTransmit
 
 	db := glob.GDb
 
@@ -26,9 +26,9 @@ func (biz *MySQLTransmitBiz) PageData(name string, page, size int) (*servlet.Pag
 
 	db.Model(&models.MySQLTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&MySQLTransmits)
+	db.Offset(offset).Limit(size).Find(&mySQLTransmits)
 
-	pagination.Data = MySQLTransmits
+	pagination.Data = mySQLTransmits
 	pagination.Page = page
 	pagination.Size = size
 

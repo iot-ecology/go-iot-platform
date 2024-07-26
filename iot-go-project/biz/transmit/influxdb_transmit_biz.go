@@ -16,7 +16,7 @@ type InfluxdbTransmitBiz struct{}
 
 func (biz *InfluxdbTransmitBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var InfluxdbTransmits []models.InfluxdbTransmit
+	var influxdbTransmits []models.InfluxdbTransmit
 
 	db := glob.GDb
 
@@ -26,9 +26,9 @@ func (biz *InfluxdbTransmitBiz) PageData(name string, page, size int) (*servlet.
 
 	db.Model(&models.InfluxdbTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&InfluxdbTransmits)
+	db.Offset(offset).Limit(size).Find(&influxdbTransmits)
 
-	pagination.Data = InfluxdbTransmits
+	pagination.Data = influxdbTransmits
 	pagination.Page = page
 	pagination.Size = size
 

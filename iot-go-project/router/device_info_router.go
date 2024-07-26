@@ -61,6 +61,8 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	deviceInfoBiz.SetRedis(DeviceInfo)
+
 	// 返回创建成功的设备详情
 	servlet.Resp(c, DeviceInfo)
 }
@@ -108,6 +110,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 
+	deviceInfoBiz.SetRedis(newV)
 	if result.Error != nil {
 
 		servlet.Error(c, result.Error.Error())
@@ -178,6 +181,7 @@ func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 		return
 	}
 
+	deviceInfoBiz.RemoveRedis(DeviceInfo.ID)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -245,10 +249,9 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
-	var  toDel  []models.DeviceBindMqttClient
+	var toDel []models.DeviceBindMqttClient
 
 	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
-
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
 
@@ -281,7 +284,6 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 
 	// redis 中建立 mqtt_client_id 与 device_info_id 的映射
 
-
 	var DeviceInfo models.DeviceInfo
 
 	first := tx.First(&DeviceInfo, param.DeviceId)
@@ -291,12 +293,23 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	}
 
 	for _, client := range toDel {
-		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(int(client.MqttClientId)))
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+strconv.Itoa(int(client.MqttClientId)))
 	}
 
 	for _, item := range param.MqttClientId {
-		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(item), DeviceInfo.ProductId)
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+strconv.Itoa(item), DeviceInfo.ProductId)
 	}
+
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(int(client.MqttClientId)))
+	}
+
+	for _, item := range param.MqttClientId {
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
+
+	}
+
 
 	servlet.Resp(c, "绑定成功")
 

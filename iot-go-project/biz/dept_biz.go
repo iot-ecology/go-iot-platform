@@ -19,7 +19,7 @@ func (biz *DeptBiz) ById(id uint) (*models.Dept, error) {
 }
 func (biz *DeptBiz) PageData(name, pid string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var dashboards []models.Dept
+	var deptList []models.Dept
 
 	db := glob.GDb
 	if name != "" {
@@ -30,14 +30,16 @@ func (biz *DeptBiz) PageData(name, pid string, page, size int) (*servlet.Paginat
 	}
 	db.Model(&models.Dept{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&dashboards)
-	for i, dashboard := range dashboards {
-		id, err := biz.ById(dashboard.ParentId)
+	db.Offset(offset).Limit(size).Find(&deptList)
+	for i, dept := range deptList {
+		id, err := biz.ById(dept.ParentId)
 		if err == nil {
-			dashboards[i].ParentName = id.Name
+			deptList[i].ParentName = id.Name
 		}
+
+
 	}
-	pagination.Data = dashboards
+	pagination.Data = deptList
 	pagination.Page = page
 	pagination.Size = size
 

@@ -87,7 +87,7 @@ func (biz *SignalBiz) FindByName(name string) (*models.Signal, error) {
 func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, page, size int) (*servlet.PaginationQ, error) {
 
 	var pagination servlet.PaginationQ
-	var signals []models.SignalWaringConfig
+	var dt []models.SignalWaringConfig
 
 	db := glob.GDb
 
@@ -101,16 +101,10 @@ func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, 
 	db.Model(&models.SignalWaringConfig{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&signals)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	//for i, signal := range signals {
-	//	forSignal, err := biz.FindByIdForSignal(signal.SignalId)
-	//	if err != nil {
-	//
-	//	}
-	//	signals[i].Signal = forSignal
-	//}
-	pagination.Data = signals
+
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 

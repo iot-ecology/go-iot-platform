@@ -16,7 +16,7 @@ type ClickhouseTransmitBiz struct{}
 
 func (biz *ClickhouseTransmitBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var ClickhouseTransmit []models.ClickhouseTransmit
+	var clickhouseTransmit []models.ClickhouseTransmit
 
 	db := glob.GDb
 
@@ -26,9 +26,9 @@ func (biz *ClickhouseTransmitBiz) PageData(name string, page, size int) (*servle
 
 	db.Model(&models.ClickhouseTransmit{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&ClickhouseTransmit)
+	db.Offset(offset).Limit(size).Find(&clickhouseTransmit)
 
-	pagination.Data = ClickhouseTransmit
+	pagination.Data = clickhouseTransmit
 	pagination.Page = page
 	pagination.Size = size
 

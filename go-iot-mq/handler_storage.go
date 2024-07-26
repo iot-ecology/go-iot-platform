@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/dop251/goja"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -72,7 +74,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		zap.S().Infof("推送报警原始数据: %s", jsonData)
 		writeAPI.Flush()
-
+		HandlerLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
 		PushToQueue("transmit_handler", jsonData)
@@ -80,6 +82,69 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		zap.S().Infof("执行脚本为空")
 	}
 
+}
+
+// HandlerLastTime 和上一次推送事件进行对比，判断是否超过阈值，如果超过则发送额外的消息通知
+func HandlerLastTime(data []DataRowList) {
+	if len(data) == 0 {
+		return
+	}
+
+	var deviceUid = data[0].DeviceUid
+	key := "last_push_time:" + deviceUid
+	// 1. 从redis中获取这个设备上次推送的时间
+	lastTime, err := globalRedisClient.Get(context.Background(), key).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		zap.S().Errorf("获取设备上次推送时间异常：%+v", err)
+		return
+	}
+	now := time.Now().Unix()
+
+	// 如果没有这个时间则设置时间(当前时间）
+	if errors.Is(err, redis.Nil) {
+		err := globalRedisClient.Set(context.Background(), key, now, 0).Err()
+		if err != nil {
+			zap.S().Errorf("设置设备上次推送时间异常：%+v", err)
+			return
+		}
+		lastTime = fmt.Sprintf("%d", now)
+	}
+
+	if lastTime != fmt.Sprintf("%d", now) {
+
+		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0,
+			-1).Val()
+
+		for _, s := range val {
+			handlerOne(s)
+		}
+
+	}
+
+}
+
+func handlerOne( deviceUid string) bool {
+	val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
+	if val == "" {
+		return true
+	}
+	parseUint, _ := strconv.ParseUint(val, 10, 64)
+	withRedis := FindByIdWithRedis(parseUint)
+	if withRedis == nil {
+		return true
+	}
+	globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
+	return false
+}
+func  FindByIdWithRedis(id uint64) *DeviceInfo {
+	val := globalRedisClient.HGet(context.Background(), "struct:device_info", strconv.Itoa(int(id))).Val()
+
+	var res DeviceInfo
+	err := json.Unmarshal([]byte(val), &res)
+	if err != nil {
+		return nil
+	}
+	return &res
 }
 
 // StorageDataRowList 函数将DataRowList类型指针dt中的数据写入InfluxDB数据库

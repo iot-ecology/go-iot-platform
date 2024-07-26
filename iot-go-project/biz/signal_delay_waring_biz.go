@@ -13,7 +13,7 @@ type SignalDelayWaringBiz struct{}
 
 func (biz *SignalDelayWaringBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var rules []models.SignalDelayWaring
+	var dt []models.SignalDelayWaring
 
 	db := glob.GDb
 
@@ -24,9 +24,9 @@ func (biz *SignalDelayWaringBiz) PageData(name string, page, size int) (*servlet
 	db.Model(&models.SignalDelayWaring{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	pagination.Data = rules
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 
@@ -75,9 +75,9 @@ func (biz *SignalDelayWaringBiz) Mock(id int) bool {
 //	models.SignalDelayWaring - 与给定id匹配的信号延迟警告规则。
 //	map[string][]v - 参数名到模拟数据值的映射，其中v的类型是一个包含时间和值的结构体。
 func (biz *SignalDelayWaringBiz) GenParam(id int) (models.SignalDelayWaring, map[string][]v) {
-	var rule models.SignalDelayWaring
+	var dt models.SignalDelayWaring
 	db := glob.GDb
-	db.First(&rule, id)
+	db.First(&dt, id)
 
 	var param []models.SignalDelayWaringParam
 	db.Model(models.SignalDelayWaringParam{}).Where("signal_delay_waring_id = ?", id).Find(&param)
@@ -100,7 +100,7 @@ func (biz *SignalDelayWaringBiz) GenParam(id int) (models.SignalDelayWaring, map
 		}
 		mm[waringParam.Name] = vm
 	}
-	return rule, mm
+	return dt, mm
 }
 
 type v struct {

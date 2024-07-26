@@ -17,7 +17,7 @@ type MqttApi struct{}
 
 var bizMqtt = biz.MqttClientBiz{}
 var nodeBiz = biz.NodeBiz{}
-var scriptBiz = biz.ScirptBiz{}
+var scriptBiz = biz.ScriptBiz{}
 
 // CreateMqtt
 // @Tags      MQTT

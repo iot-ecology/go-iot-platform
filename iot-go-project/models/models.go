@@ -13,7 +13,7 @@ type MqttClient struct {
 	Password string `json:"password"`  // 密码
 	Subtopic string `json:"subtopic"`  // 订阅的主题
 	Start    bool   `json:"start"`     // 是否启动
-
+LastPushTime string `json:"last_push_time" gorm:"-"` // 最后推送时间
 	Script     string `json:"script" gorm:"type:text"` // 数据处理脚本
 	gorm.Model `structs:"-"`
 }
@@ -118,6 +118,8 @@ type DeviceInfo struct {
 	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
 	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
 	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
+	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                          // 推送间隔（秒）
+	ErrorRate         float64    `json:"error_rate" structs:"error_rate"`                                                               // 推送时间误差（秒）
 	gorm.Model        `structs:"-"`
 }
 
