@@ -113,12 +113,20 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	newV.PushInterval = req.PushInterval
 	newV.ErrorRate = req.ErrorRate
 
+
 	var Product models.Product
 	result = glob.GDb.First(&Product, newV.ProductId)
 	if result.Error != nil {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+
+	if newV.Source == 2 {
+		newV.ManufacturingDate = req.ProcurementDate
+		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		newV.WarrantyExpiry = WarrantyExpiry
+	}
+
 	if !newV.ManufacturingDate.IsZero() {
 		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
 		newV.WarrantyExpiry = WarrantyExpiry
