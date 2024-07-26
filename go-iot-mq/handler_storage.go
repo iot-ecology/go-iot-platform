@@ -114,8 +114,7 @@ func HandlerMqttLastTime(data []DataRowList) {
 
 	if lastTime != fmt.Sprintf("%d", now) {
 
-		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0,
-			-1).Val()
+		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0, -1).Val()
 
 		for _, s := range val {
 			handlerOne(s)
@@ -125,7 +124,7 @@ func HandlerMqttLastTime(data []DataRowList) {
 
 }
 
-func handlerOne( deviceUid string) bool {
+func handlerOne(deviceUid string) bool {
 	val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
 	if val == "" {
 		return true
@@ -138,7 +137,7 @@ func handlerOne( deviceUid string) bool {
 	globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
 	return false
 }
-func  FindByIdWithRedis(id uint64) *DeviceInfo {
+func FindByIdWithRedis(id uint64) *DeviceInfo {
 	val := globalRedisClient.HGet(context.Background(), "struct:device_info", strconv.Itoa(int(id))).Val()
 
 	var res DeviceInfo
@@ -147,6 +146,14 @@ func  FindByIdWithRedis(id uint64) *DeviceInfo {
 		return nil
 	}
 	return &res
+}
+
+func genMeasurement(dt DataRowList) string {
+	if dt.DeviceUid == dt.IdentificationCode {
+		return "mqtt_" + dt.DeviceUid
+	} else {
+		return "mqtt_" + dt.DeviceUid + dt.IdentificationCode
+	}
 }
 
 // StorageDataRowList 函数将DataRowList类型指针dt中的数据写入InfluxDB数据库
@@ -160,7 +167,8 @@ func  FindByIdWithRedis(id uint64) *DeviceInfo {
 func StorageDataRowList(dt DataRowList) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid)
 	timeFromUnix := time.Unix(dt.Time, 0)
-	p := influxdb2.NewPointWithMeasurement(dt.DeviceUid).
+
+	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt)).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
 		SetTime(timeFromUnix)
