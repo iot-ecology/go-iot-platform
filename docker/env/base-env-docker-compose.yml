@@ -125,24 +125,6 @@ services:
       - ./redis/log:/var/log/redis
     networks:
       - iot-net
-  prometheus:
-    image: bitnami/prometheus:latest
-    environment:
-      - TZ=Asia/Shanghai
-    ports:
-      - '9090:9090'
-    volumes:
-      - ./prometheus/prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml
-    networks:
-      - iot-net
-  grafana:
-    image: grafana/grafana
-    environment:
-      - TZ=Asia/Shanghai
-    ports:
-      - '9091:3000'
-    networks:
-      - iot-net
 volumes:
     influxdbv2:
 

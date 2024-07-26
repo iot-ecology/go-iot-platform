@@ -1,0 +1,29 @@
+version: '3'
+services:
+  prometheus:
+    image: bitnami/prometheus:latest
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml
+    networks:
+      - iot-metrics-monitor
+  grafana:
+    image: grafana/grafana
+    environment:
+      - TZ=Asia/Shanghai
+      - GF_AUTH_ADMIN_PASSWORD=iot123456
+    ports:
+      - '9091:3000'
+    volumes:
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+    #    command: >
+#      bash -c "/usr/sbin/grafana-cli --config /etc/grafana/grafana.ini datasources import /etc/grafana/provisioning/datasources/datasources.json &&
+#          /run.sh"
+    networks:
+      - iot-metrics-monitor
+networks:
+  iot-metrics-monitor:
+    driver: bridge
