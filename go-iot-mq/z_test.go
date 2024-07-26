@@ -3,9 +3,45 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 )
 
+func TestInfluxdbQueryM(t *testing.T) {
+	var config = InfluxConfig{
+		Host:     "127.0.0.1",
+		Port:   8086,
+		Token:  "mytoken",
+		Org:    "myorg",
+		Bucket: "mybucket",
+	}
+	InitInfluxDbClient(config)
+	query := `from(bucket: "mybucket")
+              |> range(start: -1h, stop: now())
+		      |> filter(fn: (r) => r._measurement =~ /^d/)
+              |> keep(columns: ["_measurement"])
+              |> group()
+              |> distinct(column: "_measurement")
+              |> limit(n: 200)
+              |> sort()`
+
+	queryAPI := GlobalInfluxDbClient.QueryAPI("myorg")
+
+	// 执行查询
+	result, err := queryAPI.Query(context.Background(), query)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+
+	// 处理查询结果
+	for result.Next() {
+		record := result.Record()
+		value := record.Value()
+		fmt.Printf("Result: %v\n", value)
+	}
+
+}
 func TestA(t *testing.T) {
 	var config = RedisConfig{
 		Host:     "127.0.0.1",
@@ -29,8 +65,7 @@ func TestA(t *testing.T) {
 	}
 	jsonData, _ = json.Marshal(auth)
 
-	globalRedisClient.HSet(context.Background(), "auth:coap","1234567890", jsonData)
-
+	globalRedisClient.HSet(context.Background(), "auth:coap", "1234567890", jsonData)
 
 }
 
