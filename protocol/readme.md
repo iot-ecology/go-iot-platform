@@ -67,3 +67,34 @@ datadata
 
 ## COAP
 
+## Websocket 
+1. 使用 http base auth 进行登录认证 ， 会返回标识码
+
+```shell
+curl --location --request GET 'http://127.0.0.1:13332/auth' \
+--header 'Accept: application/json, text/plain, */*' \
+--header 'Accept-Language: zh-CN,zh;q=0.9' \
+--header 'Cache-Control: no-cache' \
+--header 'Connection: keep-alive' \
+--header 'Content-Type: application/json' \
+--header 'Origin: http://192.168.3.107:5958' \
+--header 'Pragma: no-cache' \
+--header 'Referer: http://192.168.3.107:5958/' \
+--header 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' \
+--header 'pls: pls' \
+--header 'device_id: 123' \
+--header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+--data '{}'
+```
+
+返回值结构: 
+
+```json
+{
+    "message": "认证通过",
+    "uid": "123@f57f814e-4d59-11ef-be14-acde48001122"
+}
+```
+uid: @前是设备id，@后是客户端id
+
+2. websocket 链接： ws://127.0.0.1:13332/ws?id=uid
