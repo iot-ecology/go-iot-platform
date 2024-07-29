@@ -278,6 +278,15 @@ type CoapHandler struct {
 	gorm.Model   `structs:"-"`
 }
 
+type WebsocketHandler struct {
+	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
+	Name         string `json:"name" structs:"name"`                     // 处理器名
+	Username     string `json:"username" structs:"username"`             // 用户名
+	Password     string `json:"password" structs:"password"`             // 密码
+	Script       string `json:"script" structs:"script"`                 // 脚本
+	gorm.Model   `structs:"-"`
+}
+
 type DeviceGroupBindMqttClient struct {
 	gorm.Model    `structs:"-"`
 	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID

@@ -67,6 +67,42 @@ datadata
 
 ## COAP
 
+1.   与coap服务建立链接，发送数据到`/auth`地址，数据报文如下
+
+```
+	auth := Auth{
+		Username: "admin",
+		Password: "admin",
+		DeviceId: "1234567890",
+	}
+	marshal, _ := json.Marshal(auth)
+	req := coap.Message{
+		Type:      coap.Confirmable,
+		Code:      coap.GET,
+		MessageID: 12345,
+		Payload:   marshal,
+	}
+```
+
+2.   认证通过后发送数据到 `/data`地址，数据报文如下
+
+
+
+```
+	req := coap.Message{
+		Type:      coap.Confirmable,
+		Code:      coap.GET,
+		MessageID: 12345,
+		Payload:   []byte("test"),
+	}
+
+	path := "/data"
+```
+
+
+
+
+
 ## Websocket 
 1. 使用 http base auth 进行登录认证 ， 会返回标识码
 

@@ -125,6 +125,20 @@ func main() {
 		}
 		cus.Handle(preHttpHandler, HandlerHttpDataStorage, 1, "pre_http_handler", "")
 	}
+	if globalConfig.NodeInfo.Type == "pre_ws_handler" {
+		preWsHandler, err := cus.AnnounceQueue("pre_ws_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preWsHandler, HandlerWsDataStorage, 1, "pre_ws_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "pre_coap_handler" {
+		preCCoapHandler, err := cus.AnnounceQueue("pre_coap_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preCCoapHandler, HandlerCoapDataStorage, 1, "pre_coap_handler", "")
+	}
 
 }
 

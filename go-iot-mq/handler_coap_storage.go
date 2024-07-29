@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// CoapMessage 用于处理tcp转发后的数据
+// CoapMessage 用于处理coap转发后的数据
 type CoapMessage struct {
 	Uid     string `json:"uid"`
 	Message string `json:"message"`
@@ -50,7 +50,7 @@ func HandlerDataCoapStorageString(d amqp.Delivery) {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return
 	}
-	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
+	zap.S().Infof("处理 pre_coap_handler 数据 : %+v", msg)
 
 	script := GetScriptRedisForCoap(msg.Uid)
 	if script != "" {

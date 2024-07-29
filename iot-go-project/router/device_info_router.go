@@ -595,6 +595,53 @@ func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
 
 }
 
+
+// BindWebsocket
+// @Tags      DeviceInfos
+// @Summary   绑定websocket处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body models.CoapHandler true "绑定参数"
+// @Router    /DeviceInfo/BindWebsocket [post]
+func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
+	var param models.WebsocketHandler
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	if param.ID != 0 {
+		var old models.CoapHandler
+
+		result := glob.GDb.First(&old, param.ID)
+		if result.Error != nil {
+
+			servlet.Error(c, "HttpHandler not found")
+			return
+		}
+		var newV models.CoapHandler
+		newV = old
+		newV.DeviceInfoId = param.DeviceInfoId
+		newV.Name = param.Name
+		newV.Username = param.Username
+		newV.Password = param.Password
+		newV.Script = param.Script
+		// 更新记录
+		result = glob.GDb.Model(&newV).Updates(newV)
+		setCoapHandlerRedis(newV)
+	} else {
+		// 新增
+		glob.GDb.Model(models.CoapHandler{}).Create(&param)
+		setWebsocketHandlerRedis(param)
+
+	}
+
+	glob.GRedis.LPush(context.Background(), "ws_bind_device_info:"+strconv.Itoa(int(param.ID)), param.DeviceInfoId)
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
 func setHttpHandlerRedis(config models.HttpHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:http", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
@@ -602,4 +649,8 @@ func setHttpHandlerRedis(config models.HttpHandler) {
 func setCoapHandlerRedis(config models.CoapHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:coap", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
+}
+func setWebsocketHandlerRedis(config models.WebsocketHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:ws", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }
