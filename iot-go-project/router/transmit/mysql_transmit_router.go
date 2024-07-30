@@ -77,7 +77,7 @@ func (api *MySQLTransmitApi) UpdateMySQLTransmit(c *gin.Context) {
 
 	var newV models.MySQLTransmit
 	newV = old
-	newV.Name = req.Name
+	newV.Name  = req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

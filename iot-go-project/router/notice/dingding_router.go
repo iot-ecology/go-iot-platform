@@ -86,9 +86,12 @@ func (api *DingDingApi) UpdateDingDing(c *gin.Context) {
 	var newV models.DingDing
 	newV = old
 	newV.Name = req.Name
+	newV.AccessToken = req.AccessToken
+	newV.Secret = req.Secret
+	newV.Content = req.Content
 
 	m := structs.Map(newV)
-	result = glob.GDb.Table("DingDings").Where("id = ?", newV.ID).Updates(m)
+	result = glob.GDb.Model(models.DingDing{}).Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 

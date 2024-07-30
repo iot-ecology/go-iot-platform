@@ -71,6 +71,7 @@ func (api *InfluxdbTransmitApi) UpdateInfluxdbTransmit(c *gin.Context) {
 
 	var newV models.InfluxdbTransmit
 	newV = old
+	newV.Name =req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

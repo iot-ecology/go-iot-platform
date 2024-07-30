@@ -71,6 +71,8 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 
 	var newV models.MongoTransmit
 	newV = old
+
+	newV.Name = req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

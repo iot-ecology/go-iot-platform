@@ -194,7 +194,7 @@ type ProductionPlan struct {
 	StartDate   time.Time `json:"start_date" structs:"start_date"`   // 生产计划开始日期
 	EndDate     time.Time `json:"end_date" structs:"end_date"`       // 生产计划结束日期
 	Description string    `json:"description" structs:"description"` // 生产计划描述
-	Status      string    `json:"status" structs:"status"`           // 计划状态（准备中,进行中, 已完成）
+	Status      string    `json:"status" structs:"status"`           // 计划状态（1准备中,2进行中, 3已完成）
 }
 
 // ProductPlan 表示生产计划中的具体产品计划

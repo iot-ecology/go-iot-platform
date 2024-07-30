@@ -28,6 +28,9 @@ func main() {
 	InitRabbitCon()
 
 	initGlobalRedisClient(globalConfig.RedisConfig)
+
+	go BeatTask(globalConfig.NodeInfo)
+
 	server := New(&Config{
 		Host: "localhost",
 		Port: strconv.Itoa(globalConfig.NodeInfo.Port),

@@ -71,6 +71,7 @@ func (api *CassandraTransmitApi) UpdateCassandraTransmit(c *gin.Context) {
 
 	var newV models.CassandraTransmit
 	newV = old
+	newV.Name = req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

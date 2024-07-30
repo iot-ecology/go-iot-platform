@@ -79,6 +79,7 @@ func (server *Server) handleClient(client *Client) {
 	}
 }
 
+
 func (server *Server) handleMessage(client *Client, message string) {
 
 	// 判断这个客户端是否建立过uid映射，没有的话不处理数据
@@ -99,7 +100,6 @@ func (server *Server) handleMessage(client *Client, message string) {
 			defer server.mu.Unlock()
 
 			storageUid(deviceId, client.conn.RemoteAddr().String())
-
 			clientWrite(client, "成功识别设备编码.\n")
 
 			return
@@ -111,20 +111,21 @@ func (server *Server) handleMessage(client *Client, message string) {
 }
 
 func getUid(remoteAdd string) string {
-	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f", remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd).Val()
 	return val
 }
 
 func storageUid(uid, remoteAdd string) {
-	globalRedisClient.HSet(context.Background(), "tcp_uid", uid, remoteAdd)
-	globalRedisClient.HSet(context.Background(), "tcp_uid_f", remoteAdd, uid)
+	globalRedisClient.HSet(context.Background(), "tcp_uid:"+globalConfig.NodeInfo.Name, uid, remoteAdd)
+	globalRedisClient.HSet(context.Background(),  "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd, uid)
+
 }
 func RemoveUid(remoteAdd string) {
-	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f", remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(),  "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd).Val()
 	if val == "" {
 		return
 	} else {
-		globalRedisClient.HDel(context.Background(), "tcp_uid", val)
+		globalRedisClient.HDel(context.Background(), "tcp_uid:"+globalConfig.NodeInfo.Name, val)
 
 	}
 }

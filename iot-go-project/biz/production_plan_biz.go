@@ -78,10 +78,10 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 		return false
 	}
 
-	if productionPlan.Status == "准备中" && param.Status == "已完成" {
+	if productionPlan.Status == "1" && param.Status == "3" {
 		return false
 	}
-	if productionPlan.Status == "进行中" && param.Status == "准备中" {
+	if productionPlan.Status == "2" && param.Status == "1" {
 		return false
 	}
 	tx := glob.GDb.Begin()
@@ -95,7 +95,7 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 		return false
 	}
 	now := time.Now()
-	if param.Status == "已完成" {
+	if param.Status == "3" {
 
 		var pp []models.ProductPlan
 

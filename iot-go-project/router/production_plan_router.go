@@ -50,11 +50,12 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 	productionPlan.Description = param.Description
 	productionPlan.StartDate = param.StartDate
 	productionPlan.EndDate = param.EndDate
+	productionPlan.Status = param.Status
 
-	create := tx.Model(models.ProductionPlan{}).Create(productionPlan)
+	create := tx.Model(models.ProductionPlan{}).Create(&productionPlan)
 	if create.Error != nil {
-		tx.Rollback()
 		zap.S().Errorf("创建 ProductionPlan 异常 %+v", create.Error)
+		tx.Rollback()
 		servlet.Error(c, create.Error.Error())
 		return
 	}
@@ -138,6 +139,7 @@ func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
 	productionPlan.Description = param.Description
 	productionPlan.StartDate = param.StartDate
 	productionPlan.EndDate = param.EndDate
+	productionPlan.Status = param.Status
 
 	create := tx.Model(models.ProductionPlan{}).Updates(productionPlan)
 	if create.Error != nil {
@@ -268,6 +270,7 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 	res.StartDate = ProductionPlan.StartDate
 	res.EndDate = ProductionPlan.EndDate
 	res.Description = ProductionPlan.Description
+	res.Status = ProductionPlan.Status
 	var dt []models.ProductPlan
 
 	tx := glob.GDb.Model(models.ProductPlan{}).Where("production_plan_id = ?", ProductionPlan.ID).Find(&dt)

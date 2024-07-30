@@ -12,8 +12,8 @@ import (
 func SetLastOpTime(uid string) {
 
 	// 设置24小时有效时间
-	//globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 24*time.Hour)
-	globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 10*time.Second)
+	globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 24*time.Hour)
+	//globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 10*time.Second)
 
 }
 

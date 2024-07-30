@@ -308,6 +308,20 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 	if !glob.GDb.Migrator().HasTable(&models.InfluxdbTransmit{}) {
 
 		err := glob.GDb.AutoMigrate(&models.InfluxdbTransmit{})
@@ -517,33 +531,33 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
 	r.POST("/MySQLTransmit/mockScript", mysqlTransmitApi.MockScript)
 
-	r.POST("/MongoTransmitApi/create", mongoTransmitApi.CreateMongoTransmit)
-	r.POST("/MongoTransmitApi/update", mongoTransmitApi.UpdateMongoTransmit)
-	r.GET("/MongoTransmitApi/:id", mongoTransmitApi.ByIdMongoTransmit)
-	r.GET("/MongoTransmitApi/page", mongoTransmitApi.PageMongoTransmit)
-	r.POST("/MongoTransmitApi/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
-	r.POST("/MongoTransmitApi/mockScript", mongoTransmitApi.MockScript)
+	r.POST("/MongoTransmit/create", mongoTransmitApi.CreateMongoTransmit)
+	r.POST("/MongoTransmit/update", mongoTransmitApi.UpdateMongoTransmit)
+	r.GET("/MongoTransmit/:id", mongoTransmitApi.ByIdMongoTransmit)
+	r.GET("/MongoTransmit/page", mongoTransmitApi.PageMongoTransmit)
+	r.POST("/MongoTransmit/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
+	r.POST("/MongoTransmit/mockScript", mongoTransmitApi.MockScript)
 
-	r.POST("/InfluxdbTransmitApi/create", influxdbTransmitApi.CreateInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/page", influxdbTransmitApi.PageInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/mockScript", influxdbTransmitApi.MockScript)
+	r.POST("/InfluxdbTransmit/create", influxdbTransmitApi.CreateInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/page", influxdbTransmitApi.PageInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/mockScript", influxdbTransmitApi.MockScript)
 
-	r.POST("/ClickTransmitApi/create", clickTransmitApi.CreateClickhouseTransmit)
-	r.POST("/ClickTransmitApi/update", clickTransmitApi.UpdateClickhouseTransmit)
-	r.GET("/ClickTransmitApi/:id", clickTransmitApi.ByIdClickhouseTransmit)
-	r.GET("/ClickTransmitApi/page", clickTransmitApi.PageClickhouseTransmit)
-	r.POST("/ClickTransmitApi/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
-	r.POST("/ClickTransmitApi/mockScript", clickTransmitApi.MockScript)
+	r.POST("/ClickhouseTransmit/create", clickTransmitApi.CreateClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/update", clickTransmitApi.UpdateClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/:id", clickTransmitApi.ByIdClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/page", clickTransmitApi.PageClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/mockScript", clickTransmitApi.MockScript)
 
-	r.POST("/CassandraTransmitApi/create", cassandraTransmitApi.CreateCassandraTransmit)
-	r.POST("/CassandraTransmitApi/update", cassandraTransmitApi.UpdateCassandraTransmit)
-	r.GET("/CassandraTransmitApi/:id", cassandraTransmitApi.ByIdCassandraTransmit)
-	r.GET("/CassandraTransmitApi/page", cassandraTransmitApi.PageCassandraTransmit)
-	r.POST("/CassandraTransmitApi/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
-	r.POST("/CassandraTransmitApi/mockScript", cassandraTransmitApi.MockScript)
+	r.POST("/CassandraTransmit/create", cassandraTransmitApi.CreateCassandraTransmit)
+	r.POST("/CassandraTransmit/update", cassandraTransmitApi.UpdateCassandraTransmit)
+	r.GET("/CassandraTransmit/:id", cassandraTransmitApi.ByIdCassandraTransmit)
+	r.GET("/CassandraTransmit/page", cassandraTransmitApi.PageCassandraTransmit)
+	r.POST("/CassandraTransmit/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
+	r.POST("/CassandraTransmit/mockScript", cassandraTransmitApi.MockScript)
 
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)

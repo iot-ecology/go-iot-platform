@@ -67,8 +67,9 @@ func (biz *CassandraTransmitBiz) toByte(req models.CassandraTransmitBind) []byte
 // ChangeEnable 修改启用状态
 func (biz *CassandraTransmitBiz) ChangeEnable(req models.CassandraTransmitBind) {
 	glob.GDb.Model(models.CassandraTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
-
-	glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
+	if req.Enable == false {
+		glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
+	}
 }
 
 var CassandraOp = cassandra.CassandraOp{}

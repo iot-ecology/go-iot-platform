@@ -225,6 +225,7 @@ type ProductionPlanCreateParam struct {
 	Name                    string                   `json:"name" structs:"name"`               // 生产计划名称
 	StartDate               time.Time                `json:"start_date" structs:"start_date"`   // 生产计划开始日期
 	EndDate                 time.Time                `json:"end_date" structs:"end_date"`       // 生产计划结束日期
+	Status      string    `json:"status" structs:"status"`           // 计划状态（准备中,进行中, 已完成）
 	Description             string                   `json:"description" structs:"description"` // 生产计划描述
 	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans" `
 }
