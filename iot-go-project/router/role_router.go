@@ -1,9 +1,11 @@
 package router
 
 import (
+	"errors"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
@@ -39,14 +41,28 @@ func (api *RoleApi) CreateRole(c *gin.Context) {
 		return
 	}
 
-	result := glob.GDb.Create(&Role)
+	var qRole models.Role
+	err := glob.GDb.Where("name = ?", Role.Name).First(&qRole).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		result := glob.GDb.Create(&Role)
 
-	if result.Error != nil {
-		servlet.Error(c, result.Error.Error())
-		return
+		if result.Error != nil {
+			servlet.Error(c, result.Error.Error())
+			return
+		}
+		// 返回创建成功的面板
+		servlet.Resp(c, Role)
+	} else {
+		if err != nil {
+			servlet.Error(c, err.Error())
+			return
+		}
+		if qRole.ID != 0 {
+			servlet.Error(c, "角色已存在")
+			return
+		}
+
 	}
-	// 返回创建成功的面板
-	servlet.Resp(c, Role)
 }
 
 // UpdateRole

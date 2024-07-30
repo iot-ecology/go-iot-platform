@@ -1,9 +1,11 @@
 package router
 
 import (
+	"errors"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
@@ -38,15 +40,29 @@ func (api *UserApi) CreateUser(c *gin.Context) {
 		servlet.Error(c, "名称不能为空")
 		return
 	}
+	var qUser models.User
 
-	result := glob.GDb.Create(&User)
+	err := glob.GDb.Where("username = ?", User.Username).First(&qUser).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		result := glob.GDb.Create(&User)
 
-	if result.Error != nil {
-		servlet.Error(c, result.Error.Error())
-		return
+		if result.Error != nil {
+			servlet.Error(c, result.Error.Error())
+			return
+		}
+		// 返回创建成功的用户
+		servlet.Resp(c, User)
+	} else {
+		if err != nil {
+			servlet.Error(c, err.Error())
+			return
+		}
+		if qUser.ID != 0 {
+			servlet.Error(c, "用户已存在")
+			return
+		}
 	}
-	// 返回创建成功的用户
-	servlet.Resp(c, User)
+
 }
 
 // UpdateUser
@@ -245,6 +261,58 @@ func (api *UserApi) BindRole(c *gin.Context) {
 	servlet.Resp(c, "绑定成功")
 
 }
+// BindDept
+// @Tags      Users
+// @Summary   用户绑定部门
+// @Param User body servlet.UserBindDeptParam true "绑定参数"
+// @Produce   application/json
+// @Router    /User/BindDept [post]
+func (api *UserApi) BindDept(c *gin.Context) {
+
+	var param servlet.UserBindDeptParam
+
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+
+	result := tx.Where("`user_id` = ?", param.UserId).Delete(&models.UserDept{})
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var userRoles []models.UserDept
+	for _, roleId := range param.DeptIds {
+		userRoles = append(userRoles, models.UserDept{
+			UserId: uint(param.UserId),
+			DeptId: uint(roleId),
+		})
+	}
+
+	result = tx.Model(&models.UserDept{}).CreateInBatches(userRoles, len(userRoles))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	servlet.Resp(c, "绑定成功")
+
+}
 
 // QueryBindRole
 // @Tags      Users
@@ -255,6 +323,25 @@ func (api *UserApi) QueryBindRole(c *gin.Context) {
 	param := c.Query("user_id")
 
 	var userRoles []models.UserRole
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`user_id` = ?", param).Find(&userRoles)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, userRoles)
+}
+// QueryBindDept
+// @Tags      Users
+// @Summary   查询绑定部门
+// @Param user_id query string false "用户id"
+// @Router    /User/QueryBindDept [get]
+func (api *UserApi) QueryBindDept(c *gin.Context) {
+	param := c.Query("user_id")
+
+	var userRoles []models.UserDept
 
 	// 使用 Where 和 Find 方法查询记录
 	result := glob.GDb.Where("`user_id` = ?", param).Find(&userRoles)

@@ -138,8 +138,8 @@ type DeviceGroup struct {
 
 // DeviceGroupDevice 设备组与设备信息的关联表
 type DeviceGroupDevice struct {
-	DeviceInfoId       uint `json:"device_info_id" structs:"device_info_id"`   // 设备表的外键ID
-	DeviceGroupGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组表的外键ID
+	DeviceInfoId       uint `json:"device_info_id" structs:"device_info_id" gorm:"column:device_info_id;"`   // 设备表的外键ID
+	DeviceGroupGroupId uint `json:"device_group_id" structs:"device_group_id" gorm:"column:device_group_id;"` // 设备组表的外键ID
 	gorm.Model         `structs:"-"`
 }
 
@@ -218,6 +218,13 @@ type Role struct {
 	Name        string `json:"name" structs:"name"`               // 角色名
 	Description string `json:"description" structs:"description"` // 角色描述
 	CanDel      bool   `json:"can_del" structs:"can_del"`         // 是否可以删除
+}
+
+type UserDept struct {
+	gorm.Model `structs:"-"`
+	UserId     uint `json:"user_id" structs:"user_id"` // 用户ID
+	DeptId     uint `json:"dept_id" structs:"dept_id"` // 部门ID
+
 }
 
 type UserRole struct {

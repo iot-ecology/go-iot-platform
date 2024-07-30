@@ -42,6 +42,12 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		return
 	}
 
+	sn := deviceInfoBiz.FindBySn(DeviceInfo.SN)
+	if sn != nil {
+		servlet.Error(c, "设备已存在")
+		return
+	}
+
 	var Product models.Product
 	result := glob.GDb.First(&Product, DeviceInfo.ProductId)
 	if result.Error != nil {
@@ -106,7 +112,6 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	newV = old
 	newV.ProductId = req.ProductId
 	newV.Source = req.Source
-	newV.SN = req.SN
 	newV.ManufacturingDate = req.ManufacturingDate
 	newV.ProcurementDate = req.ProcurementDate
 	newV.WarrantyExpiry = req.WarrantyExpiry
@@ -276,7 +281,7 @@ func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 }
 // QueryBindCoap
 // @Tags      DeviceInfos
-// @Summary   查询绑定HTTP客户端
+// @Summary   查询绑定coap客户端
 // @Accept json
 // @Produce json
 // @Param device_info_id path int true "主键"
@@ -285,6 +290,27 @@ func (api *DeviceInfoApi) QueryBindCoap(c *gin.Context) {
 	param := c.Param("device_info_id")
 
 	var res []models.CoapHandler
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, res)
+}
+// QueryBindWebsocket
+// @Tags      DeviceInfos
+// @Summary   查询绑定websocket客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindWebsocket [get]
+func (api *DeviceInfoApi) QueryBindWebsocket(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var res []models.WebsocketHandler
 
 	// 使用 Where 和 Find 方法查询记录
 	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)

@@ -67,6 +67,13 @@ func (biz *DeviceInfoBiz) FindById(id uint) *models.DeviceInfo {
 	biz.SetRedis(dt)
 	return &dt
 }
+func (biz *DeviceInfoBiz) FindBySn(sn string) *models.DeviceInfo {
+
+	var dt models.DeviceInfo
+	db := glob.GDb
+	db.Where("sn = ?", sn).Find(&dt)
+	return &dt
+}
 
 func (biz *DeviceInfoBiz) FindByIdWithRedis(id uint) *models.DeviceInfo {
 	val := glob.GRedis.HGet(context.Background(), "struct:device_info", strconv.Itoa(int(id))).Val()

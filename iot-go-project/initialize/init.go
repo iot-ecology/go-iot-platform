@@ -64,6 +64,8 @@ var (
 
 	tcpHandlerApi  = router.TcpHandlerApi{}
 	httpHandlerApi = router.HttpHandlerApi{}
+	coapHandlerApi = router.CoapHandlerApi{}
+	wsHandlerApi = router.WebsocketHandlerApi{}
 )
 
 func initTable() {
@@ -198,6 +200,13 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.UserRole{}) {
 
 		err := glob.GDb.AutoMigrate(&models.UserRole{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.UserDept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserDept{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -353,6 +362,34 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.HttpHandler{}) {
 
 		err := glob.GDb.AutoMigrate(&models.HttpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.WebsocketHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.WebsocketHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CoapHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CoapHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.FeiShu{}) {
+
+		err := glob.GDb.AutoMigrate(&models.FeiShu{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DingDing{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -535,10 +572,12 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
 	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
 	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
+	r.POST("/DeviceInfo/BindWebsocket", deviceInfoApi.BindWebsocket)
 	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
 	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
 	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
+	r.GET("/DeviceInfo/QueryBindWebsocket", deviceInfoApi.QueryBindWebsocket)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -581,7 +620,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/User/:id", userApi.ByIdUser)
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/BindDept", userApi.BindDept)
 	r.GET("/User/QueryBindRole", userApi.QueryBindRole)
+	r.GET("/User/QueryBindDept", userApi.QueryBindDept)
 	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
 	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 
@@ -650,6 +691,18 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/HttpHandler/:id", httpHandlerApi.ByIdHttpHandler)
 	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
 	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
+
+	r.POST("/CoapHandler/create", coapHandlerApi.CreateCoapHandler)
+	r.POST("/CoapHandler/update", coapHandlerApi.UpdateCoapHandler)
+	r.GET("/CoapHandler/:id", coapHandlerApi.ByIdCoapHandler)
+	r.GET("/CoapHandler/page", coapHandlerApi.PageCoapHandler)
+	r.POST("/CoapHandler/delete/:id", coapHandlerApi.DeleteCoapHandler)
+
+	r.POST("/WebsocketHandler/create", wsHandlerApi.CreateWebsocketHandler)
+	r.POST("/WebsocketHandler/update", wsHandlerApi.UpdateWebsocketHandler)
+	r.GET("/WebsocketHandler/:id", wsHandlerApi.ByIdWebsocketHandler)
+	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
+	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
 
 }
 func initGlobalRedisClient() {

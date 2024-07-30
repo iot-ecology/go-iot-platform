@@ -280,6 +280,11 @@ type UserBindRoleParam struct {
 	RoleIds []int `json:"role_id"`
 }
 
+type UserBindDeptParam struct {
+	UserId  int   `json:"user_id"`
+	DeptIds []int `json:"dept_id"`
+}
+
 type UserBindDeviceInfoParam struct {
 	UserId        int   `json:"user_id"`
 	DeviceInfoIds []int `json:"device_info_id"`
