@@ -217,6 +217,8 @@ const zhCHS = {
         pleaseEnterIccid: '请输入集成电路卡识别码',
         pleaseEnterAccessNumber: '请输入接入号',
         pleaseEnterExpiration: '请输入到期时间',
+        pleaseCreateCalculateRule: '请至少创建一条计算规则',
+        pleaseCreateScriptAlarmRule: '请至少创建一条脚本报警规则',
     }
 };
 

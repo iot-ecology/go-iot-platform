@@ -217,6 +217,8 @@ const en = {
         pleaseEnterIccid: 'Please Enter iccid',
         pleaseEnterAccessNumber: 'Please Enter Access Number',
         pleaseEnterExpiration: 'Please Enter Expiration',
+        pleaseCreateCalculateRule: 'Please create one calculation rule',
+        pleaseCreateScriptAlarmRule: 'Please create one script alarm rule',
 
     }
 };

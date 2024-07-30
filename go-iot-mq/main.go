@@ -50,6 +50,7 @@ func main() {
 	}
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
+	CreateRabbitQueue("calc_queue")
 	CreateRabbitQueue("waring_handler")
 	CreateRabbitQueue("waring_notice")
 	CreateRabbitQueue("transmit_handler")

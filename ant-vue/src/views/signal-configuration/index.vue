@@ -293,8 +293,8 @@ const pageList = async () => {
   }));
 };
 const onSignal = (id: string, mqtt_client_id: string) => {
-  routerStore.setRouterName("/signal");
-  jump.routeJump({ path: "/signal", query: { id, mqtt_client_id } });
+  routerStore.setRouterName("/signal/index");
+  jump.routeJump({ path: "/signal/index", query: { id, mqtt_client_id } });
 };
 
 const handleTableChange = async (page: any) => {

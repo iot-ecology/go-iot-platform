@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -26,7 +25,6 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"syscall"
 	"time"
 )
 
@@ -465,12 +463,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer func(lg *zap.Logger) {
-		err := lg.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			zap.S().Errorf("日志同步失败 %+v", err)
-		}
-	}(lg)
+	//defer func(lg *zap.Logger) {
+	//	err := lg.Sync()
+	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	//		zap.S().Errorf("日志同步失败 %+v", err)
+	//	}
+	//}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -478,7 +476,8 @@ func initLog() {
 }
 
 func initRouter(r *gin.RouterGroup) {
-	r.Use(router.JwtCheck())
+	// todo 暂时屏蔽
+	//r.Use(router.JwtCheck())
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
