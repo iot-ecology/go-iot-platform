@@ -188,6 +188,7 @@ const zhCHS = {
         email: '邮箱',
         pleaseEnterEmailAddress: '请输入正确邮箱地址',
         assigningRoles: '分配角色',
+        assigningDept: '分配部门',
         unbound: '未绑定',
         bound: '已绑定',
         productDes: '产品描述',

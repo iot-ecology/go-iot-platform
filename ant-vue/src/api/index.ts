@@ -298,5 +298,16 @@ export async function SimCardDelete(id: any) {
   return await axios.post(`${url}/SimCard/delete/${id}`);
 }
 
-
-
+//生产计划
+export async function ProductionPlanPage(params: any) {
+  return await axios.get(`${url}/ProductionPlan/page`, { params });
+}
+export async function ProductionPlanCreate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/create`, data);
+}
+export async function ProductionPlanUpdate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/change_state`, data);
+}
+export async function ProductionPlanDelete(id: any) {
+  return await axios.post(`${url}/SimCard/delete/${id}`);
+}

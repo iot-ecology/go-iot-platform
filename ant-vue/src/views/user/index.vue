@@ -34,7 +34,7 @@
               <span v-else>
                 <a-button type="primary" size="small" @click="edit(record.key)">{{$t('message.edit')}}</a-button>
                 <a-button type="primary" size="small" @click="showRoleBol = true, userId=record.id, getBindRole()" style="margin-left: 10px;">{{$t('message.assigningRoles')}}</a-button>
-                                <a-button type="primary" size="small" @click="showDeptBol = true, userId=record.id,getBindDept()" style="margin-left: 10px;">分配部门</a-button>
+                                <a-button type="primary" size="small" @click="showDeptBol = true, userId=record.id,getBindDept()" style="margin-left: 10px;">{{$t('message.assigningDept')}}</a-button>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.id)">
                   <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>

@@ -188,6 +188,7 @@ const en = {
         email: 'Email',
         pleaseEnterEmailAddress: 'Please Enter The Correct Email Address',
         assigningRoles: 'Assigning Roles',
+        assigningDept: 'Assigning Dept',
         unbound: 'Unbound',
         bound: 'Bound',
         productDes: 'Product Description',
