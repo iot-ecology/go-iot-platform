@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0.38
+    container_name: mysql8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: iot
+      MYSQL_USER: app
+      MYSQL_PASSWORD: iot123456
+      TZ: "Asia/Shanghai"
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --binlog-format=ROW

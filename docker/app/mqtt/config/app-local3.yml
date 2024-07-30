@@ -1,0 +1,19 @@
+node_info:
+  host: 172.17.0.1
+  port: 8008
+  name: m3
+  type: mqtt
+  size: 3
+redis_config:
+  host: 172.17.0.1
+  port: 6379
+  db: 10
+  password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+
+
+mq_config:
+  host: 172.17.0.1
+  port: 5672
+  username: guest
+  password: guest

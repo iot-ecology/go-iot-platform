@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// HttpMessage 用于处理tcp转发后的数据
+// HttpMessage 用于处理http转发后的数据
 type HttpMessage struct {
 	Uid     string `json:"uid"`
 	Message string `json:"message"`
@@ -50,14 +50,14 @@ func HandlerDataHttpStorageString(d amqp.Delivery) {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return
 	}
-	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
+	zap.S().Infof("处理 pre_http_handler 数据 : %+v", msg)
 
 	script := GetScriptRedisForHttp(msg.Uid)
 	if script != "" {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row)
+			StorageDataRowList(row,"http")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 

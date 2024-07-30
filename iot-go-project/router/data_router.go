@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	"igp/biz"
 	"igp/glob"
 	"igp/servlet"
 	"reflect"
 )
 
 type InfluxDbApi struct{}
+
+var InfluxdbBiz = biz.InfluxdbBiz{}
 
 // QueryInfluxdb
 // @Tags      DATA
@@ -50,6 +53,26 @@ func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 
 	servlet.Resp(c, field)
 
+}
+
+// QueryMeasurement
+// @Tags      DATA
+// @Summary   查询Measurement明细
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      servlet.InfluxQueryConfig true "查询参数"
+// @Success   200  {object}  servlet.JSONResult
+// @Router    /query/QueryMeasurement [post]
+func (s *InfluxDbApi) QueryMeasurement(c *gin.Context) {
+	json := servlet.InfluxQueryConfig{}
+	err := c.ShouldBind(&json)
+	if err != nil {
+		glob.GLog.Sugar().Error("操作异常", err)
+		panic(err)
+
+	}
+	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement)
+	servlet.Resp(c, measurement)
 }
 
 // QueryInfluxdbString

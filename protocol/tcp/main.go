@@ -27,6 +27,7 @@ func main() {
 	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
 	InitRabbitCon()
 
+	initGlobalRedisClient(globalConfig.RedisConfig)
 	server := New(&Config{
 		Host: "localhost",
 		Port: strconv.Itoa(globalConfig.NodeInfo.Port),

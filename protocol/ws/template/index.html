@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+hello
+<script>
+    var webSocket;
+    try {
+        webSocket = new WebSocket('ws://127.0.0.1:8081/ws?id=abc123456789');
+    }catch (e) {
+        console.log(e)
+    }
+
+    webSocket.onerror = function(event) {}
+
+    //与WebSocket建立连接
+    webSocket.onopen = function(event) {
+        console.log('建立连接')
+        console.log(JSON.stringify(event))
+        var msg = "hi"
+        //发送消息
+        webSocket.send(msg);
+    };
+    //接收服务端发送的消息
+    webSocket.onmessage=function (m) {
+        console.log(m)
+        console.log(m.data)
+    }
+</script>
+</body>
+</html>

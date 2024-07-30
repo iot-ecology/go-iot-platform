@@ -26,7 +26,7 @@ var writeAPI api.WriteAPI
 func main() {
 
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local-pre_handler.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)
@@ -50,6 +50,7 @@ func main() {
 	}
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
+	CreateRabbitQueue("calc_queue")
 	CreateRabbitQueue("waring_handler")
 	CreateRabbitQueue("waring_notice")
 	CreateRabbitQueue("transmit_handler")
@@ -124,6 +125,20 @@ func main() {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
 		cus.Handle(preHttpHandler, HandlerHttpDataStorage, 1, "pre_http_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "pre_ws_handler" {
+		preWsHandler, err := cus.AnnounceQueue("pre_ws_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preWsHandler, HandlerWsDataStorage, 1, "pre_ws_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "pre_coap_handler" {
+		preCCoapHandler, err := cus.AnnounceQueue("pre_coap_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preCCoapHandler, HandlerCoapDataStorage, 1, "pre_coap_handler", "")
 	}
 
 }

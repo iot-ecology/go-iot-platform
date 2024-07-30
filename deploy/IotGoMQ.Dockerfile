@@ -9,7 +9,6 @@ WORKDIR /app
 COPY ../go-iot-mq ./go-iot-mq
 COPY ../notice ./notice
 COPY ../transmit ./transmit
-COPY ../go-iot ./go-iot
 
 #
 RUN cd go-iot-mq && go mod tidy && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
@@ -32,4 +31,4 @@ ENV GIN_MODE=release \
 EXPOSE 8080
 
 #fixme: 配置需要动态调整
-ENTRYPOINT ["/app/main", "-config", "/app/app-local.yml"]
+ENTRYPOINT ["/app/main","-config","/app/app-local.yml"]

@@ -327,7 +327,7 @@ const onConfirm = () => {
           };
           if (activeKey.value === "dynamic_Time") {
             listArr.value[indexNumber.value].param.sub = activeKey.value === "dynamic_Time" ? dateTime.value : "";
-            listArr.value[indexNumber.value].param.sub = activeKey.value === "dynamic_Time" ? dateUnit.value : "";
+            listArr.value[indexNumber.value].param.dateUnit = activeKey.value === "dynamic_Time" ? dateUnit.value : "";
           }
           if (activeKey.value === "static_Time") {
             listArr.value[indexNumber.value].param.start_time = activeKey.value === "dynamic_Time" ? start_time : form.start_time;
@@ -418,8 +418,7 @@ const onSaveInformation = () => {
   const list = listArr.value.map((it) => ({ name: it.name, id: it.id, show: it.show, param: it.param, showSpinning: it.showSpinning }));
   const data = {
     config: JSON.stringify(list),
-    name: createName.value,
-    id:""
+    name: createName.value
   };
   if (route.query.id) {
     data.id = id.value;

@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/router"
@@ -27,7 +25,6 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"syscall"
 	"time"
 )
 
@@ -65,6 +62,8 @@ var (
 
 	tcpHandlerApi  = router.TcpHandlerApi{}
 	httpHandlerApi = router.HttpHandlerApi{}
+	coapHandlerApi = router.CoapHandlerApi{}
+	wsHandlerApi = router.WebsocketHandlerApi{}
 )
 
 func initTable() {
@@ -199,6 +198,13 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.UserRole{}) {
 
 		err := glob.GDb.AutoMigrate(&models.UserRole{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.UserDept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserDept{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -358,9 +364,30 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&models.DeviceBindHTTPHandler{}) {
+	if !glob.GDb.Migrator().HasTable(&models.WebsocketHandler{}) {
 
-		err := glob.GDb.AutoMigrate(&models.DeviceBindHTTPHandler{})
+		err := glob.GDb.AutoMigrate(&models.WebsocketHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CoapHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CoapHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.FeiShu{}) {
+
+		err := glob.GDb.AutoMigrate(&models.FeiShu{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DingDing{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -436,12 +463,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer func(lg *zap.Logger) {
-		err := lg.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			zap.S().Errorf("日志同步失败 %+v", err)
-		}
-	}(lg)
+	//defer func(lg *zap.Logger) {
+	//	err := lg.Sync()
+	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	//		zap.S().Errorf("日志同步失败 %+v", err)
+	//	}
+	//}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -449,7 +476,8 @@ func initLog() {
 }
 
 func initRouter(r *gin.RouterGroup) {
-	r.Use(router.JwtCheck())
+	// todo 暂时屏蔽
+	//r.Use(router.JwtCheck())
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
@@ -462,6 +490,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/mqtt/check-script", mqttApi.CheckScript)
 	r.POST("/mqtt/send", mqttApi.SendMqttMessage)
 	r.POST("/query/influxdb", influxdbApi.QueryInfluxdb)
+	r.POST("/query/QueryMeasurement", influxdbApi.QueryMeasurement)
 	r.POST("/query/str-influxdb", influxdbApi.QueryInfluxdbString)
 
 	r.POST("/signal/create", signalApi.CreateSignal)
@@ -541,9 +570,13 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
 	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
 	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
+	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
+	r.POST("/DeviceInfo/BindWebsocket", deviceInfoApi.BindWebsocket)
 	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
 	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
+	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
+	r.GET("/DeviceInfo/QueryBindWebsocket", deviceInfoApi.QueryBindWebsocket)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -586,7 +619,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/User/:id", userApi.ByIdUser)
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/BindDept", userApi.BindDept)
 	r.GET("/User/QueryBindRole", userApi.QueryBindRole)
+	r.GET("/User/QueryBindDept", userApi.QueryBindDept)
 	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
 	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 
@@ -655,6 +690,18 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/HttpHandler/:id", httpHandlerApi.ByIdHttpHandler)
 	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
 	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
+
+	r.POST("/CoapHandler/create", coapHandlerApi.CreateCoapHandler)
+	r.POST("/CoapHandler/update", coapHandlerApi.UpdateCoapHandler)
+	r.GET("/CoapHandler/:id", coapHandlerApi.ByIdCoapHandler)
+	r.GET("/CoapHandler/page", coapHandlerApi.PageCoapHandler)
+	r.POST("/CoapHandler/delete/:id", coapHandlerApi.DeleteCoapHandler)
+
+	r.POST("/WebsocketHandler/create", wsHandlerApi.CreateWebsocketHandler)
+	r.POST("/WebsocketHandler/update", wsHandlerApi.UpdateWebsocketHandler)
+	r.GET("/WebsocketHandler/:id", wsHandlerApi.ByIdWebsocketHandler)
+	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
+	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
 
 }
 func initGlobalRedisClient() {
@@ -965,7 +1012,7 @@ func InitAll(r *gin.RouterGroup) {
 	initMongo()
 
 	initRouter(r)
-	go biz.InitRedisExpireHandler(glob.GRedis)
+	//go biz.InitRedisExpireHandler(glob.GRedis)
 	InitInfluxDbClient()
 }
 

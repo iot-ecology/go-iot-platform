@@ -58,6 +58,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 	zap.S().Infof("处理 handlerWaringDelayOnce 数据: %+v", msg)
 	uid := msg.DeviceUid
 	mapping := getDelayParam(uid, msg.DataRows)
+	zap.S().Infof("getDelayParam 数据: %+v", mapping)
 	background := context.Background()
 	var scriptParam = make(map[string][]Tv)
 	for _, param := range mapping {
@@ -74,6 +75,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 
 	}
 	script := getDelayScript(mapping)
+	zap.S().Infof("getDelayScript结果: %+v", script)
 	zap.S().Infof("脚本报警参数 = %+v", scriptParam)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
 	collection := db.Collection(globalConfig.MongoConfig.ScriptWaringCollection)
@@ -81,6 +83,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 	for _, waring := range script {
 		zap.S().Infof("key = %+v", waring)
 		delayScript := runWaringDelayScript(waring.Script, scriptParam)
+		zap.S().Infof("runWaringDelayScript 执行后数据: %+v", delayScript)
 		toInsert = append(toInsert, bson.M{
 			"device_uid":  uid,
 			"param":       scriptParam,
@@ -91,6 +94,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 			"up_time":     msg.Time,
 		})
 	}
+	zap.S().Infof("toInsert 数据: %+v", toInsert)
 	if toInsert != nil {
 
 		one, err := collection.InsertMany(context.Background(), toInsert)
@@ -150,7 +154,19 @@ func getDelayScript(mapping []SignalDelayWaringParam) []SignalDelayWaring {
 		}
 		res = append(res, singw)
 	}
-	return res
+	// 使用map来存储已经出现过的ID
+	idMap := make(map[int]bool)
+
+	var uniqueRes []SignalDelayWaring
+	for _, item := range res {
+		if _, exists := idMap[item.ID]; !exists {
+			// 如果ID在map中不存在，则添加到结果数组中
+			uniqueRes = append(uniqueRes, item)
+			// 将ID添加到map中，标记为已存在
+			idMap[item.ID] = true
+		}
+	}
+	return uniqueRes
 }
 
 // getDelayParam 函数根据用户UID和DataRow切片从Redis中获取延迟报警参数

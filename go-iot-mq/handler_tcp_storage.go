@@ -50,14 +50,14 @@ func HandlerDataTcpStorageString(d amqp.Delivery) {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return
 	}
-	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
+	zap.S().Infof("处理 pre_tcp_handler 数据 : %+v", msg)
 
 	script := GetScriptRedisForTcp(msg.Uid)
 	if script != "" {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row)
+			StorageDataRowList(row,"tcp")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 

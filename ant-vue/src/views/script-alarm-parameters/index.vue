@@ -230,6 +230,10 @@ watch(locale, () => {
 });
 
 const onAdd = () => {
+  if (!form.signal_delay_waring_id) {
+    message.error(`${t('message.pleaseCreateScriptAlarmRule')}`);
+    return;
+  }
   modalVisible.value = true;
   title.value = t('message.addition');
 };
@@ -266,6 +270,10 @@ const handleTableChange = async (page: any) => {
   await pageList();
 };
 const onAddData = () => {
+  if (!form.signal_delay_waring_id) {
+    message.error(`${t('message.pleaseCreateScriptAlarmRule')}`);
+    return;
+  }
   (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {

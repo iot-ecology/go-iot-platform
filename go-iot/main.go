@@ -20,7 +20,7 @@ func main() {
 	InitLog()
 
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)

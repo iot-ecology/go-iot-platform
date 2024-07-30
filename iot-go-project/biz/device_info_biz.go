@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -27,19 +28,32 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 	offset := (page - 1) * size
 	db.Offset(offset).Limit(size).Find(&dt)
 
-	for i, info := range dt {
-		dt[i].ProductName = productBiz.FindById(info.ProductId).Name
+	var resp []servlet.DeviceInfoRes
 
+	for _, info := range dt {
+		ProductName := productBiz.FindById(info.ProductId).Name
+		resp = append(resp, servlet.DeviceInfoRes{
+			ProductId:         info.ProductId,
+			SN:                info.SN,
+			ManufacturingDate: ut.LocalTime(info.ManufacturingDate) ,
+			ProcurementDate:   ut.LocalTime(info.ProcurementDate),
+			Source:            info.Source,
+			WarrantyExpiry:    ut.LocalTime(info.WarrantyExpiry),
+			PushInterval:      info.PushInterval,
+			ErrorRate:         info.ErrorRate,
+			Model:             info.Model,
+			ProductName:       ProductName,
+		})
 
 	}
-	pagination.Data = dt
+	pagination.Data = resp
 	pagination.Page = page
 	pagination.Size = size
 
 	return &pagination, nil
 }
-//mqttClients[i].LastPushTime = glob.GRedis.Get(context.Background(), "last_push_time:"+strconv.Itoa(int(client.ID))).Val()
 
+//mqttClients[i].LastPushTime = glob.GRedis.Get(context.Background(), "last_push_time:"+strconv.Itoa(int(client.ID))).Val()
 
 func (biz *DeviceInfoBiz) FindById(id uint) *models.DeviceInfo {
 	redis := biz.FindByIdWithRedis(id)
@@ -51,6 +65,13 @@ func (biz *DeviceInfoBiz) FindById(id uint) *models.DeviceInfo {
 	db := glob.GDb
 	db.Where("id = ?", id).Find(&dt)
 	biz.SetRedis(dt)
+	return &dt
+}
+func (biz *DeviceInfoBiz) FindBySn(sn string) *models.DeviceInfo {
+
+	var dt models.DeviceInfo
+	db := glob.GDb
+	db.Where("sn = ?", sn).Find(&dt)
 	return &dt
 }
 

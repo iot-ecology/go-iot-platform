@@ -13,7 +13,9 @@ func main() {
 	defer handler.Close()
 	client := modbus.NewClient(handler)
 
-	_, err = client.WriteMultipleRegisters(0, 5, []byte{0, 3, 0, 4, 0, 5, 1, 1, 1, 2})
+
+
+	_, err = client.WriteMultipleRegisters(0, 5, []byte{0, 1, 0, 4, 0, 5, 1, 1, 1, 2})
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}

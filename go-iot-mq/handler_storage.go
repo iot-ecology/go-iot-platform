@@ -65,7 +65,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row)
+			StorageDataRowList(row,"mqtt")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -114,8 +114,7 @@ func HandlerMqttLastTime(data []DataRowList) {
 
 	if lastTime != fmt.Sprintf("%d", now) {
 
-		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0,
-			-1).Val()
+		val := globalRedisClient.LRange(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid, 0, -1).Val()
 
 		for _, s := range val {
 			handlerOne(s)
@@ -125,7 +124,7 @@ func HandlerMqttLastTime(data []DataRowList) {
 
 }
 
-func handlerOne( deviceUid string) bool {
+func handlerOne(deviceUid string) bool {
 	val := globalRedisClient.Get(context.Background(), "mqtt_client_id_bind_device_info:"+deviceUid).Val()
 	if val == "" {
 		return true
@@ -138,7 +137,7 @@ func handlerOne( deviceUid string) bool {
 	globalRedisClient.Expire(context.Background(), "Device_Off_Message:"+deviceUid, time.Duration(withRedis.PushInterval)*time.Second)
 	return false
 }
-func  FindByIdWithRedis(id uint64) *DeviceInfo {
+func FindByIdWithRedis(id uint64) *DeviceInfo {
 	val := globalRedisClient.HGet(context.Background(), "struct:device_info", strconv.Itoa(int(id))).Val()
 
 	var res DeviceInfo
@@ -149,6 +148,14 @@ func  FindByIdWithRedis(id uint64) *DeviceInfo {
 	return &res
 }
 
+func genMeasurement(dt DataRowList, protocol string) string {
+	if dt.DeviceUid == dt.IdentificationCode {
+		return protocol + "_" + dt.DeviceUid
+	} else {
+		return protocol + "_" + dt.DeviceUid  +"_"+ dt.IdentificationCode
+	}
+}
+
 // StorageDataRowList 函数将DataRowList类型指针dt中的数据写入InfluxDB数据库
 // 参数：
 //
@@ -157,10 +164,13 @@ func  FindByIdWithRedis(id uint64) *DeviceInfo {
 // 返回值：
 //
 //	无
-func StorageDataRowList(dt DataRowList) {
+func StorageDataRowList(dt DataRowList,protocol string) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid)
+	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
+	zap.S().Infof("当前的DataRowList数据: %+v", dt)
 	timeFromUnix := time.Unix(dt.Time, 0)
-	p := influxdb2.NewPointWithMeasurement(dt.DeviceUid).
+
+	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt,protocol)).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
 		SetTime(timeFromUnix)
@@ -175,32 +185,38 @@ func StorageDataRowList(dt DataRowList) {
 			p.AddField(strconv.Itoa(signal2[row.Name].ID), row.Value)
 
 		}
-
+		zap.S().Infof("当前信号的的CacheSize:%+v=============rowName:%+v", signal2[row.Name].CacheSize, row.Name)
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
-
+			zap.S().Infof("当前signal_delay_warning的大小: %+v", currentSize)
 			// 如果 ZSet 的大小已经达到或超过配置的缓存大小，则移除第一个元素
 			if currentSize >= signal2[row.Name].CacheSize {
+				zap.S().Infof("当前signal_delay_warning的currentSize大于等于配置大小:%+v", signal2[row.Name].CacheSize)
 				// 移除 ZSet 中分数最低的元素，即最早的元素
 				i := signal2[row.Name].CacheSize + 1 - currentSize
+				zap.S().Infof("计算后的i: %+v", i)
 				if i == 1 {
-
+					zap.S().Infof("计算后的i的值为1")
 				} else {
-					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i).Err()
+					zap.S().Infof("开始移除之前的元素")
+					err := globalRedisClient.ZRemRangeByRank(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), 0, i-1).Err()
 					if err != nil {
 						// 处理错误
 						zap.S().Errorf("移除 ZSet 元素异常：%+v", err)
 					}
 				}
+			} else {
+				zap.S().Infof("当前大小未超过配置大小,写入缓存")
+				// 写入缓存
+				// 根据zset的特效,如果value一致的话,则会修改score,此处体现为修改了该值的时间,也就是说最新的值和之前的值相同的话只会保留最新时间的这一份
+				err := globalRedisClient.ZAdd(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
+				if err != nil {
+					// 处理错误
+					zap.S().Errorf("写入 ZSet 元素异常：%+v", err)
+				}
 			}
 
-			// 写入缓存
-			err := globalRedisClient.ZAdd(context.Background(), "signal_delay_warning:"+dt.DeviceUid+":"+strconv.Itoa(signal2[row.Name].ID), redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
-			if err != nil {
-				// 处理错误
-				zap.S().Errorf("写入 ZSet 元素异常：%+v", err)
-			}
 		}
 
 	}
