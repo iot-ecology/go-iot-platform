@@ -10,7 +10,7 @@ import (
 func registerInfo(node *NodeInfo) {
 
 	jsonData, _ := json.Marshal(node)
-	globalRedisClient.Set(context.Background(), "pod:info:tcp:"+node.Name, jsonData, 1*time.Hour)
+	globalRedisClient.Set(context.Background(), "pod:info:http:"+node.Name, jsonData, 1*time.Hour)
 
 }
 func BeatTask(f NodeInfo) {
