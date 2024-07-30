@@ -193,7 +193,7 @@ const zhCHS = {
         productDes: '产品描述',
         imageUrl: '图片',
         minimum_stock: '最低库存量',
-        price: '价格',
+        price: '价格（元）',
         quantity: '库存数量',
         sku: '库存单位',
         status: '状态',

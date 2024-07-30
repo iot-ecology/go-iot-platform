@@ -193,7 +193,7 @@ const en = {
         productDes: 'Product Description',
         imageUrl: 'ImageUrl',
         minimum_stock: 'Minimum Stock',
-        price: 'Price',
+        price: 'Price（$）',
         quantity: 'Quantity',
         sku: 'Sku',
         status: 'Status',

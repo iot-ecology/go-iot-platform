@@ -46,7 +46,7 @@
         </template>
       </a-table>
       <!--新增-->
-      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
+      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @cancel="handleCancel()" @ok="onAddData()">
         <a-form ref="formRef" :label-col="{ style: { width: '120px' } }" :labelWrap="true" :rules="rules" :model="form">
           <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" :placeholder="$t('message.pleaseEnter')" />
@@ -171,6 +171,11 @@ const confirm = async (id: string) => {
     console.error(e)
   });
 };
+
+const handleCancel = ()=>{
+  formRef.value?.resetFields();
+}
+
 
 const onAddData = async() => {
   (formRef.value as HTMLFormElement)

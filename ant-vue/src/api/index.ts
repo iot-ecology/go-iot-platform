@@ -261,8 +261,14 @@ export async function UserDelete(id: any) {
 export async function UserBindRole(data: any) {
   return await axios.post(`${url}/User/BindRole`, data);
 }
+export async function UserBindDept(data: any) {
+  return await axios.post(`${url}/User/BindDept`, data);
+}
 export async function UserQueryBindRole(params: any) {
   return await axios.get(`${url}/User/QueryBindRole?user_id=${params}`, );
+}
+export async function UserQueryBindDept(params: any) {
+  return await axios.get(`${url}/User/QueryBindDept?user_id=${params}`, );
 }
 
 //产品

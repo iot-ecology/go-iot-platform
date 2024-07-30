@@ -13,12 +13,13 @@
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
-          <template v-if="['username', 'password', 'email'].includes(String(column.dataIndex))">
+          <template v-if="[ 'password', 'email'].includes(String(column.dataIndex))">
             <div>
               <a-input v-if="editableData[record.key] && column.dataIndex!=='password'" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
               <a-input-password v-else-if="editableData[record.key] && column.dataIndex==='password'" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
               <template v-else>
-                <div>{{ text }}</div>
+                <div v-if="column.dataIndex==='password'">*****</div>
+                <div v-else>{{ text }}</div>
               </template>
             </div>
           </template>
@@ -33,6 +34,7 @@
               <span v-else>
                 <a-button type="primary" size="small" @click="edit(record.key)">{{$t('message.edit')}}</a-button>
                 <a-button type="primary" size="small" @click="showRoleBol = true, userId=record.id, getBindRole()" style="margin-left: 10px;">{{$t('message.assigningRoles')}}</a-button>
+                                <a-button type="primary" size="small" @click="showDeptBol = true, userId=record.id,getBindDept()" style="margin-left: 10px;">分配部门</a-button>
                 <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.id)">
                   <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
                 </a-popconfirm>
@@ -43,7 +45,7 @@
       </a-table>
 
       <!--      新增-->
-      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
+      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @cancel="handleCancel()" @ok="onAddData()">
         <a-form ref="formRef" :label-col="{ style: { width: '120px' } }" :labelWrap="true" :rules="rules" :model="form">
           <a-form-item :label="$t('message.username')" name="username">
             <a-input v-model:value="form.username" style="width: 350px" :placeholder="$t('message.pleaseEnter')" />
@@ -71,16 +73,31 @@
             @selectChange="handleSelectChange"
         />
       </a-modal>
+
+      <!--绑定部门-->
+      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="showDeptBol" :destroy-on-close="true" title="分配部门" @ok="onAddDept()">
+        <DeptSelect :multiple="true" v-model:value="deptId" style="width: 350px" />
+      </a-modal>
     </a-card>
   </div>
 </template>
 <script lang="ts" setup>
 import {onMounted, reactive, ref, UnwrapRef, watch} from 'vue'
-import {RoleList, UserBindRole, UserCreate, UserDelete, UserPage, UserQueryBindRole, UserUpdate} from "@/api";
+import {
+  RoleList,
+  UserBindDept,
+  UserBindRole,
+  UserCreate,
+  UserDelete,
+  UserPage, UserQueryBindDept,
+  UserQueryBindRole,
+  UserUpdate
+} from "@/api";
 import {useI18n} from "vue-i18n";
 import {Rule} from "ant-design-vue/es/form";
 import {message} from "ant-design-vue";
 import {cloneDeep} from "lodash-es";
+import DeptSelect from "@/components/select/DeptSelect.vue";
 
 interface DataItem {
   name: string;
@@ -88,7 +105,9 @@ interface DataItem {
   can_del: boolean;
 }
 
+const deptId = ref([]);
 const showRoleBol = ref(false);
+const showDeptBol = ref(false)
 const roleData = ref([]);
 const selectedKeys = ref([]);
 const targetKeys = ref([]);
@@ -229,6 +248,25 @@ const onAddData = async() => {
       });
 }
 
+
+const onAddDept = async() => {
+console.log(deptId.value);
+  UserBindDept({ user_id: userId.value,dept_id: deptId.value, }).then(async ({ data }) => {
+    if (data.code === 20000) {
+      message.success(data.message);
+      showDeptBol.value = false;
+      await pageList();
+    } else {
+      message.error(`${t('message.operationFailed')}:${data.data}`);
+    }
+  }).catch(e=>{
+    console.error(e)
+  });
+}
+const handleCancel = ()=>{
+  formRef.value?.resetFields();
+}
+
 const onAddRole = async()=> {
   UserBindRole({ role_id:targetKeys.value, user_id: userId.value }).then(async ({ data }) => {
     if (data.code === 20000) {
@@ -251,24 +289,27 @@ const handleTableChange = async (page: any) => {
 
 const handleChange = (nextTargetKeys: string[], direction: string, moveKeys: string[]) => {
   targetKeys.value = nextTargetKeys;
-  console.log('targetKeys: ', nextTargetKeys);
-  console.log('direction: ', direction);
-  console.log('moveKeys: ', moveKeys);
 };
 const handleSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
   selectedKeys.value = [...sourceSelectedKeys, ...targetSelectedKeys];
-  console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-  console.log('targetSelectedKeys: ', targetSelectedKeys);
 };
 
 const getRoleList = async()=> {
   const { data } = await RoleList();
   roleData.value = data.data?.map((item: any)=>({key:item.ID,title:item.name}))
 }
+
+
 const getBindRole = async()=>{
   targetKeys.value = []
   const { data } = await UserQueryBindRole(userId.value);
   targetKeys.value = data.data?.map(it=>it.role_id)
+}
+
+const getBindDept = async()=> {
+  deptId.value = []
+  const { data } = await UserQueryBindDept(userId.value);
+  deptId.value = data.data?.map(it=>it.dept_id)
 }
 
 onMounted(async () => {
