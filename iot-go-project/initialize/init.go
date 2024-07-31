@@ -546,28 +546,24 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/MongoTransmit/:id", mongoTransmitApi.ByIdMongoTransmit)
 	r.GET("/MongoTransmit/page", mongoTransmitApi.PageMongoTransmit)
 	r.POST("/MongoTransmit/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
-	r.POST("/MongoTransmit/mockScript", mongoTransmitApi.MockScript)
 
 	r.POST("/InfluxdbTransmit/create", influxdbTransmitApi.CreateInfluxdbTransmit)
 	r.POST("/InfluxdbTransmit/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
 	r.GET("/InfluxdbTransmit/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
 	r.GET("/InfluxdbTransmit/page", influxdbTransmitApi.PageInfluxdbTransmit)
 	r.POST("/InfluxdbTransmit/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
-	r.POST("/InfluxdbTransmit/mockScript", influxdbTransmitApi.MockScript)
 
 	r.POST("/ClickhouseTransmit/create", clickTransmitApi.CreateClickhouseTransmit)
 	r.POST("/ClickhouseTransmit/update", clickTransmitApi.UpdateClickhouseTransmit)
 	r.GET("/ClickhouseTransmit/:id", clickTransmitApi.ByIdClickhouseTransmit)
 	r.GET("/ClickhouseTransmit/page", clickTransmitApi.PageClickhouseTransmit)
 	r.POST("/ClickhouseTransmit/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
-	r.POST("/ClickhouseTransmit/mockScript", clickTransmitApi.MockScript)
 
 	r.POST("/CassandraTransmit/create", cassandraTransmitApi.CreateCassandraTransmit)
 	r.POST("/CassandraTransmit/update", cassandraTransmitApi.UpdateCassandraTransmit)
 	r.GET("/CassandraTransmit/:id", cassandraTransmitApi.ByIdCassandraTransmit)
 	r.GET("/CassandraTransmit/page", cassandraTransmitApi.PageCassandraTransmit)
 	r.POST("/CassandraTransmit/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
-	r.POST("/CassandraTransmit/mockScript", cassandraTransmitApi.MockScript)
 
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)

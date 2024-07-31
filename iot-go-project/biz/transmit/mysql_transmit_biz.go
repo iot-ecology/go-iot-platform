@@ -6,9 +6,6 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"iot-transmit/cache"
-	"iot-transmit/common"
-	"iot-transmit/mysql"
 	"strconv"
 )
 
