@@ -14,7 +14,7 @@ const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
 const options = ref<any>([]);
-const value = ref<any>(props.modelValue);
+const value = ref<any>();
 const valueResult = ref<any>("");
 const valueSearch = ref<any>("");
 const showOpen = ref(false);
@@ -24,7 +24,7 @@ const List = async () => {
   const { data } = await ProductPage({ name: "", page: page.value, page_size: 100 });
   const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
   options.value = options.value.concat(listArr);
-  if (Number(props.modelValue) && !options.value.map((it) => it.value).includes(Number(props.modelValue))) {
+  if (Number(props.modelValue) && !options.value.map((it: any) => it.value).includes(Number(props.modelValue))) {
     page.value++;
     await List();
   } else {
@@ -40,6 +40,12 @@ const List = async () => {
   valueResult.value = value.value;
 };
 
+watch(()=>props.modelValue,(newValue)=>{
+  console.log(newValue)
+  if(newValue) {
+    value.value = newValue
+  }
+})
 const select = async (ValueClick: any) => {
   if (ValueClick === -11) {
     value.value = valueResult.value;
@@ -98,6 +104,8 @@ watch(value, async (newValue) => {
     page.value = 1;
     valueSearch.value = "";
     await List();
+  }else {
+    emits("update:modelValue", newValue);
   }
 });
 

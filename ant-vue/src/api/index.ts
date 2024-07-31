@@ -306,8 +306,11 @@ export async function ProductionPlanCreate(data: any) {
   return await axios.post(`${url}/ProductionPlan/create`, data);
 }
 export async function ProductionPlanUpdate(data: any) {
-  return await axios.post(`${url}/ProductionPlan/change_state`, data);
+  return await axios.post(`${url}/ProductionPlan/update`, data);
 }
 export async function ProductionPlanDelete(id: any) {
-  return await axios.post(`${url}/SimCard/delete/${id}`);
+  return await axios.post(`${url}/ProductionPlan/delete/${id}`);
+}
+export async function ProductionPlanDetail(id: any) {
+  return await axios.get(`${url}/ProductionPlan/${id}`);
 }
