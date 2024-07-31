@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build-docker": "vite build --mode docker",
     "lint": "eslint . --ext .cjs,.ts,.vue --fix",
     "svgo:simple": "svgo -f src/icons/simple --config=src/icons/simple.config.cjs",
     "svgo:complex": "svgo -f src/icons/complex --config=src/icons/complex.config.cjs"

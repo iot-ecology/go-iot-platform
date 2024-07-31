@@ -11,7 +11,7 @@ import (
 
 type ClickhouseTransmitApi struct{}
 
-var ClickhouseTransmit = transmit.ClickhouseTransmitBiz{}
+var ClickhouseTransmitBiz = transmit.ClickhouseTransmitBiz{}
 
 // CreateClickhouseTransmit
 // @Summary 创建Clickhouse数据库管理
@@ -37,6 +37,7 @@ func (api *ClickhouseTransmitApi) CreateClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	ClickhouseTransmitBiz.SetRedis(ClickhouseTransmit)
 	// 返回创建成功的Clickhouse数据库管理
 	servlet.Resp(c, ClickhouseTransmit)
 }
@@ -71,6 +72,7 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 
 	var newV models.ClickhouseTransmit
 	newV = old
+	newV.Name=req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +80,7 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	ClickhouseTransmitBiz.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +112,7 @@ func (api *ClickhouseTransmitApi) PageClickhouseTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := ClickhouseTransmit.PageData(name, parseUint, u)
+	data, err := ClickhouseTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -139,7 +142,7 @@ func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	ClickhouseTransmitBiz.DeleteRedis(ClickhouseTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -162,21 +165,4 @@ func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 	}
 
 	servlet.Resp(c, ClickhouseTransmit)
-}
-
-// MockScript
-// @Tags      ClickhouseTransmits
-// @Summary   模拟脚本
-// @Param ClickhouseTransmit body servlet.TransmitScriptParam true "执行参数"
-// @Produce   application/json
-// @Router    /ClickhouseTransmit/mockScript [post]
-func (api *ClickhouseTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := ClickhouseTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
 }

@@ -32,6 +32,7 @@ func main() {
 	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
 	InitRabbitCon()
 	initGlobalRedisClient(globalConfig.RedisConfig)
+	go BeatTask(globalConfig.NodeInfo)
 
 	Create(globalConfig.NodeInfo.Port)
 }

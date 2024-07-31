@@ -23,7 +23,7 @@ func HandlerTransmit(messages <-chan amqp.Delivery) {
 				zap.S().Error("处理cassandra数据失败", zap.Error(err))
 			}
 
-			transmitCacheBiz.Run(globalRedisClient, data[0].DeviceUid, data)
+			transmitCacheBiz.Run(globalRedisClient, data)
 			err = d.Ack(false)
 			if err != nil {
 				zap.S().Errorf("消息确认异常：%+v", err)

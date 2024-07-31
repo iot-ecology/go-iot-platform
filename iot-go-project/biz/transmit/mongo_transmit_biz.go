@@ -6,9 +6,6 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"iot-transmit/cache"
-	"iot-transmit/common"
-	"iot-transmit/mongo"
 	"strconv"
 )
 
@@ -34,45 +31,16 @@ func (biz *MongoTransmitBiz) PageData(name string, page, size int) (*servlet.Pag
 
 	return &pagination, nil
 }
-func (biz *MongoTransmitBiz) Bind(req models.MongoTransmitBind) {
-	glob.GDb.Model(models.MongoTransmitBind{}).Create(req)
-	jsonData := biz.toByte(req)
-	// 缓存构造
-	glob.GRedis.LPush(context.Background(), "transmit:mongo:"+strconv.Itoa(req.MqttClientId), jsonData)
-}
 
-func (biz *MongoTransmitBiz) toByte(req models.MongoTransmitBind) []byte {
-	var ref models.MongoTransmit
+func (biz *MongoTransmitBiz) SetRedis(param models.MongoTransmit) {
+	jsonData, err := json.Marshal(param)
 
-	glob.GDb.First(&ref, req.MongoTransmitId)
-
-	v := cache.MongoTransmitCache{
-		ID: "mongo-" + strconv.Itoa(int(req.ID)),
-
-		Host:       ref.Host,
-		Port:       ref.Port,
-		Username:   ref.Username,
-		Password:   ref.Password,
-		Database:   req.Database,
-		Collection: req.Collection,
-		Script:     req.Script,
-	}
-	jsonData, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
-	return jsonData
+	glob.GRedis.HSet(context.Background(), "transmit:mongo:"+strconv.Itoa(int(param.ID)), jsonData)
 }
 
-// ChangeEnable 修改启用状态
-func (biz *MongoTransmitBiz) ChangeEnable(req models.MongoTransmitBind) {
-	glob.GDb.Model(models.MongoTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
-	glob.GRedis.LRem(context.Background(), "transmit:mongo:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
-}
-
-var mongoOp = mongo.MongoOp{}
-
-// MockScript 模拟执行脚本
-func (biz *MongoTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) []map[string]interface{} {
-	return mongoOp.RunScript(dataRowList, script)
+func (biz *MongoTransmitBiz) DeleteRedis(param models.MongoTransmit) {
+	glob.GRedis.HDel(context.Background(), "transmit:mongo:"+strconv.Itoa(int(param.ID)))
 }

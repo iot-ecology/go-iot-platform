@@ -327,8 +327,8 @@ const onAddUpdateData = () => {
 };
 
 const onGo = (id: string) => {
-  routerStore.setRouterName("/script-alarm-parameters");
-  jump.routeJump({ path: "/script-alarm-parameters", query: { signal_delay_waring_id: id } });
+  routerStore.setRouterName("/script-alarm-parameters/index");
+  jump.routeJump({ path: "/script-alarm-parameters/index", query: { signal_delay_waring_id: id } });
 };
 const handleCancel = () => {
   modalVisible.value = false;

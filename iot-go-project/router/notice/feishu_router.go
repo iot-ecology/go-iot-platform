@@ -83,9 +83,12 @@ func (api *FeiShuApi) UpdateFeiShu(c *gin.Context) {
 	var newV models.FeiShu
 	newV = old
 	newV.Name = req.Name
+	newV.AccessToken = req.AccessToken
+	newV.Secret = req.Secret
+	newV.Content = req.Content
 
 	m := structs.Map(newV)
-	result = glob.GDb.Table("FeiShus").Where("id = ?", newV.ID).Updates(m)
+	result = glob.GDb.Model(models.FeiShu{}).Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 

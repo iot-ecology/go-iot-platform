@@ -1,0 +1,120 @@
+services:
+  iotgomqtt1:
+    build:
+      context: ../../
+      dockerfile: deploy/IotMQTT.Dockerfile
+    image: go-iot-mqtt:latest
+    entrypoint: ["/app/main", "-config", "/app/app-local.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./mqtt/config/app-local.yml:/app/app-local.yml
+    ports:
+      - 8006:8006
+    networks:
+      - iot-net
+  iotgomqtt2:
+    image: go-iot-mqtt:latest
+    ports:
+      - 8007:8007
+    entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./mqtt/config/app-local2.yml:/app/app-local2.yml
+    networks:
+      - iot-net
+  iotgomqtt3:
+    image: go-iot-mqtt:latest
+    ports:
+      - 8008:8008
+    entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./mqtt/config/app-local3.yml:/app/app-local3.yml
+    networks:
+      - iot-net
+  iotgomq-pre_handler:
+    build:
+      context: ../../
+      dockerfile: deploy/IotGoMQ.Dockerfile
+    image: go-iot-mq:latest
+    ports:
+      - 8001:29002
+    volumes:
+       - ./mq/config/app-local-pre_handler.yml:/app/app-local-pre_handler.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-pre_handler.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - iotgomqtt1
+    networks:
+      - iot-net
+  iotgomq-calc_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8002:29001
+    volumes:
+       - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - iotgomq-pre_handler
+    networks:
+      - iot-net
+  iotgomq-waring_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8003:29003
+    volumes:
+       - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - iotgomq-calc_handler
+    networks:
+      - iot-net
+  iotgomq-wd_handler:
+    image: go-iot-mq:latest
+    ports:
+      - 8004:29004
+    volumes:
+       - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
+    entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - iotgomq-calc_handler
+    networks:
+      - iot-net
+  iotgoproject:
+    build:
+      context: ../../
+      dockerfile: deploy/IotGoProject.Dockerfile
+    image: go-iot-project:latest
+    volumes:
+      - ./iot-project/config/app-local.yml:/app/app-local.yml
+      - ./iot-project/fileupdate:/app/fileupdate
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8005:8080
+    networks:
+      - iot-net
+  iot-admin-vue:
+    build:
+      context: ../../
+      dockerfile: deploy/IotAdminVue.Dockerfile
+    image: go-iot-admin-vue:latest
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8080:80
+    networks:
+      - iot-net
+networks:
+  iot-net:
+    driver: bridge

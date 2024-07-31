@@ -40,6 +40,8 @@ func main() {
 	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
 	InitRabbitCon()
 	InitGlobalRedisClient(globalConfig.RedisConfig)
+
+	go BeatTask(globalConfig.NodeInfo)
 	r := gin.Default()
 	initLog()
 	r.POST("/handler", HandlerMessage)

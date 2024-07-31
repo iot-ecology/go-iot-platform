@@ -178,15 +178,15 @@ func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 // @Summary   查询绑定设备
 // @Accept json
 // @Produce json
-// @Param group_id path int true "主键"
+// @Param group_id query int true "主键"
 // @Router    /device_group/query_bind_device [get]
 func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
-	param := c.Param("group_id")
+	param := c.Query("group_id")
 
 	var deviceGroupDevices []models.DeviceGroupDevice
 
 	// 使用 Where 和 Find 方法查询记录
-	result := glob.GDb.Where("`group_id` = ?", param).Find(&deviceGroupDevices)
+	result := glob.GDb.Where("`device_group_id` = ?", param).Find(&deviceGroupDevices)
 	if result.Error != nil {
 		zap.S().Infoln("Error occurred during query:", result.Error)
 		servlet.Error(c, "暂无数据")
@@ -217,7 +217,7 @@ func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	result := tx.Where("`group_id` = ?", param.GroupId).Delete(&models.DeviceGroupDevice{})
+	result := tx.Where("`device_group_id` = ?", param.GroupId).Delete(&models.DeviceGroupDevice{})
 
 	if result.Error != nil {
 		// 如果出现错误，回滚事务
@@ -263,7 +263,7 @@ func (api *DeviceGroupApi) QueryBindMqtt(c *gin.Context) {
 	var deviceGroupDevices []models.DeviceGroupBindMqttClient
 
 	// 使用 Where 和 Find 方法查询记录
-	result := glob.GDb.Where("`group_id` = ?", param).Find(&deviceGroupDevices)
+	result := glob.GDb.Where("`device_group_id` = ?", param).Find(&deviceGroupDevices)
 	if result.Error != nil {
 		zap.S().Infoln("Error occurred during query:", result.Error)
 		servlet.Error(c, "暂无数据")
@@ -294,7 +294,7 @@ func (api *DeviceGroupApi) BindMqtt(c *gin.Context) {
 		return
 	}
 
-	result := tx.Where("`group_id` = ?", param.DeviceGroupId).Delete(&models.DeviceGroupBindMqttClient{})
+	result := tx.Where("`device_group_id` = ?", param.DeviceGroupId).Delete(&models.DeviceGroupBindMqttClient{})
 
 	if result.Error != nil {
 		// 如果出现错误，回滚事务

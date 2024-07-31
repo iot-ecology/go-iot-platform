@@ -2,6 +2,11 @@ package models
 
 import "gorm.io/gorm"
 
+/****
+
+fixme: MqttClientId 字段语义存在歧义，应该修订为两个字段
+*/
+
 type MySQLTransmit struct {
 	gorm.Model `structs:"-"`
 	Name       string `json:"name" gorm:"column:name;type:varchar(255);" structs:"name"`
@@ -13,8 +18,9 @@ type MySQLTransmit struct {
 }
 
 type MySQLTransmitBind struct {
-	gorm.Model      `structs:"-"`
-	MqttClientId    int  `structs:"mqtt_client_id" json:"mqtt_client_id" ` // 客户端表的外键ID
+	gorm.Model `structs:"-"`
+	DeviceUid string    `json:"device_uid"` // 设备UID
+	IdentificationCode string `json:"identification_code"` // 设备标识码
 	MySQLTransmitId uint `struct:"mysql_transmit_id" json:"mysql_transmit_id" gorm:"column:mysql_transmit_id;type:int(
 10);" ` // MySQL传输表的外键ID
 	Table  string `struct:"table" json:"table" gorm:"column:table;type:varchar(255);"` // 表
@@ -34,7 +40,10 @@ type MongoTransmit struct {
 
 type MongoTransmitBind struct {
 	gorm.Model      `structs:"-"`
-	MqttClientId    int    `json:"mqtt_client_id"`                                                              // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	MongoTransmitId uint   `json:"mongo_transmit_id_transmit_id" gorm:"column:mysql_transmit_id;type:int(10);"` // Mongo传输表的外键ID
 	Collection      string `json:"collection" gorm:"column:collection;type:varchar(255);"`                      // 集合表
 	Database        string `json:"database" gorm:"column:database;type:varchar(255);"`
@@ -53,7 +62,10 @@ type InfluxdbTransmit struct {
 
 type InfluxdbTransmitBind struct {
 	gorm.Model         `structs:"-"`
-	MqttClientId       int    `json:"mqtt_client_id"`                                                        // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	InfluxdbTransmitId uint   `json:"influxdb_transmit_id" gorm:"column:influxdb_transmit_id;type:int(10);"` // 传输表的外键ID
 	Bucket             string `json:"bucket" gorm:"column:bucket;type:varchar(255);"`                        // 桶
 	Org                string `json:"org" gorm:"column:org;type:varchar(255);"`                              // 组织
@@ -74,7 +86,10 @@ type ClickhouseTransmit struct {
 
 type ClickhouseTransmitBind struct {
 	gorm.Model           `structs:"-"`
-	MqttClientId         int    `json:"mqtt_client_id"`                                                            // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	ClickhouseTransmitId uint   `json:"clickhouse_transmit_id" gorm:"column:clickhouse_transmit_id;type:int(10);"` // 传输表的外键ID
 	Database             string `json:"database" gorm:"column:database;type:varchar(255);"`                        // 数据库
 	Script               string `json:"script" gorm:"column:script"`                                               // 转换insert语句的脚本
@@ -94,7 +109,10 @@ type CassandraTransmit struct {
 
 type CassandraTransmitBind struct {
 	gorm.Model          `structs:"-"`
-	MqttClientId        int    `json:"mqtt_client_id"`                                                          // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	CassandraTransmitId uint   `json:"cassandra_transmit_id" gorm:"column:cassandra_transmit_id;type:int(10);"` // 传输表的外键ID
 	Database            string `json:"database" gorm:"column:database;type:varchar(255);"`                      // 数据库
 	Table               string `json:"table" gorm:"column:table;type:varchar(255);"`                            // 表
@@ -114,7 +132,10 @@ type RabbitmqTransmit struct {
 
 type RabbitmqTransmitBind struct {
 	gorm.Model         `structs:"-"`
-	MqttClientId       int    `json:"mqtt_client_id"`                                                        // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	RabbitmqTransmitId uint   `json:"rabbitmq_transmit_id" gorm:"column:rabbitmq_transmit_id;type:int(10);"` // 传输表
 	Exchange           string `json:"exchange" gorm:"column:exchange;type:varchar(255);"`                    // 交换机
 	RoutingKey         string `json:"routing_key" gorm:"column:routing_key;type:varchar(255);"`              // 路由键
@@ -131,7 +152,10 @@ type KafkaTransmit struct {
 }
 type KafkaTransmitBind struct {
 	gorm.Model      `structs:"-"`
-	MqttClientId    int    `json:"mqtt_client_id"`                                                  // MQTT客户端表的外键ID
+	DeviceUid string    `json:"device_uid"` // 设备UID
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
 	KafkaTransmitId uint   `json:"kafka_transmit_id" gorm:"column:kafka_transmit_id;type:int(10);"` // 传输表
 	Topic           string `json:"topic" gorm:"column:topic;type:varchar(255);"`                    // topic
 	Script             string `json:"script" gorm:"column:script"`                                           // 转换insert语句的脚本

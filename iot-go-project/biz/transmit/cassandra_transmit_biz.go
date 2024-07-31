@@ -6,9 +6,6 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"iot-transmit/cache"
-	"iot-transmit/cassandra"
-	"iot-transmit/common"
 	"strconv"
 )
 
@@ -35,46 +32,15 @@ func (biz *CassandraTransmitBiz) PageData(name string, page, size int) (*servlet
 	return &pagination, nil
 }
 
-func (biz *CassandraTransmitBiz) Bind(req models.CassandraTransmitBind) {
-	glob.GDb.Model(models.CassandraTransmitBind{}).Create(req)
-	jsonData := biz.toByte(req)
-	// 缓存构造
-	glob.GRedis.LPush(context.Background(), "transmit:cassandra:"+strconv.Itoa(req.MqttClientId), jsonData)
-}
+func (biz *CassandraTransmitBiz) SetRedis(param models.CassandraTransmit) {
+	jsonData, err := json.Marshal(param)
 
-func (biz *CassandraTransmitBiz) toByte(req models.CassandraTransmitBind) []byte {
-	var ref models.CassandraTransmit
-
-	glob.GDb.First(&ref, req.CassandraTransmitId)
-
-	v := cache.CassandraTransmitCache{
-		ID:       "cassandra-" + strconv.Itoa(int(req.ID)),
-		Host:     ref.Host,
-		Port:     ref.Port,
-		Username: ref.Username,
-		Password: ref.Password,
-		Database: req.Database,
-		Table:    req.Table,
-		Script:   req.Script,
-	}
-	jsonData, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
-	return jsonData
+	glob.GRedis.HSet(context.Background(), "transmit:cassandra:"+strconv.Itoa(int(param.ID)), jsonData)
 }
 
-// ChangeEnable 修改启用状态
-func (biz *CassandraTransmitBiz) ChangeEnable(req models.CassandraTransmitBind) {
-	glob.GDb.Model(models.CassandraTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
-
-	glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
-}
-
-var CassandraOp = cassandra.CassandraOp{}
-
-// MockScript 模拟执行脚本
-func (biz *CassandraTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) [][]cassandra.CassandraParam {
-
-	return CassandraOp.RunScript(dataRowList, script)
+func (biz *CassandraTransmitBiz) DeleteRedis(param models.CassandraTransmit) {
+	glob.GRedis.HDel(context.Background(), "transmit:cassandra:"+strconv.Itoa(int(param.ID)))
 }

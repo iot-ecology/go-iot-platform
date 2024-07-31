@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -23,10 +22,10 @@ import (
 	"igp/router"
 	"igp/router/notice"
 	"igp/router/transmit"
+	"igp/router/transmit/transmit_mqtt"
 	"log"
 	"net/url"
 	"os"
-	"syscall"
 	"time"
 )
 
@@ -64,6 +63,18 @@ var (
 
 	tcpHandlerApi  = router.TcpHandlerApi{}
 	httpHandlerApi = router.HttpHandlerApi{}
+	coapHandlerApi = router.CoapHandlerApi{}
+	wsHandlerApi = router.WebsocketHandlerApi{}
+
+	cassandraTransmitBindApi = transmit_mqtt.CassandraTransmitBindApi{}
+	clickhouseTransmitBindApi = transmit_mqtt.ClickhouseTransmitBindApi{}
+	influxdbTransmitBindApi = transmit_mqtt.InfluxdbTransmitBindApi{}
+	kafkaTransmitBindApi = transmit_mqtt.KafkaTransmitBindApi{}
+	mongoTransmitBindApi = transmit_mqtt.MongoTransmitBindApi{}
+	mySQLTransmitBindApi = transmit_mqtt.MySQLTransmitBindApi{}
+	rabbitmqTransmitBindApi = transmit_mqtt.RabbitmqTransmitBindApi{}
+
+
 )
 
 func initTable() {
@@ -202,6 +213,13 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.UserDept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserDept{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 	if !glob.GDb.Migrator().HasTable(&models.Dept{}) {
 
 		err := glob.GDb.AutoMigrate(&models.Dept{})
@@ -301,6 +319,20 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 	if !glob.GDb.Migrator().HasTable(&models.InfluxdbTransmit{}) {
 
 		err := glob.GDb.AutoMigrate(&models.InfluxdbTransmit{})
@@ -353,6 +385,34 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.HttpHandler{}) {
 
 		err := glob.GDb.AutoMigrate(&models.HttpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.WebsocketHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.WebsocketHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CoapHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CoapHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.FeiShu{}) {
+
+		err := glob.GDb.AutoMigrate(&models.FeiShu{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DingDing{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -428,12 +488,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer func(lg *zap.Logger) {
-		err := lg.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			zap.S().Errorf("日志同步失败 %+v", err)
-		}
-	}(lg)
+	//defer func(lg *zap.Logger) {
+	//	err := lg.Sync()
+	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	//		zap.S().Errorf("日志同步失败 %+v", err)
+	//	}
+	//}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -441,7 +501,8 @@ func initLog() {
 }
 
 func initRouter(r *gin.RouterGroup) {
-	r.Use(router.JwtCheck())
+	// todo 暂时屏蔽
+	//r.Use(router.JwtCheck())
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
@@ -479,35 +540,30 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/MySQLTransmit/:id", mysqlTransmitApi.ByIdMySQLTransmit)
 	r.GET("/MySQLTransmit/page", mysqlTransmitApi.PageMySQLTransmit)
 	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
-	r.POST("/MySQLTransmit/mockScript", mysqlTransmitApi.MockScript)
 
-	r.POST("/MongoTransmitApi/create", mongoTransmitApi.CreateMongoTransmit)
-	r.POST("/MongoTransmitApi/update", mongoTransmitApi.UpdateMongoTransmit)
-	r.GET("/MongoTransmitApi/:id", mongoTransmitApi.ByIdMongoTransmit)
-	r.GET("/MongoTransmitApi/page", mongoTransmitApi.PageMongoTransmit)
-	r.POST("/MongoTransmitApi/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
-	r.POST("/MongoTransmitApi/mockScript", mongoTransmitApi.MockScript)
+	r.POST("/MongoTransmit/create", mongoTransmitApi.CreateMongoTransmit)
+	r.POST("/MongoTransmit/update", mongoTransmitApi.UpdateMongoTransmit)
+	r.GET("/MongoTransmit/:id", mongoTransmitApi.ByIdMongoTransmit)
+	r.GET("/MongoTransmit/page", mongoTransmitApi.PageMongoTransmit)
+	r.POST("/MongoTransmit/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
 
-	r.POST("/InfluxdbTransmitApi/create", influxdbTransmitApi.CreateInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/page", influxdbTransmitApi.PageInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/mockScript", influxdbTransmitApi.MockScript)
+	r.POST("/InfluxdbTransmit/create", influxdbTransmitApi.CreateInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/page", influxdbTransmitApi.PageInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
 
-	r.POST("/ClickTransmitApi/create", clickTransmitApi.CreateClickhouseTransmit)
-	r.POST("/ClickTransmitApi/update", clickTransmitApi.UpdateClickhouseTransmit)
-	r.GET("/ClickTransmitApi/:id", clickTransmitApi.ByIdClickhouseTransmit)
-	r.GET("/ClickTransmitApi/page", clickTransmitApi.PageClickhouseTransmit)
-	r.POST("/ClickTransmitApi/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
-	r.POST("/ClickTransmitApi/mockScript", clickTransmitApi.MockScript)
+	r.POST("/ClickhouseTransmit/create", clickTransmitApi.CreateClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/update", clickTransmitApi.UpdateClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/:id", clickTransmitApi.ByIdClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/page", clickTransmitApi.PageClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
 
-	r.POST("/CassandraTransmitApi/create", cassandraTransmitApi.CreateCassandraTransmit)
-	r.POST("/CassandraTransmitApi/update", cassandraTransmitApi.UpdateCassandraTransmit)
-	r.GET("/CassandraTransmitApi/:id", cassandraTransmitApi.ByIdCassandraTransmit)
-	r.GET("/CassandraTransmitApi/page", cassandraTransmitApi.PageCassandraTransmit)
-	r.POST("/CassandraTransmitApi/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
-	r.POST("/CassandraTransmitApi/mockScript", cassandraTransmitApi.MockScript)
+	r.POST("/CassandraTransmit/create", cassandraTransmitApi.CreateCassandraTransmit)
+	r.POST("/CassandraTransmit/update", cassandraTransmitApi.UpdateCassandraTransmit)
+	r.GET("/CassandraTransmit/:id", cassandraTransmitApi.ByIdCassandraTransmit)
+	r.GET("/CassandraTransmit/page", cassandraTransmitApi.PageCassandraTransmit)
+	r.POST("/CassandraTransmit/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
 
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
@@ -535,10 +591,12 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
 	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
 	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
+	r.POST("/DeviceInfo/BindWebsocket", deviceInfoApi.BindWebsocket)
 	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
 	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
 	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
 	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
+	r.GET("/DeviceInfo/QueryBindWebsocket", deviceInfoApi.QueryBindWebsocket)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -581,7 +639,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/User/:id", userApi.ByIdUser)
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/BindDept", userApi.BindDept)
 	r.GET("/User/QueryBindRole", userApi.QueryBindRole)
+	r.GET("/User/QueryBindDept", userApi.QueryBindDept)
 	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
 	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 
@@ -651,6 +711,60 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
 	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
 
+	r.POST("/CoapHandler/create", coapHandlerApi.CreateCoapHandler)
+	r.POST("/CoapHandler/update", coapHandlerApi.UpdateCoapHandler)
+	r.GET("/CoapHandler/:id", coapHandlerApi.ByIdCoapHandler)
+	r.GET("/CoapHandler/page", coapHandlerApi.PageCoapHandler)
+	r.POST("/CoapHandler/delete/:id", coapHandlerApi.DeleteCoapHandler)
+
+	r.POST("/WebsocketHandler/create", wsHandlerApi.CreateWebsocketHandler)
+	r.POST("/WebsocketHandler/update", wsHandlerApi.UpdateWebsocketHandler)
+	r.GET("/WebsocketHandler/:id", wsHandlerApi.ByIdWebsocketHandler)
+	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
+	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
+
+
+	r.POST("/CassandraTransmitBind/create", cassandraTransmitBindApi.CreateCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/update", cassandraTransmitBindApi.UpdateCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/:id", cassandraTransmitBindApi.ByIdCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/page", cassandraTransmitBindApi.PageCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/delete/:id", cassandraTransmitBindApi.DeleteCassandraTransmitBind)
+
+	r.POST("/ClickhouseTransmitBind/create", clickhouseTransmitBindApi.CreateClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/update", clickhouseTransmitBindApi.UpdateClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/:id", clickhouseTransmitBindApi.ByIdClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/page", clickhouseTransmitBindApi.PageClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/delete/:id", clickhouseTransmitBindApi.DeleteClickhouseTransmitBind)
+
+	r.POST("/InfluxdbTransmitBind/create", influxdbTransmitBindApi.CreateInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/update", influxdbTransmitBindApi.UpdateInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/:id", influxdbTransmitBindApi.ByIdInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/page", influxdbTransmitBindApi.PageInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/delete/:id", influxdbTransmitBindApi.DeleteInfluxdbTransmitBind)
+
+	r.POST("/KafkaTransmitBind/create", kafkaTransmitBindApi.CreateKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/update", kafkaTransmitBindApi.UpdateKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/:id", kafkaTransmitBindApi.ByIdKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/page", kafkaTransmitBindApi.PageKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/delete/:id", kafkaTransmitBindApi.DeleteKafkaTransmitBind)
+
+	r.POST("/MongoTransmitBind/create", mongoTransmitBindApi.CreateMongoTransmitBind)
+	r.POST("/MongoTransmitBind/update", mongoTransmitBindApi.UpdateMongoTransmitBind)
+	r.GET("/MongoTransmitBind/:id", mongoTransmitBindApi.ByIdMongoTransmitBind)
+	r.GET("/MongoTransmitBind/page", mongoTransmitBindApi.PageMongoTransmitBind)
+	r.POST("/MongoTransmitBind/delete/:id", mongoTransmitBindApi.DeleteMongoTransmitBind)
+
+	r.POST("/MySQLTransmitBind/create", mySQLTransmitBindApi.CreateMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/update", mySQLTransmitBindApi.UpdateMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/:id", mySQLTransmitBindApi.ByIdMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/page", mySQLTransmitBindApi.PageMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/delete/:id", mySQLTransmitBindApi.DeleteMySQLTransmitBind)
+
+	r.POST("/RabbitmqTransmitBind/create", rabbitmqTransmitBindApi.CreateRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/update", rabbitmqTransmitBindApi.UpdateRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/:id", rabbitmqTransmitBindApi.ByIdRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/page", rabbitmqTransmitBindApi.PageRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/delete/:id", rabbitmqTransmitBindApi.DeleteRabbitmqTransmitBind)
 }
 func initGlobalRedisClient() {
 

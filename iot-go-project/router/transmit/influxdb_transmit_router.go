@@ -11,7 +11,7 @@ import (
 
 type InfluxdbTransmitApi struct{}
 
-var InfluxdbTransmit = transmit.InfluxdbTransmitBiz{}
+var InfluxdbTransmitBiz = transmit.InfluxdbTransmitBiz{}
 
 // CreateInfluxdbTransmit
 // @Summary 创建Influxdb数据库管理
@@ -37,6 +37,7 @@ func (api *InfluxdbTransmitApi) CreateInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	InfluxdbTransmitBiz.SetRedis(InfluxdbTransmit)
 	// 返回创建成功的Influxdb数据库管理
 	servlet.Resp(c, InfluxdbTransmit)
 }
@@ -71,6 +72,7 @@ func (api *InfluxdbTransmitApi) UpdateInfluxdbTransmit(c *gin.Context) {
 
 	var newV models.InfluxdbTransmit
 	newV = old
+	newV.Name =req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +80,7 @@ func (api *InfluxdbTransmitApi) UpdateInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	InfluxdbTransmitBiz.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +112,7 @@ func (api *InfluxdbTransmitApi) PageInfluxdbTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := InfluxdbTransmit.PageData(name, parseUint, u)
+	data, err := InfluxdbTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -139,7 +142,7 @@ func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	InfluxdbTransmitBiz.DeleteRedis(InfluxdbTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -162,21 +165,4 @@ func (api *InfluxdbTransmitApi) ByIdInfluxdbTransmit(c *gin.Context) {
 	}
 
 	servlet.Resp(c, InfluxdbTransmit)
-}
-
-// MockScript
-// @Tags      InfluxdbTransmits
-// @Summary   模拟脚本
-// @Param InfluxdbTransmit body servlet.TransmitScriptParam true "执行参数"
-// @Produce   application/json
-// @Router    /InfluxdbTransmit/mockScript [post]
-func (api *InfluxdbTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := InfluxdbTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
 }

@@ -11,7 +11,7 @@ import (
 
 type MongoTransmitApi struct{}
 
-var MongoTransmit = transmit.MongoTransmitBiz{}
+var MongoTransmitBiz = transmit.MongoTransmitBiz{}
 
 // CreateMongoTransmit
 // @Summary 创建Mongo数据库管理
@@ -37,6 +37,7 @@ func (api *MongoTransmitApi) CreateMongoTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	MongoTransmitBiz.SetRedis(MongoTransmit)
 	// 返回创建成功的Mongo数据库管理
 	servlet.Resp(c, MongoTransmit)
 }
@@ -71,6 +72,8 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 
 	var newV models.MongoTransmit
 	newV = old
+
+	newV.Name = req.Name
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +81,8 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	MongoTransmitBiz.SetRedis(newV)
+
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +114,7 @@ func (api *MongoTransmitApi) PageMongoTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := MongoTransmit.PageData(name, parseUint, u)
+	data, err := MongoTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -140,6 +145,7 @@ func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 		return
 	}
 
+	MongoTransmitBiz.DeleteRedis(MongoTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -162,21 +168,4 @@ func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 	}
 
 	servlet.Resp(c, MongoTransmit)
-}
-
-// MockScript
-// @Tags      MongoTransmits
-// @Summary   模拟脚本
-// @Param MongoTransmit body servlet.TransmitScriptParam true "执行参数"
-// @Produce   application/json
-// @Router    /MongoTransmit/mockScript [post]
-func (api *MongoTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := MongoTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
 }

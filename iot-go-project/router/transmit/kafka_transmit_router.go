@@ -11,7 +11,7 @@ import (
 
 type KafkaTransmitApi struct{}
 
-var KafkaTransmit = transmit.KafkaTransmitBiz{}
+var KafkaTransmitBiz = transmit.KafkaTransmitBiz{}
 
 // CreateKafkaTransmit
 // @Summary 创建Kafka数据库管理
@@ -43,6 +43,7 @@ func (api *KafkaTransmitApi) CreateKafkaTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	KafkaTransmitBiz.SetRedis(KafkaTransmit)
 	// 返回创建成功的Kafka数据库管理
 	servlet.Resp(c, KafkaTransmit)
 }
@@ -85,6 +86,7 @@ func (api *KafkaTransmitApi) UpdateKafkaTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	KafkaTransmitBiz.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -116,7 +118,7 @@ func (api *KafkaTransmitApi) PageKafkaTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := KafkaTransmit.PageData(name, parseUint, u)
+	data, err := KafkaTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -146,7 +148,7 @@ func (api *KafkaTransmitApi) DeleteKafkaTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	KafkaTransmitBiz.DeleteRedis(KafkaTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
