@@ -11,16 +11,16 @@ import (
 
 type CassandraTransmitApi struct{}
 
-var CassandraTransmit = transmit.CassandraTransmitBiz{}
+var CassandraTransmitBiz = transmit.CassandraTransmitBiz{}
 
 // CreateCassandraTransmit
-// @Summary 创建Clickhouse数据库管理
-// @Description 创建Clickhouse数据库管理
+// @Summary 创建Cassandra数据库管理
+// @Description 创建Cassandra数据库管理
 // @Tags CassandraTransmits
 // @Accept json
 // @Produce json
-// @Param CassandraTransmit body models.CassandraTransmit true "Clickhouse数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.CassandraTransmit} "创建成功的Clickhouse数据库管理"
+// @Param CassandraTransmit body models.CassandraTransmit true "Cassandra数据库管理"
+// @Success 201 {object} servlet.JSONResult{data=models.CassandraTransmit} "创建成功的Cassandra数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CassandraTransmit/create [post]
@@ -37,20 +37,21 @@ func (api *CassandraTransmitApi) CreateCassandraTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-	// 返回创建成功的Clickhouse数据库管理
+	CassandraTransmitBiz.SetRedis(CassandraTransmit)
+	// 返回创建成功的Cassandra数据库管理
 	servlet.Resp(c, CassandraTransmit)
 }
 
 // UpdateCassandraTransmit
-// @Summary 更新一个Clickhouse数据库管理
-// @Description 更新一个Clickhouse数据库管理
+// @Summary 更新一个Cassandra数据库管理
+// @Description 更新一个Cassandra数据库管理
 // @Tags CassandraTransmits
 // @Accept json
 // @Produce json
-// @Param CassandraTransmit body models.CassandraTransmit true "Clickhouse数据库管理"
-// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit} "Clickhouse数据库管理"
+// @Param CassandraTransmit body models.CassandraTransmit true "Cassandra数据库管理"
+// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit} "Cassandra数据库管理"
 // @Failure 400 {string} string "请求数据错误"
-// @Failure 404 {string} string "Clickhouse数据库管理未找到"
+// @Failure 404 {string} string "Cassandra数据库管理未找到"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CassandraTransmit/update [post]
 func (api *CassandraTransmitApi) UpdateCassandraTransmit(c *gin.Context) {
@@ -79,18 +80,20 @@ func (api *CassandraTransmitApi) UpdateCassandraTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	CassandraTransmitBiz.SetRedis(newV)
+
 	servlet.Resp(c, old)
 }
 
 // PageCassandraTransmit
-// @Summary 分页查询Clickhouse数据库管理
-// @Description 分页查询Clickhouse数据库管理
+// @Summary 分页查询Cassandra数据库管理
+// @Description 分页查询Cassandra数据库管理
 // @Tags CassandraTransmits
 // @Accept json
 // @Produce json
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
-// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.CassandraTransmit}} "Clickhouse数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.CassandraTransmit}} "Cassandra数据库管理"
 // @Failure 400 {string} string "请求参数错误"
 // @Failure 500 {string} string "查询异常"
 // @Router /CassandraTransmit/page [get]
@@ -110,7 +113,7 @@ func (api *CassandraTransmitApi) PageCassandraTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := CassandraTransmit.PageData(name, parseUint, u)
+	data, err := CassandraTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -120,7 +123,7 @@ func (api *CassandraTransmitApi) PageCassandraTransmit(c *gin.Context) {
 
 // DeleteCassandraTransmit
 // @Tags      CassandraTransmits
-// @Summary   删除Clickhouse数据库管理
+// @Summary   删除Cassandra数据库管理
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CassandraTransmit/delete/:id [post]
@@ -140,7 +143,7 @@ func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	CassandraTransmitBiz.DeleteRedis(CassandraTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -163,21 +166,4 @@ func (api *CassandraTransmitApi) ByIdCassandraTransmit(c *gin.Context) {
 	}
 
 	servlet.Resp(c, CassandraTransmit)
-}
-
-// MockScript
-// @Tags      CassandraTransmits
-// @Summary   模拟脚本
-// @Param CassandraTransmit body servlet.TransmitScriptParam true "执行参数"
-// @Produce   application/json
-// @Router    /CassandraTransmit/mockScript [post]
-func (api *CassandraTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := CassandraTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
 }

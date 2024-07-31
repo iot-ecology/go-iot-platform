@@ -22,6 +22,7 @@ import (
 	"igp/router"
 	"igp/router/notice"
 	"igp/router/transmit"
+	"igp/router/transmit/transmit_mqtt"
 	"log"
 	"net/url"
 	"os"
@@ -64,6 +65,16 @@ var (
 	httpHandlerApi = router.HttpHandlerApi{}
 	coapHandlerApi = router.CoapHandlerApi{}
 	wsHandlerApi = router.WebsocketHandlerApi{}
+
+	cassandraTransmitBindApi = transmit_mqtt.CassandraTransmitBindApi{}
+	clickhouseTransmitBindApi = transmit_mqtt.ClickhouseTransmitBindApi{}
+	influxdbTransmitBindApi = transmit_mqtt.InfluxdbTransmitBindApi{}
+	kafkaTransmitBindApi = transmit_mqtt.KafkaTransmitBindApi{}
+	mongoTransmitBindApi = transmit_mqtt.MongoTransmitBindApi{}
+	mySQLTransmitBindApi = transmit_mqtt.MySQLTransmitBindApi{}
+	rabbitmqTransmitBindApi = transmit_mqtt.RabbitmqTransmitBindApi{}
+
+
 )
 
 func initTable() {
@@ -529,7 +540,6 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/MySQLTransmit/:id", mysqlTransmitApi.ByIdMySQLTransmit)
 	r.GET("/MySQLTransmit/page", mysqlTransmitApi.PageMySQLTransmit)
 	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
-	r.POST("/MySQLTransmit/mockScript", mysqlTransmitApi.MockScript)
 
 	r.POST("/MongoTransmit/create", mongoTransmitApi.CreateMongoTransmit)
 	r.POST("/MongoTransmit/update", mongoTransmitApi.UpdateMongoTransmit)
@@ -717,6 +727,48 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
 	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
 
+
+	r.POST("/CassandraTransmitBind/create", cassandraTransmitBindApi.CreateCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/update", cassandraTransmitBindApi.UpdateCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/:id", cassandraTransmitBindApi.ByIdCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/page", cassandraTransmitBindApi.PageCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/delete/:id", cassandraTransmitBindApi.DeleteCassandraTransmitBind)
+
+	r.POST("/ClickhouseTransmitBind/create", clickhouseTransmitBindApi.CreateClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/update", clickhouseTransmitBindApi.UpdateClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/:id", clickhouseTransmitBindApi.ByIdClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/page", clickhouseTransmitBindApi.PageClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/delete/:id", clickhouseTransmitBindApi.DeleteClickhouseTransmitBind)
+
+	r.POST("/InfluxdbTransmitBind/create", influxdbTransmitBindApi.CreateInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/update", influxdbTransmitBindApi.UpdateInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/:id", influxdbTransmitBindApi.ByIdInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/page", influxdbTransmitBindApi.PageInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/delete/:id", influxdbTransmitBindApi.DeleteInfluxdbTransmitBind)
+
+	r.POST("/KafkaTransmitBind/create", kafkaTransmitBindApi.CreateKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/update", kafkaTransmitBindApi.UpdateKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/:id", kafkaTransmitBindApi.ByIdKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/page", kafkaTransmitBindApi.PageKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/delete/:id", kafkaTransmitBindApi.DeleteKafkaTransmitBind)
+
+	r.POST("/MongoTransmitBind/create", mongoTransmitBindApi.CreateMongoTransmitBind)
+	r.POST("/MongoTransmitBind/update", mongoTransmitBindApi.UpdateMongoTransmitBind)
+	r.GET("/MongoTransmitBind/:id", mongoTransmitBindApi.ByIdMongoTransmitBind)
+	r.GET("/MongoTransmitBind/page", mongoTransmitBindApi.PageMongoTransmitBind)
+	r.POST("/MongoTransmitBind/delete/:id", mongoTransmitBindApi.DeleteMongoTransmitBind)
+
+	r.POST("/MySQLTransmitBind/create", mySQLTransmitBindApi.CreateMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/update", mySQLTransmitBindApi.UpdateMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/:id", mySQLTransmitBindApi.ByIdMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/page", mySQLTransmitBindApi.PageMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/delete/:id", mySQLTransmitBindApi.DeleteMySQLTransmitBind)
+
+	r.POST("/RabbitmqTransmitBind/create", rabbitmqTransmitBindApi.CreateRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/update", rabbitmqTransmitBindApi.UpdateRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/:id", rabbitmqTransmitBindApi.ByIdRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/page", rabbitmqTransmitBindApi.PageRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/delete/:id", rabbitmqTransmitBindApi.DeleteRabbitmqTransmitBind)
 }
 func initGlobalRedisClient() {
 

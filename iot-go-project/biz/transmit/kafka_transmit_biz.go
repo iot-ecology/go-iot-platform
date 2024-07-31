@@ -6,7 +6,6 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"iot-transmit/cache"
 	"strconv"
 )
 
@@ -33,41 +32,17 @@ func (biz *KafkaTransmitBiz) PageData(name string, page, size int) (*servlet.Pag
 	return &pagination, nil
 }
 
-func (biz *KafkaTransmitBiz) Bind(req models.KafkaTransmitBind) {
-	glob.GDb.Model(models.KafkaTransmitBind{}).Create(req)
-	jsonData := biz.toByte(req)
-	// 缓存构造
-	glob.GRedis.LPush(context.Background(), "transmit:Kafka:"+strconv.Itoa(req.MqttClientId), jsonData)
-}
 
-func (biz *KafkaTransmitBiz) toByte(req models.KafkaTransmitBind) []byte {
-	var KafkaInfo models.KafkaTransmit
+func (biz *KafkaTransmitBiz) SetRedis(param models.KafkaTransmit) {
+	jsonData, err := json.Marshal(param)
 
-	glob.GDb.First(&KafkaInfo, req.KafkaTransmitId)
-
-	v := cache.KafkaTransmitCache{
-		ID:     "Kafka-" + strconv.Itoa(int(req.ID)),
-		Host:   KafkaInfo.Host,
-		Port:   KafkaInfo.Port,
-		Script: req.Script,
-		Topic:  req.Topic,
-	}
-	jsonData, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
-	return jsonData
+	glob.GRedis.HSet(context.Background(), "transmit:kafka:"+strconv.Itoa(int(param.ID)), jsonData)
 }
 
-// ChangeEnable 修改启用状态
-func (biz *KafkaTransmitBiz) ChangeEnable(req models.KafkaTransmitBind) {
-	glob.GDb.Model(models.KafkaTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
-	glob.GRedis.LRem(context.Background(), "transmit:Kafka:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
+func (biz *KafkaTransmitBiz) DeleteRedis(param models.KafkaTransmit) {
+	glob.GRedis.HDel(context.Background(), "transmit:kafka:"+strconv.Itoa(int(param.ID)))
 }
 
-//var KafkaOp = Kafka.KafkaOp{}
-//
-//// MockScript 模拟执行脚本
-//func (biz *KafkaTransmitBiz) MockScript(dataRowList []common.DataRowList, script string) [][]Kafka.KafkaParam {
-//	return KafkaOp.RunScript(dataRowList, script)
-//}

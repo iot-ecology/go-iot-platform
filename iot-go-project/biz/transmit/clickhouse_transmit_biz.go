@@ -6,9 +6,6 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"iot-transmit/cache"
-	"iot-transmit/clickhouse"
-	"iot-transmit/common"
 	"strconv"
 )
 
@@ -35,46 +32,15 @@ func (biz *ClickhouseTransmitBiz) PageData(name string, page, size int) (*servle
 	return &pagination, nil
 }
 
-func (biz *ClickhouseTransmitBiz) Bind(req models.ClickhouseTransmitBind) {
-	glob.GDb.Model(models.ClickhouseTransmitBind{}).Create(req)
-	jsonData := biz.toByte(req)
-	// 缓存构造
-	glob.GRedis.LPush(context.Background(), "transmit:clickhouse:"+strconv.Itoa(req.MqttClientId), jsonData)
-}
+func (biz *ClickhouseTransmitBiz) SetRedis(param models.ClickhouseTransmit) {
+	jsonData, err := json.Marshal(param)
 
-var clickhouseOp = clickhouse.ClickhouseOp{}
-
-func (biz *ClickhouseTransmitBiz) toByte(req models.ClickhouseTransmitBind) []byte {
-	var ref models.ClickhouseTransmit
-
-	glob.GDb.First(&ref, req.ClickhouseTransmitId)
-
-	v := cache.ClickhouseTransmitCache{
-		ID:       "clickhouse-" + strconv.Itoa(int(req.ID)),
-		Host:     ref.Host,
-		Port:     ref.Port,
-		Username: ref.Username,
-		Password: ref.Password,
-		Database: req.Database,
-		Table:    req.Table,
-		Script:   req.Script,
-	}
-	jsonData, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
-	return jsonData
+	glob.GRedis.HSet(context.Background(), "transmit:clickhouse:"+strconv.Itoa(int(param.ID)), jsonData)
 }
 
-// ChangeEnable 修改启用状态
-func (biz *ClickhouseTransmitBiz) ChangeEnable(req models.ClickhouseTransmitBind) {
-	glob.GDb.Model(models.ClickhouseTransmitBind{}).Where("id = ?", req.ID).Update("enable", req.Enable)
-	glob.GRedis.LRem(context.Background(), "transmit:clickhouse:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
-}
-
-// MockScript 模拟执行脚本
-func (biz *ClickhouseTransmitBiz) MockScript(dataRowList []common.DataRowList,
-	script string) [][]clickhouse.ClickhouseParam {
-	return clickhouseOp.RunScript(dataRowList, script)
-
+func (biz *ClickhouseTransmitBiz) DeleteRedis(param models.ClickhouseTransmit) {
+	glob.GRedis.HDel(context.Background(), "transmit:clickhouse:"+strconv.Itoa(int(param.ID)))
 }

@@ -11,7 +11,7 @@ import (
 
 type RabbitmqTransmitApi struct{}
 
-var RabbitmqTransmit = transmit.RabbitTransmitBiz{}
+var RabbitmqTransmitBiz = transmit.RabbitTransmitBiz{}
 
 // CreateRabbitmqTransmit
 // @Summary 创建Rabbit消息队列管理
@@ -43,6 +43,7 @@ func (api *RabbitmqTransmitApi) CreateRabbitmqTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	RabbitmqTransmitBiz.SetRedis(RabbitmqTransmit)
 	// 返回创建成功的Rabbit消息队列管理
 	servlet.Resp(c, RabbitmqTransmit)
 }
@@ -85,7 +86,8 @@ func (api *RabbitmqTransmitApi) UpdateRabbitmqTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-	servlet.Resp(c, old)
+	RabbitmqTransmitBiz.SetRedis(newV)
+	servlet.Resp(c, newV)
 }
 
 // PageRabbitmqTransmit
@@ -116,7 +118,7 @@ func (api *RabbitmqTransmitApi) PageRabbitmqTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := RabbitmqTransmit.PageData(name, parseUint, u)
+	data, err := RabbitmqTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -146,7 +148,7 @@ func (api *RabbitmqTransmitApi) DeleteRabbitmqTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	RabbitmqTransmitBiz.DeleteRedis(RabbitmqTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -170,20 +172,3 @@ func (api *RabbitmqTransmitApi) ByIdRabbitmqTransmit(c *gin.Context) {
 
 	servlet.Resp(c, RabbitmqTransmit)
 }
-
-//// MockScript
-//// @Tags      RabbitmqTransmits
-//// @Summary   模拟脚本
-//// @Param RabbitmqTransmit body servlet.TransmitScriptParam true "执行参数"
-//// @Produce   application/json
-//// @Router    /RabbitmqTransmit/mockScript [post]
-//func (api *RabbitmqTransmitApi) MockScript(c *gin.Context) {
-//	var req servlet.TransmitScriptParam
-//	if err := c.ShouldBindJSON(&req); err != nil {
-//
-//		servlet.Error(c, err.Error())
-//		return
-//	}
-//	script := RabbitmqTransmit.MockScript(req.DataRowList, req.Script)
-//	servlet.Resp(c, script)
-//}

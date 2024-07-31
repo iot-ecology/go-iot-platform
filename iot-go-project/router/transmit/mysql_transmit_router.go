@@ -43,6 +43,8 @@ func (api *MySQLTransmitApi) CreateMySQLTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+
+	mySQLTransmit.SetRedis(MySQLTransmit)
 	// 返回创建成功的MySql数据库管理
 	servlet.Resp(c, MySQLTransmit)
 }
@@ -85,6 +87,7 @@ func (api *MySQLTransmitApi) UpdateMySQLTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	mySQLTransmit.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -146,7 +149,7 @@ func (api *MySQLTransmitApi) DeleteMySQLTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	mySQLTransmit.DeleteRedis(MySQLTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -171,19 +174,3 @@ func (api *MySQLTransmitApi) ByIdMySQLTransmit(c *gin.Context) {
 	servlet.Resp(c, MySQLTransmit)
 }
 
-// MockScript
-// @Tags      MySQLTransmits
-// @Summary   模拟脚本
-// @Param MySQLTransmit body servlet.TransmitScriptParam true "执行参数"
-// @Produce   application/json
-// @Router    /MySQLTransmit/mockScript [post]
-func (api *MySQLTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := mySQLTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
-}
