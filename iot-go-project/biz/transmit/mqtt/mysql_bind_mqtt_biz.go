@@ -42,7 +42,7 @@ func (biz *MySQLTransmitBindBiz) Bind(req models.MySQLTransmitBind) {
 	if req.Enable {
 		jsonData := biz.toByte(req)
 		// 缓存构造
-		glob.GRedis.LPush(context.Background(), "transmit:mysql:"+strconv.Itoa(req.MqttClientId), jsonData)
+		glob.GRedis.LPush(context.Background(), "transmit:mysql:"+req.DeviceUid +":" +req.IdentificationCode, jsonData)
 	}
 }
 
@@ -79,7 +79,7 @@ func (biz *MySQLTransmitBindBiz) HandlerRedis(req models.MySQLTransmitBind) {
 		biz.Bind(req)
 	} else {
 
-		glob.GRedis.LRem(context.Background(), "transmit:mysql:"+strconv.Itoa(req.MqttClientId), 1, biz.toByte(req))
+		glob.GRedis.LRem(context.Background(), "transmit:mysql:"+req.DeviceUid +":" +req.IdentificationCode, 1, biz.toByte(req))
 	}
 }
 
