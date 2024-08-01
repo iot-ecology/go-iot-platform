@@ -35,6 +35,13 @@ func (biz *CassandraTransmitBindBiz) PageData(table string, page, size int) (*se
 	return &pagination, nil
 }
 
+// Bind 方法将CassandraTransmitBind请求绑定到Redis缓存中
+//
+// 参数：
+// req models.CassandraTransmitBind - CassandraTransmitBind请求参数
+//
+// 返回值：
+// 无
 func (biz *CassandraTransmitBindBiz) Bind(req models.CassandraTransmitBind) {
 	if req.Enable == true {
 		jsonData := biz.toByte(req)
@@ -43,6 +50,13 @@ func (biz *CassandraTransmitBindBiz) Bind(req models.CassandraTransmitBind) {
 	}
 }
 
+// toByte 将CassandraTransmitBind请求转换为字节数组
+//
+// 参数：
+//     req models.CassandraTransmitBind - CassandraTransmitBind类型的请求参数
+//
+// 返回值：
+//     []byte - 转换后的字节数组
 func (biz *CassandraTransmitBindBiz) toByte(req models.CassandraTransmitBind) []byte {
 	var ref models.CassandraTransmit
 
@@ -71,6 +85,13 @@ func (biz *CassandraTransmitBindBiz) ChangeEnable(req models.CassandraTransmitBi
 	biz.HandlerRedis(req)
 }
 
+// HandlerRedis 处理CassandraTransmitBind请求中的Redis操作
+//
+// 参数：
+// req models.CassandraTransmitBind - CassandraTransmitBind类型的请求参数
+//
+// 返回值：
+// 无
 func (biz *CassandraTransmitBindBiz) HandlerRedis(req models.CassandraTransmitBind) {
 	if req.Enable == false {
 		glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+req.DeviceUid +":" +req.IdentificationCode, 1, biz.toByte(req))
