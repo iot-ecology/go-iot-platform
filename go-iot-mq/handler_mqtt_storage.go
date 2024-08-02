@@ -65,7 +65,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		data := runScript(msg.Message, script)
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row,"mqtt")
+			StorageDataRowList(row, "mqtt")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -149,11 +149,7 @@ func FindByIdWithRedis(id uint64) *DeviceInfo {
 }
 
 func genMeasurement(dt DataRowList, protocol string) string {
-	if dt.DeviceUid == dt.IdentificationCode {
-		return protocol + "_" + dt.DeviceUid
-	} else {
-		return protocol + "_" + dt.DeviceUid  +"_"+ dt.IdentificationCode
-	}
+	return protocol + "_" + dt.DeviceUid + "_" + dt.IdentificationCode
 }
 
 // StorageDataRowList 函数将DataRowList类型指针dt中的数据写入InfluxDB数据库
@@ -164,13 +160,13 @@ func genMeasurement(dt DataRowList, protocol string) string {
 // 返回值：
 //
 //	无
-func StorageDataRowList(dt DataRowList,protocol string) {
+func StorageDataRowList(dt DataRowList, protocol string) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid)
 	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
 	zap.S().Infof("当前的DataRowList数据: %+v", dt)
 	timeFromUnix := time.Unix(dt.Time, 0)
 
-	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt,protocol)).
+	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt, protocol)).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
 		SetTime(timeFromUnix)
