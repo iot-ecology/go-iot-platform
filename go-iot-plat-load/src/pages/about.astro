@@ -1,0 +1,137 @@
+---
+import Features2 from '~/components/widgets/Features2.astro';
+import Features3 from '~/components/widgets/Features3.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Stats from '~/components/widgets/Stats.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: '关于我们',
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    tagline=""
+    image={{
+      src: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      alt: 'Caos Image',
+    }}
+  >
+    <Fragment slot="title">
+
+      使用我们的项目快速创建物联网应用程序
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        <span class="font-semibold">Go IoT 开发平台</span> 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。</span
+      >
+      该平台支持MQTT、HTTP、WebSocket、COAP、TCP/IP协议传输，提供轻量化的配置工具完成数据的报警功能，提供基于JavaScript的数据统计服务。
+    </Fragment>
+  </Hero>
+
+  <!-- Stats Widget ****************** -->
+
+  <Stats
+    title="项目统计"
+    stats={[
+      { title: '下载量', amount: '10+' },
+      { title: '星', amount: '20+' },
+      { title: '分叉', amount: '3' },
+      { title: '用户', amount: '10' },
+    ]}
+  />
+
+  <!-- Features3 Widget ************** -->
+
+  <Features3
+    title="Go IoT Platform"
+    subtitle="Go-IoT开发平台是开发各种物联网应用场景的起始框架。"
+    columns={3}
+    isBeforeContent={true}
+    items={[
+      {
+        title: '智慧城市',
+        description:
+          '智慧城市是一种新的城市模式，它利用物联网、大数据、云计算和人工智能等技术来智能管理和服务城市运营的各个方面。',
+        icon: 'tabler:template',
+      },
+      {
+        title: '智能农业',
+        description:
+          '智能农业是一种利用现代信息技术智能管理和精确操作农业生产过程的现代农业模式。',
+        icon: 'tabler:template',
+      },
+      {
+        title: '智能家居',
+        description:
+          '智能家居是物联网技术在家庭环境中的具体应用。它通过连接家庭中的各种设备和系统来实现远程控制、自动化管理和优化生活环境。',
+        icon: 'tabler:template',
+      },
+      
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      alt: 'Colorful Image',
+    }}
+  />
+
+
+  
+
+  <!-- Steps2 Widget ****************** -->
+
+  <Steps2
+    title="我们的价值"
+    subtitle=""
+    items={[
+      {
+        title: '效率',
+        description:
+          '我们希望减少物联网软件开发中的重复工作，使用户能够快速处理使用数据，而不会受到琐碎事情的干扰。',
+      },
+      {
+        title: '简单',
+        description:
+          '我们的项目设计过程旨在使用简单的方法使用户能够有效地实现所需的结果，但需要一点脚本（JavaScript）编程技能。',
+      },
+    ]}
+  />
+
+  <!-- Steps2 Widget ****************** -->
+
+
+  <!-- Features2 Widget ************** -->
+
+
+  <!-- Features2 Widget ************** -->
+
+  <Features2
+    title="技术支持"
+    tagline="联系我们"
+    columns={3}
+    items={[
+      {
+        title: '邮箱',
+        description:
+          '发送邮箱到 <a href="mailto:huifer97@163.com">Zen HuiFer</a>',
+        icon: 'tabler:mail',
+      },
+      {
+        title: 'Gitee',
+        description:
+          '提交问题到 <a href="https://gitee.com/pychfarm_admin/go-iot-platform/issues">Issues</a> 从而与我们建立联系' ,
+        icon: 'tabler:brand-github',
+      },{
+        title: 'ProductHunt',
+        description:
+          'By accessing <a href="https://www.producthunt.com/posts/go-iot-platform">go-iot-platform</a> fund us',
+        icon: 'tabler:brand-producthunt',
+      },
+    ]}
+  />
+</Layout>
