@@ -16,95 +16,90 @@ const metadata = {
   <!-- HeroText Widget ******************* -->
 
   <HeroText
-    tagline="Pricing"
-    title="Stellar Pricing for Every Journey"
-    subtitle="Choose the perfect plan that aligns with your cosmic goals."
+    tagline=""
+    title="Go IoT 开发平台定价"
+    subtitle="选择一个与您的GoIoT开发平台的计划。"
   />
 
   <!-- Pricing Widget ******************* -->
 
   <Prices
-    title="Our prices"
-    subtitle="Only pay for what you need"
+    title="我们的定价"
+    subtitle=""
     prices={[
       {
-        title: 'basic',
-        subtitle: 'Optimal choice for personal use',
-        price: 29,
-        period: 'per month',
+        title: '开源版本',
+        subtitle: '免费使用，可以提交Issues开发人员会更近修改',
+        price: 0,
+        period: '',
         items: [
           {
-            description: 'Etiam in libero, et volutpat',
+            description: '核心程序全部开源',
           },
           {
-            description: 'Aenean ac nunc dolor tristique',
+            description: '详细设计文档',
           },
           {
-            description: 'Cras scelerisque accumsan lib',
-          },
-          {
-            description: 'In hac habitasse',
+            description: '定制化支持较弱',
+          }, {
+            description: '社区支持度高',
           },
         ],
         callToAction: {
           target: '_blank',
-          text: 'Get started',
-          href: '#',
+          text: '下载',
+          href: 'https://gitee.com/pychfarm_admin/go-iot-platform',
         },
       },
       {
-        title: 'standard',
-        subtitle: 'Optimal choice for small teams',
-        price: 69,
-        period: 'Per Month',
+        title: '标准版',
+        subtitle: '在开源基础上提供服务部署指导、二次开发支持',
+        price: 299,
+        period: '单次',
         items: [
+         
+          
           {
-            description: 'Proin vel laoreet',
+            description: '提供各类部署、功能使用中遇到的问题答疑',
           },
           {
-            description: 'Ut efficitur habitasse egestas',
+            description: '系统原理讲解',
+          },{
+            description: '在客户指定的网络和硬件环境中完成社区版服务部署',
+          },{
+            description: '提供模拟设备接入到平台中，并能完成正常设备上线、数据上下行',
           },
-          {
-            description: 'Volutpat hac curabitur',
-          },
-          {
-            description: 'Pellentesque blandit ut nibh',
-          },
-          {
-            description: 'Donec fringilla sem',
-          },
+         
         ],
         callToAction: {
           target: '_blank',
           text: 'Get started',
-          href: '#',
+          href: 'mailto:huifer97@163.com',
         },
         hasRibbon: true,
         ribbonTitle: 'popular',
       },
       {
-        title: 'premium',
-        subtitle: 'Optimal choice for companies',
-        price: 199,
-        period: 'Per Month',
+        title: '定制版',
+        subtitle: '我们接受企业用户的定制为您打造更好的物联网平台',
+        price: "面议",
+        period: '',
         items: [
           {
-            description: 'Curabitur suscipit risus',
+            description: '支持企业用户需求定制化开发',
           },
           {
-            description: 'Aliquam habitasse malesuada',
+            description: '支持对现有系统进行问题分析排查，提供改进方案',
           },
           {
-            description: 'Suspendisse sit amet blandit',
+            description: '将您的想法告诉我们，我们为您定制系统',
           },
-          {
-            description: 'Suspendisse auctor blandit dui',
-          },
+          
         ],
         callToAction: {
           target: '_blank',
-          text: 'Get started',
-          href: '#',
+          text: '联系我',
+          href: 'mailto:huifer97@163.com',
         },
       },
     ]}
@@ -113,117 +108,69 @@ const metadata = {
   <!-- Features3 Widget ************** -->
 
   <Features3
-    title="Price-related features"
-    subtitle="Discover the advantages of choosing our plans"
+    title="价格相关功能"
+    subtitle="了解选择我们计划的优势"
     columns={2}
     items={[
       {
-        title: 'Tiered Pricing Plans',
-        description: 'Choose from a range of pricing plans designed to accommodate different budgets and requirements.',
+        title: '分层定价计划',
+        description: '从一系列定价计划中进行选择，以适应不同的预算和要求。',
         icon: 'tabler:stairs',
       },
       {
-        title: 'Transparent Pricing',
-        description: 'Clearly displayed pricing details for each plan, with no hidden costs or unexpected charges.',
+        title: '透明定价',
+        description: '清晰显示每个计划的定价细节，没有隐藏成本或意外费用。',
         icon: 'tabler:flip-vertical',
       },
+      
       {
-        title: 'Secure Payment Methods',
-        description: 'Secure payment gateways to protect your financial information during transactions.',
-        icon: 'tabler:shield-lock',
-      },
-      {
-        title: 'Instant Access',
-        description: `Immediate access to your chosen plan's features and templates upon subscription.`,
-        icon: 'tabler:accessible',
-      },
-      {
-        title: 'Upgrade Value',
-        description: 'Upgrade to higher-tier plans to unlock more features and benefits for an enhanced experience.',
+        title: '升级价值',
+        description: '升级到更高级别的计划，以解锁更多功能和好处，从而获得更好的体验。',
         icon: 'tabler:chevrons-up',
       },
       {
-        title: '24H support',
-        description: 'Questions answered via live chat, email or phone, every calendar day.',
+        title: '24小时支持',
+        description: '每个日历日通过在线聊天、电子邮件或电话回答问题。',
         icon: 'tabler:headset',
       },
     ]}
     classes={{ container: 'max-w-5xl' }}
   />
 
-  <!-- Steps Widget ****************** -->
 
-  <Steps
-    title="A guided journey from plans to creativity"
-    tagline="simplified process"
-    isReversed={true}
-    items={[
-      {
-        title: 'Explore plans',
-        icon: 'tabler:number-1',
-      },
-      {
-        title: 'Select a plan',
-        icon: 'tabler:number-2',
-      },
-      {
-        title: 'Sign Up / Log In',
-        icon: 'tabler:number-3',
-      },
-      {
-        title: 'Review order',
-        icon: 'tabler:number-4',
-      },
-      {
-        title: 'Enter payment details',
-        icon: 'tabler:number-5',
-      },
-      {
-        title: 'Confirmation',
-        icon: 'tabler:number-6',
-      },
-      {
-        title: 'Download and start using the template(s)',
-        icon: 'tabler:number-7',
-      },
-    ]}
-    image={{
-      src: 'https://images.unsplash.com/photo-1536816579748-4ecb3f03d72a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80',
-      alt: 'Steps image',
-    }}
-  />
+  
 
   <!-- FAQs Widget ******************* -->
 
   <FAQs
-    title="Pricing FAQs"
-    subtitle="Choosing the right plan is important, and we're here to answer your questions. If you have queries about our pricing options, you're in the right place."
+    title="定价常见问题"
+    subtitle="选择正确的计划很重要，我们在这里回答您的问题。如果您对我们的定价选项有疑问，那么您来对地方了。"
     columns={1}
     items={[
       {
-        title: 'Do the plans come with customer support?',
+        title: '这些计划是否附带了客户支持？',
         description:
-          'Absolutely, all plans include access to our dedicated customer support to assist you with any queries or concerns.',
+          '当然，所有计划都包括访问我们专门的客户支持，以协助您解决任何疑问或疑虑。',
       },
       {
-        title: 'Is there a trial period for the different plans?',
+        title: '不同的计划有试用期吗？',
         description:
-          "Unfortunately, we don't offer trial periods for the plans. However, you can check out our demo section to preview the quality of our templates.",
+          "很遗憾，我们不提供这些计划的试用期。但是，您可以查看我们的演示部分，预览我们模板的质量。",
       },
       {
-        title: 'Can I switch between plans?',
+        title: '我可以在计划之间切换吗？',
         description:
-          'Certainly! You can easily upgrade or downgrade your plan, at any time, to find the one that best suits your evolving requirements.',
+          '当然！您可以随时轻松升级或降级您的计划，以找到最适合您不断变化的需求的计划。',
       },
       {
-        title: 'What payment methods do you accept?',
+        title: '你们接受什么付款方式？',
         description:
-          'We accept major credit cards and online payment methods to ensure a convenient and secure transaction process.',
+          '我们接受主要的信用卡和在线支付方式，以确保交易过程方便安全。',
       },
       {
-        title: 'Are there any hidden fees beyond the displayed cost?',
+        title: '除了显示的成本外，还有其他隐藏的费用吗？',
         description:
-          'No, the subscription cost covers all the features and templates listed under each plan. There are no hidden fees or extra charges.',
+          '否，订阅费用包括每个计划下列出的所有功能和模板。没有隐藏费用或额外费用。',
       },
     ]}
   />
@@ -231,13 +178,13 @@ const metadata = {
   <!-- CallToAction Widget *********** -->
 
   <CallToAction
-    title="Ready to boost your projects?"
-    subtitle="Join our community of satisfied customers who have transformed their work with our templates."
+    title="准备好推进项目了吗？"
+    subtitle="使用我们的GoIoT开发平台快速启动您的物联网平台"
     actions={[
       {
         variant: 'primary',
-        text: 'Get started now',
-        href: '/',
+        text: '联系我们',
+        href: 'mailto:huifer97@163.com',
       },
     ]}
   />

@@ -6,12 +6,22 @@ export const headerData = {
       text: '首页',
       href: '/',
     },
-    // {
-    //   text: '定价',
-    //   href: getPermalink('pricing'),
-    //
-    // },
+    {
+      text: '定价',
+      href: getPermalink('pricing'),
+
+    },
+    {
+      text: '链接',
+      href: getPermalink('contact'),
+
+    },
+
     
+    {
+      text:"关于我们",
+      href: getPermalink('about'),
+    },
     {
       text: '博客',
       links: [
@@ -25,11 +35,6 @@ export const headerData = {
         },
       ],
     },
-    {
-      text:"关于我们",
-      href: getPermalink('about'),
-    }
-   
   ],
   actions: [{ text: '下载', href: 'https://gitee.com/pychfarm_admin/go-iot-platform', target: '_blank' }],
 };
