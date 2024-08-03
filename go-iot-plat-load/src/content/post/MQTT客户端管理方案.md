@@ -3,7 +3,8 @@ publishDate: 2024-08-02T00:00:00Z
 author: Zen HuiFer
 title: MQTT 客户端管理方案
 excerpt: 面对海量MQTT客户端的应用场景应当如何设计解决方案
-image: https://images.unsplash.com/photo-1516996087931-5ae405802f9f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80
+image: "~/assets/images/communication-1439132_1280.jpg"
+
 category: 教程
 tags:
   - Go
