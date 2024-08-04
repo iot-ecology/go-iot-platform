@@ -30,6 +30,9 @@ export const headerData = {
           href: getBlogPermalink(),
         },
         {
+          text: '应用案例',
+          href: getPermalink('case', 'tag'),
+        },{
           text: '操作手册',
           href: getPermalink('operation', 'tag'),
         },

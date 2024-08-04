@@ -19,8 +19,8 @@ const relatedPosts = post.tags ? await getRelatedPosts(post, 4) : [];
   APP_BLOG.isRelatedPostsEnabled ? (
     <BlogHighlightedPosts
       classes={{ container: 'pt-0 lg:pt-0 md:pt-0' }}
-      title="Related Posts"
-      linkText="View All Posts"
+      title="相关文章"
+      linkText="查看所有文章"
       linkUrl={getBlogPermalink()}
       postIds={relatedPosts.map((post) => post.id)}
     />
