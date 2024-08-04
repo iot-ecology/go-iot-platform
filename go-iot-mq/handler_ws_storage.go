@@ -55,6 +55,10 @@ func HandlerDataWsStorageString(d amqp.Delivery) {
 	script := GetScriptRedisForWs(msg.Uid)
 	if script != "" {
 		data := runScript(msg.Message, script)
+		if data == nil {
+			zap.S().Infof("执行脚本为空")
+			return
+		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
 			StorageDataRowList(row,"websocket")

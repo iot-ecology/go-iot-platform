@@ -206,19 +206,35 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 // map[string]interface{}类型，表示JavaScript脚本执行后的结果，其中键为结果名，值为结果值
 func runCalcScript(param map[string]any, script string) map[string]interface{} {
 	vm := goja.New()
+
+	// 执行 JavaScript 脚本
 	_, err := vm.RunString(script)
 	if err != nil {
-		zap.S().Error("JS代码有问题！")
+		zap.S().Error("JS代码有问题！", zap.Error(err))
 		return nil
 	}
-	var fn func(string2 map[string]any) map[string]interface{}
+
+	// 将 JavaScript 中的 main 函数映射到 Go 的 fn 函数
+	var fn func(map[string]any) map[string]interface{}
 	err = vm.ExportTo(vm.Get("main"), &fn)
 	if err != nil {
-		zap.S().Error("Js函数映射到 Go 函数失败！")
+		zap.S().Error("Js函数映射到 Go 函数失败！", zap.Error(err))
 		return nil
 	}
-	a := fn(param)
-	return a
+
+	// 使用 defer 和 recover 来捕获 fn 函数中的 panic
+	result := make(map[string]interface{})
+	defer func() {
+		if r := recover(); r != nil {
+			zap.S().Error("在执行 JavaScript 函数时发生 panic:", zap.Any("panic value", r))
+			// 可以选择返回空的 map 或者包含错误信息的 map
+			result["error"] = fmt.Sprintf("panic occurred: %v", r)
+		}
+	}()
+
+	// 调用映射的函数
+	result = fn(param)
+	return result
 }
 
 // getNextTime 获取下一次执行时间(秒)

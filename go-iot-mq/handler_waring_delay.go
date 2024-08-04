@@ -118,20 +118,34 @@ func handlerWaringDelayOnce(msg DataRowList) {
 //	bool - JavaScript脚本执行后返回的结果
 func runWaringDelayScript(script string, param map[string][]Tv) bool {
 	vm := goja.New()
+
+	// 执行 JavaScript 脚本
 	_, err := vm.RunString(script)
 	if err != nil {
 		fmt.Println("JS代码有问题！")
+		return false // 直接返回 false 表示执行失败
 	}
-	var fn func(string2 map[string][]Tv) bool
+
+	// 将 JavaScript 中的 main 函数映射到 Go 的 fn 函数
+	var fn func(map[string][]Tv) bool
 	err = vm.ExportTo(vm.Get("main"), &fn)
 	if err != nil {
 		fmt.Println("Js函数映射到 Go 函数失败！")
-		panic(err)
+		return false // 直接返回 false 表示映射失败
 	}
+
+	// 使用 defer 和 recover 来捕获 fn 函数中的 panic
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("在执行 JavaScript 函数时发生 panic:", r)
+			// 这里可以根据需要进行错误处理，例如记录日志等
+		}
+	}()
+
+	// 调用映射的函数
 	a := fn(param)
 	return a
 }
-
 // getDelayScript 从Redis中获取SignalDelayWaring信息列表
 // 参数：
 //

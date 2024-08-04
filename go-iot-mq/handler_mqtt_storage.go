@@ -63,6 +63,11 @@ func HandlerDataStorageString(d amqp.Delivery) {
 	script := GetScriptRedis(msg.MQTTClientID)
 	if script != "" {
 		data := runScript(msg.Message, script)
+
+		if data == nil {
+			zap.S().Infof("执行脚本为空")
+			return
+		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
 			StorageDataRowList(row, "mqtt")
@@ -230,24 +235,37 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 // 返回值：
 // *DataRowList 类型指针，JS 脚本执行后的结果，如果执行失败则返回 nil
 func runScript(param string, script string) *[]DataRowList {
-
 	vm := goja.New()
+
+	// 执行 JavaScript 脚本
 	_, err := vm.RunString(script)
 	if err != nil {
-		zap.S().Errorf("JS代码有问题！")
+		zap.S().Errorf("JS代码有问题: %v", err)
 		return nil
 	}
-	var fn func(string2 string) *[]DataRowList
+
+	// 将 JavaScript 中的 main 函数映射到 Go 的 fn 函数
+	var fn func(string) *[]DataRowList
 	err = vm.ExportTo(vm.Get("main"), &fn)
 	if err != nil {
-		zap.S().Errorf("Js函数映射到 Go 函数失败！")
+		zap.S().Errorf("Js函数映射到 Go 函数失败: %v", err)
 		return nil
 	}
-	a := fn(param)
-	return a
 
+	// 使用 defer 和 recover 来捕获 fn 函数中的 panic
+	var result *[]DataRowList
+	defer func() {
+		if r := recover(); r != nil {
+			zap.S().Errorf("在执行 JavaScript 函数时发生 panic: %v", r)
+			// 这里可以进行一些清理工作或者返回一个特定的错误结果
+			result = nil // 或者设置为一个特定的错误结果
+		}
+	}()
+
+	// 调用映射的函数
+	result = fn(param)
+	return result
 }
-
 // GetMqttClientSignal 函数根据MQTT客户端ID获取对应的信号映射表
 // 参数：
 //
