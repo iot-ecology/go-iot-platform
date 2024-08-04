@@ -19,7 +19,7 @@ export const headerData = {
 
     
     {
-      text:"关于我们",
+      text:"我们",
       href: getPermalink('about'),
     },
     {
@@ -30,8 +30,8 @@ export const headerData = {
           href: getBlogPermalink(),
         },
         {
-          text: '标签',
-          href: getPermalink('IoT', 'tag'),
+          text: '操作手册',
+          href: getPermalink('operation', 'tag'),
         },
       ],
     },
