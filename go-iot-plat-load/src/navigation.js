@@ -9,7 +9,6 @@ export const headerData = {
     {
       text: '定价',
       href: getPermalink('pricing'),
-
     },
     {
       text: '链接',
@@ -20,7 +19,17 @@ export const headerData = {
     
     {
       text:"我们",
-      href: getPermalink('about'),
+      links: [
+        {
+          text: '团队',
+          href: getPermalink('about'),
+          
+        },
+        {
+          text: '作者',
+          href: getPermalink('homes/personal'),
+        }
+        ]
     },
     {
       text: '博客',

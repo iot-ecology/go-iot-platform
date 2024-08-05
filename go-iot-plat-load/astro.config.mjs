@@ -11,7 +11,8 @@ import icon from 'astro-icon';
 import compress from 'astro-compress';
 
 import astrowind from './vendor/integration';
-
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import {
   readingTimeRemarkPlugin,
   responsiveTablesRehypePlugin,
@@ -80,8 +81,8 @@ export default defineConfig({
   },
 
   markdown: {
-    remarkPlugins: [readingTimeRemarkPlugin],
-    rehypePlugins: [responsiveTablesRehypePlugin, lazyImagesRehypePlugin],
+    remarkPlugins: [readingTimeRemarkPlugin,remarkMath],
+    rehypePlugins: [responsiveTablesRehypePlugin, lazyImagesRehypePlugin,rehypeKatex],
   },
 
   vite: {
