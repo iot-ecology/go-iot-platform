@@ -40,10 +40,10 @@ export const headerData = {
         },
         {
           text: '应用案例',
-          href: getPermalink('case', 'tag'),
+          href: getPermalink('an4-li4', 'tag'),
         },{
           text: '操作手册',
-          href: getPermalink('operation', 'tag'),
+          href: getPermalink('cao1-zuo4', 'tag'),
         },
       ],
     },

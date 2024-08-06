@@ -1,6 +1,6 @@
 site:
   name: 'Go IoT 开发平台'
-  site: 'https://go-iot-plat-load.pages.dev'
+  site: 'https://iot-dev-egi.pages.dev'
   base: '/'
   trailingSlash: false
   googleSiteVerificationId: ""

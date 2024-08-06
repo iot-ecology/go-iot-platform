@@ -72,7 +72,6 @@ const getNormalizedPost = async (post: CollectionEntry<'post'>): Promise<Post> =
     slug: cleanSlug(tag),
     title: tag,
   }));
-
   return {
     id: id,
     slug: slug,
