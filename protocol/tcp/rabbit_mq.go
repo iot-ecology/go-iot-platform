@@ -58,7 +58,7 @@ func genUrl() string {
 //
 // 返回值：
 // 无返回值
-func PushToQueue(queueName string, body []byte) {
+func PushToQueue(queueName string, body []byte) error {
 
 	ch, _ := GRabbitMq.Channel()
 	defer func(ch *amqp.Channel) {
@@ -69,13 +69,18 @@ func PushToQueue(queueName string, body []byte) {
 		}
 	}(ch)
 
-	_ = ch.PublishWithContext(context.Background(), "", queueName, // routing key
+	err := ch.PublishWithContext(context.Background(), "", queueName, // routing key
 		false, // mandatory
 		false, // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        body,
 		})
+	if err != nil {
+		zap.S().Errorf("Failed to publish a message %v", err)
+		return err
+	}
 	zap.S().Infof(" [x] 发送到 %s 消息体 %s", queueName, body)
 
+	return nil
 }

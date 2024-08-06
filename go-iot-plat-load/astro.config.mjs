@@ -9,7 +9,6 @@ import mdx from '@astrojs/mdx';
 import partytown from '@astrojs/partytown';
 import icon from 'astro-icon';
 import compress from 'astro-compress';
-
 import astrowind from './vendor/integration';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -19,6 +18,8 @@ import {
   lazyImagesRehypePlugin,
 } from './src/utils/frontmatter.mjs';
 
+
+import remarkMermaid from 'remark-mermaidjs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const hasExternalScripts = false;
@@ -81,7 +82,7 @@ export default defineConfig({
   },
 
   markdown: {
-    remarkPlugins: [readingTimeRemarkPlugin,remarkMath],
+    remarkPlugins: [readingTimeRemarkPlugin,remarkMath,remarkMermaid],
     rehypePlugins: [responsiveTablesRehypePlugin, lazyImagesRehypePlugin,rehypeKatex],
   },
 

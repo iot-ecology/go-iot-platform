@@ -25,6 +25,10 @@ var InfluxdbBiz = biz.InfluxdbBiz{}
 // @Router    /query/influxdb [post]
 func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 	json := servlet.InfluxQueryConfig{}
+
+	// fixme: 修订多协议的情况
+
+
 	err := c.ShouldBind(&json)
 	if err != nil {
 		glob.GLog.Sugar().Error("操作异常", err)

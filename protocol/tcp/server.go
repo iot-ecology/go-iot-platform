@@ -87,17 +87,31 @@ func (server *Server) handleMessage(client *Client, message string) {
 	ok := getUid(client.conn.RemoteAddr().String())
 
 	if ok != "" {
-		handlerData(server, message, client)
+		handlerData( message, client)
 	} else {
 
-		deviceId := handlerUid(message)
-		if deviceId == "" {
+		uid := handlerUid(message)
+		if uid == "" {
 			clientWrite(client, "请发送uid:xxx格式的消息进行设备ID映射。\n")
 
 			return
 		} else {
 			server.mu.Lock()
 			defer server.mu.Unlock()
+
+			split := strings.Split(uid, ":")
+
+			var deviceId = split[0]
+			var username = split[1]
+			var password = split[2]
+
+			usernameC, passwordC := FindDeviceMappingUP(deviceId)
+			zap.S().Infof("device_id: %s", deviceId)
+			zap.S().Infof("有效账号密码 username: %s, password: %s", usernameC, passwordC)
+			if username != usernameC || password != passwordC {
+				clientWrite(client, "账号密码不正确.\n")
+				return
+			}
 
 			storageUid(deviceId, client.conn.RemoteAddr().String())
 			clientWrite(client, "成功识别设备编码.\n")
@@ -109,6 +123,25 @@ func (server *Server) handleMessage(client *Client, message string) {
 	}
 
 }
+
+
+type Auth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+
+func FindDeviceMappingUP(deviceId string) (string, string) {
+	// todo: 从redis中根据deviceId获取用户名和密码
+	val := globalRedisClient.HGet(context.Background(), "auth:tcp", deviceId).Val()
+	var auth Auth
+	err := json.Unmarshal([]byte(val), &auth)
+	if err != nil {
+		return "", ""
+	}
+	return auth.Username, auth.Password
+}
+
 
 func getUid(remoteAdd string) string {
 	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd).Val()
@@ -135,7 +168,7 @@ type TcpMessage struct {
 	Message string `json:"message"`
 }
 
-func handlerData(server *Server, message string, client *Client) {
+func handlerData(message string, client *Client) {
 
 	zap.S().Debugf("处理消息: %s  客户端: %s\n", message, client.conn.RemoteAddr().String())
 
@@ -151,7 +184,11 @@ func handlerData(server *Server, message string, client *Client) {
 		zap.S().Errorf("Error marshalling TCP message to JSON: %v", err)
 		return
 	}
-	PushToQueue("pre_tcp_handler", jsonData)
+	s2 := PushToQueue("pre_tcp_handler", jsonData)
+	if s2 != nil {
+		zap.S().Errorf("Error pushing TCP message to queue: %v", s2)
+		clientWrite(client, fmt.Sprintf("数据处理异常 %s.\n", s2))
+	}
 
 	clientWrite(client, "数据已处理.\n")
 
