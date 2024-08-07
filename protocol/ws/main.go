@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -31,7 +32,8 @@ func main() {
 		zap.S().Fatalf("error: %v", err)
 	}
 
-	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
+	zap.S().Infof("node name = %v , host = %v , port = %v size = %v", globalConfig.NodeInfo.Name,
+		globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port,globalConfig.NodeInfo.Size)
 	InitRabbitCon()
 	initGlobalRedisClient(globalConfig.RedisConfig)
 	go BeatTask(globalConfig.NodeInfo)
@@ -44,7 +46,7 @@ func main() {
 	e.GET("/", Index)
 	e.GET("/auth", AuthCtr)
 	e.GET("/ws", InitWebSocket)
-
+	globalRedisClient.Del(context.Background(),"ws_uid:"+globalConfig.NodeInfo.Name)
 	go ListenerWs()
 	e.Run(fmt.Sprintf(":%d", globalConfig.NodeInfo.Port))
 }

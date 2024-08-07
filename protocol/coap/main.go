@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"go.uber.org/zap"
@@ -32,6 +33,9 @@ func main() {
 	zap.S().Infof("node name = %v , host = %v , port = %v", globalConfig.NodeInfo.Name, globalConfig.NodeInfo.Host, globalConfig.NodeInfo.Port)
 	InitRabbitCon()
 	initGlobalRedisClient(globalConfig.RedisConfig)
+
+	globalRedisClient.Del(context.Background(),"coap_uid_f:" + globalConfig.NodeInfo.Name)
+	globalRedisClient.Del(context.Background(),"coap_uid:" + globalConfig.NodeInfo.Name)
 	go BeatTask(globalConfig.NodeInfo)
 
 	Create(globalConfig.NodeInfo.Port)

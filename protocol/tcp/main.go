@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"go.uber.org/zap"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 )
+
 var globalConfig ServerConfig
 
 func main() {
@@ -33,7 +35,10 @@ func main() {
 
 	initGlobalRedisClient(globalConfig.RedisConfig)
 
+	globalRedisClient.Del(context.Background(),"tcp_uid_f:" + globalConfig.NodeInfo.Name)
+	globalRedisClient.Del(context.Background(),"tcp_uid:" + globalConfig.NodeInfo.Name)
 	go BeatTask(globalConfig.NodeInfo)
+	go ListenerTcp()
 
 	server := New(&Config{
 		Host: "localhost",
@@ -82,8 +87,6 @@ func initLog() {
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
 }
-
-
 
 // ServerConfig 定义了服务器配置的结构体，包含了节点信息、Redis配置和消息队列配置。
 type ServerConfig struct {

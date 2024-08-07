@@ -34,16 +34,20 @@ export const headerData = {
     {
       text: '博客',
       links: [
-        {
-          text: '博客列表',
-          href: getBlogPermalink(),
-        },
+        
         {
           text: '应用案例',
           href: getPermalink('an4-li4', 'tag'),
         },{
           text: '操作手册',
           href: getPermalink('cao1-zuo4', 'tag'),
+        },{
+          text: '系统设计',
+          href: getPermalink('jia4-gou4', 'tag'),
+        },
+        {
+          text: '博客列表',
+          href: getBlogPermalink(),
         },
       ],
     },

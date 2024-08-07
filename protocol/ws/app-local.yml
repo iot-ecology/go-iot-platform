@@ -1,6 +1,9 @@
 node_info:
   host: 127.0.0.1
   port: 13332
+  size: 10
+  name: ws1
+  type: websocket-server
 redis_config:
   host: 127.0.0.1
   port: 6379

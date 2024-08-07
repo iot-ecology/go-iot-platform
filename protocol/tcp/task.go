@@ -10,14 +10,14 @@ import (
 )
 
 func SetLastOpTime(uid string) {
-
+	replace := strings.Replace(uid, ":", "@", -1)
 	// 设置24小时有效时间
-	globalRedisClient.Set(context.Background(), "ws:last:"+uid, time.Now().Unix(), 24*time.Hour)
-	//globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 10*time.Second)
+	globalRedisClient.Set(context.Background(), "tcp:last:"+replace, time.Now().Unix(), 24*time.Hour)
+	//globalRedisClient.Set(context.Background(), "tcp:last:"+replace, time.Now().Unix(), 10*time.Second)
 
 }
 
-func ListenerWs() {
+func ListenerTcp() {
 	client := globalRedisClient
 
 	// 配置Redis以启用过期事件的通知。
@@ -41,22 +41,20 @@ func ListenerWs() {
 			return
 		}
 
-		// 如果消息负载以 "ws:last:" 开头，则进一步处理。
-		if strings.HasPrefix(msg.Payload, "ws:last:") {
+		// 如果消息负载以 "tcp:last:" 开头，则进一步处理。
+		if strings.HasPrefix(msg.Payload, "tcp:last:") {
 			// 分割负载字符串以获取最后一个元素。
 			parts := strings.Split(msg.Payload, ":")
 			lastElement := parts[len(parts)-1]
-			zap.S().Infof("Delete ws conn %s", lastElement)
+			zap.S().Infof("Delete tcp conn %s", lastElement)
 
-			if GWs != nil {
+			if TcpMap != nil {
+				replace := strings.Replace(lastElement, "@", ":", -1)
 
-				conn := GWs[lastElement]
+				conn := TcpMap[replace]
 				if conn != nil {
-					conn.Close()
-					og := GWsMirror[conn]
-					delete(GWs, og)
-					delete(GWsMirror, conn)
-					globalRedisClient.LRem(context.Background(), "ws_uid:"+globalConfig.NodeInfo.Name, 1, og)
+					conn.conn.Close()
+					RemoveUid(replace)
 				}
 			}
 

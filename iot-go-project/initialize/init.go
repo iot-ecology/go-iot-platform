@@ -73,7 +73,7 @@ var (
 	mongoTransmitBindApi = transmit_mqtt.MongoTransmitBindApi{}
 	mySQLTransmitBindApi = transmit_mqtt.MySQLTransmitBindApi{}
 	rabbitmqTransmitBindApi = transmit_mqtt.RabbitmqTransmitBindApi{}
-
+	protocolServiceApi = router.ProtocolService{}
 
 )
 
@@ -765,6 +765,11 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/RabbitmqTransmitBind/:id", rabbitmqTransmitBindApi.ByIdRabbitmqTransmitBind)
 	r.GET("/RabbitmqTransmitBind/page", rabbitmqTransmitBindApi.PageRabbitmqTransmitBind)
 	r.POST("/RabbitmqTransmitBind/delete/:id", rabbitmqTransmitBindApi.DeleteRabbitmqTransmitBind)
+
+
+
+	r.GET("/protocol/ws_info",protocolServiceApi.WsServerInfo)
+	r.GET("/protocol/tcp_info",protocolServiceApi.TcpServerInfo)
 }
 func initGlobalRedisClient() {
 
@@ -783,7 +788,7 @@ func initGlobalRedisClient() {
 }
 func InitConfig() {
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)

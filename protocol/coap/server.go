@@ -11,20 +11,21 @@ import (
 )
 
 func getUid(remoteAdd string) string {
-	val := globalRedisClient.HGet(context.Background(), "coap_uid_f", remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	return val
 }
 
 func storageUid(uid, remoteAdd string) {
-	globalRedisClient.HSet(context.Background(), "coap_uid", uid, remoteAdd)
-	globalRedisClient.HSet(context.Background(), "coap_uid_f", remoteAdd, uid)
+	globalRedisClient.HSet(context.Background(), "coap_uid:"+globalConfig.NodeInfo.Name, uid, remoteAdd)
+	globalRedisClient.HSet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd, uid)
 }
 func RemoveUid(remoteAdd string) {
-	val := globalRedisClient.HGet(context.Background(), "coap_uid_f", remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	if val == "" {
 		return
 	} else {
-		globalRedisClient.HDel(context.Background(), "coap_uid", val)
+		globalRedisClient.HDel(context.Background(), "coap_uid:"+globalConfig.NodeInfo.Name, val)
+		globalRedisClient.HDel(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd)
 
 	}
 }
@@ -75,19 +76,38 @@ func auth(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			return res
 		}
 
-		res := &coap.Message{
-			Type:      coap.Acknowledgement,
-			Code:      coap.Content,
-			MessageID: m.MessageID,
-			Token:     m.Token,
-			Payload:   []byte("安全认证成功"),
+
+
+		mc := globalRedisClient.HRandField(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, -1).Val()
+
+		if int64(len(mc)) <= globalConfig.NodeInfo.Size {
+			res := &coap.Message{
+				Type:      coap.Acknowledgement,
+				Code:      coap.Content,
+				MessageID: m.MessageID,
+				Token:     m.Token,
+				Payload:   []byte("安全认证成功"),
+			}
+			res.SetOption(coap.ContentFormat, coap.TextPlain)
+			storageUid(auth.DeviceId, a.String())
+			CoapMap[l.RemoteAddr().String()] = l
+			return res
+		}else {
+			res := &coap.Message{
+				Type:      coap.Acknowledgement,
+				Code:      coap.Content,
+				MessageID: m.MessageID,
+				Token:     m.Token,
+				Payload:   []byte("当前设备数量已达上线"),
+			}
+			res.SetOption(coap.ContentFormat, coap.TextPlain)
+			return res
 		}
-		res.SetOption(coap.ContentFormat, coap.TextPlain)
-		storageUid(auth.DeviceId, a.String())
-		return res
 	}
 	return nil
 }
+
+var CoapMap = make(map[string]*net.UDPConn)
 
 func data(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 	if m.IsConfirmable() {

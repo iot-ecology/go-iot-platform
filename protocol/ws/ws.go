@@ -33,7 +33,7 @@ func InitWebSocket(c *gin.Context) {
 	defer func(conn *websocket.Conn) {
 		err := conn.Close()
 		og := GWsMirror[conn]
-		globalRedisClient.LRem(context.Background(), "ws_uid", 1, og)
+		globalRedisClient.LRem(context.Background(), "ws_uid:"+globalConfig.NodeInfo.Name, 1, og)
 		delete(GWs, og)
 		delete(GWsMirror, conn)
 		if err != nil {
@@ -43,7 +43,7 @@ func InitWebSocket(c *gin.Context) {
 	userId := c.Query("id")
 	log.Println("用户id:", userId)
 
-	val := globalRedisClient.LRange(context.Background(), "ws_uid", 0, -1).Val()
+	val := globalRedisClient.LRange(context.Background(), "ws_uid:"+globalConfig.NodeInfo.Name, 0, -1).Val()
 
 	exists := false
 	for _, el := range val {

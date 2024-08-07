@@ -10,6 +10,8 @@
   - [ ] 基于JavaScript的统计功能（低代码）
 - [ ] 系统内通知
 - [ ] 系统外通知（微信公众号、钉钉、邮件）
+  - [ ] 飞书机器人
+  - [ ] 钉钉机器人
 - 数据转发
   - [ ] kafka
   - [ ] influxdb 
@@ -34,7 +36,9 @@
   - [ ] 运维模块
 - 通讯协议对接
   - [x] MQTT
-  - [ ] HTTP
-  - [ ] WEBSOCKET
+  - [x] HTTP
+  - [x] WEBSOCKET
   - [ ] MODBUS
+  - [X] TCP/IP
 - [ ] 硬件版本管理(OTA)
+- [ ] 报警后置行为

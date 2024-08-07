@@ -79,7 +79,6 @@ func (server *Server) handleClient(client *Client) {
 	}
 }
 
-
 func (server *Server) handleMessage(client *Client, message string) {
 
 	// 判断这个客户端是否建立过uid映射，没有的话不处理数据
@@ -87,7 +86,7 @@ func (server *Server) handleMessage(client *Client, message string) {
 	ok := getUid(client.conn.RemoteAddr().String())
 
 	if ok != "" {
-		handlerData( message, client)
+		handlerData(message, client)
 	} else {
 
 		uid := handlerUid(message)
@@ -101,6 +100,10 @@ func (server *Server) handleMessage(client *Client, message string) {
 
 			split := strings.Split(uid, ":")
 
+			if len(split) != 3 {
+				clientWrite(client, "uid格式错误.\n")
+				return
+			}
 			var deviceId = split[0]
 			var username = split[1]
 			var password = split[2]
@@ -113,26 +116,35 @@ func (server *Server) handleMessage(client *Client, message string) {
 				return
 			}
 
-			storageUid(deviceId, client.conn.RemoteAddr().String())
-			clientWrite(client, "成功识别设备编码.\n")
+			m := globalRedisClient.HRandField(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, -1).Val()
 
-			return
+			if int64(len(m)) <= globalConfig.NodeInfo.Size {
 
+				storageUid(deviceId, client.conn.RemoteAddr().String())
+
+				TcpMap[client.conn.RemoteAddr().String()] = client
+
+				clientWrite(client, "成功识别设备编码.\n")
+
+				return
+			} else {
+				clientWrite(client, "当前服务器已满载.\n")
+				client.conn.Close()
+				return
+			}
 		}
 
 	}
 
 }
 
-
 type Auth struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-
 func FindDeviceMappingUP(deviceId string) (string, string) {
-	// todo: 从redis中根据deviceId获取用户名和密码
+	//  从redis中根据deviceId获取用户名和密码
 	val := globalRedisClient.HGet(context.Background(), "auth:tcp", deviceId).Val()
 	var auth Auth
 	err := json.Unmarshal([]byte(val), &auth)
@@ -142,24 +154,23 @@ func FindDeviceMappingUP(deviceId string) (string, string) {
 	return auth.Username, auth.Password
 }
 
-
 func getUid(remoteAdd string) string {
-	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	return val
 }
 
 func storageUid(uid, remoteAdd string) {
 	globalRedisClient.HSet(context.Background(), "tcp_uid:"+globalConfig.NodeInfo.Name, uid, remoteAdd)
-	globalRedisClient.HSet(context.Background(),  "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd, uid)
+	globalRedisClient.HSet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd, uid)
 
 }
 func RemoveUid(remoteAdd string) {
-	val := globalRedisClient.HGet(context.Background(),  "tcp_uid_f:"+ globalConfig.NodeInfo.Name, remoteAdd).Val()
+	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	if val == "" {
 		return
 	} else {
 		globalRedisClient.HDel(context.Background(), "tcp_uid:"+globalConfig.NodeInfo.Name, val)
-
+		globalRedisClient.HDel(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd)
 	}
 }
 
@@ -167,6 +178,8 @@ type TcpMessage struct {
 	Uid     string `json:"uid"`
 	Message string `json:"message"`
 }
+
+var TcpMap = make(map[string]*Client)
 
 func handlerData(message string, client *Client) {
 
@@ -184,6 +197,7 @@ func handlerData(message string, client *Client) {
 		zap.S().Errorf("Error marshalling TCP message to JSON: %v", err)
 		return
 	}
+	SetLastOpTime(client.conn.RemoteAddr().String())
 	s2 := PushToQueue("pre_tcp_handler", jsonData)
 	if s2 != nil {
 		zap.S().Errorf("Error pushing TCP message to queue: %v", s2)

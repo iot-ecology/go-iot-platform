@@ -35,16 +35,28 @@ func AuthCtr(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "账号密码不匹配"})
 		return
 	}
-	newUUID, _ := uuid.NewUUID()
 
-	uidString := newUUID.String()
-	storageId := deviceId + "@" + uidString
-	globalRedisClient.LPush(context.Background(), "ws_uid", storageId)
+	// fixme: 确认客户端数量
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "认证通过",
-		"uid":    storageId,
-	})
+	curSize := globalRedisClient.LLen(context.Background(), "ws_uid:"+globalConfig.NodeInfo.Name).Val()
+	if curSize <= globalConfig.NodeInfo.Size {
+
+		newUUID, _ := uuid.NewUUID()
+
+		uidString := newUUID.String()
+		storageId := deviceId + "@" + uidString
+		globalRedisClient.LPush(context.Background(), "ws_uid:"+globalConfig.NodeInfo.Name, storageId)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "认证通过",
+			"uid":     storageId,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "当前节点已满",
+		})
+
+	}
 }
 
 type Auth struct {
