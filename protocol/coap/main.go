@@ -34,13 +34,13 @@ func main() {
 	InitRabbitCon()
 	initGlobalRedisClient(globalConfig.RedisConfig)
 
-	globalRedisClient.Del(context.Background(),"coap_uid_f:" + globalConfig.NodeInfo.Name)
-	globalRedisClient.Del(context.Background(),"coap_uid:" + globalConfig.NodeInfo.Name)
+	globalRedisClient.Del(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name)
+	globalRedisClient.Del(context.Background(), "coap_uid:"+globalConfig.NodeInfo.Name)
 	go BeatTask(globalConfig.NodeInfo)
+	go ListenerCoap()
 
 	Create(globalConfig.NodeInfo.Port)
 }
-
 
 var myTimeEncoder = zapcore.TimeEncoder(func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	// 按照 "2006-01-02 15:04:05" 的格式编码时间
@@ -82,6 +82,7 @@ func initLog() {
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
 }
+
 // ServerConfig 定义了服务器配置的结构体，包含了节点信息、Redis配置和消息队列配置。
 type ServerConfig struct {
 	// NodeInfo 定义了节点的信息，包括主机地址、端口、节点名称、节点类型和最大处理数量。

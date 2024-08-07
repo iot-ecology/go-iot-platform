@@ -17,7 +17,7 @@ func SetLastOpTime(uid string) {
 
 }
 
-func ListenerTcp() {
+func ListenerCoap() {
 	client := globalRedisClient
 
 	// 配置Redis以启用过期事件的通知。
