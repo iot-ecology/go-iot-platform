@@ -191,7 +191,7 @@ let rules: Record<string, Rule[]> = {
   subtopic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
   payload: [{ required: true, message: t('message.pleaseMessage'), trigger: "blur" }],
   qos: [{ required: true, message: t('message.pleaseService'), trigger: "change" }],
-  topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+  topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "change" }],
   retained: [{ required: true, message: t('message.pleaseChooseMessage'), trigger: "change" }],
 };
 const routerStore = useRouterNameStore();

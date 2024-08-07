@@ -14,15 +14,16 @@ const { t } = useI18n();
 const page = ref(1);
 const pageSelect = ref(1);
 const options = ref<any>([]);
-const value = ref<any>();
+const value = ref<any>(props.modelValue);
 const valueResult = ref<any>("");
 const valueSearch = ref<any>("");
 const showOpen = ref(false);
+const unit = ref('');
 
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue",'dataUnit']);
 const List = async () => {
   const { data } = await ProductPage({ name: "", page: page.value, page_size: 100 });
-  const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
+  const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name,unit:item.sku }));
   options.value = options.value.concat(listArr);
   if (Number(props.modelValue) && !options.value.map((it: any) => it.value).includes(Number(props.modelValue))) {
     page.value++;
@@ -36,12 +37,18 @@ const List = async () => {
       });
     }
   }
+  if(!unit.value) {
+    unit.value = options.value.filter((it:any)=>it.value===value.value)[0]?.unit
+    console.log(unit.value)
+    emits("dataUnit", unit.value);
+  }
+
   emits("update:modelValue", value.value);
+  // emits("dataUnit", unit.value);
   valueResult.value = value.value;
 };
 
 watch(()=>props.modelValue,(newValue)=>{
-  console.log(newValue)
   if(newValue) {
     value.value = newValue
   }
@@ -54,7 +61,7 @@ const select = async (ValueClick: any) => {
       await List();
     } else {
       const { data } = await ProductPage({ name: valueSearch.value, page: pageSelect.value, page_size: 100 });
-      const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
+      const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name, unit:item.sku }));
       options.value = options.value.concat(listArr);
       if (data.data.total > 0 && options.value.length < data.data.total) {
         pageSelect.value++;
@@ -87,7 +94,7 @@ const handleSearch = async (val: string) => {
     return;
   }
   options.value = [];
-  const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name }));
+  const listArr = data.data.data.map((item: any) => ({ value: item.ID, label: item.name, unit:item.sku }));
   options.value = options.value.concat(listArr);
   if (data.data.total > 0 && options.value.length < data.data.total) {
     pageSelect.value++;
@@ -105,6 +112,9 @@ watch(value, async (newValue) => {
     valueSearch.value = "";
     await List();
   }else {
+    value.value = newValue
+    unit.value = options.value.filter((it:any)=>it.value===value.value)[0]?.unit
+    emits("dataUnit", unit.value);
     emits("update:modelValue", newValue);
   }
 });

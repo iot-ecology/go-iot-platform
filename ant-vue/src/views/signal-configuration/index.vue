@@ -43,7 +43,7 @@
                   </a-popconfirm>
                 </span>
                 <span v-else>
-                  <a-button type="primary" size="small" style="margin-right: 10px" @click="onView(record.mqtt_client_id, record.ID, record.alias, record.unit, record.type)">{{ $t('message.check') }}</a-button>
+                  <a-button type="primary" size="small" style="margin-right: 10px" @click="onView(record.ID, record.alias, record.unit, record.type, record.protocol,record.device_uid,record.identification_code)">{{ $t('message.check') }}</a-button>
                   <a-button type="primary" size="small"  @click="edit(record.key)">{{$t('message.edit')}}</a-button>
                   <a-button type="primary" size="small"  style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">{{ $t('message.SignalAlarmConfig') }}</a-button>
                   <a-button type="primary" size="small"  style="margin-left: 10px" @click="onHistoryView(record)">{{ $t('message.historicalData') }}</a-button>
@@ -63,6 +63,15 @@
             </a-form-item>
             <a-form-item :label="$t('message.name')" name="name">
               <a-input v-model:value="form.name" style="width: 350px" />
+            </a-form-item>
+            <a-form-item label="协议" name="protocol">
+              <a-input :disabled="true" v-model:value="form.protocol" style="width: 350px" />
+            </a-form-item>
+            <a-form-item label="device_uid" name="device_uid">
+              <a-input  v-model:value="form.device_uid" style="width: 350px" />
+            </a-form-item>
+            <a-form-item label="identification_code" name="identification_code">
+              <a-input  v-model:value="form.identification_code" style="width: 350px" />
             </a-form-item>
             <a-form-item :label="$t('message.type')" name="type">
               <a-select v-model:value="form.type" style="width: 350px">
@@ -134,6 +143,9 @@ let rules: Record<string, Rule[]> = {
   alias: [{ required: true, message: t('message.pleaseAlias'), trigger: "blur" }],
   cache_size: [{ required: true, message: t('message.pleaseCacheSize'), trigger: "blur" }],
   unit: [{ required: true, message: t('message.pleaseUnit'), trigger: "blur" }],
+  protocol: [{ required: true, message: t('message.pleaseAlias'), trigger: "change" }],
+  device_uid: [{ required: true, message: t('message.pleaseAlias'), trigger: "change" }],
+  identification_code: [{ required: true, message: t('message.pleaseAlias'), trigger: "change" }],
 };
 const jump = useRouteJump();
 const formRef = ref<HTMLFormElement | null>(null);
@@ -142,7 +154,7 @@ const route = useRoute();
 const value = ref("");
 const modalVisible = ref(false);
 const modalView = ref(false);
-const form = reactive({ mqtt_client_id: Number(route.query.id) || "", name: "", type: "", alias: "", cache_size: 1, unit: "" });
+const form = reactive({ mqtt_client_id: Number(route.query.id) || "", name: "", type: "", alias: "", cache_size: 1, unit: "",protocol:'mqtt',identification_code:String(route.query.mqtt_client_id), device_uid:Number(route.query.mqtt_client_id)});
 let columns = [
   {
     title: t('message.uniCode'),
@@ -155,6 +167,18 @@ let columns = [
   {
     title: t('message.type'),
     dataIndex: "type",
+  },
+  {
+    title: 'IdentificationCode',
+    dataIndex:'identification_code'
+  },
+  {
+    title: 'protocol',
+    dataIndex:'protocol'
+  },
+  {
+    title: 'device_uid',
+    dataIndex:'device_uid'
   },
   {
     title: t('message.alias'),
@@ -285,6 +309,9 @@ const pageList = async () => {
     ID: item.ID,
     mqtt_client_id: item.mqtt_client_id,
     mqtt_client_name: item.mqtt_client_name,
+    device_uid: item.device_uid,
+    identification_code: item.identification_code,
+    protocol: item.protocol,
     name: item.name,
     type: item.type,
     alias: item.alias,
@@ -303,12 +330,12 @@ const handleTableChange = async (page: any) => {
   await pageList();
 };
 
-const onView = (id: number, rowId: number, alias: string, unit: string, type: string) => {
+const onView = (rowId: number, alias: string, unit: string, type: string, protocol: string,device_uid:number,identification_code:string) => {
   const time = dayjs();
   const data = type === "数字" ? QueryInfluxdb : QueryStrInfluxdb;
   showSpinning.value = true;
   data({
-    measurement: String(id),
+    measurement: protocol+'_'+device_uid+'_'+identification_code,
     fields: [String(rowId), "storage_time", "push_time"],
     start_time: time.subtract(30, "day").unix(),
     end_time: time.unix(),

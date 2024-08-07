@@ -9,7 +9,7 @@
           <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
         </a-form-item>
       </a-form>
-      <a-button style="margin: 10px 0" type="primary" @click="modalVisible = true">{{ $t('message.addition') }}</a-button>
+      <a-button style="margin: 10px 0" type="primary" @click="title =$t('message.addition') ,modalVisible = true">{{ $t('message.addition') }}</a-button>
 
       <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
@@ -38,32 +38,30 @@
         </template>
       </a-table>
       <!--新增-->
-      <a-modal style="width:700px" :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
+      <a-modal style="width:700px" :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" @cancel="onClose()" :title="title" @ok="onAddData()">
         <a-form ref="formRef" :label-col="{ style: { width: '150px' } }" :labelWrap="true" :rules="rules" :model="form">
-          <a-form-item label="生产计划名称" name="name">
-            <a-input v-model:value="form.name" style="width: 400px" :placeholder="$t('message.pleaseEnter')" />
+          <a-form-item :label="$t('message.productionPlanName')" name="name">
+            <a-input :disabled="disabled" v-model:value="form.name" style="width: 400px" :placeholder="$t('message.pleaseEnter')" />
           </a-form-item>
-          <a-form-item label="生产计划开始日期" name="start_date">
-            <a-date-picker v-model:value="form.start_date" style="width: 400px;" />
+          <a-form-item :label="$t('message.timeframe')" name="date">
+            <a-range-picker :placeholder="[$t('message.startTime'), $t('message.endTime')]" :disabled="disabled" valueFormat="YYYY-MM-DD" @change="onDateFun" v-model:value="form.date" style="width: 400px;" />
           </a-form-item>
-          <a-form-item label="生产计划结束日期" name="end_date">
-            <a-date-picker v-model:value="form.end_date" style="width: 400px;" />
-          </a-form-item>
-          <a-form-item label="状态" name="name">
-            <a-select v-model:value="form.status" style="width: 400px;">
-              <a-select-option value="1">准备中</a-select-option>
-              <a-select-option value="2">进行中</a-select-option>
-              <a-select-option value="3">已完成</a-select-option>
+          <a-form-item :label="$t('message.status')" name="status">
+            <a-select :disabled="disabled" v-model:value="form.status" style="width: 400px;">
+              <a-select-option value="1">{{ $t('message.preparing') }}</a-select-option>
+              <a-select-option value="2">{{ $t('message.ongoing') }}</a-select-option>
+              <a-select-option value="3">{{ $t('message.finished') }}</a-select-option>
             </a-select>
           </a-form-item>
-          <a-form-item label="生产计划描述" name="description">
-            <a-textarea v-model:value="form.description" style="width: 400px" :placeholder="$t('message.pleaseEnter')" />
+          <a-form-item :label="$t('message.describe')" name="description">
+            <a-textarea :disabled="disabled" v-model:value="form.description" style="width: 400px" :placeholder="$t('message.pleaseEnter')" />
           </a-form-item>
-          <a-form-item label="生产产品" name="">
+          <a-form-item :label="$t('message.productionName')" name="">
             <div v-for="(item, index) in form.product_plans" :key="index" style="display: flex;align-items: center;margin-bottom: 10px">
-                <Product v-model="item.product_id" style="width: 200px" />
-                <a-input-number placeholder="请输入数量" v-model:value="item.quantity" style="width: 100px;margin: 0 10px" />
-                <a-button shape="circle" @click="onUpdateProductFun(1,index)" style="margin-right: 8px">+</a-button>
+                <Product @dataUnit="dataUnit(index,$event)" :disabled="disabled" v-model="item.product_id" style="width: 200px" />
+                <a-input-number :disabled="disabled" :placeholder="$t('message.pleaseEnterTheQuantity')" v-model:value="item.quantity" style="width: 100px;margin: 0 10px" />
+                <div style="min-width: 40px" v-show="item.unit">（{{item.unit}}）</div>
+                <a-button shape="circle" @click="onUpdateProductFun(1,index)" style="margin: 0 8px">+</a-button>
                 <a-button v-if="index!==0" shape="circle" @click="onUpdateProductFun(-1,index)">-</a-button>
             </div>
           </a-form-item>
@@ -84,7 +82,10 @@ import {message} from "ant-design-vue";
 import dayjs from "dayjs";
 import  Product  from '@/components/select/Product.vue'
 import {cloneDeep} from "lodash-es";
-
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 interface DataItem {
   name: string;
   description: string;
@@ -99,6 +100,7 @@ const pagination = reactive({
   pageSize: 10,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
+const disabled = ref(false);
 const nameStr = ref('');
 const modalVisible = ref(false);
 const form = reactive({
@@ -107,7 +109,8 @@ const form = reactive({
   end_date: '',
   status:'',
   description: '',
-  product_plans: [{product_id: '',quantity: '' }],
+  date: '',
+  product_plans: [{product_id: '',quantity: '',unit: '' }],
 });
 const list = ref([]);
 const columns = ref([
@@ -120,19 +123,19 @@ const columns = ref([
     dataIndex: "name",
   },
   {
-    title: '生产计划开始日期',
+    title: t('message.productionPlanStartDate'),
     dataIndex: "start_date",
   },
   {
-    title: '生产计划结束日期',
+    title: t('message.endDateOfProductionPlan'),
     dataIndex: "end_date",
   },
   {
-    title: '描述',
+    title: t('message.describe'),
     dataIndex: "description",
   },
   {
-    title: '状态',
+    title: t('message.status'),
     dataIndex: "status_name",
   },
   {
@@ -140,14 +143,16 @@ const columns = ref([
     dataIndex: "operation",
   }
 ]);
-const statusName = {'1':'准备中','2':'进行中','3':'已完成'}
+const title = ref('');
 
+
+let statusName = {'1': t('message.preparing'),'2': t('message.ongoing'),'3': t('message.finished')}
 
 let rules: Record<string, Rule[]> = {
-  name: [{ required: true, message: t('message.pleaseEnterOperatorName'), trigger: "change" }],
-  start_date: [{ required: true, message: t('message.pleaseEnterImsi'), trigger: "change" }],
-  end_date: [{ required: true, message: t('message.pleaseEnterIccid'), trigger: "change" }],
-  description: [{ required: true, message: t('message.pleaseEnterAccessNumber'), trigger: "change" }],
+  name: [{ required: true, message: t('message.pleaseName'), trigger: "change" }],
+  date: [{ required: true, message: t('message.pleaseSelectADate'), trigger: "change" }],
+  status: [{ required: true, message: t('message.pleaseSelectStatus'), trigger: "change" }],
+  description: [{ required: true, message: t('message.pleaseEnterDescription'), trigger: "change" }],
 };
 
 watch(locale, () => {
@@ -157,24 +162,24 @@ watch(locale, () => {
       dataIndex: "id",
     },
     {
-      title: t('message.operatorName'),
-      dataIndex: "operator",
+      title: t('message.name'),
+      dataIndex: "name",
     },
     {
-      title: t('message.imsi'),
-      dataIndex: "imsi",
+      title: t('message.productionPlanStartDate'),
+      dataIndex: "start_date",
     },
     {
-      title: t('message.iccid'),
-      dataIndex: "iccid",
+      title: t('message.endDateOfProductionPlan'),
+      dataIndex: "end_date",
     },
     {
-      title: t('message.accessNumber'),
-      dataIndex: "access_number",
+      title: t('message.describe'),
+      dataIndex: "description",
     },
     {
-      title: t('message.expiration'),
-      dataIndex: "expiration",
+      title: t('message.status'),
+      dataIndex: "status_name",
     },
     {
       title: t('message.operation'),
@@ -182,14 +187,33 @@ watch(locale, () => {
     }
   ]
   rules = {
-    operator: [{ required: true, message: t('message.pleaseEnterOperatorName'), trigger: "change" }],
-    access_number: [{ required: true, message: t('message.pleaseEnterImsi'), trigger: "change" }],
-    expiration: [{ required: true, message: t('message.pleaseEnterIccid'), trigger: "change" }],
-    iccid: [{ required: true, message: t('message.pleaseEnterAccessNumber'), trigger: "change" }],
-    imsi: [{ required: true, message: t('message.pleaseEnterExpiration'), trigger: "change" }],
+    name: [{ required: true, message: t('message.pleaseName'), trigger: "change" }],
+    date: [{ required: true, message: t('message.pleaseSelectADate'), trigger: "change" }],
+    status: [{ required: true, message: t('message.pleaseSelectStatus'), trigger: "change" }],
+    description: [{ required: true, message: t('message.pleaseEnterDescription'), trigger: "change" }],
   }
 });
 const formatDate = (date: string) => dayjs(date).format('YYYY-MM-DD');
+
+const onDateFun = ()=> {
+  form.start_date = dayjs(form.date[0]).format('YYYY-MM-DDTHH:mm:ss[Z]')
+  form.end_date = dayjs(form.date[1]).format('YYYY-MM-DDTHH:mm:ss[Z]')
+}
+
+const onClose = ()=>{
+  Object.assign(form,{
+    name: '',
+    start_date: '',
+    end_date: '',
+    status:'',
+    description: '',
+    date: '',
+    product_plans: [{product_id: '',quantity: '',unit: '' }]})
+}
+
+const dataUnit = (index:number,unit:string)=>{
+  form.product_plans[index].unit = unit
+}
 
 const pageList = async () => {
   const { data } = await ProductionPlanPage({name:nameStr.value, page: pagination.current, page_size: pagination.pageSize });
@@ -207,12 +231,16 @@ const pageList = async () => {
 };
 
 const edit = async(record: string) => {
-  modalVisible.value = true
   const { data } = await ProductionPlanDetail(record.id);
-  console.log(data.data);
-  Object.assign(form, cloneDeep(data.data))
-  console.log(form);
-  // editableData[key] = cloneDeep(list.value.filter((item) => key === item.key)[0]);
+  Object.assign(form, cloneDeep(data.data),{
+    start_date:dayjs(data.data.start_date).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+    end_date:dayjs(data.data.end_date).format('YYYY-MM-DDTHH:mm:ss[Z]')
+  })
+  disabled.value = dayjs(data.data.start_date).isBefore(dayjs());
+  form.date = [form.start_date,form.end_date]
+  form.product_plans = cloneDeep(data.data.product_plans)
+  modalVisible.value = true
+  title.value = t('message.edit')
 };
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
