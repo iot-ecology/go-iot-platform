@@ -136,8 +136,8 @@ func removeOldCache(threshold int, signalId uint, mqttId int) {
 // @Tags signals
 // @Accept json
 // @Produce json
-// @Param mqtt_client_id query string false "MQTT客户端ID"
-// @Param type query string false "数据类型,数字、中文"
+// @Param device_uid query string false "device_uid"
+// @Param protocol query string false "协议"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Signal}} "信号列表"
@@ -145,8 +145,8 @@ func removeOldCache(threshold int, signalId uint, mqttId int) {
 // @Failure 500 {string} string "查询异常"
 // @Router /signal/page [get]
 func (api *SignalApi) PageSignal(c *gin.Context) {
-	var mqqtClientId = c.Query("mqtt_client_id")
-	var ty = c.Query("type")
+	var deviceUid = c.Query("device_uid")
+	var protocol = c.Query("protocol")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -161,7 +161,7 @@ func (api *SignalApi) PageSignal(c *gin.Context) {
 		return
 	}
 
-	data, err := bizSignal.PageSignal(mqqtClientId, ty, parseUint, u)
+	data, err := bizSignal.PageSignal(deviceUid, protocol,parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

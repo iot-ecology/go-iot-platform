@@ -125,7 +125,9 @@ type CalcCache struct {
 }
 
 type CalcParamCache struct {
-	MqttClientId int    `json:"mqtt_client_id"`                                        // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol"`
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
 	Name         string `json:"name"`                                                  // 参数名称
 	SignalName   string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId     int    `json:"signal_id" structs:"signal_id"`                         // 信号表的外键ID

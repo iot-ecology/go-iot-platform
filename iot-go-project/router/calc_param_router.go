@@ -83,7 +83,9 @@ func (api *CalcParamApi) UpdateCalcParam(c *gin.Context) {
 	newV.Name = req.Name
 	newV.Reduce = req.Reduce
 	newV.SignalName = req.SignalName
-	newV.MqttClientId = req.MqttClientId
+	newV.Protocol = req.Protocol
+	newV.DeviceUid = req.DeviceUid
+	newV.IdentificationCode = req.IdentificationCode
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

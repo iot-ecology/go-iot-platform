@@ -4,7 +4,6 @@ author: Zen HuiFer
 title: MQTT 客户端管理方案
 excerpt: 面对海量MQTT客户端的应用场景应当如何设计解决方案
 image: "~/assets/images/communication-1439132_1280.jpg"
-
 category: 教程
 tags:
   - Go

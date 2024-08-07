@@ -166,7 +166,7 @@ func genMeasurement(dt DataRowList, protocol string) string {
 //
 //	无
 func StorageDataRowList(dt DataRowList, protocol string) {
-	signal2 := GetMqttClientSignal2(dt.DeviceUid)
+	signal2 := GetMqttClientSignal2(dt.DeviceUid,dt.IdentificationCode)
 	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
 	zap.S().Infof("当前的DataRowList数据: %+v", dt)
 	timeFromUnix := time.Unix(dt.Time, 0)
@@ -266,42 +266,10 @@ func runScript(param string, script string) *[]DataRowList {
 	result = fn(param)
 	return result
 }
-// GetMqttClientSignal 函数根据MQTT客户端ID获取对应的信号映射表
-// 参数：
-//
-//	mqtt_client_id string - MQTT客户端ID
-//
-// 返回值：
-//
-//	map[string]bool - 信号映射表，其中key为信号名称，value表示信号类型是否为数字类型（忽略大小写）
-func GetMqttClientSignal(mqttClientId string) (map[int]bool, map[int]int64, map[string]int) {
+
+func GetMqttClientSignal2(mqttClientId ,IdentificationCode string) map[string]signalMapping {
 	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
-	if err != nil {
-		// 处理错误，例如记录日志或返回错误
-		zap.S().Errorf("获取信号映射表失败：%+v", err)
-	}
-	mapping := make(map[int]bool)
-	mappingName := make(map[string]int)
-	cacheSizeMapping := make(map[int]int64)
-	for _, strSignal := range result {
-		var signal Signal
-		err := json.Unmarshal([]byte(strSignal), &signal)
-		if err != nil {
-			continue // 如果反序列化失败，跳过当前信号
-		}
-
-		mapping[signal.ID] = strings.EqualFold(signal.Type, "数字")
-		cacheSizeMapping[signal.ID] = signal.CacheSize
-		mappingName[signal.Name] = signal.ID
-	}
-	return mapping, cacheSizeMapping, mappingName
-
-}
-
-func GetMqttClientSignal2(mqttClientId string) map[string]signalMapping {
-	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
+	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId +":" + IdentificationCode, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
 		zap.S().Errorf("获取信号映射表失败：%+v", err)

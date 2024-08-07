@@ -19,6 +19,9 @@ type MqttClient struct {
 }
 
 type Signal struct {
+	Protocol   string `json:"protocol"`
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
 	MqttClientId   int    `json:"mqtt_client_id"`                  // MQTT客户端表的外键ID
 	Name           string `json:"name"`                            // 信号的名称，用于标识不同的信号
 	Alias          string `json:"alias" structs:"alias"`           // 信号的别名，用于显示
@@ -76,7 +79,9 @@ type CalcRule struct {
 
 // CalcParam 计算参数
 type CalcParam struct {
-	MqttClientId   int    `json:"mqtt_client_id"`                                        // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol"`
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
 	Name           string `json:"name"`                                                  // 参数名称
 	SignalName     string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId       int    `gorm:"signal_id"  json:"signal_id" structs:"signal_id"`       // 信号表的外键ID

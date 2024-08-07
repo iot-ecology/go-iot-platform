@@ -3,7 +3,7 @@ node_info:
   port: 8081
   name: m1
   type: mqtt
-  size: 3
+  size: 30
 redis_config:
   host: 127.0.0.1
   port: 6379

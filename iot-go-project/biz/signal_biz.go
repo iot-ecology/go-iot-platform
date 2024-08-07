@@ -17,17 +17,17 @@ type SignalBiz struct{}
 
 var bizMqtt = MqttClientBiz{}
 
-func (biz *SignalBiz) PageSignal(mqttClientId, ty string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalBiz) PageSignal(deviceUid ,protocol string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var signals []models.Signal
 
 	db := glob.GDb
 
-	if mqttClientId != "" {
-		db = db.Where("mqtt_client_id = ?", mqttClientId)
+	if deviceUid != "" {
+		db = db.Where("device_uid = ?", deviceUid)
 	}
-	if ty != "" {
-		db = db.Where("type = ?", ty)
+	if protocol !=""{
+		db = db.Where("protocol = ?", protocol)
 	}
 	db.Model(&models.Signal{}).Count(&pagination.Total) // 计算总记录数
 
@@ -124,11 +124,13 @@ func (biz *SignalBiz) RemoveSignalWaringCache(config models.SignalWaringConfig) 
 func (biz *SignalBiz) SetSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId), configBytes)
+	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId) +":"+  config.
+		IdentificationCode, configBytes)
 }
 
 func (biz *SignalBiz) RemoveSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId), 0, configBytes)
+	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId) +":" + config.
+		IdentificationCode, 0, configBytes)
 }

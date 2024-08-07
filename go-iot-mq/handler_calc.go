@@ -39,6 +39,9 @@ func HandlerCalc(messages <-chan amqp.Delivery) {
 
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
+func calcMeasurement(deviceUid int , IdentificationCode, protocol string) string {
+	return protocol + "_" + strconv.Itoa(deviceUid) + "_" + IdentificationCode
+}
 
 func HandlerCalcStr(d amqp.Delivery) bool {
 	var myMap map[string]int64
@@ -74,13 +77,13 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 	}
 	var m = make(map[string]any)
 	for _, cache := range ccc.Param {
-		// fixme: 支持一下直接查询原始数据
+		// todo: 查询逻辑调整。  Measurement 不能直接和 MQTT_CLIENT_ID 对应了
 		if "原始" == cache.Reduce {
 			var fd []string
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := InfluxQueryConfig{}
 			config.Bucket = globalConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Measurement = calcMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = AggregationConfig{
 				Every:       1,
@@ -116,7 +119,7 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 
 			config := InfluxQueryConfig{}
 			config.Bucket = globalConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Measurement = calcMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
 			config.Fields = fd
 
 			config.StartTime = preTime - ccc.Offset

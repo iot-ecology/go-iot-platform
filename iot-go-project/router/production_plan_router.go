@@ -141,7 +141,7 @@ func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
 	productionPlan.EndDate = param.EndDate
 	productionPlan.Status = param.Status
 
-	create := tx.Model(models.ProductionPlan{}).Updates(productionPlan)
+	create := tx.Model(models.ProductionPlan{}).Where("id = ?",old.ID).Updates(productionPlan)
 	if create.Error != nil {
 		tx.Rollback()
 		zap.S().Errorf("更新 ProductionPlan 异常 %+v", create.Error)
@@ -149,7 +149,7 @@ func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
 		return
 	}
 
-	db := tx.Model(&models.ProductPlan{}).Where("production_plan_id = ?", productionPlan.ID).Delete(models.ProductPlan{})
+	db := tx.Where("production_plan_id = ?", productionPlan.ID).Delete(&models.ProductPlan{})
 	if db.Error != nil {
 		tx.Rollback()
 		zap.S().Infoln("Error occurred during deletion:", db.Error)

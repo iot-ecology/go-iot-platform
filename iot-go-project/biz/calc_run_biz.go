@@ -92,14 +92,17 @@ func (b CalcRunBiz) RefreshRule(id any) {
 
 	var m []servlet.CalcParamCache
 
+	// todo: IdentificationCode 字段出出力
 	for _, param := range calcParams {
 		m = append(m, servlet.CalcParamCache{
-			MqttClientId: param.MqttClientId,
-			SignalId:     param.SignalId,
-			Name:         param.Name,
-			SignalName:   param.SignalName,
-			Reduce:       param.Reduce,
-			CalcRuleId:   param.CalcRuleId,
+			DeviceUid:          param.DeviceUid,
+			Protocol:           param.Protocol,
+			IdentificationCode: param.IdentificationCode,
+			SignalId:           param.SignalId,
+			Name:               param.Name,
+			SignalName:         param.SignalName,
+			Reduce:             param.Reduce,
+			CalcRuleId:         param.CalcRuleId,
 		})
 	}
 
@@ -187,6 +190,10 @@ func getNextTime(cronExpr string) int64 {
 	return nextTimestamp
 }
 
+func genMeasurement(deviceUid int , IdentificationCode, protocol string) string {
+	return protocol + "_" + strconv.Itoa(deviceUid) + "_" + IdentificationCode
+}
+
 // MockCalc 是一个CalcRunBiz类型的方法，用于模拟计算操作
 //
 // 参数：
@@ -217,7 +224,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := servlet.InfluxQueryConfig{}
 			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Measurement = genMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = servlet.AggregationConfig{
 				Every:       1,
@@ -255,7 +262,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 
 			config := servlet.InfluxQueryConfig{}
 			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Measurement = genMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
 			config.Fields = fd
 			config.StartTime = startTime
 			config.EndTime = endTime

@@ -141,6 +141,7 @@ func data(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			}
 			res.SetOption(coap.ContentFormat, coap.TextPlain)
 			SetLastOpTime(a.String())
+			DataHandlerCount()
 			return res
 		} else {
 			res := &coap.Message{
