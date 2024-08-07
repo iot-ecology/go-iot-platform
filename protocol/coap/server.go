@@ -90,7 +90,7 @@ func auth(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			}
 			res.SetOption(coap.ContentFormat, coap.TextPlain)
 			storageUid(auth.DeviceId, a.String())
-			CoapMap[l.RemoteAddr().String()] = l
+			CoapMap[a.String()] = l
 			return res
 		}else {
 			res := &coap.Message{
@@ -140,6 +140,7 @@ func data(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 				Payload:   []byte("数据处理成功"),
 			}
 			res.SetOption(coap.ContentFormat, coap.TextPlain)
+			SetLastOpTime(a.String())
 			return res
 		} else {
 			res := &coap.Message{

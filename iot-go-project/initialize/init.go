@@ -770,6 +770,7 @@ func initRouter(r *gin.RouterGroup) {
 
 	r.GET("/protocol/ws_info",protocolServiceApi.WsServerInfo)
 	r.GET("/protocol/tcp_info",protocolServiceApi.TcpServerInfo)
+	r.GET("/protocol/coap_info",protocolServiceApi.CoapServerInfo)
 }
 func initGlobalRedisClient() {
 

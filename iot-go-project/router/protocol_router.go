@@ -132,3 +132,59 @@ func (api *ProtocolService) TcpServerInfo(c *gin.Context){
 	}
 	c.JSON(200, res)
 }
+
+
+
+
+// CoapServerInfo
+// @Summary Coap服务端信息
+// @Description 协议服务信息
+// @Tags protocol
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=router.NodeInfo[]} "节点信息"
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /protocol/coap_info [get]
+func (api *ProtocolService) CoapServerInfo(c *gin.Context){
+	val := glob.GRedis.Keys(context.Background(), "pod:info:coap:*").Val()
+
+	var  res []NodeInfo
+	for _, s := range val {
+
+
+
+
+		s2 := glob.GRedis.Get(context.Background(), s).Val()
+		v := NodeInfo{}
+		err := json.Unmarshal([]byte(s2), &v)
+
+
+		if err != nil {
+			zap.S().Error(err)
+			continue
+		}
+
+		parts := strings.Split(s, ":")
+		lastElement := parts[len(parts)-1]
+
+		m := glob.GRedis.HRandField(context.Background(), "coap_uid_f:"+lastElement,-1).Val()
+		zap.S().Info(m)
+
+		clientInfo := make(map[string]interface{})
+		for _, s3 := range m {
+			replace := strings.Replace(s3, ":", "@", -1)
+			result, err := glob.GRedis.Get(context.Background(), "coap:last:"+replace).Result()
+			if err !=nil {
+				zap.S().Error(err)
+				continue
+			}
+			clientInfo[s3] = result
+		}
+
+		v.ClientInfo = clientInfo
+		res = append(res, v)
+
+	}
+	c.JSON(200, res)
+}
