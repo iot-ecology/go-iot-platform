@@ -105,14 +105,18 @@ const metadata = {
     title="Go IoT 开发平台蓝图"
     items={[
       {
-        title: '持续发展',
+        title: '开发语言',
         description:
-          '完成核心业务，如大规模MQTT客户端管理、数据分析、生产计划和多协议对接方案。',
+          '使用Go语言进行开发，因为其语法简洁易学、原生支持并发编程、性能接近C语言、自动垃圾回收简化内存管理、编译速度快。',
       },
       {
-        title: '基于Go语言开发',
+        title: '高可用',
         description:
-          'Golang因其简单、高效、并发支持和强大的标准库而受到开发人员的喜爱。',
+          '在Go IoT 开发平台中能够给稳定的提供 MQTT 客户端管理、WebSocket、HTTP、TCP/IP和COAP服务。',
+      },{
+        title: '开箱即用',
+        description:
+          '通过Docker Compose的方式用户可以在1分钟内进入系统开始进行业务开发。',
       },
     ]}
     image={{
@@ -120,10 +124,9 @@ const metadata = {
       alt: 'Colorful Image',
     }}
   >
-    <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">建立在现代基础之上</h3>
-      通过整合行业领先的实践获得竞争优势
-    </Fragment>
+    <!--<Fragment slot="content">-->
+    <!--  <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">基础架构</h3>-->
+    <!--</Fragment>-->
 
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
@@ -137,17 +140,17 @@ const metadata = {
     items={[
       {
         title: '极速接入',
-        description: `使用MQTT协议轻松连接设备进行传输，整个过程只需1分钟。`,
+        description: `在Go IoT 开发平台中不论你是MQTT、WebSocket、HTTP、TCP/IP还是COAP，平均接入时间在1分钟内。`,
       },
       {
-        title: '开源',
+        title: '报警分析',
         description:
-          '此项目支持源代码交付。您可以根据自己的需要进行修改，也可以联系我们进行相关开发，并通过Gitee提交问题。',
+          '用户可以通过界面化的方式配置阈值报警、级联报警无需开发人员编写程序并重新发布，极大程度上节省开发时间。',
       },
       {
-        title: '微服务架构',
+        title: '数据使用',
         description:
-          "该项目采用微服务架构，分为MQTT管理端、消息队列消费端、后端管理端和其他核心组件。",
+          "在Go IoT 开发平台中支持用户通过JavaScript脚本的方式编写数据分析任务，并将用户的分析任务做完整的数据存储",
       },
     ]}
     image={{
@@ -192,7 +195,7 @@ const metadata = {
       alt: 'Astronauts Image',
     }}
   >
-    <Fragment slot="content">旨在促进成长和成功。</Fragment>
+    <Fragment slot="content">共建Go IoT 开发平台</Fragment>
 
     <Fragment slot="bg">
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
@@ -205,19 +208,19 @@ const metadata = {
     title="使用Go IoT 开发平台，让您的梦想物联网平台快速启动并运行。"
     items={[
       {
-        title: 'Step 1: <span class="font-medium">下载</span>',
+        title: '步骤 1: <span class="font-medium">下载</span>',
         description:
           "使用Gitee下载我们的项目，通常建议您使用开发分支，这将为我们的开发版本带来更多新功能。",
         icon: 'tabler:package',
       },
       {
-        title: 'Step 2: <span class="font-medium">编译</span>',
+        title: '步骤 2: <span class="font-medium">编译</span>',
         description:
           "当您希望在本地下载项目时，需要执行依赖项安装并编译项目",
         icon: 'tabler:letter-case',
       },
       {
-        title: 'Step 3: <span class="font-medium">配置</span>',
+        title: '步骤 3: <span class="font-medium">配置</span>',
         description:
           '编译后，您需要对启动环境进行基本配置，包括MySQL、Mongo等',
         icon: 'tabler:paint',
