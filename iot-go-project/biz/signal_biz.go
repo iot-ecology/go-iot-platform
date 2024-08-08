@@ -10,6 +10,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -17,12 +18,15 @@ type SignalBiz struct{}
 
 var bizMqtt = MqttClientBiz{}
 
-func (biz *SignalBiz) PageSignal(deviceUid ,protocol string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalBiz) PageSignal(deviceUid ,protocol ,ty string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var signals []models.Signal
 
 	db := glob.GDb
 
+	if ty!=""{
+		db = db.Where("type = ?", ty)
+	}
 	if deviceUid != "" {
 		db = db.Where("device_uid = ?", deviceUid)
 	}
@@ -133,4 +137,11 @@ func (biz *SignalBiz) RemoveSignalCache(config *models.Signal) {
 
 	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId) +":" + config.
 		IdentificationCode, 0, configBytes)
+}
+
+
+
+func (b SignalBiz) InitMongoCollection(m *models.SignalWaringConfig) {
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.WaringCollection, m.ID)
+	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.WaringCollection, name)
 }

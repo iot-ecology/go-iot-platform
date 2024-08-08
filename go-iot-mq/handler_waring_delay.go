@@ -78,13 +78,17 @@ func handlerWaringDelayOnce(msg DataRowList) {
 	zap.S().Infof("getDelayScript结果: %+v", script)
 	zap.S().Infof("脚本报警参数 = %+v", scriptParam)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
+
+
+
+
 	collection := db.Collection(globalConfig.MongoConfig.ScriptWaringCollection)
-	var toInsert []interface{}
 	for _, waring := range script {
 		zap.S().Infof("key = %+v", waring)
 		delayScript := runWaringDelayScript(waring.Script, scriptParam)
 		zap.S().Infof("runWaringDelayScript 执行后数据: %+v", delayScript)
-		toInsert = append(toInsert, bson.M{
+
+		v := bson.M{
 			"device_uid":  uid,
 			"param":       scriptParam,
 			"script":      waring.Script,
@@ -92,18 +96,15 @@ func handlerWaringDelayOnce(msg DataRowList) {
 			"rule_id":     waring.ID,
 			"insert_time": time.Now().Unix(),
 			"up_time":     msg.Time,
-		})
-	}
-	zap.S().Infof("toInsert 数据: %+v", toInsert)
-	if toInsert != nil {
-
-		one, err := collection.InsertMany(context.Background(), toInsert)
-		if err != nil {
-			zap.S().Errorf("插入数据失败 %+v", err)
-		} else {
-			zap.S().Infof("插入数据成功 %+v", one)
 		}
-		return
+		name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(waring.ID))
+		CheckCollectionAndCreate(globalConfig.MongoConfig.ScriptWaringCollection,name)
+		one, err := collection.InsertOne(context.Background(), v)
+		if err != nil {
+			zap.S().Errorf("插入数据异常: %+v", err)
+		} else {
+			zap.S().Infof("插入数据成功: %+v", one)
+		}
 	}
 }
 

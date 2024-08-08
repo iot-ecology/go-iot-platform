@@ -40,7 +40,11 @@ func (api *CalcRuleApi) CreateCalcRule(c *gin.Context) {
 	}
 
 	result := glob.GDb.Create(&CalcRule)
+
+	calcRunBiz.InitMongoCollection(&CalcRule)
 	calcRunBiz.RefreshRule(CalcRule.ID)
+
+
 
 	if result.Error != nil {
 		servlet.Error(c, result.Error.Error())

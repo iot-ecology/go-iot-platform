@@ -4,6 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"net/url"
 	"testing"
 )
 
@@ -97,4 +103,45 @@ func TestMqCustomer(t *testing.T) {
 			t.Log(string(d.Body))
 		}
 	}()
+}
+
+
+func TestMongo(t *testing.T){
+
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape("admin"),
+		url.QueryEscape("admin"), "127.0.0.1", 27017)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 检查连接
+	err = client.Ping(context.TODO(), nil)
+
+	db := client.Database("iot")
+
+	prefix := ""
+
+	// 构建正则表达式，匹配以prefix开头的集合名称
+	regex := primitive.Regex{Pattern: "^" + prefix, Options: "i"} // 'i' 表示不区分大小写
+
+	// 构建查询条件
+	filter := bson.M{"name": regex}
+	// 检查集合是否存在
+	collectionNames, err := db.ListCollectionNames(context.TODO(),filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collectionExists := false
+	for _, name := range collectionNames {
+		if name == "你的集合名" {
+			collectionExists = true
+			break
+		}
+		log.Println(name)
+	}
+	log.Println(collectionExists)
+
+	db.CreateCollection(context.TODO(), "aaaaaaaaa")
 }

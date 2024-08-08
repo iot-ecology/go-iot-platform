@@ -14,6 +14,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"log"
 	"strconv"
 	"time"
@@ -190,7 +191,7 @@ func getNextTime(cronExpr string) int64 {
 	return nextTimestamp
 }
 
-func genMeasurement(deviceUid int , IdentificationCode, protocol string) string {
+func genMeasurement(deviceUid int, IdentificationCode, protocol string) string {
 	return protocol + "_" + strconv.Itoa(deviceUid) + "_" + IdentificationCode
 }
 
@@ -224,7 +225,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := servlet.InfluxQueryConfig{}
 			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = genMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
+			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = servlet.AggregationConfig{
 				Every:       1,
@@ -262,7 +263,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 
 			config := servlet.InfluxQueryConfig{}
 			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = genMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
+			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.StartTime = startTime
 			config.EndTime = endTime
@@ -338,7 +339,10 @@ func runCalcScript(param map[string]any, script string) map[string]interface{} {
 // 返回查询结果，类型为[]bson.M，即bson.M类型的切片
 func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
-	collection := database.Collection(glob.GConfig.MongoConfig.Collection)
+	// fixme: 暂时使用固定集合名，后续需要改成根据规则ID动态获取
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.Collection, uint(ruleId))
+
+	collection := database.Collection(name)
 
 	filter := bson.M{
 		"calc_rule_id": ruleId,
@@ -378,4 +382,9 @@ func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 
 	return c
 
+}
+
+func (b CalcRunBiz) InitMongoCollection(m *models.CalcRule) {
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.Collection, m.ID)
+	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.Collection, name)
 }

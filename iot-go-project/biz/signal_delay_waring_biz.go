@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"time"
 )
 
@@ -103,7 +104,14 @@ func (biz *SignalDelayWaringBiz) GenParam(id int) (models.SignalDelayWaring, map
 	return dt, mm
 }
 
+
+func (b SignalDelayWaringBiz) InitMongoCollection(m *models.SignalDelayWaring) {
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.ScriptWaringCollection, m.ID)
+	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.ScriptWaringCollection, name)
+}
+
+
 type v struct {
-	Time  int64   `json:"time"`
-	Value float64 `json:"value"`
+	Time  int64   `json:"Time"`
+	Value float64 `json:"Value"`
 }

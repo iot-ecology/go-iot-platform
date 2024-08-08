@@ -98,6 +98,7 @@ type InfluxResponse struct {
 
 type InfluxQueryConfig struct {
 	Bucket      string            `json:"-"`
+	Protocol      string            `json:"protocol,omitempty"`
 	Measurement string            `json:"measurement,omitempty"`
 	Fields      []string          `json:"fields,omitempty"`
 	StartTime   int64             `json:"start_time,omitempty"`

@@ -153,7 +153,10 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 
 	// 获取数据库和集合
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
-	collection := db.Collection(globalConfig.MongoConfig.Collection)
+	// fixme: 暂时使用固定集合名，后续需要改成根据规则ID动态获取
+	name := CalcCollectionName(globalConfig.MongoConfig.Collection, ccc.ID)
+	CheckCollectionAndCreate(globalConfig.MongoConfig.Collection,name)
+	collection := db.Collection(name)
 
 	// 插入数据
 	insertResult, err := collection.InsertOne(context.Background(), bson.M{

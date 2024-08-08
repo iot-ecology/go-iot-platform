@@ -10,6 +10,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"log"
 	"strconv"
 )
@@ -44,6 +45,7 @@ func (api *SignalWaringConfigApi) CreateSignalWaringConfig(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	bizSignal.InitMongoCollection(&config)
 	servlet.Resp(c, config)
 }
 
@@ -191,7 +193,10 @@ func (api *SignalWaringConfigApi) QueryWaringList(c *gin.Context) {
 
 func query(req servlet.WaringRowQuery) []bson.M {
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
-	collection := database.Collection(glob.GConfig.MongoConfig.WaringCollection)
+
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.WaringCollection, uint(req.ID))
+
+	collection := database.Collection(name)
 
 	filter := bson.M{
 		"rule_id": req.ID,

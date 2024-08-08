@@ -12,6 +12,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"log"
 	"strconv"
 )
@@ -56,6 +57,8 @@ func (api *SignalDelayWaringApi) CreateSignalDelayWaring(c *gin.Context) {
 		glob.GLog.Error("json 序列化异常", zap.Any("err", err))
 	}
 	glob.GRedis.HSet(context.Background(), "signal_delay_config", strconv.Itoa(int(SignalDelayWaring.ID)), jsonData)
+
+	SignalDelayWaringBiz.InitMongoCollection(&SignalDelayWaring)
 
 	// 返回创建成功的脚本报警
 	servlet.Resp(c, SignalDelayWaring)
@@ -229,8 +232,11 @@ func (api *SignalDelayWaringApi) QueryWaringList(c *gin.Context) {
 
 }
 func query2(req servlet.WaringRowQuery) []bson.M {
+
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.ScriptWaringCollection, uint(req.ID))
+
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
-	collection := database.Collection(glob.GConfig.MongoConfig.ScriptWaringCollection)
+	collection := database.Collection(name)
 
 	filter := bson.M{
 		"rule_id": req.ID,

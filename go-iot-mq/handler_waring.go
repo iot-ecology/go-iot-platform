@@ -72,9 +72,7 @@ func handlerWaringOnce(msg DataRowList) {
 
 	mapping := getMqttClientMappingSignalWarningConfig(uid)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
-	collection := db.Collection(globalConfig.MongoConfig.WaringCollection)
 
-	var toInsert []interface{}
 	for _, row := range msg.DataRows {
 		configs := mapping[row.Name]
 
@@ -92,7 +90,7 @@ func handlerWaringOnce(msg DataRowList) {
 				if config.Min <= floatValue && floatValue <= config.Max {
 					// 在范围内，根据需求执行操作
 					zap.S().Infof("当前信号 %s  值在范围内: %+v 命中规则ID %d", row.Name, floatValue, config.ID)
-					toInsert = append(toInsert, bson.M{
+					m := bson.M{
 						"device_uid":  uid,
 						"signal_name": row.Name,
 						"signal_id":   config.SignalId,
@@ -100,13 +98,22 @@ func handlerWaringOnce(msg DataRowList) {
 						"rule_id":     config.ID,
 						"insert_time": time.Now().Unix(),
 						"up_time":     msg.Time,
-					})
+					}
+					name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(config.ID))
+					collection := db.Collection(name)
+					one, err := collection.InsertOne(context.TODO(), m)
+					if err != nil {
+						zap.S().Errorf("插入数据失败: %+v", err)
+					} else {
+						zap.S().Infof("插入数据成功: %s", one.InsertedID)
+					}
 				}
+
 			} else {
 				if floatValue < config.Min || floatValue > config.Max {
 					// 范围外报警
 					zap.S().Infof("当前信号 %s 范围外报警: %+v 命中规则ID %d", row.Name, floatValue, config.ID)
-					toInsert = append(toInsert, bson.M{
+					m := bson.M{
 						"device_uid":  uid,
 						"signal_name": row.Name,
 						"signal_id":   config.SignalId,
@@ -114,15 +121,23 @@ func handlerWaringOnce(msg DataRowList) {
 						"rule_id":     config.ID,
 						"insert_time": time.Now().Unix(),
 						"up_time":     msg.Time,
-					})
+					}
+
+					name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(config.ID))
+					collection := db.Collection(name)
+					one, err := collection.InsertOne(context.TODO(), m)
+					if err != nil {
+						zap.S().Errorf("插入数据失败: %+v", err)
+					} else {
+						zap.S().Infof("插入数据成功: %s", one.InsertedID)
+					}
 				}
 			}
 
-
 			// fixme: 将报警元数据分发到不同的数据推送通道。
-			mt :=	models.MessageTemplate{
+			mt := models.MessageTemplate{
 				GeneratorTime: msg.Time,
-				DeviceUid:    uid,
+				DeviceUid:     uid,
 				SignalId:      config.SignalId,
 				MqttClientId:  uid,
 				SignalName:    row.Name,
@@ -140,14 +155,10 @@ func handlerWaringOnce(msg DataRowList) {
 			}
 			PushToQueue("waring_notice", jsonData)
 
-
 		}
 
 	}
-	_, err := collection.InsertMany(context.Background(), toInsert)
-	if err != nil {
-		zap.S().Errorf("消息确认异常：%+v", err)
-	}
+
 }
 
 // getMqttClientMappingSignalWarningConfig 根据 MQTT 客户端 ID 获取信号警告配置的映射

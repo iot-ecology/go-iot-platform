@@ -75,3 +75,6 @@ sequenceDiagram
 
 
 
+## 存储
+
+目前数据存储采用Mongo做文档存储。

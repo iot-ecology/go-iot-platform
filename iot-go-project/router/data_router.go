@@ -75,7 +75,7 @@ func (s *InfluxDbApi) QueryMeasurement(c *gin.Context) {
 		panic(err)
 
 	}
-	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement)
+	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement,json.Protocol)
 	servlet.Resp(c, measurement)
 }
 
