@@ -95,7 +95,7 @@ func (api *InfluxdbTransmitBindApi) UpdateInfluxdbTransmitBind(c *gin.Context) {
 // @Tags InfluxdbTransmitBinds
 // @Accept json
 // @Produce json
-// @Param page org string false "组织" default(0)
+// @Param org query string false "组织" default(0)
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.InfluxdbTransmitBind}} "InfluxdbTransmitBind"

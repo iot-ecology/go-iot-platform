@@ -95,7 +95,7 @@ func (api *RabbitmqTransmitBindApi) UpdateRabbitmqTransmitBind(c *gin.Context) {
 // @Tags RabbitmqTransmitBinds
 // @Accept json
 // @Produce json
-// @Param page table string false "表名" default(0)
+// @Param exchange query string false "表名" default(0)
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.RabbitmqTransmitBind}} "RabbitmqTransmitBind"

@@ -98,7 +98,8 @@ type InfluxResponse struct {
 
 type InfluxQueryConfig struct {
 	Bucket      string            `json:"-"`
-	Protocol      string            `json:"protocol,omitempty"`
+	DeviceUid   uint              `json:"device_uid,omitempty"`
+	Protocol    string            `json:"protocol,omitempty"`
 	Measurement string            `json:"measurement,omitempty"`
 	Fields      []string          `json:"fields,omitempty"`
 	StartTime   int64             `json:"start_time,omitempty"`
@@ -197,15 +198,15 @@ type CalcCache struct {
 }
 
 type CalcParamCache struct {
-	Protocol   string `json:"protocol"`
+	Protocol           string `json:"protocol"`
 	IdentificationCode string `json:"identification_code"` // 设备标识码
-	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
+	DeviceUid          int    `json:"device_uid"`          // MQTT客户端表的外键ID
 
-	Name         string `json:"name"`                                                  // 参数名称
-	SignalName   string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
-	Reduce       string `json:"reduce"`                                                // 数据聚合方式 1. 求和 2. 平均值 3. 最大值 4. 最小值 4. 原始
-	CalcRuleId   int    `json:"calc_rule_id"`                                          // CalcRule 主键
-	SignalId     int    `json:"signal_id" structs:"signal_id"`                         // 信号表的外键ID
+	Name       string `json:"name"`                                                  // 参数名称
+	SignalName string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
+	Reduce     string `json:"reduce"`                                                // 数据聚合方式 1. 求和 2. 平均值 3. 最大值 4. 最小值 4. 原始
+	CalcRuleId int    `json:"calc_rule_id"`                                          // CalcRule 主键
+	SignalId   int    `json:"signal_id" structs:"signal_id"`                         // 信号表的外键ID
 }
 type Event struct {
 	StartTime int64 `json:"start_time" bson:"start_time"`
@@ -229,7 +230,7 @@ type ProductionPlanCreateParam struct {
 	Name                    string                   `json:"name" structs:"name"`               // 生产计划名称
 	StartDate               time.Time                `json:"start_date" structs:"start_date"`   // 生产计划开始日期
 	EndDate                 time.Time                `json:"end_date" structs:"end_date"`       // 生产计划结束日期
-	Status      string    `json:"status" structs:"status"`           // 计划状态（准备中,进行中, 已完成）
+	Status                  string                   `json:"status" structs:"status"`           // 计划状态（准备中,进行中, 已完成）
 	Description             string                   `json:"description" structs:"description"` // 生产计划描述
 	ProductPlanCreateParams []ProductPlanCreateParam `json:"product_plans" `
 }
@@ -333,15 +334,15 @@ type TransmitScriptParam struct {
 }
 
 type DeviceInfoRes struct {
-	ProductId uint `json:"product_id" structs:"product_id"` // 产品ID
-	SN string `json:"sn" structs:"sn"` // 设备编号
+	ProductId         uint         `json:"product_id" structs:"product_id"`                                                               // 产品ID
+	SN                string       `json:"sn" structs:"sn"`                                                                               // 设备编号
 	ManufacturingDate ut.LocalTime `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
-	ProcurementDate ut.LocalTime `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"` // 采购日期
-	Source int `json:"source" structs:"source"` // 设备来源,1: 内部,2: 外源
-	WarrantyExpiry ut.LocalTime `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"` // 保修截止日期
-	PushInterval int `json:"push_interval,omitempty" structs:"push_interval"` // 推送间隔（秒）
-	ErrorRate float64 `json:"error_rate,omitempty" structs:"error_rate"` // 推送时间误差（秒）
-	gorm.Model  `structs:"-"`
-	ProductName string `gorm:"-" json:"product_name,omitempty" ` // 产品名称
+	ProcurementDate   ut.LocalTime `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
+	Source            int          `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    ut.LocalTime `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
+	PushInterval      int          `json:"push_interval,omitempty" structs:"push_interval"`                                               // 推送间隔（秒）
+	ErrorRate         float64      `json:"error_rate,omitempty" structs:"error_rate"`                                                     // 推送时间误差（秒）
+	gorm.Model        `structs:"-"`
+	ProductName       string `gorm:"-" json:"product_name,omitempty" ` // 产品名称
 
 }

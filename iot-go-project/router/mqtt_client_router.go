@@ -10,6 +10,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -35,6 +36,8 @@ func (s *MqttApi) CreateMqtt(c *gin.Context) {
 		panic(err)
 	}
 
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "mqtt", mqttClient.ID)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, bizMqtt.CreateMqtt(mqttClient))
 }
 

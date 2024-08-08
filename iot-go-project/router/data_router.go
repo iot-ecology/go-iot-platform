@@ -8,6 +8,7 @@ import (
 	"igp/biz"
 	"igp/glob"
 	"igp/servlet"
+	"igp/ut"
 	"reflect"
 )
 
@@ -28,14 +29,13 @@ func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 
 	// fixme: 修订多协议的情况
 
-
 	err := c.ShouldBind(&json)
 	if err != nil {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 
 	}
-	json.Bucket = glob.GConfig.InfluxConfig.Bucket
+	json.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, json.Protocol,json.DeviceUid)
 	query := json.GenerateFluxQuery()
 	glob.GLog.Sugar().Info(query)
 	result, err := glob.GInfluxdb.QueryAPI(glob.GConfig.InfluxConfig.Org).Query(context.Background(), query)
@@ -75,7 +75,8 @@ func (s *InfluxDbApi) QueryMeasurement(c *gin.Context) {
 		panic(err)
 
 	}
-	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement,json.Protocol)
+
+	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement, json.Protocol)
 	servlet.Resp(c, measurement)
 }
 
@@ -95,7 +96,8 @@ func (s *InfluxDbApi) QueryInfluxdbString(c *gin.Context) {
 		panic(err)
 
 	}
-	json.Bucket = glob.GConfig.InfluxConfig.Bucket
+	json.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, json.Protocol,json.DeviceUid)
+
 	query := json.GenerateFluxQueryString()
 	glob.GLog.Sugar().Info(query)
 	result, err := glob.GInfluxdb.QueryAPI(glob.GConfig.InfluxConfig.Org).Query(context.Background(), query)

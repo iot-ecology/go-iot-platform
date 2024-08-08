@@ -95,7 +95,7 @@ func (api *KafkaTransmitBindApi) UpdateKafkaTransmitBind(c *gin.Context) {
 // @Tags KafkaTransmitBinds
 // @Accept json
 // @Produce json
-// @Param page topic string false "组织" default(0)
+// @Param topic query string false "主题" default(0)
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.KafkaTransmitBind}} "KafkaTransmitBind"

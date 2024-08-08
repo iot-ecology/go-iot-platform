@@ -38,7 +38,8 @@ func CheckCollectionAndCreate(prefix , collectionName string ) {
 	}
 	zap.S().Infof("collection %s exists: %v", collectionName, collectionExists)
 
-	if collectionExists {
+	// 不存在则创建
+	if !collectionExists {
 		err := db.CreateCollection(context.TODO(), collectionName)
 		if err != nil {
 			zap.S().Fatal(err)

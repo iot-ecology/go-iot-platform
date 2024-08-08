@@ -95,7 +95,7 @@ func (api *MySQLTransmitBindApi) UpdateMySQLTransmitBind(c *gin.Context) {
 // @Tags MySQLTransmitBinds
 // @Accept json
 // @Produce json
-// @Param page table string false "表名" default(0)
+// @Param table query string false "表名" default(0)
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.MySQLTransmitBind}} "MySQLTransmitBind"

@@ -145,3 +145,34 @@ func TestMongo(t *testing.T){
 
 	db.CreateCollection(context.TODO(), "aaaaaaaaa")
 }
+
+func TestInfluxDbCreateBucket(t *testing.T){
+	var config = InfluxConfig{
+		Host:     "127.0.0.1",
+		Port:   8086,
+		Token:  "mytoken",
+		Org:    "myorg",
+		Bucket: "mybucket",
+	}
+	InitInfluxDbClient(config)
+	name, err := GlobalInfluxDbClient.OrganizationsAPI().FindOrganizationByName(context.Background(), config.Org)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(name)
+	id, err := GlobalInfluxDbClient.BucketsAPI().FindBucketsByOrgID(context.Background(), *name.Id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 假设id是一个存储桶ID的切片
+	for _, bucketID := range *id {
+		log.Println(bucketID.Name)
+	}
+
+	GlobalInfluxDbClient.BucketsAPI().CreateBucketWithName(context.Background(), name, "cli_create")
+
+
+
+
+}

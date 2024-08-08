@@ -95,7 +95,7 @@ func (api *MongoTransmitBindApi) UpdateMongoTransmitBind(c *gin.Context) {
 // @Tags MongoTransmitBinds
 // @Accept json
 // @Produce json
-// @Param page topic string false "组织" default(0)
+// @Param collection query string false "collection" default(0)
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.MongoTransmitBind}} "MongoTransmitBind"
