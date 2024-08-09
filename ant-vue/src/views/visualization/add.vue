@@ -74,19 +74,26 @@
 
         <div style="border: 1px solid #d9d9d9; margin-top: 12px">
           <div style="display: flex; line-height: 32px; border-bottom: 1px solid #d9d9d9">
-            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.clientID') }}</div>
-            <div style="width: 33.3%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.signalName') }}</div>
-            <div style="width: 33.3%; text-align: center">{{ $t('message.statisticalMethods') }}</div>
+            <div style="width: 20%; text-align: center; border-right: 1px solid #d9d9d9">协议</div>
+            <div style="width: 25%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.clientID') }}</div>
+            <div style="width: 30%; text-align: center; border-right: 1px solid #d9d9d9">{{ $t('message.signalName') }}</div>
+<!--            <div style="width: 20%; text-align: center; border-right: 1px solid #d9d9d9">identification_code</div>-->
+            <div style="width: 25%; text-align: center">{{ $t('message.statisticalMethods') }}</div>
           </div>
           <div v-for="(item, index) in form.list" :key="index" style="display: flex; justify-content: space-between">
-            <div style="width: 33.3%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
-              <MqttSelect v-model="item.client_id" style="width: 160px"></MqttSelect>
+            <div style="width: 20%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
+              <a-select v-model:value="item.protocol" style="width: 110px">
+                <a-select-option value="mqtt">mqtt</a-select-option>
+              </a-select>
             </div>
-            <div style="width: 33.3%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
-              <SignalModeSelect v-model="item.fields" style="width: 160px" :mqtt_client_id="item.client_id" name="ID" @custom-event="handleCustomEvent"></SignalModeSelect>
+            <div style="width: 25%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
+              <MqttSelect v-model="item.client_id" style="width: 140px"></MqttSelect>
             </div>
-            <div style="width: 33.3%; text-align: center; padding: 4px 0">
-              <a-select v-model:value="item.function" style="width: 160px">
+            <div style="width: 30%; text-align: center; padding: 4px 0; border-right: 1px solid #d9d9d9">
+              <SignalModeSelect v-model="item.fields" style="width: 170px" :mqtt_client_id="item.client_id" name="ID" @custom-event="handleCustomEvent(index,$event)"></SignalModeSelect>
+            </div>
+            <div style="width: 25%; text-align: center; padding: 4px 0">
+              <a-select v-model:value="item.function" style="width: 140px">
                 <a-select-option value="mean">{{ $t('message.mean') }}</a-select-option>
                 <a-select-option value="sum">{{ $t('message.sum') }}</a-select-option>
                 <a-select-option value="min">{{ $t('message.min') }}</a-select-option>
@@ -153,7 +160,7 @@ const listArr = ref<Item[]>([
       start_time: null,
       end_time: null,
       aggregation: { every: 1, function: "mean", create_empty: false },
-      list: [{ client_id: "", fields: "", function: "mean" }],
+      list: [{ client_id: "", fields: "", function: "mean", protocol:'mqtt', device_uid:'', identification_code: '' }],
     },
     showSpinning: false,
     chart: {},
@@ -162,7 +169,7 @@ const listArr = ref<Item[]>([
 const modalVisible = ref(false);
 const modalSave = ref(false);
 const time = ref<RangeValue>();
-const form = reactive({ client_id: "", fields: [], start_time: "", end_time: "", every: 1, function: "mean", create_empty: false, list: [{ client_id: "", fields: "", function: "mean" }] });
+const form = reactive({ client_id: "", fields: [], start_time: "", end_time: "", every: 1, function: "mean", create_empty: false, list: [{ client_id: "", fields: "", function: "mean", protocol:'mqtt', device_uid:'', identification_code: '' }] });
 const indexNumber = ref(0);
 const activeKey = ref("dynamic_Time");
 const dateTime = ref('');
@@ -235,7 +242,7 @@ function onAdd() {
       start_time: null,
       end_time: null,
       aggregation: { every: 1, function: "mean", create_empty: false },
-      list: [{ client_id: "", fields: "", function: "mean" }],
+      list: [{ client_id: "", fields: "", function: "mean",protocol:'mqtt', device_uid:'', identification_code: '' }],
     },
     chart: {},
     showSpinning: false,
@@ -301,7 +308,7 @@ const onConfirm = () => {
   modalVisible.value = false;
   form.list.forEach((item, index) => {
     QueryInfluxdb({
-      measurement: String(item.client_id),
+      measurement: item.protocol + '_' + item.device_uid +'_' + item.identification_code,
       fields: [String(item.fields), "storage_time", "push_time"],
       start_time: activeKey.value === "dynamic_Time" ? start_time : form.start_time,
       end_time: activeKey.value === "dynamic_Time" ? end_time : form.end_time,
@@ -316,7 +323,7 @@ const onConfirm = () => {
           const dataArr = await SignalPage({ mqtt_client_id: item.client_id, page: 1, page_size: pageSize });
           const signalList = dataArr.data.data?.data || [];
           listArr.value[indexNumber.value].param = {
-            measurement: form.client_id,
+            measurement: item.protocol + '_' + item.device_uid +'_' + item.identification_code,
             fields: form.fields,
             aggregation: {
               every: form.every,
@@ -424,7 +431,7 @@ const onSaveInformation = () => {
     data.id = id.value;
     DashboardUpdate(data).then(({ data }) => {
       if (data.code === 20000) {
-        router.push({ path: "/visualization/index" });
+        router.push({ path: "/visualization/list" });
       }
     }).catch(e=>{
       console.error(e)
@@ -432,7 +439,7 @@ const onSaveInformation = () => {
   } else {
     DashboardCreate(data).then(({ data }) => {
       if (data.code === 20000) {
-        router.push({ path: "/visualization/index" });
+        router.push({ path: "/visualization/list" });
       }
     }).catch(e=>{
       console.error(e)
@@ -454,7 +461,7 @@ const getData = async (index: number) => {
   listArr.value[index].showSpinning = true;
   listArr.value[index].param.list.forEach((text: any, number: number) => {
     QueryInfluxdb({
-      measurement: String(text.client_id),
+      measurement: text.protocol + '_' + text.device_uid +'_' + text.identification_code,
       fields: [String(text.fields), "storage_time", "push_time"],
       start_time: listArr.value[index].param.sub ? start_time : listArr.value[index].param.start_time,
       end_time: listArr.value[index].param.sub ? end_time : listArr.value[index].param.end_time,
@@ -579,8 +586,12 @@ const onChange = (text: string, index: number) => {
   listArr.value[index].chart = { ...data };
 };
 
-const handleCustomEvent = (payload: any) => {
+const handleCustomEvent = (index:number, payload: any) => {
+  console.log(payload[0])
   if (payload.value !== -11) {
+    form.list[index].device_uid = payload[0]?.device_uid
+    form.list[index].identification_code = payload[0]?.identification_code
+    form.list[index].protocol = payload[0]?.protocol
     optionList.value.push(...payload);
   }
 };

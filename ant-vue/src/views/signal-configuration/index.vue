@@ -3,6 +3,11 @@
     <a-spin :tip="$t('message.loading')" size="large" :spinning="showSpinning">
       <a-card :bordered="true">
         <a-form layout="inline">
+          <a-form-item label="协议">
+            <a-select style="width: 100px;" v-model:value="protocol">
+              <a-select-option value="mqtt">mqtt</a-select-option>
+            </a-select>
+          </a-form-item>
           <a-form-item :label="$t('message.clientID')">
             <MqttSelect v-model="value"></MqttSelect>
           </a-form-item>
@@ -45,7 +50,7 @@
                 <span v-else>
                   <a-button type="primary" size="small" style="margin-right: 10px" @click="onView(record.ID, record.alias, record.unit, record.type, record.protocol,record.device_uid,record.identification_code)">{{ $t('message.check') }}</a-button>
                   <a-button type="primary" size="small"  @click="edit(record.key)">{{$t('message.edit')}}</a-button>
-                  <a-button type="primary" size="small"  style="margin-left: 10px" @click="onSignal(record.ID, record.mqtt_client_id)">{{ $t('message.SignalAlarmConfig') }}</a-button>
+                  <a-button type="primary" size="small"  style="margin-left: 10px" @click="onSignal(record.ID, record.device_uid)">{{ $t('message.SignalAlarmConfig') }}</a-button>
                   <a-button type="primary" size="small"  style="margin-left: 10px" @click="onHistoryView(record)">{{ $t('message.historicalData') }}</a-button>
                   <a-popconfirm :title="$t('message.sureDelete')" :okText="$t('message.yes')" :cancelText="$t('message.no')" @confirm="confirm(record.ID)">
                     <a-button type="primary" size="small" danger style="margin-left: 10px;">{{$t('message.delete')}}</a-button>
@@ -152,6 +157,7 @@ const formRef = ref<HTMLFormElement | null>(null);
 const routerStore = useRouterNameStore();
 const route = useRoute();
 const value = ref("");
+const protocol = ref(route.query.protocol|| 'mqtt');
 const modalVisible = ref(false);
 const modalView = ref(false);
 const form = reactive({ mqtt_client_id: Number(route.query.id) || "", name: "", type: "", alias: "", cache_size: 1, unit: "",protocol:'mqtt',identification_code:String(route.query.mqtt_client_id), device_uid:Number(route.query.mqtt_client_id)});
@@ -302,7 +308,7 @@ const confirm = async (id: string) => {
 };
 
 const pageList = async () => {
-  const { data } = await SignalPage({ mqtt_client_id: value.value, page: pagination.current, page_size: pagination.pageSize });
+  const { data } = await SignalPage({ device_uid: value.value, protocol : route.query.protocol, page: pagination.current, page_size: pagination.pageSize });
   pagination.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
@@ -339,6 +345,8 @@ const onView = (rowId: number, alias: string, unit: string, type: string, protoc
     fields: [String(rowId), "storage_time", "push_time"],
     start_time: time.subtract(30, "day").unix(),
     end_time: time.unix(),
+    device_uid: Number(route.query.mqtt_client_id) || device_uid,
+    protocol:route.query.protocol || protocol,
     aggregation: {
       every: 1,
       function: type === "数字" ? "mean" : "first",

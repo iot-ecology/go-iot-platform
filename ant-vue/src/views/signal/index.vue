@@ -2,11 +2,16 @@
   <div class="comp-preview">
     <a-card :bordered="true">
       <a-form layout="inline">
+        <a-form-item label="协议">
+          <a-select style="width: 100px;" v-model:value="protocol">
+            <a-select-option value="mqtt">mqtt</a-select-option>
+          </a-select>
+        </a-form-item>
         <a-form-item :label="$t('message.clientID')">
-          <MqttSelect v-model="form.mqtt_client_id"></MqttSelect>
+          <MqttSelect v-model="form.device_uid"></MqttSelect>
         </a-form-item>
         <a-form-item :label="$t('message.signalName')">
-          <SignalSelect v-model="form.signal_id" :mqtt_client_id="form.mqtt_client_id"></SignalSelect>
+          <SignalSelect v-model="form.signal_id" :mqtt_client_id="form.device_uid"></SignalSelect>
         </a-form-item>
         <a-form-item>
           <a-button type="primary" @click="pageList()">{{ $t('message.search') }}</a-button>
@@ -84,6 +89,9 @@
           <a-form-item :label="$t('message.max')" name="max">
             <a-input-number v-model:value="form.max" style="width: 200px" :min="form.min" />
           </a-form-item>
+          <a-form-item label="IdentificationCode" name="identification_code">
+            <a-input v-model:value="form.identification_code" style="width: 200px"></a-input>
+          </a-form-item>
           <a-form-item :label="$t('message.internalExternalAlarm')" name="checked">
             <a-switch v-model:checked="form.checked" :checked-children="$t('message.internalAlarm')" :un-checked-children="$t('message.externalAlarm')" @change="handleChange" />
           </a-form-item>
@@ -119,7 +127,8 @@ const formRefTime = ref<HTMLFormElement | null>(null);
 const modalVisible = ref(false);
 const modalTime = ref(false);
 const modalHistory = ref(false);
-const form = reactive({ mqtt_client_id: "", signal_id: "", max: "", min: "", in_or_out: 1, checked: true });
+const protocol = ref('mqtt');
+const form = reactive({ device_uid: "", signal_id: "", max: "", min: "", in_or_out: 1, checked: true,identification_code:'',protocol:protocol.value});
 let columns = [
   {
     title: t('message.uniCode'),
@@ -151,6 +160,7 @@ let rules: Record<string, Rule[]> = {
   min: [{ required: true, message: t('message.pleaseMinimum'), trigger: "blur" }],
   max: [{ required: true, message: t('message.pleaseMaximum'), trigger: "blur" }],
   checked: [{ required: true, message: t('message.pleaseAlarm'), trigger: "change" }],
+  identification_code: [{ required: true, message: '请输入identification_code', trigger: "change" }],
   date: [{ required: true, message: t('message.pleaseTime'), trigger: "change" }],
 };
 const showSpinning = ref(false);
@@ -178,7 +188,7 @@ const columnsResult = ref([
   },
 ]);
 
-watch([() => form.mqtt_client_id, () => form.signal_id], async ([newParam1, newParam2], []) => {
+watch([() => form.device_uid, () => form.signal_id], async ([newParam1, newParam2], []) => {
   if (newParam1 && newParam2) {
     await pageList();
   }
@@ -235,7 +245,7 @@ const onAddData = () => {
   (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
-      if (!form.signal_id || !form.mqtt_client_id) {
+      if (!form.signal_id || !form.device_uid) {
         message.error(t('message.clientSignal'));
         return;
       }
@@ -294,6 +304,7 @@ const save = async (key: string) => {
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete editableData[key];
   data.in_or_out = data.in_or_out ? 1 : 0;
+  data.protocol = protocol.value;
   await SignalWaringConfigUpdate(data);
   await pageList();
 };
@@ -314,12 +325,12 @@ const confirm = async (id: string) => {
 };
 
 const pageList = async () => {
-  const { data } = await SignalWaringConfigPage({ mqtt_client_id: form.mqtt_client_id, signal_id: form.signal_id, page: paginations.current, page_size: paginations.pageSize });
+  const { data } = await SignalWaringConfigPage({ device_uid: form.device_uid, protocol:protocol.value, signal_id: form.signal_id, page: paginations.current, page_size: paginations.pageSize });
   paginations.total = data.data?.total || 0;
   list.value = data.data.data?.map((item: any, index: number) => ({
     key: index,
     ID: item.ID,
-    mqtt_client_id: item.mqtt_client_id,
+    device_uid: item.device_uid,
     signal: item.signal,
     signal_id: item.signal_id,
     in_or_out: item.in_or_out === 1,
