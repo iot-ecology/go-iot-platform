@@ -50,7 +50,7 @@ watch(
 );
 const List = async () => {
   const { data } = await SignalPage({ mqtt_client_id: mqttClientId.value, page: page.value, page_size: 100, type: "数字" });
-  const listArr = data.data.data.map((item: any) => ({ value: String(item[props.name]), label: item.name + "（" + item.alias + "）", alias: item.alias, unit: item.unit }));
+  const listArr = data.data.data.map((item: any) => ({ value: String(item[props.name]), label: item.name + "（" + item.alias + '/'+item.identification_code+"）",protocol:item.protocol,device_uid:item.device_uid, identification_code:item.identification_code, unit: item.unit }));
   options.value = options.value.concat(listArr);
   if (!props.show) {
     if (!value.value) {
@@ -93,7 +93,7 @@ const select = async (valueClick: any) => {
       await List();
     } else {
       const { data } = await SignalPage({ mqtt_client_id: valueSearch.value, page: pageSelect.value, page_size: 100, type: "数字" });
-      const listArr = data.data.data.map((item: any) => ({ value: String(item[props.name]), label: item.name + "（" + item.alias + "）", alias: item.alias, unit: item.unit }));
+      const listArr = data.data.data.map((item: any) => ({ value: String(item[props.name]), label: item.name + "（" + item.alias + '/'+item.identification_code+"）", alias: item.alias, protocol:item.protocol,device_uid:item.device_uid, identification_code:item.identification_code, unit: item.unit }));
       options.value = options.value.concat(listArr);
       if (data.data.total > 0 && options.value.length < data.data.total) {
         pageSelect.value++;
@@ -110,6 +110,7 @@ const select = async (valueClick: any) => {
 };
 
 const onChange = (value:any, option:any) => {
+  console.log(option)
   emits("custom-event", option);
   emits("update:modelValue", value);
 };

@@ -191,7 +191,7 @@ let rules: Record<string, Rule[]> = {
   subtopic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
   payload: [{ required: true, message: t('message.pleaseMessage'), trigger: "blur" }],
   qos: [{ required: true, message: t('message.pleaseService'), trigger: "change" }],
-  topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "blur" }],
+  topic: [{ required: true, message: t('message.pleaseTopic'), trigger: "change" }],
   retained: [{ required: true, message: t('message.pleaseChooseMessage'), trigger: "change" }],
 };
 const routerStore = useRouterNameStore();
@@ -349,6 +349,7 @@ const onCopy = async () => {
     var result = {
         "Time":  Math.floor(Date.now() / 1000),
         "DataRows": dataRows,
+        "IdentificationCode": "${scriptId.value}",
         "DeviceUid": "${scriptId.value}",
         "Nc": nc
     };
@@ -365,7 +366,7 @@ const cancel = (key: string) => {
 
 const onSignal = (id: string) => {
   routerStore.setRouterName("/signal-configuration/index");
-  jump.routeJump({ path: "/signal-configuration/index", query: { mqtt_client_id: id } });
+  jump.routeJump({ path: "/signal-configuration/index", query: { mqtt_client_id: id,protocol :"mqtt" } });
 };
 const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);

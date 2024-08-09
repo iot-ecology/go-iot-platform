@@ -63,6 +63,9 @@
 
       <a-modal v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()" @cancel="clear()">
         <a-form ref="formRef" :label-col="{ style: { width: '110px' } }" :rules="rules" :model="form">
+          <a-form-item label="协议" name="protocol">
+            <a-input :disabled="true" v-model:value="form.protocol" style="width: 350px" />
+          </a-form-item>
           <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
@@ -72,6 +75,12 @@
           <a-form-item :label="$t('message.signalName')" name="signal_id">
             <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
           </a-form-item>
+<!--          <a-form-item label="device_uid" name="device_uid">-->
+<!--            <a-input  v-model:value="form.device_uid" style="width: 350px" />-->
+<!--          </a-form-item>-->
+<!--          <a-form-item label="identification_code" name="identification_code">-->
+<!--            <a-input  v-model:value="form.identification_code" style="width: 350px" />-->
+<!--          </a-form-item>-->
           <a-form-item :label="$t('message.aggregationMethod')" name="reduce">
             <a-select v-model:value="form.reduce" style="width: 350px">
               <a-select-option value="mean">{{ $t('message.mean') }}</a-select-option>
@@ -132,7 +141,7 @@ let rules: Record<string, Rule[]> = {
 };
 const formRef = ref<HTMLFormElement | null>(null);
 const modalVisible = ref(false);
-const form = reactive({ calc_rule_id: "", mqtt_client_id: "", signal_id: "", signal_name: "", name: "", reduce: "" });
+const form = reactive({ calc_rule_id: "", mqtt_client_id: "", signal_id: "", signal_name: "", name: "", reduce: "",protocol:"mqtt",identification_code:'',device_uid:"" });
 let columns = [
   {
     title: t('message.name'),
@@ -144,6 +153,22 @@ let columns = [
     render: ({ record }:any) => {
       return record.mqtt_client_name;
     },
+  },
+  {
+    title: t('message.signalName'),
+    dataIndex: "signal_name",
+  },
+  {
+    title: 'protocol',
+    dataIndex: "protocol",
+  },
+  {
+    title: 'device_uid',
+    dataIndex: "device_uid",
+  },
+  {
+    title: 'identification_code',
+    dataIndex: "identification_code",
   },
   {
     title: t('message.signalName'),
@@ -324,8 +349,11 @@ const pageList = async () => {
 };
 
 const handleCustomEvent = (payload: any) => {
+  console.log(payload)
   if (payload.value !== -11) {
     form.signal_name = payload.name;
+    form.device_uid = payload.device_uid;
+    form.identification_code = payload.identification_code;
   }
 };
 

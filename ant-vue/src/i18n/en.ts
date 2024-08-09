@@ -254,6 +254,18 @@ const en = {
     mongo: "mongo",
     mysql: "mysql",
     token: "token",
+    // 生产计划
+    productionPlanStartDate: 'Production plan start date',
+    endDateOfProductionPlan: 'Production plan End date',
+    describe: 'Describe',
+    preparing: 'Preparing',
+    ongoing: 'Ongoing',
+    finished: 'Finished',
+    productionPlanName: 'Production Plan Name',
+    productionName: 'Production Name',
+    pleaseEnterTheQuantity: 'Please enter the quantity',
+    pleaseSelectADate: 'Please select a date',
+    pleaseSelectStatus: 'Please select daily status'
   },
 };
 

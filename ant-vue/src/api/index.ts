@@ -411,8 +411,14 @@ export async function UserDelete(id: any) {
 export async function UserBindRole(data: any) {
   return await axios.post(`${url}/User/BindRole`, data);
 }
+export async function UserBindDept(data: any) {
+  return await axios.post(`${url}/User/BindDept`, data);
+}
 export async function UserQueryBindRole(params: any) {
   return await axios.get(`${url}/User/QueryBindRole?user_id=${params}`);
+}
+export async function UserQueryBindDept(params: any) {
+  return await axios.get(`${url}/User/QueryBindDept?user_id=${params}`, );
 }
 
 //产品
@@ -440,4 +446,21 @@ export async function SimCardUpdate(data: any) {
 }
 export async function SimCardDelete(id: any) {
   return await axios.post(`${url}/SimCard/delete/${id}`);
+}
+
+//生产计划
+export async function ProductionPlanPage(params: any) {
+  return await axios.get(`${url}/ProductionPlan/page`, { params });
+}
+export async function ProductionPlanCreate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/create`, data);
+}
+export async function ProductionPlanUpdate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/update`, data);
+}
+export async function ProductionPlanDelete(id: any) {
+  return await axios.post(`${url}/ProductionPlan/delete/${id}`);
+}
+export async function ProductionPlanDetail(id: any) {
+  return await axios.get(`${url}/ProductionPlan/${id}`);
 }

@@ -254,6 +254,18 @@ const zhCHS = {
     mongo: "mongo",
     mysql: "mysql",
     token: "token",
+    // 生产计划
+    productionPlanStartDate: '生产计划开始日期',
+    endDateOfProductionPlan: '生产计划结束日期',
+    describe: '描述',
+    preparing: '准备中',
+    ongoing: '进行中',
+    finished: '已完成',
+    productionPlanName: '生产计划名称',
+    productionName: '生产产品',
+    pleaseEnterTheQuantity: '请输入数量',
+    pleaseSelectADate: '请选择日期',
+    pleaseSelectStatus: '请选择状态'
   },
 };
 
