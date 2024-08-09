@@ -36,7 +36,7 @@ cd $project_path/docker
 sh app-start.sh
 ```
 
-部署完成后访问: http://localhost:80/ 即可看到项目
+部署完成后访问: http://localhost:8080/ 即可看到项目
 
 ## 端口使用情况
 

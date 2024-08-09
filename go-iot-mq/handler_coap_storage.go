@@ -71,7 +71,6 @@ func HandlerDataCoapStorageString(d amqp.Delivery) {
 			return
 		}
 		zap.S().Infof("推送报警原始数据: %s", jsonData)
-		writeAPI.Flush()
 		HandlerCoapLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +20,6 @@ import (
 )
 
 var globalConfig ServerConfig
-var writeAPI api.WriteAPI
 
 func main() {
 
@@ -42,7 +40,6 @@ func main() {
 
 	InitGlobalRedisClient(globalConfig.RedisConfig)
 	InitInfluxDbClient(globalConfig.InfluxConfig)
-	writeAPI = GlobalInfluxDbClient.WriteAPI(globalConfig.InfluxConfig.Org, globalConfig.InfluxConfig.Bucket)
 	//InitRabbitCon(globalConfig.MQConfig)
 	err = ConnectToRMQ()
 	if err != nil {

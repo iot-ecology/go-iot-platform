@@ -35,10 +35,10 @@ func (s *MqttApi) CreateMqtt(c *gin.Context) {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 	}
-
-	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "mqtt", mqttClient.ID)
+	mqtt := bizMqtt.CreateMqtt(mqttClient)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "mqtt", mqtt.ID)
 	ut.CheckBucketNameAndCreate(name)
-	servlet.Resp(c, bizMqtt.CreateMqtt(mqttClient))
+	servlet.Resp(c,mqtt )
 }
 
 // UpdateMqtt

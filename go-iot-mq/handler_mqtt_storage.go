@@ -80,7 +80,6 @@ func HandlerDataStorageString(d amqp.Delivery) {
 			return
 		}
 		zap.S().Infof("推送报警原始数据: %s", jsonData)
-		writeAPI.Flush()
 		HandlerMqttLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
@@ -157,6 +156,15 @@ func genMeasurement(dt DataRowList, protocol string) string {
 	return protocol + "_" + dt.DeviceUid + "_" + dt.IdentificationCode
 }
 
+// CalcBucketName 函数根据前缀、协议和id计算桶名
+// prefix: 桶名前缀
+// protocol: 使用的协议
+// id: 桶的ID
+// 返回值: 计算得到的桶名
+func CalcBucketName(prefix, protocol string, id uint) string {
+	return prefix + "_" + protocol + "_" + strconv.Itoa(int(id%100))
+}
+
 // StorageDataRowList 函数将DataRowList类型指针dt中的数据写入InfluxDB数据库
 // 参数：
 //
@@ -166,10 +174,20 @@ func genMeasurement(dt DataRowList, protocol string) string {
 //
 //	无
 func StorageDataRowList(dt DataRowList, protocol string) {
-	signal2 := GetMqttClientSignal2(dt.DeviceUid,dt.IdentificationCode)
+	signal2 := GetMqttClientSignal2(dt.DeviceUid, dt.IdentificationCode)
 	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
 	zap.S().Infof("当前的DataRowList数据: %+v", dt)
 	timeFromUnix := time.Unix(dt.Time, 0)
+
+	i, err := strconv.Atoi(dt.DeviceUid)
+	if err != nil {
+		fmt.Println("转换错误:", err)
+	} else {
+		fmt.Println("转换后的整数:", i)
+	}
+
+	writeAPI := GlobalInfluxDbClient.WriteAPI(globalConfig.InfluxConfig.Org,
+		CalcBucketName(globalConfig.InfluxConfig.Bucket, protocol, uint(i)))
 
 	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt, protocol)).
 		AddField("storage_time", time.Now().Unix()).
@@ -177,6 +195,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 		SetTime(timeFromUnix)
 
 	for _, row := range dt.DataRows {
+
 		b := signal2[row.Name].Numb
 		if b {
 			float, _ := strconv.ParseFloat(row.Value, 64)
@@ -267,9 +286,9 @@ func runScript(param string, script string) *[]DataRowList {
 	return result
 }
 
-func GetMqttClientSignal2(mqttClientId ,IdentificationCode string) map[string]signalMapping {
+func GetMqttClientSignal2(mqttClientId, IdentificationCode string) map[string]signalMapping {
 	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId +":" + IdentificationCode, 0, -1).Result()
+	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId+":"+IdentificationCode, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
 		zap.S().Errorf("获取信号映射表失败：%+v", err)
