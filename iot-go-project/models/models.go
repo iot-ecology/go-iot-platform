@@ -22,7 +22,6 @@ type Signal struct {
 	Protocol   string `json:"protocol"`
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
-	MqttClientId   int    `json:"mqtt_client_id"`                  // MQTT客户端表的外键ID
 	Name           string `json:"name"`                            // 信号的名称，用于标识不同的信号
 	Alias          string `json:"alias" structs:"alias"`           // 信号的别名，用于显示
 	Type           string `json:"type"`                            // 信号的数据类型，如整数、字符串等
@@ -36,7 +35,9 @@ type SignalWaringConfig struct {
 	Min          float64 `gorm:"min"  json:"min" structs:"min"`                   // 范围,小值
 	Max          float64 `gorm:"max"  json:"max" structs:"max"`                   // 范围,大值
 	InOrOut      int     `gorm:"in_or_out"  json:"in_or_out" structs:"in_or_out"` //范围内报警,范围外报警 1 范围内报警 0 范围外报警
-	MqttClientId int     `json:"mqtt_client_id" structs:"mqtt_client_id"`         // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol" structs:"protocol"`
+	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid" structs:"device_uid"`                                        // MQTT客户端表的外键ID
 	gorm.Model   `structs:"-"`
 	Signal       Signal `gorm:"-" json:"signal" structs:"-"`
 }
@@ -50,7 +51,12 @@ type SignalDelayWaring struct {
 
 type SignalDelayWaringParam struct {
 	MqttClientName      string `gorm:"-" json:"mqtt_client_name"`                             // MQTT客户端的名称，不存储在数据库中
-	MqttClientId        int    `json:"mqtt_client_id"`                                        // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol" structs:"protocol"`
+
+	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
+
+	DeviceUid int    `json:"device_uid" structs:"device_uid"`                                        // MQTT客户端表的外键ID
+
 	Name                string `json:"name"`                                                  // 参数名称
 	SignalName          string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId            int    `gorm:"signal_id"  json:"signal_id" structs:"signal_id"`       // 信号表的外键ID

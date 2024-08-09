@@ -57,12 +57,13 @@ func HandlerWaringDelayStr(d amqp.Delivery) bool {
 func handlerWaringDelayOnce(msg DataRowList) {
 	zap.S().Infof("处理 handlerWaringDelayOnce 数据: %+v", msg)
 	uid := msg.DeviceUid
-	mapping := getDelayParam(uid, msg.DataRows)
+	mapping := getDelayParam(uid , msg.IdentificationCode, msg.DataRows)
 	zap.S().Infof("getDelayParam 数据: %+v", mapping)
 	background := context.Background()
 	var scriptParam = make(map[string][]Tv)
 	for _, param := range mapping {
-		key := "signal_delay_warning:" + strconv.Itoa(param.MqttClientId) + ":" + strconv.Itoa(param.SignalId)
+
+		key := "signal_delay_warning:" + strconv.Itoa(param.DeviceUid) +":" +param.IdentificationCode + ":" + strconv.Itoa(param.SignalId)
 		zap.S().Infof("key = %s", key)
 		members, _ := globalRedisClient.ZRevRangeWithScores(background, key, 0, -1).Result()
 		var vs []Tv
@@ -192,7 +193,7 @@ func getDelayScript(mapping []SignalDelayWaringParam) []SignalDelayWaring {
 //
 // 返回值：
 // []SignalDelayWaringParam - SignalDelayWaringParam切片，包含符合要求的延迟报警参数
-func getDelayParam(uid string, rows []DataRow) []SignalDelayWaringParam {
+func getDelayParam(uid string, code string, rows []DataRow) []SignalDelayWaringParam {
 	val := globalRedisClient.LRange(context.Background(), "delay_param", 0, -1).Val()
 	var mapping []SignalDelayWaringParam
 	for _, s := range val {
@@ -201,7 +202,7 @@ func getDelayParam(uid string, rows []DataRow) []SignalDelayWaringParam {
 		if err != nil {
 			continue // 如果反序列化失败，跳过当前信号
 		}
-		if strconv.Itoa(param.MqttClientId) == uid && nameInDataRow(param.SignalName, rows) {
+		if strconv.Itoa(param.DeviceUid) == uid && code == param.IdentificationCode && nameInDataRow(param.SignalName, rows) {
 
 			mapping = append(mapping, param)
 		}

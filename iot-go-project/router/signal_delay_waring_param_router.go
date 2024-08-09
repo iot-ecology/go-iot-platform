@@ -92,7 +92,9 @@ func (api *SignalDelayWaringParamApi) UpdateSignalDelayWaring(c *gin.Context) {
 
 	var newV models.SignalDelayWaringParam
 	newV = old
-	newV.MqttClientId = req.MqttClientId
+	newV.DeviceUid = req.DeviceUid
+	newV.Protocol = req.Protocol
+	newV.IdentificationCode = req.IdentificationCode
 	newV.Name = req.Name
 	newV.SignalName = req.SignalName
 	newV.SignalId = req.SignalId

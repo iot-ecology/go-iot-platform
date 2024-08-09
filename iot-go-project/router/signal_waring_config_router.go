@@ -102,7 +102,9 @@ func (api *SignalWaringConfigApi) UpdateSignalWaringConfig(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param signal_id query int false "信号ID"
-// @Param mqtt_client_id query int false "mqtt客户端表id"
+// @Param device_uid query int false "device_uid"
+// @Param protocol query string false "协议"
+// @Param identification_code query string false "协议"
 // @Param page query int true "页码" default(1)
 // @Param page_size query int true "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.SignalWaringConfig}} "信号报警配置列表"
@@ -113,7 +115,9 @@ func (api *SignalWaringConfigApi) PageSignalWaringConfig(c *gin.Context) {
 	var err error
 
 	value := c.Query("signal_id")
-	mqttClientId := c.Query("mqtt_client_id")
+	deviceUid := c.Query("device_uid")
+	identification_code := c.Query("identification_code")
+	protocol := c.DefaultQuery("protocol","mqtt")
 
 	atoi, err := strconv.Atoi(value)
 	if err != nil {
@@ -138,7 +142,9 @@ func (api *SignalWaringConfigApi) PageSignalWaringConfig(c *gin.Context) {
 		return
 	}
 
-	data, err := bizSignal.PageSignalWaringConfig(atoi, mqttClientId, parseUint, u)
+	data, err := bizSignal.PageSignalWaringConfig(atoi, deviceUid,
+		identification_code,
+	protocol, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

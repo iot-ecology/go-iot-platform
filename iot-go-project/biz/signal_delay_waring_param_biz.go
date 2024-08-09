@@ -29,12 +29,12 @@ func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string,
 	db.Offset(offset).Limit(size).Find(&dt)
 
 	for i, rule := range dt {
-		id, err := bizMqtt.FindById(strconv.Itoa(rule.MqttClientId))
+		id, err := bizMqtt.FindById(strconv.Itoa(rule.DeviceUid))
 		if err != nil {
 			return nil, err
 		}
 		if id == nil {
-			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(rule.MqttClientId))
+			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(rule.DeviceUid))
 		}
 		dt[i].MqttClientName = id.ClientId
 	}

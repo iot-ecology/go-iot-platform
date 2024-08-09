@@ -70,7 +70,7 @@ func handlerWaringOnce(msg DataRowList) {
 	uid := msg.DeviceUid
 	// 1. 根据设备UID（mqtt客户端ID）获取所有信号
 
-	mapping := getMqttClientMappingSignalWarningConfig(uid)
+	mapping := getMqttClientMappingSignalWarningConfig(uid,msg.IdentificationCode)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
 
 	for _, row := range msg.DataRows {
@@ -99,7 +99,7 @@ func handlerWaringOnce(msg DataRowList) {
 						"insert_time": time.Now().Unix(),
 						"up_time":     msg.Time,
 					}
-					name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(config.ID))
+					name := CalcCollectionName(globalConfig.MongoConfig.WaringCollection, uint(config.ID))
 					collection := db.Collection(name)
 					one, err := collection.InsertOne(context.TODO(), m)
 					if err != nil {
@@ -123,7 +123,7 @@ func handlerWaringOnce(msg DataRowList) {
 						"up_time":     msg.Time,
 					}
 
-					name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(config.ID))
+					name := CalcCollectionName(globalConfig.MongoConfig.WaringCollection, uint(config.ID))
 					collection := db.Collection(name)
 					one, err := collection.InsertOne(context.TODO(), m)
 					if err != nil {
@@ -169,9 +169,9 @@ func handlerWaringOnce(msg DataRowList) {
 // 返回值:
 //
 //	map[string][]SignalWaringConfig - 信号名称到信号警告配置切片的映射
-func getMqttClientMappingSignalWarningConfig(mqttClientId string) map[string][]SignalWaringConfig {
+func getMqttClientMappingSignalWarningConfig(mqttClientId string, code string) map[string][]SignalWaringConfig {
 	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
+	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId +":"+ code, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
 		zap.S().Errorf("获取信号列表失败: %+v", err)

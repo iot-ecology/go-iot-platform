@@ -39,7 +39,7 @@ func (biz *SignalBiz) PageSignal(deviceUid ,protocol ,ty string, page, size int)
 	db.Offset(offset).Limit(size).Find(&signals)
 
 	for i, signal := range signals {
-		id, err := bizMqtt.FindById(signal.MqttClientId)
+		id, err := bizMqtt.FindById(signal.DeviceUid)
 		if err != nil {
 			zap.S().Errorf("error %+v", err)
 		}
@@ -64,7 +64,7 @@ func (biz *SignalBiz) FindByIdForSignal(id int) (models.Signal, error) {
 		return models.Signal{}, errors.New(result.Error.Error())
 
 	}
-	mqttClient, err := bizMqtt.FindById(signal.MqttClientId)
+	mqttClient, err := bizMqtt.FindById(signal.DeviceUid)
 	if err != nil {
 		return models.Signal{}, err
 	}
@@ -88,7 +88,7 @@ func (biz *SignalBiz) FindByName(name string) (*models.Signal, error) {
 	return &signal, nil
 }
 
-func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalBiz) PageSignalWaringConfig(signalId int, device_uid, code, protocol string, page, size int) (*servlet.PaginationQ, error) {
 
 	var pagination servlet.PaginationQ
 	var dt []models.SignalWaringConfig
@@ -98,10 +98,19 @@ func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, 
 	if signalId != -1 {
 		db = db.Where("signal_id = ?", signalId)
 	}
-	if mqttClientId != "" {
-		db = db.Where("mqtt_client_id = ?", mqttClientId)
+	if device_uid != "" {
+		db = db.Where("device_uid = ?", device_uid)
 
 	}
+	if code != "" {
+		db = db.Where("identification_code = ?", code)
+
+	}
+	if protocol != "" {
+		db = db.Where("protocol = ?", protocol)
+
+	}
+
 	db.Model(&models.SignalWaringConfig{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
@@ -128,14 +137,14 @@ func (biz *SignalBiz) RemoveSignalWaringCache(config models.SignalWaringConfig) 
 func (biz *SignalBiz) SetSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId) +":"+  config.
+	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.DeviceUid) +":"+  config.
 		IdentificationCode, configBytes)
 }
 
 func (biz *SignalBiz) RemoveSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId) +":" + config.
+	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.DeviceUid) +":" + config.
 		IdentificationCode, 0, configBytes)
 }
 

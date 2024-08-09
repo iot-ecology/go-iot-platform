@@ -91,7 +91,7 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 
 	result = glob.GDb.Model(&newV).Updates(newV)
 
-	removeOldCache(newV.CacheSize, newV.ID, newV.MqttClientId)
+	removeOldCache(newV.CacheSize, newV.ID, newV.DeviceUid,newV.IdentificationCode)
 	bizSignal.SetSignalCache(&newV)
 	if result.Error != nil {
 
@@ -106,13 +106,13 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 // 参数：
 // threshold：int类型，表示保留的元素数量阈值
 // signalId：uint类型，表示信号ID
-// mqttId：int类型，表示MQTT连接ID
+// deviceUid：int类型，表示MQTT连接ID
 //
 // 返回值：无
-func removeOldCache(threshold int, signalId uint, mqttId int) {
+func removeOldCache(threshold int, signalId uint, deviceUid int, code string) {
 	ctx := context.Background()
 
-	redisKey := "signal_delay_warning:" + strconv.Itoa(mqttId) + ":" + strconv.Itoa(int(signalId))
+	redisKey := "signal_delay_warning:" + strconv.Itoa(deviceUid) + ":"+code +":" + strconv.Itoa(int(signalId))
 	count, err := glob.GRedis.ZCard(ctx, redisKey).Result()
 	if err != nil {
 		panic(err)
