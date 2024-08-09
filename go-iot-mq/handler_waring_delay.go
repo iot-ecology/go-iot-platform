@@ -83,7 +83,6 @@ func handlerWaringDelayOnce(msg DataRowList) {
 
 
 
-	collection := db.Collection(globalConfig.MongoConfig.ScriptWaringCollection)
 	for _, waring := range script {
 		zap.S().Infof("key = %+v", waring)
 		delayScript := runWaringDelayScript(waring.Script, scriptParam)
@@ -100,6 +99,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 		}
 		name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(waring.ID))
 		CheckCollectionAndCreate(globalConfig.MongoConfig.ScriptWaringCollection,name)
+		collection := db.Collection(name)
 		one, err := collection.InsertOne(context.Background(), v)
 		if err != nil {
 			zap.S().Errorf("插入数据异常: %+v", err)
