@@ -44,6 +44,9 @@ export const headerData = {
         },{
           text: '系统设计',
           href: getPermalink('jia4-gou4', 'tag'),
+        },{
+          text: '教程',
+          href: getPermalink('jiao4-cheng2', 'category'),
         },
         {
           text: '博客列表',
