@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 // HttpMessage 用于处理http转发后的数据
@@ -19,6 +20,7 @@ type HttpMessage struct {
 }
 
 // HandlerHttpDataStorage 函数处理从AMQP通道接收到的HTTP消息数据
+//
 // 参数：
 //
 //	messages <-chan amqp.Delivery：接收AMQP消息的通道
@@ -61,7 +63,7 @@ func HandlerDataHttpStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row,"http")
+			StorageDataRowList(row, "http")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -134,14 +136,15 @@ func handlerHttpOne(deviceUid string) bool {
 }
 
 // GetScriptRedisForHttp 根据 http 的设备ID从Redis中获取对应的脚本
+//
 // 参数:
 //
-//	tcp id string - tcp id
+//	- httpId string  http id
 //
 // 返回值:
 //
-//	string - 对应的脚本
-func GetScriptRedisForHttp(tcpId string) string {
-	val := globalRedisClient.HGet(context.Background(), "struct:Http", tcpId).Val()
+//	- string  对应的脚本
+func GetScriptRedisForHttp(httpId string) string {
+	val := globalRedisClient.HGet(context.Background(), "struct:Http", httpId).Val()
 	return val
 }

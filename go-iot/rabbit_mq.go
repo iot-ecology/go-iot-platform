@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 )
@@ -53,11 +54,13 @@ func genUrl() string {
 // PushToQueue 将消息推送到RabbitMQ队列中
 //
 // 参数：
-// queue_name: string类型，目标队列的名称
-// body: []byte类型，待发送的消息体
+//
+//   - queue_name string 目标队列的名称
+//   - body: []byte 待发送的消息体
 //
 // 返回值：
-// 无返回值
+//
+//	无返回值
 func PushToQueue(queueName string, body []byte) {
 
 	ch, _ := GRabbitMq.Channel()

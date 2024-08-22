@@ -2,14 +2,15 @@ package biz
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type ProductionPlanBiz struct{}
@@ -99,7 +100,7 @@ func (biz *ProductionPlanBiz) ChangeProductionPlanState(param servlet.Production
 
 		var pp []models.ProductPlan
 
-		tx.Where("production_plan_id = ?", productionPlan.ID).Find(pp)
+		tx.Where("production_plan_id = ?", productionPlan.ID).Find(&pp)
 
 		for _, plan := range pp {
 			// 更新产品库存

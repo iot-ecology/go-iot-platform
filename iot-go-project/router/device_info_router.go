@@ -3,14 +3,15 @@ package router
 import (
 	"context"
 	"encoding/json"
-	"github.com/fatih/structs"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+
+	"github.com/fatih/structs"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type DeviceInfoApi struct{}
@@ -118,7 +119,6 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	newV.PushInterval = req.PushInterval
 	newV.ErrorRate = req.ErrorRate
 
-
 	var Product models.Product
 	result = glob.GDb.First(&Product, newV.ProductId)
 	if result.Error != nil {
@@ -137,7 +137,6 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 		newV.WarrantyExpiry = WarrantyExpiry
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
-
 
 	if result.Error != nil {
 		zap.S().Errorw("更新 DeviceInfo 失败", "error", result.Error)
@@ -279,6 +278,7 @@ func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 	}
 	servlet.Resp(c, res)
 }
+
 // QueryBindCoap
 // @Tags      DeviceInfos
 // @Summary   查询绑定coap客户端
@@ -300,6 +300,7 @@ func (api *DeviceInfoApi) QueryBindCoap(c *gin.Context) {
 	}
 	servlet.Resp(c, res)
 }
+
 // QueryBindWebsocket
 // @Tags      DeviceInfos
 // @Summary   查询绑定websocket客户端
@@ -367,9 +368,7 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	}
 	var toDel []models.DeviceBindMqttClient
 
-
-
-	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(&toDel)
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
 
@@ -400,14 +399,12 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 
 	first := tx.First(&DeviceInfo, param.DeviceId)
 
-
 	if first.Error != nil {
 		servlet.Error(c, "DeviceInfo not found")
 		return
 	}
 
-	tx.Model(&models.DeviceInfo{}).Where("id = ? " , param.DeviceId).Update("protocol" , "mqtt")
-
+	tx.Model(&models.DeviceInfo{}).Where("id = ? ", param.DeviceId).Update("protocol", "mqtt")
 
 	if err := tx.Commit().Error; err != nil {
 		servlet.Error(c, "Failed to commit transaction")
@@ -415,9 +412,6 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	}
 
 	// redis 中建立 mqtt_client_id 与 device_info_id 的映射
-
-
-
 
 	for _, client := range toDel {
 		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+strconv.Itoa(int(client.MqttClientId)))
@@ -463,7 +457,7 @@ func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 	}
 	var toDel []models.DeviceBindTcpHandler
 
-	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(&toDel)
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindTcpHandler{})
 
@@ -490,11 +484,10 @@ func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 		return
 	}
 
-
 	var DeviceInfo models.DeviceInfo
 
 	first := tx.First(&DeviceInfo, param.DeviceId)
-	tx.Model(&models.DeviceInfo{}).Where("id = ? " , param.DeviceId).Update("protocol" , "tcp")
+	tx.Model(&models.DeviceInfo{}).Where("id = ? ", param.DeviceId).Update("protocol", "tcp")
 	if first.Error != nil {
 		servlet.Error(c, "DeviceInfo not found")
 		return
@@ -505,8 +498,6 @@ func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 	}
 
 	// redis 中建立 tcp 与 device_info_id 的映射
-
-
 
 	for _, client := range toDel {
 		glob.GRedis.Del(context.Background(), "tcp_bind_product:"+strconv.Itoa(int(client.TcpHandlerId)))
@@ -620,7 +611,6 @@ func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
 	servlet.Resp(c, "绑定成功")
 
 }
-
 
 // BindWebsocket
 // @Tags      DeviceInfos

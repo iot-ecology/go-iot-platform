@@ -14,11 +14,13 @@ import (
 // SendCreateMqttMessage 向指定节点发送创建MQTT客户端的请求
 //
 // 参数：
-// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
-// param string - 创建MQTT客户端的参数
+//
+//   - node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+//   - param string - 创建MQTT客户端的参数
 //
 // 返回值：
-// bool - 发送请求是否成功，成功返回true，失败返回false
+//
+//   - bool 发送请求是否成功，成功返回true，失败返回false
 func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 	zap.S().Infof("发送创建MQTT客户端请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/create_mqtt", node.Host, node.Port)
@@ -58,11 +60,13 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 // SendBeat 向指定节点发送心跳请求
 //
 // 参数：
-// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
-// param string - 心跳请求参数
+//
+//   - node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+//   - param string - 心跳请求参数
 //
 // 返回值：
-// bool - 发送心跳请求是否成功，成功返回true，失败返回false
+//
+//   - bool  发送心跳请求是否成功，成功返回true，失败返回false
 func SendBeat(node *NodeInfo, param string) bool {
 	zap.S().Debugf("发送心跳请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/beat", node.Host, node.Port)
@@ -110,12 +114,14 @@ func HttpBeat(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+//
 // 参数：
 //
-//	w http.ResponseWriter: HTTP响应的写入对象
-//	r *http.Request: HTTP请求对象
+//   - w http.ResponseWriter: HTTP响应的写入对象
+//   - r *http.Request: HTTP请求对象
 //
-// 返回值：无
+// 返回值：
+//   - 无
 func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	// 确保请求方法是POST
 	if r.Method != http.MethodPost {
@@ -189,10 +195,14 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 // PubCreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+//
 // 参数：
-// w: http.ResponseWriter类型，HTTP响应的写入对象
-// r: *http.Request类型，HTTP请求对象
-// 返回值：无
+//
+//   - w: http.ResponseWriter类型，HTTP响应的写入对象
+//   - r: *http.Request类型，HTTP请求对象
+//
+// 返回值：
+//   - 无
 func PubCreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")

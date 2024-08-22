@@ -11,7 +11,6 @@ import (
 // registerInfo 注册节点信息
 func registerInfo(node *NodeInfo) {
 	zap.S().Infof("registerInfo 开始, node = %v", node)
-
 	jsonData, _ := json.Marshal(node)
 	globalRedisClient.Set(context.Background(), "pod:info:http:"+node.Name, jsonData, 1*time.Hour)
 

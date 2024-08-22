@@ -2,12 +2,13 @@ package biz
 
 import (
 	"fmt"
-	"github.com/dop251/goja"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"igp/ut"
 	"time"
+
+	"github.com/dop251/goja"
 )
 
 type SignalDelayWaringBiz struct{}
@@ -38,6 +39,7 @@ var signalBiz = SignalBiz{}
 
 // Mock 根据给定的id模拟信号延迟警告业务的规则执行。
 // 该方法主要用于测试或模拟特定规则的执行，以验证规则的有效性和触发条件。
+//
 // 参数:
 //
 //	id - 规则的唯一标识符。
@@ -67,14 +69,15 @@ func (biz *SignalDelayWaringBiz) Mock(id int) bool {
 
 // GenParam 根据给定的id生成信号延迟警告参数。
 // 该方法检索与id匹配的信号延迟警告规则，并为该规则的每个参数生成模拟数据。
+//
 // 参数:
 //
-//	id - 信号延迟警告规则的唯一标识。
+//   - id - 信号延迟警告规则的唯一标识。
 //
 // 返回值:
 //
-//	models.SignalDelayWaring - 与给定id匹配的信号延迟警告规则。
-//	map[string][]v - 参数名到模拟数据值的映射，其中v的类型是一个包含时间和值的结构体。
+//   - models.SignalDelayWaring - 与给定id匹配的信号延迟警告规则。
+//   - map[string][]v - 参数名到模拟数据值的映射，其中v的类型是一个包含时间和值的结构体。
 func (biz *SignalDelayWaringBiz) GenParam(id int) (models.SignalDelayWaring, map[string][]v) {
 	var dt models.SignalDelayWaring
 	db := glob.GDb
@@ -104,12 +107,10 @@ func (biz *SignalDelayWaringBiz) GenParam(id int) (models.SignalDelayWaring, map
 	return dt, mm
 }
 
-
 func (b SignalDelayWaringBiz) InitMongoCollection(m *models.SignalDelayWaring) {
 	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.ScriptWaringCollection, m.ID)
 	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.ScriptWaringCollection, name)
 }
-
 
 type v struct {
 	Time  int64   `json:"Time"`

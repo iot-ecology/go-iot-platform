@@ -19,10 +19,10 @@ import (
 // HandlerCalc 处理计算消息队列中的消息
 //
 // 参数：
-// messages <-chan amqp.Delivery：消息队列通道，用于接收消息
+//   - messages <-chan amqp.Delivery：消息队列通道，用于接收消息
 //
 // 返回值：
-// 无
+//   - 无
 func HandlerCalc(messages <-chan amqp.Delivery) {
 
 	go func() {
@@ -207,11 +207,14 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 // runCalcScript 函数用于执行JavaScript脚本，并返回计算结果
 //
 // 参数：
-// param: map[string]float64类型，表示传递给JavaScript脚本的参数，其中键为参数名，值为参数值
-// script: string类型，表示待执行的JavaScript脚本
+//
+//   - param: map[string]float64类型，表示传递给JavaScript脚本的参数，其中键为参数名，值为参数值
+//
+//   - script: string类型，表示待执行的JavaScript脚本
 //
 // 返回值：
-// map[string]interface{}类型，表示JavaScript脚本执行后的结果，其中键为结果名，值为结果值
+//
+//	- map[string]interface{}类型，表示JavaScript脚本执行后的结果，其中键为结果名，值为结果值
 func runCalcScript(param map[string]any, script string) map[string]interface{} {
 	vm := goja.New()
 
@@ -245,15 +248,15 @@ func runCalcScript(param map[string]any, script string) map[string]interface{} {
 	return result
 }
 
-// getNextTime 获取下一次执行时间(秒)
 // getNextTime 函数根据传入的cron表达式，返回下一次执行时间的时间戳（秒）
+//
 // 参数：
 //
-//	cronExpr string - cron表达式
+//	- cronExpr string cron表达式
 //
 // 返回值：
 //
-//	int64 - 下一次执行时间的时间戳（秒）
+//	- int64  下一次执行时间的时间戳（秒）
 func getNextTime(cronExpr string) int64 {
 
 	// 解析cron表达式

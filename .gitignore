@@ -10,3 +10,5 @@ fileupdate/
 /docker/RocketMQ/data/
 /docker/clickhouse/data/
 /docker/clickhouse/log/
+
+docker/Cassandra/dataa

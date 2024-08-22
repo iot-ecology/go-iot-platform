@@ -59,10 +59,12 @@ func HandlerWaringString(d amqp.Delivery) bool {
 // handlerWaringOnce 处理警告处理器数据的函数
 //
 // 参数：
-// msg DataRowList - 包含反序列化后的消息的数据行列表
+//
+//	- msg DataRowList 包含反序列化后的消息的数据行列表
 //
 // 返回值：
-// bool - 表示是否处理成功
+//
+//	- bool  表示是否处理成功
 func handlerWaringOnce(msg DataRowList) {
 	// 打印反序列化后的消息
 	zap.S().Debugf("处理 waring_handler 数据: %+v", msg)
@@ -70,7 +72,7 @@ func handlerWaringOnce(msg DataRowList) {
 	uid := msg.DeviceUid
 	// 1. 根据设备UID（mqtt客户端ID）获取所有信号
 
-	mapping := getMqttClientMappingSignalWarningConfig(uid,msg.IdentificationCode)
+	mapping := getMqttClientMappingSignalWarningConfig(uid, msg.IdentificationCode)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
 
 	for _, row := range msg.DataRows {
@@ -162,16 +164,17 @@ func handlerWaringOnce(msg DataRowList) {
 }
 
 // getMqttClientMappingSignalWarningConfig 根据 MQTT 客户端 ID 获取信号警告配置的映射
+//
 // 参数:
 //
-//	mqtt_client_id string - MQTT 客户端 ID
+//	- mqtt_client_id string  MQTT 客户端 ID
 //
 // 返回值:
 //
-//	map[string][]SignalWaringConfig - 信号名称到信号警告配置切片的映射
+//	- map[string][]SignalWaringConfig - 信号名称到信号警告配置切片的映射
 func getMqttClientMappingSignalWarningConfig(mqttClientId string, code string) map[string][]SignalWaringConfig {
 	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId +":"+ code, 0, -1).Result()
+	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId+":"+code, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
 		zap.S().Errorf("获取信号列表失败: %+v", err)

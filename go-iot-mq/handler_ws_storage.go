@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 // WsMessage 用于处理ws转发后的数据
@@ -19,6 +20,7 @@ type WsMessage struct {
 }
 
 // HandlerWsDataStorage 函数处理从AMQP通道接收到的websocket消息数据
+//
 // 参数：
 //
 //	messages <-chan amqp.Delivery：接收AMQP消息的通道
@@ -61,7 +63,7 @@ func HandlerDataWsStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row,"websocket")
+			StorageDataRowList(row, "websocket")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -134,13 +136,14 @@ func handlerWebsocketOne(deviceUid string) bool {
 }
 
 // GetScriptRedisForWs 根据 http 的设备ID从Redis中获取对应的脚本
+//
 // 参数:
 //
-//	tcp id string - tcp id
+//	- tcpid string tcp id
 //
 // 返回值:
 //
-//	string - 对应的脚本
+//	- string 对应的脚本
 func GetScriptRedisForWs(tcpId string) string {
 	val := globalRedisClient.HGet(context.Background(), "struct:Websocket", tcpId).Val()
 	return val

@@ -18,6 +18,7 @@ import (
 )
 
 // HandlerDataStorage 函数处理从AMQP通道接收到的MQTT消息数据
+//
 // 参数：
 //
 //	messages <-chan amqp.Delivery：接收AMQP消息的通道
@@ -209,7 +210,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(),
-				"signal_delay_warning:"+dt.DeviceUid+":" +  dt.IdentificationCode+ ":"+strconv.Itoa(signal2[row.Name].ID)).Val()
+				"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
 			zap.S().Infof("当前signal_delay_warning的大小: %+v", currentSize)
 			// 如果 ZSet 的大小已经达到或超过配置的缓存大小，则移除第一个元素
 			if currentSize >= signal2[row.Name].CacheSize {
@@ -222,7 +223,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 				} else {
 					zap.S().Infof("开始移除之前的元素")
 					err := globalRedisClient.ZRemRangeByRank(context.Background(),
-						"signal_delay_warning:"+dt.DeviceUid+":" +dt.IdentificationCode+ ":"+strconv.Itoa(
+						"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(
 							signal2[row.Name].ID), 0,
 						i-1).Err()
 					if err != nil {
@@ -235,7 +236,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 				// 写入缓存
 				// 根据zset的特效,如果value一致的话,则会修改score,此处体现为修改了该值的时间,也就是说最新的值和之前的值相同的话只会保留最新时间的这一份
 				err := globalRedisClient.ZAdd(context.Background(),
-					"signal_delay_warning:"+dt.DeviceUid+":" + dt.IdentificationCode +":"+strconv.Itoa(signal2[row.
+					"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(signal2[row.
 						Name].
 						ID),
 					redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
@@ -256,11 +257,11 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 // runScript 函数接收两个字符串参数，param 和 script，返回一个指向 DataRowList 类型的指针
 //
 // 参数：
-// param：string 类型，传递给 JS 脚本的参数
-// script：string 类型，待执行的 JS 脚本
+// 	- param：string 类型，传递给 JS 脚本的参数
+// 	- script：string 类型，待执行的 JS 脚本
 //
 // 返回值：
-// *DataRowList 类型指针，JS 脚本执行后的结果，如果执行失败则返回 nil
+// 	- *DataRowList 类型指针，JS 脚本执行后的结果，如果执行失败则返回 nil
 func runScript(param string, script string) *[]DataRowList {
 	vm := goja.New()
 

@@ -16,7 +16,7 @@ type NodeBiz struct{}
 
 var r = rand.New(rand.NewSource(13))
 
-// 获取所有实例列表
+// randomNode 随机获取一个节点
 func (biz *NodeBiz) randomNode() (*models.NodeInfo, error) {
 	all, err := glob.GRedis.HGetAll(context.Background(), "register:mqtt").Result()
 	if err != nil {

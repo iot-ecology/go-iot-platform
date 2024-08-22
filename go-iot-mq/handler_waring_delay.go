@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/dop251/goja"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 func HandlerWaringDelay(messages <-chan amqp.Delivery) {
@@ -48,6 +49,7 @@ func HandlerWaringDelayStr(d amqp.Delivery) bool {
 }
 
 // handlerWaringDelayOnce 函数用于处理handlerWaringDelayOnce数据
+//
 // 参数：
 //   - msg DataRowList: 包含反序列化后的消息的数据行列表
 //
@@ -57,13 +59,13 @@ func HandlerWaringDelayStr(d amqp.Delivery) bool {
 func handlerWaringDelayOnce(msg DataRowList) {
 	zap.S().Infof("处理 handlerWaringDelayOnce 数据: %+v", msg)
 	uid := msg.DeviceUid
-	mapping := getDelayParam(uid , msg.IdentificationCode, msg.DataRows)
+	mapping := getDelayParam(uid, msg.IdentificationCode, msg.DataRows)
 	zap.S().Infof("getDelayParam 数据: %+v", mapping)
 	background := context.Background()
 	var scriptParam = make(map[string][]Tv)
 	for _, param := range mapping {
 
-		key := "signal_delay_warning:" + strconv.Itoa(param.DeviceUid) +":" +param.IdentificationCode + ":" + strconv.Itoa(param.SignalId)
+		key := "signal_delay_warning:" + strconv.Itoa(param.DeviceUid) + ":" + param.IdentificationCode + ":" + strconv.Itoa(param.SignalId)
 		zap.S().Infof("key = %s", key)
 		members, _ := globalRedisClient.ZRevRangeWithScores(background, key, 0, -1).Result()
 		var vs []Tv
@@ -80,9 +82,6 @@ func handlerWaringDelayOnce(msg DataRowList) {
 	zap.S().Infof("脚本报警参数 = %+v", scriptParam)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
 
-
-
-
 	for _, waring := range script {
 		zap.S().Infof("key = %+v", waring)
 		delayScript := runWaringDelayScript(waring.Script, scriptParam)
@@ -98,7 +97,7 @@ func handlerWaringDelayOnce(msg DataRowList) {
 			"up_time":     msg.Time,
 		}
 		name := CalcCollectionName(globalConfig.MongoConfig.ScriptWaringCollection, uint(waring.ID))
-		CheckCollectionAndCreate(globalConfig.MongoConfig.ScriptWaringCollection,name)
+		CheckCollectionAndCreate(globalConfig.MongoConfig.ScriptWaringCollection, name)
 		collection := db.Collection(name)
 		one, err := collection.InsertOne(context.Background(), v)
 		if err != nil {
@@ -110,14 +109,15 @@ func handlerWaringDelayOnce(msg DataRowList) {
 }
 
 // runWaringDelayScript 函数执行传入的JavaScript脚本，并将传入的参数map[string][]Tv传递给该脚本执行
+//
 // 参数：
 //
-//	script string - 要执行的JavaScript脚本
-//	param map[string][]Tv - 传递给JavaScript脚本的参数
+//   - script string  要执行的JavaScript脚本
+//   - param map[string][]Tv  传递给JavaScript脚本的参数
 //
 // 返回值：
 //
-//	bool - JavaScript脚本执行后返回的结果
+//   - bool  JavaScript脚本执行后返回的结果
 func runWaringDelayScript(script string, param map[string][]Tv) bool {
 	vm := goja.New()
 
@@ -148,14 +148,16 @@ func runWaringDelayScript(script string, param map[string][]Tv) bool {
 	a := fn(param)
 	return a
 }
+
 // getDelayScript 从Redis中获取SignalDelayWaring信息列表
+//
 // 参数：
 //
-//	mapping []SignalDelayWaringParam - SignalDelayWaringParam类型的切片，用于从Redis中查询SignalDelayWaring信息
+//   - mapping []SignalDelayWaringParam  SignalDelayWaringParam类型的切片，用于从Redis中查询SignalDelayWaring信息
 //
 // 返回值：
 //
-//	[]SignalDelayWaring - SignalDelayWaring类型的切片，包含了从Redis中查询到的SignalDelayWaring信息
+//   - []SignalDelayWaring  SignalDelayWaring类型的切片，包含了从Redis中查询到的SignalDelayWaring信息
 func getDelayScript(mapping []SignalDelayWaringParam) []SignalDelayWaring {
 	var res []SignalDelayWaring
 
@@ -188,11 +190,13 @@ func getDelayScript(mapping []SignalDelayWaringParam) []SignalDelayWaring {
 // getDelayParam 函数根据用户UID和DataRow切片从Redis中获取延迟报警参数
 //
 // 参数：
-// uid string - 用户UID
-// rows []DataRow - DataRow切片
+//
+//   - uid string  用户UID
+//   - rows []DataRow  DataRow切片
 //
 // 返回值：
-// []SignalDelayWaringParam - SignalDelayWaringParam切片，包含符合要求的延迟报警参数
+//
+//   - []SignalDelayWaringParam  SignalDelayWaringParam切片，包含符合要求的延迟报警参数
 func getDelayParam(uid string, code string, rows []DataRow) []SignalDelayWaringParam {
 	val := globalRedisClient.LRange(context.Background(), "delay_param", 0, -1).Val()
 	var mapping []SignalDelayWaringParam
@@ -214,12 +218,12 @@ func getDelayParam(uid string, code string, rows []DataRow) []SignalDelayWaringP
 //
 // 参数：
 //
-//	name string - 需要查找的名称
-//	rows []DataRow - DataRow切片
+//	- name string  需要查找的名称
+//	- rows []DataRow  DataRow切片
 //
 // 返回值：
 //
-//	bool - 如果找到名称，则返回true；否则返回false
+//	- bool  如果找到名称，则返回true；否则返回false
 func nameInDataRow(name string, rows []DataRow) bool {
 	for _, row := range rows {
 		if row.Name == name {

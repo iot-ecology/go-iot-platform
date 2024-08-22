@@ -4,6 +4,17 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"igp/glob"
+	"igp/models"
+	"igp/router"
+	"igp/router/notice"
+	"igp/router/transmit"
+	"igp/router/transmit/transmit_mqtt"
+	"log"
+	"net/url"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -17,16 +28,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"igp/glob"
-	"igp/models"
-	"igp/router"
-	"igp/router/notice"
-	"igp/router/transmit"
-	"igp/router/transmit/transmit_mqtt"
-	"log"
-	"net/url"
-	"os"
-	"time"
 )
 
 var (
@@ -64,17 +65,16 @@ var (
 	tcpHandlerApi  = router.TcpHandlerApi{}
 	httpHandlerApi = router.HttpHandlerApi{}
 	coapHandlerApi = router.CoapHandlerApi{}
-	wsHandlerApi = router.WebsocketHandlerApi{}
+	wsHandlerApi   = router.WebsocketHandlerApi{}
 
-	cassandraTransmitBindApi = transmit_mqtt.CassandraTransmitBindApi{}
+	cassandraTransmitBindApi  = transmit_mqtt.CassandraTransmitBindApi{}
 	clickhouseTransmitBindApi = transmit_mqtt.ClickhouseTransmitBindApi{}
-	influxdbTransmitBindApi = transmit_mqtt.InfluxdbTransmitBindApi{}
-	kafkaTransmitBindApi = transmit_mqtt.KafkaTransmitBindApi{}
-	mongoTransmitBindApi = transmit_mqtt.MongoTransmitBindApi{}
-	mySQLTransmitBindApi = transmit_mqtt.MySQLTransmitBindApi{}
-	rabbitmqTransmitBindApi = transmit_mqtt.RabbitmqTransmitBindApi{}
-	protocolServiceApi = router.ProtocolService{}
-
+	influxdbTransmitBindApi   = transmit_mqtt.InfluxdbTransmitBindApi{}
+	kafkaTransmitBindApi      = transmit_mqtt.KafkaTransmitBindApi{}
+	mongoTransmitBindApi      = transmit_mqtt.MongoTransmitBindApi{}
+	mySQLTransmitBindApi      = transmit_mqtt.MySQLTransmitBindApi{}
+	rabbitmqTransmitBindApi   = transmit_mqtt.RabbitmqTransmitBindApi{}
+	protocolServiceApi        = router.ProtocolService{}
 )
 
 func initTable() {
@@ -420,7 +420,7 @@ func initTable() {
 }
 
 func initDb() {
-
+	zap.S().Info("初始化数据库")
 	username := glob.GConfig.MySQLConfig.Username //账号
 	password := glob.GConfig.MySQLConfig.Password //密码
 	host := glob.GConfig.MySQLConfig.Host         //数据库地址，可以是Ip或者域名
@@ -441,6 +441,7 @@ func initDb() {
 }
 
 func initMongo() {
+	zap.S().Info("初始化MongoDB")
 	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username), url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host, glob.GConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
@@ -723,7 +724,6 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
 	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
 
-
 	r.POST("/CassandraTransmitBind/create", cassandraTransmitBindApi.CreateCassandraTransmitBind)
 	r.POST("/CassandraTransmitBind/update", cassandraTransmitBindApi.UpdateCassandraTransmitBind)
 	r.GET("/CassandraTransmitBind/:id", cassandraTransmitBindApi.ByIdCassandraTransmitBind)
@@ -766,13 +766,12 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/RabbitmqTransmitBind/page", rabbitmqTransmitBindApi.PageRabbitmqTransmitBind)
 	r.POST("/RabbitmqTransmitBind/delete/:id", rabbitmqTransmitBindApi.DeleteRabbitmqTransmitBind)
 
-
-
-	r.GET("/protocol/ws_info",protocolServiceApi.WsServerInfo)
-	r.GET("/protocol/tcp_info",protocolServiceApi.TcpServerInfo)
-	r.GET("/protocol/coap_info",protocolServiceApi.CoapServerInfo)
+	r.GET("/protocol/ws_info", protocolServiceApi.WsServerInfo)
+	r.GET("/protocol/tcp_info", protocolServiceApi.TcpServerInfo)
+	r.GET("/protocol/coap_info", protocolServiceApi.CoapServerInfo)
 }
 func initGlobalRedisClient() {
+	zap.S().Info("初始化Redis")
 
 	add := fmt.Sprintf("%s:%d", glob.GConfig.RedisConfig.Host, glob.GConfig.RedisConfig.Port)
 	glob.GRedis = redis.NewClient(&redis.Options{
@@ -788,6 +787,7 @@ func initGlobalRedisClient() {
 
 }
 func InitConfig() {
+	zap.S().Info("初始化配置")
 	var configPath string
 	flag.StringVar(&configPath, "config", "app-local.yml", "Path to the config file")
 	flag.Parse()
@@ -805,7 +805,7 @@ func InitConfig() {
 }
 
 func initTableData() {
-
+	zap.S().Info("初始化数据")
 	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
 		Model: gorm.Model{
 			ID: 1,
@@ -1127,6 +1127,7 @@ func CreateRabbitQueue(queueName string) {
 }
 
 func createFileUpload() {
+	zap.S().Info("初始化文件上传")
 	// 设置文件夹路径
 	dirPath := "./fileupdate"
 

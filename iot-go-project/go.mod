@@ -4,7 +4,7 @@ go 1.22.4
 
 require iot-transmit v0.0.0
 
-require iot-notice v0.0.0
+// require iot-notice v0.0.0
 
 replace iot-transmit => ../transmit
 

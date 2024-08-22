@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 // CoapMessage 用于处理coap转发后的数据
@@ -19,9 +20,10 @@ type CoapMessage struct {
 }
 
 // HandlerCoapDataStorage 函数处理从AMQP通道接收到的coap消息数据
+//
 // 参数：
 //
-//	messages <-chan amqp.Delivery：接收AMQP消息的通道
+//   - messages <-chan amqp.Delivery：接收AMQP消息的通道
 //
 // 返回值：
 //
@@ -61,7 +63,7 @@ func HandlerDataCoapStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row,"coap")
+			StorageDataRowList(row, "coap")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -134,13 +136,14 @@ func handlerCoapOne(deviceUid string) bool {
 }
 
 // GetScriptRedisForCoap 根据 http 的设备ID从Redis中获取对应的脚本
+//
 // 参数:
 //
-//	tcp id string - tcp id
+//	- tcp id string  tcp id
 //
 // 返回值:
 //
-//	string - 对应的脚本
+//	- string  对应的脚本
 func GetScriptRedisForCoap(tcpId string) string {
 	val := globalRedisClient.HGet(context.Background(), "struct:Coap", tcpId).Val()
 	return val

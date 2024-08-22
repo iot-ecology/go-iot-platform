@@ -1,11 +1,9 @@
 package biz
 
 import (
-	"context"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
-	"strconv"
 )
 
 type SimCardBiz struct{}
@@ -31,13 +29,13 @@ func (biz *SimCardBiz) PageData(accessNumber string, page, size int) (*servlet.P
 
 var deviceInfoBiz = DeviceInfoBiz{}
 
-func (biz *SimCardBiz) beforeCreate(card models.SimCard) {
-	id := strconv.Itoa(int(card.ID))
-	key := glob.SimCardExpireTime.String() + ":" + id
-	glob.GRedis.SetNX(context.Background(), key, id, 0)
-	glob.GRedis.ExpireAt(context.Background(), key, card.Expiration.AddDate(0, 0, -3))
+// func (biz *SimCardBiz) beforeCreate(card models.SimCard) {
+// 	id := strconv.Itoa(int(card.ID))
+// 	key := glob.SimCardExpireTime.String() + ":" + id
+// 	glob.GRedis.SetNX(context.Background(), key, id, 0)
+// 	glob.GRedis.ExpireAt(context.Background(), key, card.Expiration.AddDate(0, 0, -3))
 
-}
+// }
 
 func (biz *SimCardBiz) PageHistory(simCardId string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ

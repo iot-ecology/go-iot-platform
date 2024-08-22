@@ -4,13 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dop251/goja"
-	"github.com/redis/go-redis/v9"
-	"github.com/robfig/cron/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.uber.org/zap"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
@@ -18,6 +11,14 @@ import (
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/dop251/goja"
+	"github.com/redis/go-redis/v9"
+	"github.com/robfig/cron/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 )
 
 type CalcRunBiz struct{}
@@ -25,10 +26,12 @@ type CalcRunBiz struct{}
 // Start 根据传入的id启动计算任务
 //
 // 参数：
-// id：计算规则id
+//
+//	id：计算规则id
 //
 // 返回值：
-// bool：启动计算任务是否成功，成功返回true，否则返回false
+//
+//	bool：启动计算任务是否成功，成功返回true，否则返回false
 func (b CalcRunBiz) Start(id any) bool {
 
 	var calcRule models.CalcRule
@@ -70,10 +73,12 @@ func (b CalcRunBiz) Start(id any) bool {
 // RefreshRule 根据id刷新计算规则缓存
 //
 // 参数:
-// id: 计算规则id
+//
+//	id: 计算规则id
 //
 // 返回值:
-// 无
+//
+//	无
 func (b CalcRunBiz) RefreshRule(id any) {
 	var calcRule models.CalcRule
 
@@ -127,10 +132,12 @@ func (b CalcRunBiz) RefreshRule(id any) {
 // Stop 根据传入的id停止计算任务
 //
 // 参数：
-// id：计算规则id
+//
+//	id：计算规则id
 //
 // 返回值：
-// bool：停止计算任务是否成功，成功返回true，否则返回false
+//
+//	bool：停止计算任务是否成功，成功返回true，否则返回false
 func (b CalcRunBiz) Stop(id any) bool {
 	var calcRule models.CalcRule
 
@@ -198,12 +205,14 @@ func genMeasurement(deviceUid int, IdentificationCode, protocol string) string {
 // MockCalc 是一个CalcRunBiz类型的方法，用于模拟计算操作
 //
 // 参数：
-// start_time：int64类型，表示查询的起始时间戳
-// end_time：int64类型，表示查询的结束时间戳
-// id：string类型，表示计算规则的唯一标识
+//
+//	start_time：int64类型，表示查询的起始时间戳
+//	end_time：int64类型，表示查询的结束时间戳
+//	id：string类型，表示计算规则的唯一标识
 //
 // 返回值：
-// map[string]interface{}类型，表示计算的结果
+//
+//	map[string]interface{}类型，表示计算的结果
 func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interface{} {
 
 	var calcCache servlet.CalcCache
@@ -331,12 +340,14 @@ func runCalcScript(param map[string]any, script string) map[string]interface{} {
 // QueryRuleExData 函数用于查询指定规则ID在指定时间范围内的扩展数据
 //
 // 参数：
-// rule_id: 规则ID，类型为int64
-// start_time: 查询开始时间，类型为int64
-// end_time: 查询结束时间，类型为int64
+//
+//	rule_id: 规则ID，类型为int64
+//	start_time: 查询开始时间，类型为int64
+//	end_time: 查询结束时间，类型为int64
 //
 // 返回值：
-// 返回查询结果，类型为[]bson.M，即bson.M类型的切片
+//
+//	[]bson.M，即bson.M类型的切片
 func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
 	// fixme: 暂时使用固定集合名，后续需要改成根据规则ID动态获取

@@ -2,11 +2,12 @@ package notice
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+
+	"go.uber.org/zap"
 )
 
 type DingDingBiz struct{}
@@ -42,9 +43,8 @@ func (biz *DingDingBiz) Bind(req []models.DingDingBindProduct) bool {
 
 	}
 
-
 	var toDelete []models.DingDingBindProduct
-	tx.Where("product_id = ?", param.ProductId).Find(toDelete)
+	tx.Where("product_id = ?", param.ProductId).Find(&toDelete)
 	result := tx.Where("product_id = ?", param.ProductId).Delete(models.DingDingBindProduct{})
 	if result.Error != nil {
 		// 如果出现错误，回滚事务
@@ -65,11 +65,11 @@ func (biz *DingDingBiz) Bind(req []models.DingDingBindProduct) bool {
 	}
 
 	for _, product := range toDelete {
-		glob.GRedis.Del(context.Background(),"message_channel_bind:dingding:" +strconv.Itoa(product.ProductId))
+		glob.GRedis.Del(context.Background(), "message_channel_bind:dingding:"+strconv.Itoa(product.ProductId))
 	}
 
 	for _, product := range req {
-		glob.GRedis.LPush(context.Background(),"message_channel_bind:dingding:" +strconv.Itoa(product.ProductId),
+		glob.GRedis.LPush(context.Background(), "message_channel_bind:dingding:"+strconv.Itoa(product.ProductId),
 			product.DingDingId)
 	}
 	return true

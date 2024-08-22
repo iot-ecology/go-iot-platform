@@ -18,13 +18,12 @@ type MySQLTransmit struct {
 }
 
 type MySQLTransmitBind struct {
-	gorm.Model `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
-	IdentificationCode string `json:"identification_code"` // 设备标识码
-	MySQLTransmitId uint `struct:"mysql_transmit_id" json:"mysql_transmit_id" gorm:"column:mysql_transmit_id;type:int(
-10);" ` // MySQL传输表的外键ID
-	Table  string `struct:"table" json:"table" gorm:"column:table;type:varchar(255);"` // 表
-	Script string `struct:"script" json:"script" gorm:"column:script"`                 // 转换insert
+	gorm.Model         `structs:"-"`
+	DeviceUid          string `json:"device_uid"`                                                                                  // 设备UID
+	IdentificationCode string `json:"identification_code"`                                                                         // 设备标识码
+	MySQLTransmitId    uint   `struct:"mysql_transmit_id" json:"mysql_transmit_id" gorm:"column:mysql_transmit_id;type:int(10);" ` // MySQL传输表的外键ID
+	Table              string `struct:"table" json:"table" gorm:"column:table;type:varchar(255);"`                                 // 表
+	Script             string `struct:"script" json:"script" gorm:"column:script"`                                                 // 转换insert
 	// 语句的脚本
 	Enable bool `structs:"enable" json:"enable" gorm:"column:enable;type:tinyint(1);"` // 是否启用
 }
@@ -39,8 +38,8 @@ type MongoTransmit struct {
 }
 
 type MongoTransmitBind struct {
-	gorm.Model      `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -61,8 +60,8 @@ type InfluxdbTransmit struct {
 }
 
 type InfluxdbTransmitBind struct {
-	gorm.Model         `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -85,8 +84,8 @@ type ClickhouseTransmit struct {
 }
 
 type ClickhouseTransmitBind struct {
-	gorm.Model           `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -108,8 +107,8 @@ type CassandraTransmit struct {
 }
 
 type CassandraTransmitBind struct {
-	gorm.Model          `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -131,8 +130,8 @@ type RabbitmqTransmit struct {
 }
 
 type RabbitmqTransmitBind struct {
-	gorm.Model         `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -151,16 +150,14 @@ type KafkaTransmit struct {
 	Port       int    `json:"port" gorm:"column:port;type:int(10);"`
 }
 type KafkaTransmitBind struct {
-	gorm.Model      `structs:"-"`
-	DeviceUid string    `json:"device_uid"` // 设备UID
+	gorm.Model `structs:"-"`
+	DeviceUid  string `json:"device_uid"` // 设备UID
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
 	KafkaTransmitId uint   `json:"kafka_transmit_id" gorm:"column:kafka_transmit_id;type:int(10);"` // 传输表
 	Topic           string `json:"topic" gorm:"column:topic;type:varchar(255);"`                    // topic
-	Script             string `json:"script" gorm:"column:script"`                                           // 转换insert语句的脚本
-	Enable             bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                         // 是否启用
+	Script          string `json:"script" gorm:"column:script"`                                     // 转换insert语句的脚本
+	Enable          bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                   // 是否启用
 
 }
-
-

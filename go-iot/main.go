@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 )
 
 var globalConfig ServerConfig
@@ -81,7 +82,8 @@ func CBeat() {
 // processHeartbeats 函数用于处理心跳信息
 //
 // 参数：
-// service []NodeInfo - 节点信息切片，包含待处理的心跳信息
+//
+//	service []NodeInfo - 节点信息切片，包含待处理的心跳信息
 func processHeartbeats(service []NodeInfo) {
 	for _, info := range service {
 		if !SendBeat(&info, "beat") {
@@ -96,11 +98,11 @@ func processHeartbeats(service []NodeInfo) {
 //
 // 参数：
 //
-//	node_name string - 节点名称
+//   - node_name string - 节点名称
 //
 // 返回值：
 //
-//	bool - 如果处理成功返回false，否则返回true
+//   - bool - 如果处理成功返回false，否则返回true
 func HandlerOffNode(nodeName string) {
 	zap.S().Infof("开始处理节点下线情况, nodeName = %v", nodeName)
 	// 清除节点负载计数器
@@ -155,6 +157,7 @@ func startHttp() {
 	}
 }
 
+// timerNoHandlerConfig 函数定时执行 noHandlerConfig 函数
 func timerNoHandlerConfig() {
 	ticker := time.NewTicker(1 * time.Second)
 
@@ -196,10 +199,12 @@ func noHandlerConfig() {
 // PubCreateMqttClientOp 函数用于创建MQTT客户端
 //
 // 参数：
-// conf string - MQTT客户端配置信息
+//
+//	- conf string - MQTT客户端配置信息
 //
 // 返回值：
-// int - 创建MQTT客户端的结果，成功返回1，失败返回-1
+//
+//	- int - 创建MQTT客户端的结果，成功返回1，失败返回-1
 func PubCreateMqttClientOp(conf string) int {
 	lose := GetSizeLose("")
 
