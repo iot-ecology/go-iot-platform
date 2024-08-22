@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"net/http"
-	"strings"
 )
 
 func Index(c *gin.Context) {
@@ -65,6 +66,7 @@ type Auth struct {
 }
 
 func parseBasicAuth(authHeader string) (username, password string, ok bool) {
+	zap.S().Infof("parseBasicAuth 开始, authHeader = %v", authHeader)
 	// 基本认证格式："Basic <base64-encoded-string>"
 	const prefix = "Basic "
 	if len(authHeader) < len(prefix) || authHeader[:len(prefix)] != prefix {
@@ -87,6 +89,7 @@ func parseBasicAuth(authHeader string) (username, password string, ok bool) {
 	return split[0], split[1], true
 }
 func FindDeviceMappingUP(deviceId string) (string, string) {
+	zap.S().Infof("FindDeviceMappingUP 开始, deviceId = %v", deviceId)
 	// todo: 从redis中根据deviceId获取用户名和密码
 	val := globalRedisClient.HGet(context.Background(), "auth:ws", deviceId).Val()
 	var auth Auth

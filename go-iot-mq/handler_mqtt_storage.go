@@ -181,9 +181,9 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	i, err := strconv.Atoi(dt.DeviceUid)
 	if err != nil {
-		fmt.Println("转换错误:", err)
+		zap.S().Debugf("转换错误: %+v", err)
 	} else {
-		fmt.Println("转换后的整数:", i)
+		zap.S().Debugf("转换后的整数: %+v", i)
 	}
 
 	writeAPI := GlobalInfluxDbClient.WriteAPI(globalConfig.InfluxConfig.Org,

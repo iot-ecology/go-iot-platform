@@ -5,9 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 // SendCreateMqttMessage 向指定节点发送创建MQTT客户端的请求
@@ -19,7 +20,7 @@ import (
 // 返回值：
 // bool - 发送请求是否成功，成功返回true，失败返回false
 func SendCreateMqttMessage(node *NodeInfo, param string) bool {
-
+	zap.S().Infof("发送创建MQTT客户端请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/create_mqtt", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
@@ -63,7 +64,7 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 // 返回值：
 // bool - 发送心跳请求是否成功，成功返回true，失败返回false
 func SendBeat(node *NodeInfo, param string) bool {
-
+	zap.S().Debugf("发送心跳请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/beat", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(data))
@@ -275,6 +276,7 @@ func PubRemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendRemoveMqttClient(id string, nodeinfo NodeInfo) {
+	zap.S().Infof("发送移除MQTT客户端请求，节点信息: %+v, 参数: %s", nodeinfo, id)
 	baseUrl := fmt.Sprintf("http://%s:%d/remove_mqtt_client?id=%s", nodeinfo.Host, nodeinfo.Port, id)
 
 	// 发送 GET 请求
@@ -350,7 +352,7 @@ func PubPushMqttData(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendPushMqttData(node NodeInfo, param string) bool {
-
+	zap.S().Infof("发送消息请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/push_data", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))

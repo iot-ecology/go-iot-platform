@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 	"log"
 	"net"
 	"strings"
 	"sync"
+
+	"go.uber.org/zap"
 )
 
 type Server struct {
@@ -144,6 +145,7 @@ type Auth struct {
 }
 
 func FindDeviceMappingUP(deviceId string) (string, string) {
+	zap.S().Infof("FindDeviceMappingUP 开始, deviceId = %v", deviceId)
 	//  从redis中根据deviceId获取用户名和密码
 	val := globalRedisClient.HGet(context.Background(), "auth:tcp", deviceId).Val()
 	var auth Auth
@@ -155,16 +157,19 @@ func FindDeviceMappingUP(deviceId string) (string, string) {
 }
 
 func getUid(remoteAdd string) string {
+	zap.S().Infof("getUid 开始, remoteAdd = %v", remoteAdd)
 	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	return val
 }
 
 func storageUid(uid, remoteAdd string) {
+	zap.S().Infof("storageUid 开始, uid = %v, remoteAdd = %v", uid, remoteAdd)
 	globalRedisClient.HSet(context.Background(), "tcp_uid:"+globalConfig.NodeInfo.Name, uid, remoteAdd)
 	globalRedisClient.HSet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd, uid)
 
 }
 func RemoveUid(remoteAdd string) {
+	zap.S().Infof("RemoveUid 开始, remoteAdd = %v", remoteAdd)
 	val := globalRedisClient.HGet(context.Background(), "tcp_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	if val == "" {
 		return
@@ -218,6 +223,7 @@ func clientWrite(client *Client, msg string) {
 
 // handlerUid 用于从消息中提取设备ID
 func handlerUid(message string) string {
+	zap.S().Infof("handlerUid 开始, message = %v", message)
 	if strings.HasPrefix(message, "uid:") {
 		return strings.TrimSpace(message[4:])
 	}

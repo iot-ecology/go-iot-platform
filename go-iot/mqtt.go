@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
-	"time"
 )
 
 // MqttConfig 定义了MQTT客户端配置的结构体
@@ -67,6 +68,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 var c map[string]mqtt.Client
 
 func StopMqttClient(clientId string) {
+	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	client := c[clientId]
 	if client != nil {
 		client.Disconnect(0)

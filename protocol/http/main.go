@@ -7,14 +7,15 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"gopkg.in/yaml.v3"
 	"net/http"
 	"os"
 	"strings"
 	"syscall"
 	"time"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/yaml.v3"
 
 	"github.com/gin-gonic/gin"
 )
@@ -118,6 +119,7 @@ type Auth struct {
 }
 
 func FindDeviceMappingUP(deviceId string) (string, string) {
+	zap.S().Infof("FindDeviceMappingUP 开始, deviceId = %v", deviceId)
 	// todo: 从redis中根据deviceId获取用户名和密码
 	val := globalRedisClient.HGet(context.Background(), "auth:http", deviceId).Val()
 	var auth Auth
@@ -129,6 +131,7 @@ func FindDeviceMappingUP(deviceId string) (string, string) {
 }
 
 func parseBasicAuth(authHeader string) (username, password string, ok bool) {
+	zap.S().Infof("parseBasicAuth 开始, authHeader = %v", authHeader)
 	// 基本认证格式："Basic <base64-encoded-string>"
 	const prefix = "Basic "
 	if len(authHeader) < len(prefix) || authHeader[:len(prefix)] != prefix {

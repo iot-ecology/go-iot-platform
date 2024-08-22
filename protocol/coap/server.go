@@ -4,22 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dustin/go-coap"
-	"go.uber.org/zap"
 	"log"
 	"net"
+
+	"github.com/dustin/go-coap"
+	"go.uber.org/zap"
 )
 
 func getUid(remoteAdd string) string {
+	zap.S().Infof("getUid 开始, remoteAdd = %v", remoteAdd)
 	val := globalRedisClient.HGet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	return val
 }
 
 func storageUid(uid, remoteAdd string) {
+	zap.S().Infof("storageUid 开始, uid = %v, remoteAdd = %v", uid, remoteAdd)
 	globalRedisClient.HSet(context.Background(), "coap_uid:"+globalConfig.NodeInfo.Name, uid, remoteAdd)
 	globalRedisClient.HSet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd, uid)
 }
 func RemoveUid(remoteAdd string) {
+	zap.S().Infof("RemoveUid 开始, remoteAdd = %v", remoteAdd)
 	val := globalRedisClient.HGet(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, remoteAdd).Val()
 	if val == "" {
 		return
@@ -31,6 +35,7 @@ func RemoveUid(remoteAdd string) {
 }
 
 func Create(port int) {
+	zap.S().Infof("Create 开始, port = %v", port)
 	mux := coap.NewServeMux()
 	mux.Handle("/auth", coap.FuncHandler(auth))                          //创建 "/auth"处理接口
 	mux.Handle("/data", coap.FuncHandler(data))                          //创建 "/data"处理接口
@@ -76,8 +81,6 @@ func auth(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			return res
 		}
 
-
-
 		mc := globalRedisClient.HRandField(context.Background(), "coap_uid_f:"+globalConfig.NodeInfo.Name, -1).Val()
 
 		if int64(len(mc)) <= globalConfig.NodeInfo.Size {
@@ -92,7 +95,7 @@ func auth(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			storageUid(auth.DeviceId, a.String())
 			CoapMap[a.String()] = l
 			return res
-		}else {
+		} else {
 			res := &coap.Message{
 				Type:      coap.Acknowledgement,
 				Code:      coap.Content,
@@ -164,7 +167,7 @@ type CoapMessage struct {
 }
 
 func FindDeviceMappingUP(deviceId string) (string, string) {
-
+	zap.S().Infof("FindDeviceMappingUP 开始, deviceId = %v", deviceId)
 	i := globalRedisClient.Exists(context.Background(), "auth:coap").Val()
 	if i >= 0 {
 

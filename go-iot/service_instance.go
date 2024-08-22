@@ -4,15 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
+
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"time"
 )
 
 // GetSizeLose 用户获取使用数量最小的节点
 // 参数 pass_node_name: 忽略的节点名称
 // 返回值 *NodeInfo: 返回节点信息中大小损失最小的节点指针，若不存在则返回nil
 func GetSizeLose(passNodeName string) *NodeInfo {
+	zap.S().Infof("GetSizeLose 开始, passNodeName = %v", passNodeName)
 	service, err := GetThisTypeService()
 	if err != nil {
 		return nil
@@ -91,6 +93,7 @@ func GetThisTypeService() ([]NodeInfo, error) {
 // NodeInfo - 节点信息结构体
 // error - 如果节点信息不存在或获取失败，则返回错误信息
 func GetNodeInfo(name string) (NodeInfo, error) {
+	zap.S().Infof("GetNodeInfo 开始, name = %v", name)
 	ctx := context.Background()
 	val, err := globalRedisClient.HGet(ctx, "register:"+globalConfig.NodeInfo.Type, name).Result()
 	if errors.Is(err, redis.Nil) {
@@ -119,6 +122,7 @@ func GetNodeInfo(name string) (NodeInfo, error) {
 //
 //	error - 如果删除操作失败，则返回错误信息；否则返回nil
 func RemoveNodeInfo(name string) error {
+	zap.S().Infof("RemoveNodeInfo 开始, name = %v", name)
 	ctx := context.Background()
 	_, err := globalRedisClient.HDel(ctx, "register:"+globalConfig.NodeInfo.Type, name).Result()
 
@@ -138,6 +142,7 @@ func RemoveNodeInfo(name string) error {
 //
 // 该函数没有返回值，会一直运行下去，直到程序被外部因素（如操作系统）终止。
 func BeatTask(f NodeInfo) {
+	zap.S().Debugf("BeatTask 开始, f = %v", f)
 
 	ticker := time.NewTicker(1 * time.Second)
 	for range ticker.C {
@@ -159,6 +164,7 @@ func BeatTask(f NodeInfo) {
 // "register:{Type}"用于存储节点的JSON信息，以节点名称为field。
 // 若序列化失败，则输出日志并终止程序。
 func Register(f NodeInfo) {
+	zap.S().Debugf("Register 开始, f = %v", f)
 	jsonData, err := json.Marshal(f)
 
 	zap.S().Debugf("健康数据 data %v", string(jsonData))

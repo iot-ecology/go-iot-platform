@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
-	"go.uber.org/zap"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 )
 
 func SetLastOpTime(uid string) {
-
+	zap.S().Infof("SetLastOpTime 开始, uid = %v", uid)
 	// 设置24小时有效时间
 	globalRedisClient.Set(context.Background(), "ws:last:"+uid, time.Now().Unix(), 24*time.Hour)
 	//globalRedisClient.Set(context.Background(), "ws:last:"+uid, uid, 10*time.Second)

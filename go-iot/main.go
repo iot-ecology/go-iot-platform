@@ -52,6 +52,7 @@ func beforeStart() {
 	go timerNoHandlerConfig()
 }
 func removeOldData() {
+	zap.S().Infof("开始清理过期数据")
 	HandlerOffNode(globalConfig.NodeInfo.Name)
 }
 
@@ -101,13 +102,17 @@ func processHeartbeats(service []NodeInfo) {
 //
 //	bool - 如果处理成功返回false，否则返回true
 func HandlerOffNode(nodeName string) {
+	zap.S().Infof("开始处理节点下线情况, nodeName = %v", nodeName)
 	// 清除节点负载计数器
 
 	// 获取节点对应的MQTT客户端ID
 	mqttClientIds := GetBindClientId(nodeName)
+	zap.S().Infof("获取到节点绑定MQTT客户端ID, nodeName = %v, mqttClientIds = %v", nodeName, mqttClientIds)
 	for _, ele := range mqttClientIds {
+		zap.S().Infof("获取到节点绑定MQTT客户端ID, nodeName = %v, mqttClientId = %v", nodeName, ele)
 		// 获取MQTT客户端ID对应的MQTT配置
 		cf := GetUseConfig(ele)
+		zap.S().Infof("获取到MQTT客户端ID对应的MQTT配置, client id = %v, config = %v", ele, cf)
 		if cf == "" {
 			zap.S().Errorf("HandlerOffNode Error get mqtt config, client id = %s", ele)
 			continue
@@ -117,6 +122,7 @@ func HandlerOffNode(nodeName string) {
 			var config MqttConfig
 			bytes := []byte(cf)
 			err := json.Unmarshal(bytes, &config)
+			zap.S().Infof("HandlerOffNode 解析MQTT配置成功, config = %v", config)
 			if err != nil {
 				zap.S().Errorf("HandlerOffNode Error unmarshalling JSON: %s", err)
 				continue

@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"go.uber.org/zap"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 // AddNoUseConfig 将不使用的MQTT配置信息存储到Redis中
@@ -16,6 +17,7 @@ import (
 // 返回值：
 // 无返回值
 func AddNoUseConfig(config MqttConfig, body []byte) {
+	zap.S().Infof("AddNoUseConfig 开始, config = %v, body = %v", config, string(body))
 	globalRedisClient.HSet(context.Background(), "mqtt_config:no", config.ClientId, body)
 }
 
@@ -42,6 +44,7 @@ func GetNoUseConfig() []string {
 //
 //	无
 func RemoveNoUseConfig(config MqttConfig) {
+	zap.S().Infof("RemoveNoUseConfig 开始, config = %v", config)
 	globalRedisClient.HDel(context.Background(), "mqtt_config:no", config.ClientId)
 }
 
@@ -53,7 +56,7 @@ func RemoveNoUseConfig(config MqttConfig) {
 // 返回值：
 // 无
 func AddUseConfig(config MqttConfig) {
-
+	zap.S().Infof("AddUseConfig 开始, config = %v", config)
 	jsonStr, err := json.Marshal(config)
 	if err != nil {
 		panic(err)
@@ -71,6 +74,7 @@ func AddUseConfig(config MqttConfig) {
 //
 //	string - 对应的MQTT配置信息
 func GetUseConfig(clientId string) string {
+	zap.S().Infof("GetUseConfig 开始, clientId = %v", clientId)
 	return globalRedisClient.HGet(context.Background(), "mqtt_config:use", clientId).Val()
 }
 
@@ -84,6 +88,7 @@ func GetUseConfig(clientId string) string {
 //
 //	string - 对应的不使用的MQTT配置信息
 func GetNoUseConfigById(clientId string) string {
+	zap.S().Infof("GetNoUseConfigById 开始, clientId = %v", clientId)
 	return globalRedisClient.HGet(context.Background(), "mqtt_config:no", clientId).Val()
 }
 
@@ -95,6 +100,7 @@ func GetNoUseConfigById(clientId string) string {
 // 返回值：
 // 无
 func RemoveUseConfig(config MqttConfig) {
+	zap.S().Infof("RemoveUseConfig 开始, config = %v", config)
 	globalRedisClient.HDel(context.Background(), "mqtt_config:use", config.ClientId)
 }
 
@@ -108,6 +114,7 @@ func RemoveUseConfig(config MqttConfig) {
 //
 //	bool - 若Redis中存在该配置信息则返回true，否则返回false
 func CheckHasConfig(config MqttConfig) bool {
+	zap.S().Infof("CheckHasConfig 开始, config = %v", config)
 	return globalRedisClient.HExists(context.Background(), "mqtt_config:use", config.ClientId).Val()
 }
 
@@ -122,6 +129,7 @@ func CheckHasConfig(config MqttConfig) bool {
 //
 //	无
 func BindNode(config MqttConfig, nodeName string) {
+	zap.S().Infof("BindNode 开始, config = %v, nodeName = %v", config, nodeName)
 	globalRedisClient.SAdd(context.Background(), "node_bind:"+nodeName, config.ClientId)
 
 	RemoveNoUseConfig(config)
@@ -140,6 +148,7 @@ func BindNode(config MqttConfig, nodeName string) {
 //
 //	无
 func RemoveBindNode(clientId string, nodeName string) {
+	zap.S().Infof("RemoveBindNode 开始, clientId = %v, nodeName = %v", clientId, nodeName)
 	globalRedisClient.SRem(context.Background(), "node_bind:"+nodeName, 0, clientId)
 
 	configStr := GetUseConfig(clientId)
@@ -164,6 +173,7 @@ func RemoveBindNode(clientId string, nodeName string) {
 // 返回值：
 // []string - 包含所有绑定在该节点下的MQTT客户端ID的字符串切片
 func GetBindClientId(nodeName string) []string {
+	zap.S().Infof("GetBindClientId 开始, nodeName = %v", nodeName)
 	return globalRedisClient.SMembers(context.Background(), "node_bind:"+nodeName).Val()
 
 }
@@ -178,6 +188,7 @@ func GetBindClientId(nodeName string) []string {
 //
 //	string：MQTT客户端ID所在的节点名称，若未找到则返回空字符串
 func FindMqttClientId(mqttClientId string) string {
+	zap.S().Infof("FindMqttClientId 开始, mqttClientId = %v", mqttClientId)
 	background := context.Background()
 	result, err := globalRedisClient.Keys(background, "node_bind:*").Result()
 	if err != nil {

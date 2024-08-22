@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"strconv"
+	"time"
+
 	"github.com/dop251/goja"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
-	"log"
-	"strconv"
-	"time"
 )
 
 // HandlerCalc 处理计算消息队列中的消息
@@ -39,7 +40,8 @@ func HandlerCalc(messages <-chan amqp.Delivery) {
 
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
 }
-func calcMeasurement(deviceUid int , IdentificationCode, protocol string) string {
+func calcMeasurement(deviceUid int, IdentificationCode, protocol string) string {
+	zap.S().Infof("calcMeasurement 开始, deviceUid = %v, IdentificationCode = %v, protocol = %v", deviceUid, IdentificationCode, protocol)
 	return protocol + "_" + strconv.Itoa(deviceUid) + "_" + IdentificationCode
 }
 
@@ -83,7 +85,7 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := InfluxQueryConfig{}
 			config.Bucket = globalConfig.InfluxConfig.Bucket
-			config.Measurement = calcMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
+			config.Measurement = calcMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = AggregationConfig{
 				Every:       1,
@@ -119,7 +121,7 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 
 			config := InfluxQueryConfig{}
 			config.Bucket = globalConfig.InfluxConfig.Bucket
-			config.Measurement = calcMeasurement(cache.DeviceUid,cache.IdentificationCode,cache.Protocol)
+			config.Measurement = calcMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 
 			config.StartTime = preTime - ccc.Offset
@@ -155,7 +157,7 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
 	// fixme: 暂时使用固定集合名，后续需要改成根据规则ID动态获取
 	name := CalcCollectionName(globalConfig.MongoConfig.Collection, ccc.ID)
-	CheckCollectionAndCreate(globalConfig.MongoConfig.Collection,name)
+	CheckCollectionAndCreate(globalConfig.MongoConfig.Collection, name)
 	collection := db.Collection(name)
 
 	// 插入数据
