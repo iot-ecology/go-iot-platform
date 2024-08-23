@@ -93,6 +93,12 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	if configMap == nil {
 		configMap = make(map[string]MqttConfig)
 	}
+	// 先判断 configMap 中是否有 clientId ， 如果有删除
+	if _, ok := configMap[clientId]; ok {
+        delete(configMap, clientId)
+    }
+
+
 	configMap[clientId] = MqttConfig{
 		Broker:   broker,
 		Port:     port,

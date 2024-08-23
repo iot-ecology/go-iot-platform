@@ -45,33 +45,15 @@ func main() {
 }
 
 func beforeStart() {
-	go removeOldData()
+	removeOldData()
 
 	go BeatTask(globalConfig.NodeInfo)
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
-	go CMqttUsing()
+	//go CMqttUsing()
 }
 
-func CMqttUsing() {
-	ticker := time.NewTicker(1 * time.Second)
-
-	for range ticker.C {
-		lock := NewRedisDistLock(globalRedisClient, "CMqttUsing")
-		if lock.TryLock() {
-			CheckMqttConfigIsUsingAndMove()
-
-			lock.Unlock()
-
-		} else {
-
-			zap.S().Error("没有获取到 c_beat 处理的锁")
-
-		}
-
-	}
-}
 func removeOldData() {
 	zap.S().Infof("开始清理过期数据")
 	HandlerOffNode(globalConfig.NodeInfo.Name)
@@ -155,9 +137,12 @@ func HandlerOffNode(nodeName string) {
 
 	}
 
-	CheckMqttConfigIsUsingAndMove()
-
+	CheckMqttConfigIsUsingAndMove(nodeName)
+	globalRedisClient.Del(context.Background(), "node_bind:"+nodeName)
+	RunCheckMqttConfigIsUsingAndMove = true
 }
+
+var RunCheckMqttConfigIsUsingAndMove = false
 
 func startHttp() {
 	http.HandleFunc("/beat", HttpBeat)
@@ -184,8 +169,11 @@ func startHttp() {
 func timerNoHandlerConfig() {
 	ticker := time.NewTicker(1 * time.Second)
 
-	for range ticker.C {
-		noHandlerConfig()
+	if RunCheckMqttConfigIsUsingAndMove {
+
+		for range ticker.C {
+			noHandlerConfig()
+		}
 	}
 }
 
@@ -211,7 +199,7 @@ func noHandlerConfig() {
 			if PubCreateMqttClientOp(conf) == -1 {
 				continue
 			}
-			time.Sleep(100*time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 		lock.Unlock()
 	} else {
@@ -224,11 +212,11 @@ func noHandlerConfig() {
 //
 // 参数：
 //
-//	- conf string - MQTT客户端配置信息
+//   - conf string - MQTT客户端配置信息
 //
 // 返回值：
 //
-//	- int - 创建MQTT客户端的结果，成功返回1，失败返回-1
+//   - int - 创建MQTT客户端的结果，成功返回1，失败返回-1
 func PubCreateMqttClientOp(conf string) int {
 	lose := GetSizeLose("")
 

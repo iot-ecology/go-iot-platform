@@ -3,6 +3,7 @@ package main
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"time"
 )
@@ -27,17 +28,16 @@ func InitLog() {
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder, // 短路径编码调用者
 	}
-
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfig), // 使用 Console 编码器
-		zapcore.AddSync(os.Stdout),               // 输出到标准输出
+		getWriteSync(),
 		zap.NewAtomicLevelAt(zap.InfoLevel),      // 设置日志级别为 Debug
+
 	)
 
 	logger := zap.New(core, zap.AddCaller())
 	zap.ReplaceGlobals(logger) // 替换全局 Logger
-
-	// 确保日志被刷新
+	//确保日志被刷新
 	//defer func(logger *zap.Logger) {
 	//	err := logger.Sync()
 	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
@@ -47,4 +47,18 @@ func InitLog() {
 
 	// 记录一条日志作为示例
 	logger.Debug("这是一个调试级别的日志")
+}
+
+func getWriteSync() zapcore.WriteSyncer {
+	lumberJackLogger := &lumberjack.Logger{
+		Filename:   "./test.log",
+		MaxSize:    1,
+		MaxBackups: 5,
+		MaxAge:     30,
+		Compress:   false,
+		LocalTime:  true,
+	}
+	syncFile := zapcore.AddSync(lumberJackLogger)
+	syncConsole := zapcore.AddSync(os.Stderr)
+	return zapcore.NewMultiWriteSyncer(syncConsole, syncFile)
 }

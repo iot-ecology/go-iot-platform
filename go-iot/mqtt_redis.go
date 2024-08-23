@@ -212,20 +212,29 @@ func GetAllNodeBind() []string {
 	return v
 
 }
-func CheckMqttConfigIsUsingAndMove() {
+func CheckMqttConfigIsUsingAndMove(ND string) {
+	zap.S().Debugf("CheckMqttConfigIsUsingAndMove 开始")
 	using := GetAllMqttConfigUsing()
-	bind := GetAllNodeBind()
-	for _, config := range using {
-		//config.ClientId  是否在bind中出现过
-		if !StringInSlice(bind, config.ClientId) {
+	bind := GetBindClientId(ND)
 
+
+	for _, s := range bind {
+		CheckUsing(using, s)
+	}
+}
+func CheckUsing(v []MqttConfig, id string) bool {
+	for _, config := range v {
+		if config.ClientId == id {
+			RemoveUseConfig(config)
 			marshal, err := json.Marshal(config)
 			if err != nil {
 			}
-			RemoveUseConfig(config)
 			AddNoUseConfig(config, marshal)
+
+			return true
 		}
 	}
+	return false
 }
 func StringInSlice(slice []string, str string) bool {
 	for _, v := range slice {

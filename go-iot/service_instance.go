@@ -184,7 +184,7 @@ func Register(f NodeInfo) {
 	if err != nil {
 		zap.S().Fatalf("Error marshalling to JSON: %v", err)
 	}
-	globalRedisClient.Set(context.Background(), "beat:"+f.Type+":"+f.Name, f.Name, 1200*time.Millisecond)
+	globalRedisClient.Set(context.Background(), "beat:"+f.Type+":"+f.Name, f.Name, 3000*time.Millisecond)
 	globalRedisClient.HSet(context.Background(), "register:"+f.Type, f.Name, jsonData)
 	zap.S().Debugf("健康心跳")
 }

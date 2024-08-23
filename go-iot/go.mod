@@ -10,6 +10,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/wagslane/go-rabbitmq v0.13.0
 	go.uber.org/zap v1.27.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
