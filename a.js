@@ -1,10 +1,93 @@
-var b = "function main(jsonData) {\n" + "    var c = []\n" + "    for (var jsonDatum of jsonData) {\n" + "        var time = jsonDatum.Time;\n" + "        var arr = []\n" + "        var timeField = {\n" + "            \"FieldName\": \"time\",\n" + "            \"Value\": time\n" + "        }\n" + "\n" + "        arr.push(timeField)\n" + "        var idd = {\n" + "            \"FieldName\": \"id\",\n" + "            \"Value\": time\n" + "        }\n" + "        arr.push(idd)\n" + "        for (var e of jsonDatum.DataRows) {\n" + "            if (e.Name == \"a\") {\n" + "                var aField = {\n" + "                    \"FieldName\": \"name\",\n" + "                    \"Value\": e.Value\n" + "                }\n" + "                arr.push(aField)\n" + "            }\n" + "        }\n" + "        c.push(arr)\n" + "    }\n" + "    return c;\n" + "}"
+function createMqttClient(i) {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-var a = [{
-    "time": 1720751132, "device_uid": "111", "data": [{
-        "name": "a", "value": "测试"
-    }], "nc": "111"
-}];
-var param = {"data_row_list": a, "script": b}
+    const raw = JSON.stringify({
+        "client_id": "TT_" + i ,
+        "host": "127.0.0.1",
+        "port": 1883,
+        "username": "admin",
+        "password": "admin",
+        "subtopic": "/test_topic/" + i
+    });
 
-console.log(param)
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch("http://localhost:8080/mqtt/create", requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.error(error));
+}
+
+function callCreateMqtt() {
+    for (let i = 0; i < 100; i++) {
+
+        createMqttClient(i);
+
+    }
+
+
+}
+
+
+function setScript(i ){
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        "id": i,
+        "script": "function main(nc) {\n   var result = JSON.parse(nc);\n    return [result];\n}"
+    });
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch("http://localhost:8080/mqtt/set-script", requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.error(error));
+}
+
+
+function callSetScript(){
+    for (let i = 0; i < 100; i++) {
+
+        setScript(i );
+
+    }
+}
+
+
+
+
+
+
+
+function c(mqtt_client_id, sid) {
+    var now = new Date();
+    var formattedNow = now.toISOString().slice(0, 19).replace('T', ' ');
+
+    var cc = `INSERT INTO \`signals\` (\`protocol\`, \`identification_code\`, \`device_uid\`, \`name\`, \`alias\`, \`type\`, \`unit\`, \`cache_size\`, \`created_at\`, \`updated_at\`, \`deleted_at\`) 
+              VALUES ('mqtt', '${mqtt_client_id}', ${mqtt_client_id}, '信号-${sid}', '信号-${sid}', '数字', '无', 1, '${formattedNow}', '${formattedNow}', NULL);`;
+    console.log(cc);
+}
+
+function main(){
+    for (let i = 0; i <100; i++) {
+        for (let j = 0; j <200; j++) {
+            c(i+1 , j);
+        }
+    }
+}
+// callCreateMqtt()
+// callSetScript()
+main()

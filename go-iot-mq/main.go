@@ -201,7 +201,7 @@ func InitInfluxDbClient(config InfluxConfig) {
 // 无
 func PushToQueue(queueName string, body []byte) {
 
-	zap.S().Infof("开始推送消息到队列 %s msg %s", queueName, body)
+	zap.S().Debugf("开始推送消息到队列 %s msg %s", queueName, body)
 
 	err := chann.PublishWithContext(context.Background(), "", queueName, // routing key
 		false, // mandatory

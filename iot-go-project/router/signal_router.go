@@ -196,3 +196,13 @@ func (api *SignalApi) DeleteSignal(c *gin.Context) {
 
 	servlet.Resp(c, "删除成功")
 }
+
+
+func (api *SignalApi) InitCache(c *gin.Context){
+	var mm []models.Signal
+	glob.GDb.Model(&models.Signal{}).Find(&mm)
+	for _, signal := range mm {
+		bizSignal.SetSignalCache(&signal)
+	}
+	servlet.Resp(c,"缓存初始化成功")
+}

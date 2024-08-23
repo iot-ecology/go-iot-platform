@@ -482,14 +482,16 @@ func NodeUsingStatus(w http.ResponseWriter, r *http.Request) {
 		for _, el := range GetBindClientId(info.Name) {
 			// 假设GetUseConfig函数返回配置的JSON字符串和错误
 			configJSON := GetUseConfig(el)
+			if configJSON != "" {
 
-			var config MqttConfig
-			b := []byte(configJSON)
-			err := json.Unmarshal(b, &config)
-			if err != nil {
-				zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
+				var config MqttConfig
+				b := []byte(configJSON)
+				err := json.Unmarshal(b, &config)
+				if err != nil {
+					zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
+				}
+				mc = append(mc, config)
 			}
-			mc = append(mc, config)
 
 		}
 

@@ -3,14 +3,15 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	"github.com/dop251/goja"
-	_ "github.com/go-sql-driver/mysql"
-	"go.uber.org/zap"
 	"iot-transmit/common"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/dop251/goja"
+	_ "github.com/go-sql-driver/mysql"
+	"go.uber.org/zap"
 )
 
 // 全局map，用于存储id和数据库连接的映射
@@ -20,6 +21,7 @@ var dbMap = make(map[string]*sql.DB)
 var mu sync.Mutex
 
 func InitMySQLConnection(username, host, password, dbname string, port int, id string) (*sql.DB, error) {
+
 	mu.Lock()         // 进入临界区前加锁
 	defer mu.Unlock() // 确保在函数返回时释放锁
 

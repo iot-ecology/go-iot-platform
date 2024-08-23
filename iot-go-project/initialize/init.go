@@ -433,10 +433,14 @@ func initDb() {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
+	s, err := db.DB()
 	if err != nil {
 		glob.GLog.Sugar().Errorf("数据库链接异常 ", err)
 
 	}
+	s.SetConnMaxLifetime(time.Hour)
+	s.SetMaxOpenConns(100)
+	s.SetMaxIdleConns(10)
 	glob.GDb = db
 }
 
@@ -523,6 +527,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal/update", signalApi.UpdateSignal)
 	r.POST("/signal/delete/:id", signalApi.DeleteSignal)
 	r.GET("/signal/page", signalApi.PageSignal)
+	r.GET("/signal/initCache", signalApi.InitCache)
 
 	r.POST("/signal-waring-config/create", signalWaringConfigApi.CreateSignalWaringConfig)
 	r.POST("/signal-waring-config/delete/:id", signalWaringConfigApi.DeleteSignalWaringConfig)

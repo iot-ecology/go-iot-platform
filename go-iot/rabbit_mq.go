@@ -79,6 +79,6 @@ func PushToQueue(queueName string, body []byte) {
 			ContentType: "text/plain",
 			Body:        body,
 		})
-	zap.S().Infof(" [x] 发送到 %s 消息体 %s", queueName, body)
+	zap.S().Debugf(" [x] 发送到 %s 消息体 %s", queueName, body)
 
 }

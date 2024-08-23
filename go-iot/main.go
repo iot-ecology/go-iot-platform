@@ -51,6 +51,26 @@ func beforeStart() {
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
+	go CMqttUsing()
+}
+
+func CMqttUsing() {
+	ticker := time.NewTicker(1 * time.Second)
+
+	for range ticker.C {
+		lock := NewRedisDistLock(globalRedisClient, "CMqttUsing")
+		if lock.TryLock() {
+			CheckMqttConfigIsUsingAndMove()
+
+			lock.Unlock()
+
+		} else {
+
+			zap.S().Error("没有获取到 c_beat 处理的锁")
+
+		}
+
+	}
 }
 func removeOldData() {
 	zap.S().Infof("开始清理过期数据")
@@ -134,6 +154,9 @@ func HandlerOffNode(nodeName string) {
 		}
 
 	}
+
+	CheckMqttConfigIsUsingAndMove()
+
 }
 
 func startHttp() {
@@ -188,6 +211,7 @@ func noHandlerConfig() {
 			if PubCreateMqttClientOp(conf) == -1 {
 				continue
 			}
+			time.Sleep(100*time.Millisecond)
 		}
 		lock.Unlock()
 	} else {

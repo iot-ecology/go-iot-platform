@@ -187,6 +187,55 @@ func GetBindClientId(nodeName string) []string {
 
 }
 
+func GetAllMqttConfigUsing() []MqttConfig {
+	val := globalRedisClient.HGetAll(context.Background(), "mqtt_config:use").Val()
+	var v []MqttConfig
+	for _, s := range val {
+		var config MqttConfig
+		bytes := []byte(s)
+
+		json.Unmarshal(bytes, &config)
+		v = append(v, config)
+	}
+	return v
+}
+
+func GetAllNodeBind() []string {
+	val := globalRedisClient.Keys(context.Background(), "node_bind:*").Val()
+	var v []string
+	for _, s := range val {
+		i := globalRedisClient.SMembers(context.Background(), s).Val()
+		for _, s2 := range i {
+			v = append(v, s2)
+		}
+	}
+	return v
+
+}
+func CheckMqttConfigIsUsingAndMove() {
+	using := GetAllMqttConfigUsing()
+	bind := GetAllNodeBind()
+	for _, config := range using {
+		//config.ClientId  是否在bind中出现过
+		if !StringInSlice(bind, config.ClientId) {
+
+			marshal, err := json.Marshal(config)
+			if err != nil {
+			}
+			RemoveUseConfig(config)
+			AddNoUseConfig(config, marshal)
+		}
+	}
+}
+func StringInSlice(slice []string, str string) bool {
+	for _, v := range slice {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
 // FindMqttClientId 函数用于查找MQTT客户端ID所在的节点名称
 //
 // 参数：

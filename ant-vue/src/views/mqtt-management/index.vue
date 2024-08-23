@@ -250,7 +250,7 @@ const columns = ref([
 const pagination = reactive({
   total: 0,
   current: 1,
-  pageSize: 10,
+  pageSize: 100,
   showSizeChanger: true, // 显示每页显示条目数选择器
 });
 const list = ref([]);

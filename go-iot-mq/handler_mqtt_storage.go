@@ -59,7 +59,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return
 	}
-	zap.S().Infof("处理 pre_handler 数据 : %+v", msg)
+	zap.S().Debugf("处理 pre_handler 数据 : %+v", msg)
 
 	script := GetScriptRedis(msg.MQTTClientID)
 	if script != "" {
@@ -80,7 +80,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 			zap.S().Errorf("推送报警原始数据异常 %s", err)
 			return
 		}
-		zap.S().Infof("推送报警原始数据: %s", jsonData)
+		zap.S().Debugf("推送报警原始数据: %s", jsonData)
 		HandlerMqttLastTime(*data)
 		PushToQueue("waring_handler", jsonData)
 		PushToQueue("waring_delay_handler", jsonData)
@@ -177,8 +177,9 @@ func CalcBucketName(prefix, protocol string, id uint) string {
 func StorageDataRowList(dt DataRowList, protocol string) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid, dt.IdentificationCode)
 	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
-	zap.S().Infof("当前的DataRowList数据: %+v", dt)
-	timeFromUnix := time.Unix(dt.Time, 0)
+	loc, _ := time.LoadLocation("Asia/Shanghai")
+
+	timeFromUnix := time.Unix(dt.Time, 0).In(loc)
 
 	i, err := strconv.Atoi(dt.DeviceUid)
 	if err != nil {
@@ -187,10 +188,12 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 		zap.S().Debugf("转换后的整数: %+v", i)
 	}
 
+	bucketName := CalcBucketName(globalConfig.InfluxConfig.Bucket, protocol, uint(i))
 	writeAPI := GlobalInfluxDbClient.WriteAPI(globalConfig.InfluxConfig.Org,
-		CalcBucketName(globalConfig.InfluxConfig.Bucket, protocol, uint(i)))
+		bucketName)
 
-	p := influxdb2.NewPointWithMeasurement(genMeasurement(dt, protocol)).
+	measurement := genMeasurement(dt, protocol)
+	p := influxdb2.NewPointWithMeasurement(measurement).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
 		SetTime(timeFromUnix)
@@ -251,6 +254,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 	}
 
 	writeAPI.WritePoint(p)
+	writeAPI.Flush()
 
 }
 
