@@ -1,7 +1,7 @@
 node_info:
   host: 127.0.0.1
-  port: 29102
-  name: mq1
+  port: 29109
+  name: mq2
   type: pre_handler # pre_handler、 waring_handler、 calc_queue、waring_delay_handler
 
 

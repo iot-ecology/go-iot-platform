@@ -221,6 +221,15 @@ func CheckMqttConfigIsUsingAndMove(ND string) {
 	for _, s := range bind {
 		CheckUsing(using, s)
 	}
+
+	for _, config := range using {
+		if !StringInSlice(bind,config.ClientId){
+			marshal, _ := json.Marshal(config)
+
+			RemoveUseConfig(config)
+			AddNoUseConfig(config, marshal)
+		}
+	}
 }
 func CheckUsing(v []MqttConfig, id string) bool {
 	for _, config := range v {

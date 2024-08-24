@@ -66,7 +66,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(deliveries, HandlerDataStorage, 1, "pre_handler", "")
+		cus.Handle(deliveries, HandlerDataStorage, 10, "pre_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_handler" {
 		waringHandler, err := cus.AnnounceQueue("waring_handler", "")
