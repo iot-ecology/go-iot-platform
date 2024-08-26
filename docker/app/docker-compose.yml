@@ -13,28 +13,28 @@ services:
       - 8006:8006
     networks:
       - iot-net
-  iotgomqtt2:
-    image: go-iot-mqtt:latest
-    ports:
-      - 8007:8007
-    entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
-    environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./mqtt/config/app-local2.yml:/app/app-local2.yml
-    networks:
-      - iot-net
-  iotgomqtt3:
-    image: go-iot-mqtt:latest
-    ports:
-      - 8008:8008
-    entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
-    environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./mqtt/config/app-local3.yml:/app/app-local3.yml
-    networks:
-      - iot-net
+#  iotgomqtt2:
+#    image: go-iot-mqtt:latest
+#    ports:
+#      - 8007:8007
+#    entrypoint: ["/app/main", "-config", "/app/app-local2.yml"]
+#    environment:
+#      - TZ=Asia/Shanghai
+#    volumes:
+#      - ./mqtt/config/app-local2.yml:/app/app-local2.yml
+#    networks:
+#      - iot-net
+#  iotgomqtt3:
+#    image: go-iot-mqtt:latest
+#    ports:
+#      - 8008:8008
+#    entrypoint: ["/app/main", "-config", "/app/app-local3.yml"]
+#    environment:
+#      - TZ=Asia/Shanghai
+#    volumes:
+#      - ./mqtt/config/app-local3.yml:/app/app-local3.yml
+#    networks:
+#      - iot-net
   iotgomq-pre_handler:
     build:
       context: ../../
@@ -51,45 +51,45 @@ services:
       - iotgomqtt1
     networks:
       - iot-net
-  iotgomq-calc_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8002:29001
-    volumes:
-       - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
-    environment:
-      - TZ=Asia/Shanghai
-    depends_on:
-      - iotgomq-pre_handler
-    networks:
-      - iot-net
-  iotgomq-waring_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8003:29003
-    volumes:
-       - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
-    environment:
-      - TZ=Asia/Shanghai
-    depends_on:
-      - iotgomq-calc_handler
-    networks:
-      - iot-net
-  iotgomq-wd_handler:
-    image: go-iot-mq:latest
-    ports:
-      - 8004:29004
-    volumes:
-       - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
-    entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
-    environment:
-      - TZ=Asia/Shanghai
-    depends_on:
-      - iotgomq-calc_handler
-    networks:
-      - iot-net
+#  iotgomq-calc_handler:
+#    image: go-iot-mq:latest
+#    ports:
+#      - 8002:29001
+#    volumes:
+#       - ./mq/config/app-local-calc.yml:/app/app-local-calc.yml
+#    entrypoint: ["/app/main", "-config", "/app/app-local-calc.yml"]
+#    environment:
+#      - TZ=Asia/Shanghai
+#    depends_on:
+#      - iotgomq-pre_handler
+#    networks:
+#      - iot-net
+#  iotgomq-waring_handler:
+#    image: go-iot-mq:latest
+#    ports:
+#      - 8003:29003
+#    volumes:
+#       - ./mq/config/app-local-waring_handler.yml:/app/app-local-waring_handler.yml
+#    entrypoint: ["/app/main", "-config", "/app/app-local-waring_handler.yml"]
+#    environment:
+#      - TZ=Asia/Shanghai
+#    depends_on:
+#      - iotgomq-calc_handler
+#    networks:
+#      - iot-net
+#  iotgomq-wd_handler:
+#    image: go-iot-mq:latest
+#    ports:
+#      - 8004:29004
+#    volumes:
+#       - ./mq/config/app-local-wd.yml:/app/app-local-wd.yml
+#    entrypoint: ["/app/main", "-config", "/app/app-local-wd.yml"]
+#    environment:
+#      - TZ=Asia/Shanghai
+#    depends_on:
+#      - iotgomq-calc_handler
+#    networks:
+#      - iot-net
   iotgoproject:
     build:
       context: ../../
