@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
 )
+
+var clock sync.Mutex
+
 
 // MqttConfig 定义了MQTT客户端配置的结构体
 type MqttConfig struct {
@@ -70,6 +74,8 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 var c map[string]mqtt.Client
 
 func StopMqttClient(clientId string) {
+	clock.Lock()
+	defer clock.Unlock()
 	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	client := c[clientId]
 	if client != nil {
@@ -92,6 +98,8 @@ func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload
 }
 
 func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
+	clock.Lock()
+	defer clock.Unlock()
 	if configMap == nil {
 		configMap = make(map[string]MqttConfig)
 	}
