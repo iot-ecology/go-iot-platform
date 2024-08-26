@@ -53,7 +53,6 @@ func main() {
 
 }
 func c(client mqtt.Client , vc Vc) {
-		zap.S().Debugf("BeatTask 开始, f = %v", f)
 
 		ticker := time.NewTicker(1 * time.Second)
 		for range ticker.C {
