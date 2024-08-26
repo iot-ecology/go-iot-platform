@@ -49,15 +49,22 @@ func main() {
 	}
 	fime := readFime("1.txt")
 
-	go c(client,fime[0])
+	for {
+
+		for _, vc := range fime {
+			publish(client, vc.Topic, vc.ID, vc.ID)
+
+		}
+		time.Sleep(1*time.Second)
+	}
 
 }
-func c(client mqtt.Client , vc Vc) {
+func c(client mqtt.Client, vc Vc) {
 
-		ticker := time.NewTicker(1 * time.Second)
-		for range ticker.C {
-			publish(client, vc.Topic, vc.ID, vc.ID)
-		}
+	ticker := time.NewTicker(1 * time.Second)
+	for range ticker.C {
+		publish(client, vc.Topic, vc.ID, vc.ID)
+	}
 
 }
 
@@ -130,7 +137,6 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 	if token.Wait() && token.Error() != nil {
 		zap.S().Error(token.Error())
 	}
-
 
 }
 
