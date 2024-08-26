@@ -63,3 +63,29 @@ scrape_configs:
           namespace: iot-mq
           pod: iot-mq-wd_handler
           instance: iot-mq-wd_handler
+
+
+
+  - job_name: iotgomq-pre_handler-1
+    static_configs:
+      - targets: ['172.17.0.1:10000']
+        labels:
+          namespace: iot-mq
+          pod: iot-mq-pre_handler-1
+          instance: iot-mq-pre_handler-1
+
+  - job_name: iotgomq-pre_handler-2
+    static_configs:
+      - targets: ['172.17.0.1:10001']
+        labels:
+          namespace: iot-mq
+          pod: iot-mq-pre_handler-2
+          instance: iot-mq-pre_handler-2
+
+  - job_name: iotgomq-pre_handler-3
+    static_configs:
+      - targets: ['172.17.0.1:10002']
+        labels:
+          namespace: iot-mq
+          pod: iot-mq-pre_handler-3
+          instance: iot-mq-pre_handler-3

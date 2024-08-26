@@ -119,7 +119,7 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 
 	marshal, _ := json.Marshal(DataRowList)
 
-	fmt.Printf("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
+	// fmt.Printf("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
 	client.Publish(topic, 0, false, marshal)
 	time.Sleep(1 * time.Second) // 暂停1秒
 
