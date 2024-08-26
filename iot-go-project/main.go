@@ -49,7 +49,7 @@ func Beat(g *gin.Context) {
 // @BasePath /
 func main() {
 
-	r := gin.Default()
+	r := gin.New()
 
 	group := r.Group("/")
 

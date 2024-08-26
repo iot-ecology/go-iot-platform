@@ -15,11 +15,12 @@ router.beforeEach((to, from, next) => {
     if (!userInput) {
       next(false);
     } else {
-      if (userInput === import.meta.env.VITE_LOGIN) {
-        next();
-      } else {
-        next(false);
-      }
+      // if (userInput === import.meta.env.VITE_LOGIN) {
+      //   next();
+      // } else {
+      //   next(false);
+      // }
+      next();
     }
   } else {
     // 替换标题

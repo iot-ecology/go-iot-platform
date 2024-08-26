@@ -4,11 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
 )
+
+var clock sync.Mutex
+
 
 // MqttConfig 定义了MQTT客户端配置的结构体
 type MqttConfig struct {
@@ -55,6 +60,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	zap.S().Errorf("失去链接: %+v", err)
 	reader := client.OptionsReader()
 	id := reader.ClientID()
+	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
 	StopMqttClient(id)
 	config := configMap[id]
 
@@ -68,6 +74,8 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 var c map[string]mqtt.Client
 
 func StopMqttClient(clientId string) {
+	clock.Lock()
+	defer clock.Unlock()
 	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	client := c[clientId]
 	if client != nil {
@@ -90,6 +98,8 @@ func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload
 }
 
 func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
+	clock.Lock()
+	defer clock.Unlock()
 	if configMap == nil {
 		configMap = make(map[string]MqttConfig)
 	}
@@ -107,12 +117,17 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		SubTopic: subTopic,
 		ClientId: clientId,
 	}
+	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
+	//mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
+	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
+	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
 	opts.SetPingTimeout(10 * time.Second)
 	opts.SetClientID(clientId)
 	opts.SetUsername(username)
 	opts.SetPassword(password)
+	opts.SetAutoReconnect(true)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -136,6 +151,9 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 func sub(client mqtt.Client, topic string) {
 	token := client.Subscribe(topic, 1, nil)
 	token.Wait()
+	if  token.Wait() && token.Error() != nil {
+		zap.S().Error("订阅异常", token.Error())
+	}
 	zap.S().Debugf("订阅主题: %s", topic)
 }
 

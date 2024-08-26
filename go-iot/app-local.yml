@@ -1,7 +1,7 @@
 node_info:
   host: 127.0.0.1
   port: 8081
-  name: m1
+  name: m122222
   type: mqtt
   size: 3000
 redis_config:

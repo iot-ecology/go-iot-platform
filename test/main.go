@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"go.uber.org/zap"
 	"log"
 	"math/rand"
 	"os"
@@ -26,6 +27,11 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 func main() {
+	InitLog()
+	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
+	mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
+	mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
+	mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
 	var broker = "172.17.0.1"
 	var port = 1883
 	opts := mqtt.NewClientOptions()
@@ -34,6 +40,7 @@ func main() {
 	opts.SetUsername("admin")
 	opts.SetPassword("public")
 	opts.SetDefaultPublishHandler(messagePubHandler)
+	opts.SetAutoReconnect(true)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
@@ -43,15 +50,20 @@ func main() {
 	fime := readFime("1.txt")
 
 	for {
+
 		for _, vc := range fime {
-			go publish(client, vc.Topic,vc.ID,vc.ID)
+			publish(client, vc.Topic, vc.ID, vc.ID)
 
 		}
-	//	for i := 0; i < 100; i++ {
-	//		topic := "/test_topic/" + strconv.Itoa(i)
-	//		go publish(client, topic,i,i)
-	//	}
-	//	time.Sleep(1 * time.Second) // 暂停1秒
+		time.Sleep(1*time.Second)
+	}
+
+}
+func c(client mqtt.Client, vc Vc) {
+
+	ticker := time.NewTicker(1 * time.Second)
+	for range ticker.C {
+		publish(client, vc.Topic, vc.ID, vc.ID)
 	}
 
 }
@@ -90,8 +102,9 @@ func readFime(path string) []Vc {
 
 type Vc struct {
 	Topic string
-	ID int
+	ID    int
 }
+
 func publish(client mqtt.Client, topic string, i int, i2 int) {
 	// 初始化随机数生成器的种子
 	rand.Seed(time.Now().UnixNano())
@@ -101,12 +114,11 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 	var dataRows []DataRow
 	for i3 := range 200 {
 		randomNum := rand.Intn(21) // Intn返回一个[0, n)范围内的随机数
-		dataRows  = append(dataRows, DataRow{
-			Name:  "信号-" + strconv.Itoa(i3) ,
+		dataRows = append(dataRows, DataRow{
+			Name:  "信号-" + strconv.Itoa(i3),
 			Value: strconv.Itoa(randomNum),
 		})
 	}
-
 
 	//
 	DataRowList := DataRowList{
@@ -119,20 +131,21 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 
 	marshal, _ := json.Marshal(DataRowList)
 
-	// fmt.Printf("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
-	client.Publish(topic, 0, false, marshal)
-	time.Sleep(1 * time.Second) // 暂停1秒
+	zap.S().Infof("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
+	token := client.Publish(topic, 0, false, marshal)
+
+	if token.Wait() && token.Error() != nil {
+		zap.S().Error(token.Error())
+	}
 
 }
 
-
-
 type DataRowList struct {
-	Time      int64     `json:"Time"`       // 秒级时间戳
-	DeviceUid string    `json:"DeviceUid"` // 能够产生网络通讯的唯一编码
-	IdentificationCode string `json:"IdentificationCode"` // 设备标识码
-	DataRows  []DataRow `json:"DataRows"`
-	Nc        string    `json:"Nc"`
+	Time               int64     `json:"Time"`               // 秒级时间戳
+	DeviceUid          string    `json:"DeviceUid"`          // 能够产生网络通讯的唯一编码
+	IdentificationCode string    `json:"IdentificationCode"` // 设备标识码
+	DataRows           []DataRow `json:"DataRows"`
+	Nc                 string    `json:"Nc"`
 }
 type DataRow struct {
 	Name  string `json:"Name"`

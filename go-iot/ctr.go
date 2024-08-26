@@ -156,6 +156,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if CheckHasConfig(config) {
+		zap.S().Errorf("已经存在客户端id")
 		err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "已经存在客户端id"})
 		if err != nil {
 			zap.S().Errorf("Error: %+v", err)
@@ -167,6 +168,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		usz := CreateMqttClient(config)
 
 		if usz == -1 {
+			zap.S().Errorf("达到最大客户端数量")
 			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "达到最大客户端数量"})
 			if err != nil {
 				zap.S().Errorf("Error: %+v", err)
@@ -175,6 +177,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 		}
 		if usz == -2 {
+			zap.S().Errorf("MQTT客户端配置异常")
 			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "MQTT客户端配置异常"})
 			if err != nil {
 				zap.S().Errorf("Error: %+v", err)
