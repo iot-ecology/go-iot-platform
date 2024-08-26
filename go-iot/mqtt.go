@@ -127,6 +127,7 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	opts.SetClientID(clientId)
 	opts.SetUsername(username)
 	opts.SetPassword(password)
+	opts.SetAutoReconnect(true)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -150,6 +151,9 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 func sub(client mqtt.Client, topic string) {
 	token := client.Subscribe(topic, 1, nil)
 	token.Wait()
+	if  token.Wait() && token.Error() != nil {
+		zap.S().Error("订阅异常", token.Error())
+	}
 	zap.S().Debugf("订阅主题: %s", topic)
 }
 
