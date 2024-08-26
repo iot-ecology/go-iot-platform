@@ -51,7 +51,7 @@ func beforeStart() {
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
-	go CCCC()
+	//go CCCC()
 }
 
 func CCCC() {
