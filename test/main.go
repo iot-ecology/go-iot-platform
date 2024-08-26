@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log"
 	"math/rand"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -22,13 +26,13 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 func main() {
-	var broker = "localhost"
+	var broker = "172.17.0.1"
 	var port = 1883
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
 	opts.SetClientID("go_mqtt_client")
 	opts.SetUsername("admin")
-	opts.SetPassword("admin")
+	opts.SetPassword("public")
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -36,15 +40,58 @@ func main() {
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+	fime := readFime("1.txt")
 
 	for {
-		for i := 0; i < 100; i++ {
-			topic := "/test_topic/" + strconv.Itoa(i)
-			go publish(client, topic,i,i)
+		for _, vc := range fime {
+			go publish(client, vc.Topic,vc.ID,vc.ID)
+				time.Sleep(1 * time.Second) // 暂停1秒
+
 		}
-		time.Sleep(1 * time.Second) // 暂停1秒
+	//	for i := 0; i < 100; i++ {
+	//		topic := "/test_topic/" + strconv.Itoa(i)
+	//		go publish(client, topic,i,i)
+	//	}
+	//	time.Sleep(1 * time.Second) // 暂停1秒
 	}
 
+}
+
+func readFime(path string) []Vc {
+	// 读取 path 每一行用空格分割分隔的数据 第一个是 Topic 第二个是ID
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	var vcs []Vc
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Split(line, "\t")
+		if len(fields) != 2 {
+			log.Printf("Invalid line format: %s", line)
+			continue
+		}
+		topic := fields[0]
+		id, err := strconv.Atoi(fields[1])
+		if err != nil {
+			log.Printf("Invalid ID: %s", fields[1])
+			continue
+		}
+		vcs = append(vcs, Vc{Topic: topic, ID: id})
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return vcs
+}
+
+type Vc struct {
+	Topic string
+	ID int
 }
 func publish(client mqtt.Client, topic string, i int, i2 int) {
 	// 初始化随机数生成器的种子
@@ -65,8 +112,8 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 	//
 	DataRowList := DataRowList{
 		Time:               time.Now().Unix(),
-		DeviceUid:          strconv.Itoa(i2+1),
-		IdentificationCode: strconv.Itoa(i2+1),
+		DeviceUid:          strconv.Itoa(i2),
+		IdentificationCode: strconv.Itoa(i2),
 		DataRows:           dataRows,
 		Nc:                 strconv.Itoa(i2),
 	}
