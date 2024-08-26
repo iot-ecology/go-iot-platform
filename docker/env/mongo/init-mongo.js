@@ -1,18 +1,18 @@
-// dbAdmin = db.getSiblingDB("admin");
-// dbAdmin.createUser({
-//     user: "iot",
-//     pwd: "iot123",
-//     roles: [{ role: "userAdminAnyDatabase", db: "admin" }],
-//     mechanisms: ["SCRAM-SHA-1"],
-// });
-//
-// // Authenticate user
-// dbAdmin.auth({
-//     user: "iot",
-//     pwd: "iot123",
-//     mechanisms: ["SCRAM-SHA-1"],
-//     digestPassword: true,
-// });
+dbAdmin = db.getSiblingDB("admin");
+dbAdmin.createUser({
+    user: "iot",
+    pwd: "iot123",
+    roles: [{ role: "userAdminAnyDatabase", db: "admin" }],
+    mechanisms: ["SCRAM-SHA-1"],
+});
+
+// Authenticate user
+dbAdmin.auth({
+    user: "iot",
+    pwd: "iot123",
+    mechanisms: ["SCRAM-SHA-1"],
+    digestPassword: true,
+});
 
 use iot;
 db.createCollection("calc");
