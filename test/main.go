@@ -26,6 +26,11 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 func main() {
+	InitLog()
+	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
+	mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
+	mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
+	mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
 	var broker = "172.17.0.1"
 	var port = 1883
 	opts := mqtt.NewClientOptions()
@@ -43,10 +48,11 @@ func main() {
 	fime := readFime("1.txt")
 
 	for {
-		for _, vc := range fime {
-			go publish(client, vc.Topic,vc.ID,vc.ID)
-
-		}
+		//for _, vc := range fime {
+		vc := fime[0]
+		go publish(client, vc.Topic,vc.ID,vc.ID)
+		//
+		//}
 	//	for i := 0; i < 100; i++ {
 	//		topic := "/test_topic/" + strconv.Itoa(i)
 	//		go publish(client, topic,i,i)

@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	go.uber.org/zap v1.27.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

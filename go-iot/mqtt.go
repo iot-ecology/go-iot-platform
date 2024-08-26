@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -55,6 +56,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	zap.S().Errorf("失去链接: %+v", err)
 	reader := client.OptionsReader()
 	id := reader.ClientID()
+	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
 	StopMqttClient(id)
 	config := configMap[id]
 
@@ -107,6 +109,10 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		SubTopic: subTopic,
 		ClientId: clientId,
 	}
+	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
+	//mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
+	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
+	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
 	opts.SetPingTimeout(10 * time.Second)
