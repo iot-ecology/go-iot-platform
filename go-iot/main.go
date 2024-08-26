@@ -51,8 +51,17 @@ func beforeStart() {
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
+	go CCCC()
 }
 
+func CCCC() {
+	ticker := time.NewTicker(1 * time.Second)
+
+	for range ticker.C {
+		CheckMqttConfigIsUsingAndMove(globalConfig.NodeInfo.Name)
+
+	}
+}
 func removeOldData() {
 	zap.S().Infof("开始清理过期数据")
 	HandlerOffNode(globalConfig.NodeInfo.Name)
