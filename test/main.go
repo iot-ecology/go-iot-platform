@@ -49,18 +49,16 @@ func main() {
 	}
 	fime := readFime("1.txt")
 
-	for {
-		//for _, vc := range fime {
-		vc := fime[0]
-		go publish(client, vc.Topic, vc.ID, vc.ID)
-		//
-		//}
-		//	for i := 0; i < 100; i++ {
-		//		topic := "/test_topic/" + strconv.Itoa(i)
-		//		go publish(client, topic,i,i)
-		//	}
-		//	time.Sleep(1 * time.Second) // 暂停1秒
-	}
+	go c(client,fime[0])
+
+}
+func c(client mqtt.Client , vc Vc) {
+		zap.S().Debugf("BeatTask 开始, f = %v", f)
+
+		ticker := time.NewTicker(1 * time.Second)
+		for range ticker.C {
+			publish(client, vc.Topic, vc.ID, vc.ID)
+		}
 
 }
 
@@ -127,14 +125,13 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 
 	marshal, _ := json.Marshal(DataRowList)
 
-	// fmt.Printf("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
+	zap.S().Infof("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
 	token := client.Publish(topic, 0, false, marshal)
 
 	if token.Wait() && token.Error() != nil {
 		zap.S().Error(token.Error())
 	}
 
-	time.Sleep(1 * time.Second) // 暂停1秒
 
 }
 

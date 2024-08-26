@@ -51,7 +51,6 @@ func beforeStart() {
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
-	//go CMqttUsing()
 }
 
 func removeOldData() {

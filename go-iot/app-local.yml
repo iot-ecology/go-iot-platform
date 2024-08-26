@@ -1,11 +1,11 @@
 node_info:
   host: 127.0.0.1
   port: 8081
-  name: m1
+  name: m122222
   type: mqtt
   size: 3000
 redis_config:
-  host: 127.0.0.1
+  host: 121.43.96.236
   port: 6379
   db: 10
   password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
@@ -13,7 +13,7 @@ redis_config:
 
 
 mq_config:
-  host: 127.0.0.1
+  host: 121.43.96.236
   port: 5672
   username: guest
   password: guest

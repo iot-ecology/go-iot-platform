@@ -1,5 +1,6 @@
 node_info:
   port: 8080
+  host: 172.17.0.1
 redis_config:
   host: 172.17.0.1
   port: 6379
