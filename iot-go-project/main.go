@@ -51,6 +51,7 @@ func main() {
 
 	r := gin.Default()
 
+	gin.SetMode(gin.ReleaseMode)
 	group := r.Group("/")
 
 	group.Use(CORSMiddleware())
