@@ -67,7 +67,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	reader := client.OptionsReader()
 	id := reader.ClientID()
 	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
-	StopMqttClient(id)
+	//StopMqttClient(id)
 }
 
 var c = make(map[string]*mqtt.Client)
@@ -128,7 +128,7 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	opts.SetUsername(username)
 	opts.SetPassword(password)
 	//opts.SetDefaultPublishHandler(messagePubHandler)
-	opts.SetAutoReconnect(false)
+	opts.SetAutoReconnect(true)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
