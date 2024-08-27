@@ -155,6 +155,12 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 
+	lock := NewRedisDistLock(globalRedisClient, "mqtt_create:" +config.ClientId)
+
+	if lock.TryLock() {
+
+
+
 	if CheckHasConfig(config) {
 		zap.S().Errorf("已经存在客户端id")
 		err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "已经存在客户端id"})
@@ -194,6 +200,13 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
+		lock.Unlock()
+
+	}else{
+	json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "上锁异常", "size": -1})
+		return
+	}
+
 
 }
 

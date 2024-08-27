@@ -62,13 +62,13 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	id := reader.ClientID()
 	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
 	StopMqttClient(id)
-	config := configMap[id]
+	//config := configMap[id]
 
-	jsonData, err := json.Marshal(config)
-	if err != nil {
-		zap.S().Errorf("to json error ,%+v", err)
-	}
-	PubCreateMqttClientOp(string(jsonData))
+	//jsonData, err := json.Marshal(config)
+	//if err != nil {
+	//	zap.S().Errorf("to json error ,%+v", err)
+	//}
+	//PubCreateMqttClientOp(string(jsonData))
 }
 
 var c map[string]mqtt.Client
@@ -79,7 +79,7 @@ func StopMqttClient(clientId string) {
 	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	client := c[clientId]
 	if client != nil {
-		client.Disconnect(0)
+		//client.Disconnect(0)
 
 		// 删除在 no use 中的配置
 		globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
