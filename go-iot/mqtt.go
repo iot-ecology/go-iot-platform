@@ -4,16 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"sync"
-	"time"
-
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
+	"log"
+	"sync"
 )
 
 var clock sync.Mutex
-
 
 // MqttConfig 定义了MQTT客户端配置的结构体
 type MqttConfig struct {
@@ -47,55 +44,59 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
 		return
 	}
-	PushToQueue("pre_handler", jsonData)
-
+	//PushToQueue("pre_handler", jsonData)
+	msgchan <- jsonData
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 	zap.S().Debugf("MQTT客户端链接成功")
 }
 
+func handleMessage() {
+	for {
+		select {
+		case msg := <-msgchan:
+			// 处理消息
+			PushToQueue("pre_handler", msg)
+		}
+	}
+}
+
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 
-	zap.S().Errorf("失去链接: %+v", err)
 	reader := client.OptionsReader()
 	id := reader.ClientID()
 	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
 	StopMqttClient(id)
-	//config := configMap[id]
-
-	//jsonData, err := json.Marshal(config)
-	//if err != nil {
-	//	zap.S().Errorf("to json error ,%+v", err)
-	//}
-	//PubCreateMqttClientOp(string(jsonData))
 }
 
-var c map[string]mqtt.Client
+var c = make(map[string]*mqtt.Client)
 
 func StopMqttClient(clientId string) {
 	clock.Lock()
 	defer clock.Unlock()
-	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
+	zap.S().Errorf("StopMqttClient 开始, clientId = %v", clientId)
+	delete(c, clientId)
 	client := c[clientId]
 	if client != nil {
-		client.Disconnect(0)
-		config := configMap[clientId]
-
-		marshal, _ := json.Marshal(config)
-		AddNoUseConfig(config,marshal)
-		globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
-		globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
-		delete(c, clientId)
+		(*client).Disconnect(250)
 	}
+	config := configMap[clientId]
+	marshal, _ := json.Marshal(config)
 
+	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
+	globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
+	AddNoUseConfig(config, marshal)
 }
 
 var configMap map[string]MqttConfig
+var msgchan = make(chan []byte, 1000)
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
 	client := c[clientId]
-	client.Publish(topic, qos, retained, payload)
+	if client != nil {
+		(*client).Publish(topic, qos, retained, payload)
+	}
 }
 
 func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
@@ -106,9 +107,8 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	}
 	// 先判断 configMap 中是否有 clientId ， 如果有删除
 	if _, ok := configMap[clientId]; ok {
-        delete(configMap, clientId)
-    }
-
+		delete(configMap, clientId)
+	}
 
 	configMap[clientId] = MqttConfig{
 		Broker:   broker,
@@ -124,12 +124,11 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
-	opts.SetPingTimeout(10 * time.Second)
 	opts.SetClientID(clientId)
 	opts.SetUsername(username)
 	opts.SetPassword(password)
-	opts.SetAutoReconnect(true)
-	opts.SetDefaultPublishHandler(messagePubHandler)
+	//opts.SetDefaultPublishHandler(messagePubHandler)
+	opts.SetAutoReconnect(false)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
@@ -140,19 +139,31 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	}
 	sub(client, subTopic)
 
-	if c == nil {
-		c = make(map[string]mqtt.Client)
-	}
-	c[clientId] = client
+	c[clientId] = &client
 
 	return client
 
 }
 
 func sub(client mqtt.Client, topic string) {
-	token := client.Subscribe(topic, 1, nil)
+	token := client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		reader := client.OptionsReader()
+		id := reader.ClientID()
+
+		// 创建 MQTTMessage 实例并序列化为 JSON
+		mqttMsg := MQTTMessage{
+			MQTTClientID: id,
+			Message:      string(msg.Payload()),
+		}
+		jsonData, err := json.Marshal(mqttMsg)
+		if err != nil {
+			zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
+			return
+		}
+		PushToQueue("pre_handler", jsonData)
+	})
 	token.Wait()
-	if  token.Wait() && token.Error() != nil {
+	if token.Wait() && token.Error() != nil {
 		zap.S().Error("订阅异常", token.Error())
 	}
 	zap.S().Debugf("订阅主题: %s", topic)

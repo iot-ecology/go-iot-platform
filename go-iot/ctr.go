@@ -51,7 +51,7 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 		zap.S().Error("Error: %s", err)
 	}
 
-	zap.S().Infof("Response Status: %v , body = %v", resp.Status, bodyString)
+	zap.S().Errorf("Response Status: %v , body = %v", resp.Status, bodyString)
 	status := m["status"].(float64)
 	return status == 200
 
