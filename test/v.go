@@ -121,11 +121,9 @@ func publish(client mqtt.Client, topic string, i int, i2 int) {
 	marshal, _ := json.Marshal(DataRowList)
 
 	zap.S().Infof("发送消息: %s  消息主题: %s\n", DataRowList.Time, topic)
-	token := client.Publish(topic, 0, false, marshal)
+	client.Publish(topic, 0, false, marshal)
 
-	if token.Wait() && token.Error() != nil {
-		zap.S().Error(token.Error())
-	}
+
 
 }
 
