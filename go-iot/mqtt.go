@@ -57,7 +57,7 @@ func handleMessage() {
 		case msg := <-msgchan:
 			// 处理消息
 
-			go funcName(msg)
+			funcName(msg)
 		}
 	}
 }
@@ -74,10 +74,10 @@ func funcName(msg Cag) bool {
 	jsonData, err := json.Marshal(mqttMsg)
 	if err != nil {
 		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-		return true
+		return false
 	}
-	PushToQueue("pre_handler", jsonData)
-	return false
+	go PushToQueue("pre_handler", jsonData)
+	return true
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
