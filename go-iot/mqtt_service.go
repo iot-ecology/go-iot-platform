@@ -7,9 +7,6 @@ import (
 	"go.uber.org/zap"
 )
 
-
-
-
 // MqttInterface 定义了MQTT客户端的基本接口
 type MqttInterface struct {
 	client mqtt.Client
@@ -17,14 +14,14 @@ type MqttInterface struct {
 }
 
 // NewMqttClient 初始化并返回一个新的MqttInterface实例
-func NewMqttClient( id string) *MqttInterface {
+func NewMqttClient(id string) *MqttInterface {
 	return &MqttInterface{
 		Id: id,
 	}
 }
 
 // Connect 连接到MQTT服务器
-func (m *MqttInterface) Connect(host,username ,password string , port int ) error {
+func (m *MqttInterface) Connect(host, username, password string, port int) error {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", host, port))
 	opts.SetUsername(username)
@@ -32,8 +29,11 @@ func (m *MqttInterface) Connect(host,username ,password string , port int ) erro
 	opts.SetPassword(password)
 	opts.SetClientID(m.Id)
 	opts.SetDefaultPublishHandler(m.messageHandler)
-	opts.OnConnectionLost = connectLostHandler
-	opts.SetAutoReconnect(true)
+	opts.OnConnectionLost = func(client mqtt.Client, err error) {
+		zap.S().Error("mqtt connection lost", zap.Error(err))
+		StopMqttClient(m.Id)
+	}
+	opts.SetAutoReconnect(false)
 	// 创建并启动客户端
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {

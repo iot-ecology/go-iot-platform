@@ -26,67 +26,6 @@ type MQTTMessage struct {
 	Message      string `json:"message"`
 }
 
-var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	zap.S().Debugf("处理消息: %s  消息主题: %s\n", msg.Payload(), msg.Topic())
-
-	reader := client.OptionsReader()
-	id := reader.ClientID()
-
-	// 创建 MQTTMessage 实例并序列化为 JSON
-	mqttMsg := MQTTMessage{
-		MQTTClientID: id,
-		Message:      string(msg.Payload()),
-	}
-	jsonData, err := json.Marshal(mqttMsg)
-	if err != nil {
-		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-		return
-	}
-	PushToQueue("pre_handler", jsonData)
-}
-
-var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	zap.S().Debugf("MQTT客户端链接成功")
-}
-
-func handleMessage() {
-	for {
-		select {
-		case msg := <-msgchan:
-			// 处理消息
-
-			funcName(msg)
-		}
-	}
-}
-
-func funcName(msg Cag) bool {
-	reader := (*msg.client).OptionsReader()
-	id := reader.ClientID()
-
-	// 创建 MQTTMessage 实例并序列化为 JSON
-	mqttMsg := MQTTMessage{
-		MQTTClientID: id,
-		Message:      string((*msg.msg).Payload()),
-	}
-	jsonData, err := json.Marshal(mqttMsg)
-	if err != nil {
-		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-		return false
-	}
-	go PushToQueue("pre_handler", jsonData)
-	return true
-}
-
-var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-
-	zap.S().Errorf("失去连接 %+v" , err)
-	// reader := client.OptionsReader()
-	// id := reader.ClientID()
-	// zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
-	// StopMqttClient(id)
-}
-
 var c = make(map[string]*mqtt.Client)
 
 func StopMqttClient(clientId string) {
@@ -107,7 +46,6 @@ func StopMqttClient(clientId string) {
 }
 
 var configMap map[string]MqttConfig
-var msgchan = make(chan Cag, 1000)
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
 	client := c[clientId]
@@ -136,48 +74,12 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		ClientId: clientId,
 	}
 	client := NewMqttClient(clientId)
-	client.Connect(broker,username,password,port)
+	client.Connect(broker, username, password, port)
 	client.Subscribe(subTopic)
-	//mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
-	////mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
-	////mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
-	////mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
-	//opts := mqtt.NewClientOptions()
-	//opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
-	//opts.SetClientID(clientId)
-	//opts.SetUsername(username)
-	//opts.SetPassword(password)
-	////opts.SetDefaultPublishHandler(messagePubHandler)
-	//opts.SetAutoReconnect(false)
-	//opts.SetOrderMatters(false)
-	//opts.OnConnect = connectHandler
-	//opts.OnConnectionLost = connectLostHandler
-	//client := mqtt.NewClient(opts)
-	//if token := client.Connect(); token.Wait() && token.Error() != nil {
-	//	zap.S().Error("创建MQTT客户端异常", token.Error())
-	//	return nil
-	//
-	//}
-	//sub(client, subTopic)
-	//
 	c[clientId] = &client.client
 
 	return client.client
 
-}
-
-func sub(client mqtt.Client, topic string) {
-	 client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
-		msgchan <- Cag{
-			client: &client,
-			msg:    &message,
-		}
-	})
-	//token.Wait()
-	//if token.Wait() && token.Error() != nil {
-	//	zap.S().Error("订阅异常", token.Error())
-	//}
-	zap.S().Debugf("订阅主题: %s", topic)
 }
 
 // CreateMqttClient 函数根据传入的MqttConfig配置创建一个MQTT客户端
@@ -206,9 +108,4 @@ func CreateMqttClient(config MqttConfig) int64 {
 
 	}
 
-}
-
-type Cag struct {
-	client *mqtt.Client
-	msg    *mqtt.Message
 }
