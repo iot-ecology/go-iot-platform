@@ -136,6 +136,7 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	}
 	client := NewMqttClient(clientId)
 	client.Connect(broker,username,password,port)
+	client.Subscribe(subTopic)
 	//mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
 	////mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
 	////mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
