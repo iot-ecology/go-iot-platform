@@ -57,22 +57,27 @@ func handleMessage() {
 		case msg := <-msgchan:
 			// 处理消息
 
-			reader := (*msg.client).OptionsReader()
-			id := reader.ClientID()
-
-			// 创建 MQTTMessage 实例并序列化为 JSON
-			mqttMsg := MQTTMessage{
-				MQTTClientID: id,
-				Message:      string((*msg.msg).Payload()),
-			}
-			jsonData, err := json.Marshal(mqttMsg)
-			if err != nil {
-				zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-				return
-			}
-			PushToQueue("pre_handler", jsonData)
+			go funcName(msg)
 		}
 	}
+}
+
+func funcName(msg Cag) bool {
+	reader := (*msg.client).OptionsReader()
+	id := reader.ClientID()
+
+	// 创建 MQTTMessage 实例并序列化为 JSON
+	mqttMsg := MQTTMessage{
+		MQTTClientID: id,
+		Message:      string((*msg.msg).Payload()),
+	}
+	jsonData, err := json.Marshal(mqttMsg)
+	if err != nil {
+		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
+		return true
+	}
+	PushToQueue("pre_handler", jsonData)
+	return false
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
@@ -203,5 +208,5 @@ func CreateMqttClient(config MqttConfig) int64 {
 
 type Cag struct {
 	client *mqtt.Client
-	msg *mqtt.Message
+	msg    *mqtt.Message
 }
