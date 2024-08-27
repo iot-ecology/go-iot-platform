@@ -165,16 +165,16 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 }
 
 func sub(client mqtt.Client, topic string) {
-	token := client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
+	 client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
 		msgchan <- Cag{
 			client: &client,
 			msg:    &message,
 		}
 	})
-	token.Wait()
-	if token.Wait() && token.Error() != nil {
-		zap.S().Error("订阅异常", token.Error())
-	}
+	//token.Wait()
+	//if token.Wait() && token.Error() != nil {
+	//	zap.S().Error("订阅异常", token.Error())
+	//}
 	zap.S().Debugf("订阅主题: %s", topic)
 }
 
