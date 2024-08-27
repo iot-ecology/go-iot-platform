@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
-	"log"
 	"sync"
 )
 
@@ -136,31 +134,33 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		SubTopic: subTopic,
 		ClientId: clientId,
 	}
-	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
-	//mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
-	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
-	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
-	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
-	opts.SetClientID(clientId)
-	opts.SetUsername(username)
-	opts.SetPassword(password)
-	//opts.SetDefaultPublishHandler(messagePubHandler)
-	opts.SetAutoReconnect(false)
-	opts.SetOrderMatters(false)
-	opts.OnConnect = connectHandler
-	opts.OnConnectionLost = connectLostHandler
-	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		zap.S().Error("创建MQTT客户端异常", token.Error())
-		return nil
+	client := NewMqttClient(clientId)
+	client.Connect(broker,username,password,port)
+	//mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
+	////mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
+	////mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
+	////mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
+	//opts := mqtt.NewClientOptions()
+	//opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
+	//opts.SetClientID(clientId)
+	//opts.SetUsername(username)
+	//opts.SetPassword(password)
+	////opts.SetDefaultPublishHandler(messagePubHandler)
+	//opts.SetAutoReconnect(false)
+	//opts.SetOrderMatters(false)
+	//opts.OnConnect = connectHandler
+	//opts.OnConnectionLost = connectLostHandler
+	//client := mqtt.NewClient(opts)
+	//if token := client.Connect(); token.Wait() && token.Error() != nil {
+	//	zap.S().Error("创建MQTT客户端异常", token.Error())
+	//	return nil
+	//
+	//}
+	//sub(client, subTopic)
+	//
+	c[clientId] = &client.client
 
-	}
-	sub(client, subTopic)
-
-	c[clientId] = &client
-
-	return client
+	return client.client
 
 }
 
