@@ -23,21 +23,25 @@ func main1() {
 
 	select {
 	case msg := <-choke:
-		zap.S().Infof(msg[0], msg[1], msg[2])
+		go funcName(msg)
 	}
-	select {
-
-	}
+	select {}
 }
 
-var choke = make(chan [3]string)
+func funcName(msg Cag) {
+	reader := (*msg.client).OptionsReader()
+	id := reader.ClientID()
+	zap.S().Infof(id)
+}
+
+var choke = make(chan Cag,1000)
 
 func createMqttClient(i int) mqtt.Client {
 	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
 	mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
 	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
 	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
-	var broker = "localhost"
+	var broker = "172.17.0.1"
 	var port = 1883
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
@@ -45,13 +49,21 @@ func createMqttClient(i int) mqtt.Client {
 	opts.SetClientID(s)
 	opts.SetUsername("admin")
 	opts.SetPassword("public")
+	opts.SetOrderMatters(false)
+	opts.SetPingTimeout(10*time.Second)
 	//opts.SetDefaultPublishHandler(messagePubHandler)
-	//opts.SetAutoReconnect(true)
+	opts.SetAutoReconnect(false)
+	opts.SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) {
+		zap.S().Errorf("Reconnecting to %s:%d", broker, port)
 
-	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		reader := client.OptionsReader()
-		choke <- [3]string{msg.Topic(), string(msg.Payload()), reader.ClientID()}
 	})
+
+	//opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+	//	choke <- Cag{
+	//		client: &client,
+	//		msg:    msg.Topic(),
+	//	}
+	//})
 
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -59,7 +71,12 @@ func createMqttClient(i int) mqtt.Client {
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-	subscribe := client.Subscribe("/test_topic/"+strconv.Itoa(i), 0, nil)
+	subscribe := client.Subscribe("/test_topic/"+strconv.Itoa(i), 0, func(client mqtt.Client, message mqtt.Message) {
+			choke <- Cag{
+				client: &client,
+				msg:    message.Topic(),
+			}
+	})
 	if subscribe.Wait() && subscribe.Error() != nil {
 		panic(subscribe.Error())
 
@@ -80,4 +97,9 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	zap.S().Errorf("Connect lost: %v", err)
+}
+
+type Cag struct {
+	client *mqtt.Client
+	msg string
 }

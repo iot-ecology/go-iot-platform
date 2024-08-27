@@ -1,5 +1,9 @@
 package main
 
 func main() {
-	main1()
+	//go main1()
+	go main2()
+	select {
+
+	}
 }

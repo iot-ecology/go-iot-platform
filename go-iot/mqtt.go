@@ -44,8 +44,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
 		return
 	}
-	//PushToQueue("pre_handler", jsonData)
-	msgchan <- jsonData
+	PushToQueue("pre_handler", jsonData)
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
@@ -57,7 +56,21 @@ func handleMessage() {
 		select {
 		case msg := <-msgchan:
 			// 处理消息
-			PushToQueue("pre_handler", msg)
+
+			reader := (*msg.client).OptionsReader()
+			id := reader.ClientID()
+
+			// 创建 MQTTMessage 实例并序列化为 JSON
+			mqttMsg := MQTTMessage{
+				MQTTClientID: id,
+				Message:      string((*msg.msg).Payload()),
+			}
+			jsonData, err := json.Marshal(mqttMsg)
+			if err != nil {
+				zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
+				return
+			}
+			PushToQueue("pre_handler", jsonData)
 		}
 	}
 }
@@ -67,7 +80,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	reader := client.OptionsReader()
 	id := reader.ClientID()
 	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
-	//StopMqttClient(id)
+	StopMqttClient(id)
 }
 
 var c = make(map[string]*mqtt.Client)
@@ -75,7 +88,7 @@ var c = make(map[string]*mqtt.Client)
 func StopMqttClient(clientId string) {
 	clock.Lock()
 	defer clock.Unlock()
-	zap.S().Errorf("StopMqttClient 开始, clientId = %v", clientId)
+	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	delete(c, clientId)
 	client := c[clientId]
 	if client != nil {
@@ -90,7 +103,7 @@ func StopMqttClient(clientId string) {
 }
 
 var configMap map[string]MqttConfig
-var msgchan = make(chan []byte, 1000)
+var msgchan = make(chan Cag, 1000)
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
 	client := c[clientId]
@@ -128,7 +141,8 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	opts.SetUsername(username)
 	opts.SetPassword(password)
 	//opts.SetDefaultPublishHandler(messagePubHandler)
-	opts.SetAutoReconnect(true)
+	opts.SetAutoReconnect(false)
+	opts.SetOrderMatters(false)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
@@ -146,21 +160,11 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 }
 
 func sub(client mqtt.Client, topic string) {
-	token := client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		reader := client.OptionsReader()
-		id := reader.ClientID()
-
-		// 创建 MQTTMessage 实例并序列化为 JSON
-		mqttMsg := MQTTMessage{
-			MQTTClientID: id,
-			Message:      string(msg.Payload()),
+	token := client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
+		msgchan <- Cag{
+			client: &client,
+			msg:    &message,
 		}
-		jsonData, err := json.Marshal(mqttMsg)
-		if err != nil {
-			zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-			return
-		}
-		PushToQueue("pre_handler", jsonData)
 	})
 	token.Wait()
 	if token.Wait() && token.Error() != nil {
@@ -195,4 +199,9 @@ func CreateMqttClient(config MqttConfig) int64 {
 
 	}
 
+}
+
+type Cag struct {
+	client *mqtt.Client
+	msg *mqtt.Message
 }
