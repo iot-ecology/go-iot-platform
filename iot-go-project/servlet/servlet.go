@@ -135,7 +135,7 @@ func (iqc *InfluxQueryConfig) GenerateFluxQuery() string {
 			|> range(%s)
 			%s
 			|> filter(fn: (r) => r["_measurement"] == "%s")
-			|> aggregateWindow(every: %ds, fn: %s, createEmpty: %t)
+			|> aggregateWindow(every: %dm, fn: %s, createEmpty: %t)
 			|> yield(name: "mean")
 	`, iqc.Bucket, timeRange, filterClause, iqc.Measurement, iqc.Aggregation.Every, iqc.Aggregation.Function, iqc.Aggregation.CreateEmpty)
 }

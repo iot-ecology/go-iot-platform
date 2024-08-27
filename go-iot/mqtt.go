@@ -80,10 +80,11 @@ func funcName(msg Cag) bool {
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 
-	reader := client.OptionsReader()
-	id := reader.ClientID()
-	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
-	StopMqttClient(id)
+	zap.S().Errorf("失去连接 %+v" , err)
+	// reader := client.OptionsReader()
+	// id := reader.ClientID()
+	// zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
+	// StopMqttClient(id)
 }
 
 var c = make(map[string]*mqtt.Client)

@@ -32,7 +32,8 @@ func (m *MqttInterface) Connect(host,username ,password string , port int ) erro
 	opts.SetPassword(password)
 	opts.SetClientID(m.Id)
 	opts.SetDefaultPublishHandler(m.messageHandler)
-
+	opts.OnConnectionLost = connectLostHandler
+	opts.SetAutoReconnect(true)
 	// 创建并启动客户端
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {

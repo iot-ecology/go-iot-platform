@@ -82,9 +82,9 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		zap.S().Debugf("推送报警原始数据: %s", jsonData)
 		HandlerMqttLastTime(*data)
-		PushToQueue("waring_handler", jsonData)
-		PushToQueue("waring_delay_handler", jsonData)
-		PushToQueue("transmit_handler", jsonData)
+		// PushToQueue("waring_handler", jsonData)
+		// PushToQueue("waring_delay_handler", jsonData)
+		// PushToQueue("transmit_handler", jsonData)
 	} else {
 		zap.S().Infof("执行脚本为空")
 	}
@@ -176,7 +176,7 @@ func CalcBucketName(prefix, protocol string, id uint) string {
 //	无
 func StorageDataRowList(dt DataRowList, protocol string) {
 	signal2 := GetMqttClientSignal2(dt.DeviceUid, dt.IdentificationCode)
-	zap.S().Infof("获取的mqtt信号数据signal2: %+v", signal2)
+	zap.S().Debugf("获取的mqtt信号数据signal2: %+v", signal2)
 	loc, _ := time.LoadLocation("Asia/Shanghai")
 
 	timeFromUnix := time.Unix(dt.Time, 0).In(loc)
@@ -193,6 +193,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 		bucketName)
 
 	measurement := genMeasurement(dt, protocol)
+	zap.S().Infof("bucketName = %s , measurement = %s",bucketName,measurement)
 	p := influxdb2.NewPointWithMeasurement(measurement).
 		AddField("storage_time", time.Now().Unix()).
 		AddField("push_time", dt.Time).
