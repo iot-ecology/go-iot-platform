@@ -46,7 +46,6 @@ func main() {
 
 func beforeStart() {
 	removeOldData()
-	go handleMessage()
 	go BeatTask(globalConfig.NodeInfo)
 	go ListenerBeat()
 	go CBeat()
