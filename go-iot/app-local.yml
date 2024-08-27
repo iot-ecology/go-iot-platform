@@ -5,7 +5,7 @@ node_info:
   type: mqtt
   size: 3000
 redis_config:
-  host: 121.43.96.236
+  host: 127.0.0.1
   port: 6379
   db: 10
   password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
@@ -13,7 +13,7 @@ redis_config:
 
 
 mq_config:
-  host: 121.43.96.236
+  host: 127.0.0.1
   port: 5672
   username: guest
   password: guest
