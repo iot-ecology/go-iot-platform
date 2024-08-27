@@ -62,35 +62,28 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 	id := reader.ClientID()
 	zap.S().Errorf("失去链接，id: %s ,error %+v：", id, err)
 	StopMqttClient(id)
-	//config := configMap[id]
-
-	//jsonData, err := json.Marshal(config)
-	//if err != nil {
-	//	zap.S().Errorf("to json error ,%+v", err)
-	//}
-	//PubCreateMqttClientOp(string(jsonData))
 }
 
 var c map[string]mqtt.Client
 
 func StopMqttClient(clientId string) {
-	clock.Lock()
-	defer clock.Unlock()
+
 	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 	client := c[clientId]
 	if client != nil {
-		//client.Disconnect(0)
-
+		client.Disconnect(0)
 		// 删除在 no use 中的配置
 		globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
 		globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
 		globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
+
+		clock.Lock()
+		defer clock.Unlock()
 		delete(c, clientId)
 	}
 
 }
 
-var configMap map[string]MqttConfig
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
 	client := c[clientId]
@@ -100,23 +93,6 @@ func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload
 func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
 	clock.Lock()
 	defer clock.Unlock()
-	if configMap == nil {
-		configMap = make(map[string]MqttConfig)
-	}
-	// 先判断 configMap 中是否有 clientId ， 如果有删除
-	if _, ok := configMap[clientId]; ok {
-        delete(configMap, clientId)
-    }
-
-
-	configMap[clientId] = MqttConfig{
-		Broker:   broker,
-		Port:     port,
-		Username: username,
-		Password: password,
-		SubTopic: subTopic,
-		ClientId: clientId,
-	}
 	mqtt.ERROR = log.New(getWriteSync(), "[ERROR] ", 0)
 	//mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
 	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
