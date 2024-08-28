@@ -50,8 +50,11 @@ func beforeStart() {
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
-	//go CCCC()
+
+
+
 }
+var PUSH_CHAN = make(chan []byte, 1000)
 
 func removeOldData() {
 	zap.S().Infof("开始清理过期数据")

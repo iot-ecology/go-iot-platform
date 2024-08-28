@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
 	"sync"
 )
@@ -26,18 +25,12 @@ type MQTTMessage struct {
 	Message      string `json:"message"`
 }
 
-var c = make(map[string]*mqtt.Client)
 
-func StopMqttClient(clientId string) {
-	clock.Lock()
-	defer clock.Unlock()
+func StopMqttClient(clientId string,config MqttConfig) {
+
 	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
-	delete(c, clientId)
-	client := c[clientId]
-	if client != nil {
-		(*client).Disconnect(250)
-	}
-	config := configMap[clientId]
+
+
 	marshal, _ := json.Marshal(config)
 
 	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
@@ -46,41 +39,29 @@ func StopMqttClient(clientId string) {
 }
 
 func StopMqttClient2(clientId string) {
-	clock.Lock()
-	defer clock.Unlock()
-	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
-	delete(c, clientId)
-	client := c[clientId]
-	if client != nil {
-		(*client).Disconnect(250)
-	}
+	zap.S().Errorf("StopMqttClient 开始, clientId = %v", clientId)
+
+
 
 	globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
 	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
 	globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
 }
 
-var configMap map[string]MqttConfig
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
-	client := c[clientId]
-	if client != nil {
-		(*client).Publish(topic, qos, retained, payload)
-	}
+	//client := c[clientId]
+	//if client != nil {
+	//	(*client).Publish(topic, qos, retained, payload)
+	//}
 }
 
-func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
-	clock.Lock()
-	defer clock.Unlock()
-	if configMap == nil {
-		configMap = make(map[string]MqttConfig)
-	}
-	// 先判断 configMap 中是否有 clientId ， 如果有删除
-	if _, ok := configMap[clientId]; ok {
-		delete(configMap, clientId)
-	}
+func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string,
+	clientId string) bool {
 
-	configMap[clientId] = MqttConfig{
+
+
+	config := MqttConfig{
 		Broker:   broker,
 		Port:     port,
 		Username: username,
@@ -88,12 +69,17 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		SubTopic: subTopic,
 		ClientId: clientId,
 	}
-	client := NewMqttClient(clientId)
-	client.Connect(broker, username, password, port)
-	client.Subscribe(subTopic)
-	c[clientId] = &client.client
+	client := NewMqttClient(clientId,config)
+	err := client.Connect(broker, username, password, port)
+	if err != nil {
+		zap.S().Errorf("mqtt connect err = %v", err)
+        return false
+	}
+	go client.Subscribe(subTopic)
+	go client.HandlerMsg()
+	//c[clientId] = &client.client
 
-	return client.client
+	return true
 
 }
 
@@ -111,7 +97,7 @@ func CreateMqttClient(config MqttConfig) int64 {
 
 	if globalConfig.NodeInfo.Size > i {
 		clientMin := CreateMqttClientMin(config.Broker, config.Port, config.Username, config.Password, config.SubTopic, config.ClientId)
-		if clientMin == nil {
+		if !clientMin  {
 			return -2
 
 		}

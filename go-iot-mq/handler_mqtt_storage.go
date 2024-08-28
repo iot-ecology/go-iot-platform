@@ -194,9 +194,11 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	measurement := genMeasurement(dt, protocol)
 	zap.S().Infof("bucketName = %s , measurement = %s",bucketName,measurement)
+	unix := time.Now().Unix()
 	p := influxdb2.NewPointWithMeasurement(measurement).
-		AddField("storage_time", time.Now().Unix()).
+		AddField("storage_time", unix).
 		AddField("push_time", dt.Time).
+		AddField("time-sub",unix-dt.Time).
 		SetTime(timeFromUnix)
 
 	for _, row := range dt.DataRows {
