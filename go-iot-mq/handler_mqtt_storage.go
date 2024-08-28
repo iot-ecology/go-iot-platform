@@ -56,7 +56,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 	var msg MQTTMessage
 	err := json.Unmarshal(d.Body, &msg)
 	if err != nil {
-		zap.S().Infof("Failed to unmarshal message: %s", err)
+		zap.S().Errorf("Failed to unmarshal message: %s", err)
 		return
 	}
 	zap.S().Debugf("处理 pre_handler 数据 : %+v", msg)
@@ -66,7 +66,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		data := runScript(msg.Message, script)
 
 		if data == nil {
-			zap.S().Infof("执行脚本为空")
+			zap.S().Errorf("执行脚本为空")
 			return
 		}
 		for i := 0; i < len(*data); i++ {
@@ -86,7 +86,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		// PushToQueue("waring_delay_handler", jsonData)
 		// PushToQueue("transmit_handler", jsonData)
 	} else {
-		zap.S().Infof("执行脚本为空")
+		zap.S().Errorf("执行脚本为空")
 	}
 
 }
@@ -210,22 +210,22 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 			p.AddField(strconv.Itoa(signal2[row.Name].ID), row.Value)
 
 		}
-		zap.S().Infof("当前信号的的CacheSize:%+v=============rowName:%+v", signal2[row.Name].CacheSize, row.Name)
+		zap.S().Debugf("当前信号的的CacheSize:%+v=============rowName:%+v", signal2[row.Name].CacheSize, row.Name)
 		if signal2[row.Name].CacheSize > 0 {
 			// 获取当前 ZSet 的大小
 			currentSize := globalRedisClient.ZCard(context.Background(),
 				"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(signal2[row.Name].ID)).Val()
-			zap.S().Infof("当前signal_delay_warning的大小: %+v", currentSize)
+			zap.S().Debugf("当前signal_delay_warning的大小: %+v", currentSize)
 			// 如果 ZSet 的大小已经达到或超过配置的缓存大小，则移除第一个元素
 			if currentSize >= signal2[row.Name].CacheSize {
-				zap.S().Infof("当前signal_delay_warning的currentSize大于等于配置大小:%+v", signal2[row.Name].CacheSize)
+				zap.S().Debugf("当前signal_delay_warning的currentSize大于等于配置大小:%+v", signal2[row.Name].CacheSize)
 				// 移除 ZSet 中分数最低的元素，即最早的元素
 				i := signal2[row.Name].CacheSize + 1 - currentSize
-				zap.S().Infof("计算后的i: %+v", i)
+				zap.S().Debugf("计算后的i: %+v", i)
 				if i == 1 {
-					zap.S().Infof("计算后的i的值为1")
+					zap.S().Debugf("计算后的i的值为1")
 				} else {
-					zap.S().Infof("开始移除之前的元素")
+					zap.S().Debugf("开始移除之前的元素")
 					err := globalRedisClient.ZRemRangeByRank(context.Background(),
 						"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(
 							signal2[row.Name].ID), 0,
@@ -236,7 +236,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 					}
 				}
 			} else {
-				zap.S().Infof("当前大小未超过配置大小,写入缓存")
+				zap.S().Errorf("当前大小未超过配置大小,写入缓存")
 				// 写入缓存
 				// 根据zset的特效,如果value一致的话,则会修改score,此处体现为修改了该值的时间,也就是说最新的值和之前的值相同的话只会保留最新时间的这一份
 				err := globalRedisClient.ZAdd(context.Background(),
