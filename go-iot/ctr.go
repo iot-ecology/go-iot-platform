@@ -667,7 +667,7 @@ func RemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 假设GetUseConfig函数返回配置的JSON字符串和错误
-	StopMqttClient(id)
+	StopMqttClient2(id)
 
 	// 将配置信息编码为JSON并发送给客户端
 	err := json.NewEncoder(w).Encode(map[string]any{

@@ -45,6 +45,21 @@ func StopMqttClient(clientId string) {
 	AddNoUseConfig(config, marshal)
 }
 
+func StopMqttClient2(clientId string) {
+	clock.Lock()
+	defer clock.Unlock()
+	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
+	delete(c, clientId)
+	client := c[clientId]
+	if client != nil {
+		(*client).Disconnect(250)
+	}
+
+	globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
+	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
+	globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
+}
+
 var configMap map[string]MqttConfig
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
