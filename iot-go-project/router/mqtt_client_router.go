@@ -99,7 +99,7 @@ func (s *MqttApi) StartMqtt(c *gin.Context) {
 	if err != nil {
 		zap.S().Error("Error unmarshalling JSON", zap.Error(err))
 		// 这里可以返回错误或者处理错误
-		servlet.Error(c, "MQTT管理工具未启动")
+		servlet.Error(c, "JSON 解析异常")
 		return
 	}
 	msg := m["message"]

@@ -56,7 +56,7 @@ func CheckBucketNameAndCreate(bucket string) {
 		if err != nil {
 			zap.S().Errorf(err.Error())
 		} else {
-			zap.S().Infof("Bucket %s created", withName)
+			zap.S().Debugf("Bucket %s created", withName)
 		}
 
 	}

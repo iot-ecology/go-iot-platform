@@ -31,7 +31,7 @@ func HandlerDataStorage(messages <-chan amqp.Delivery) {
 	go func() {
 
 		for d := range messages {
-			HandlerDataStorageString(d)
+			go HandlerDataStorageString(d)
 			err := d.Ack(false)
 			if err != nil {
 				zap.S().Errorf("消息确认异常：%+v", err)

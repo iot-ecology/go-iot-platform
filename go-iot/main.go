@@ -52,8 +52,9 @@ func beforeStart() {
 	go timerNoHandlerConfig()
 
 
-
 }
+
+
 var PUSH_CHAN = make(chan []byte, 1000)
 
 func removeOldData() {
