@@ -31,16 +31,20 @@ func HandlerDataStorage(messages <-chan amqp.Delivery) {
 	go func() {
 
 		for d := range messages {
-			go HandlerDataStorageString(d)
-			err := d.Ack(false)
-			if err != nil {
-				zap.S().Errorf("消息确认异常：%+v", err)
-
-			}
+			go funcName(d)
 		}
 	}()
 
 	zap.S().Infof(" [*] Waiting for messages. To exit press CTRL+C")
+}
+
+func funcName(d amqp.Delivery) {
+	HandlerDataStorageString(d)
+	err := d.Ack(false)
+	if err != nil {
+		zap.S().Errorf("消息确认异常：%+v", err)
+
+	}
 }
 
 // HandlerDataStorageString 是一个处理来自AMQP的消息的函数
