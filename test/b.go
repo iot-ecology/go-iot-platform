@@ -36,8 +36,15 @@ var choke = make(chan Cag,1000)
 
 func createMqttClient(i int) mqtt.Client {
 	s := uuid.New().String()
-	client := NewMqttClient(s)
-	client.Connect("s")
+	client := NewMqttClient(s,MqttConfig{
+		Broker:   "127.0.0.1",
+		Port:     1883,
+		Username: "admin",
+		Password: "public",
+		SubTopic: "/test_topic/"+strconv.Itoa(i),
+		ClientId: s,
+	})
+	client.Connect("127.0.0.1","admin","public",1883)
 	client.Subscribe("/test_topic/"+strconv.Itoa(i))
 	return client.client
 }

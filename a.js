@@ -18,7 +18,7 @@ function createMqttClient(i) {
         redirect: "follow"
     };
 
-    fetch("http://localhost:8080/mqtt/create", requestOptions)
+    fetch("http://127.0.0.1:8005/mqtt/create", requestOptions)
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.error(error));
@@ -51,7 +51,7 @@ function setScript(i ){
         redirect: "follow"
     };
 
-    fetch("http://localhost:8080/mqtt/set-script", requestOptions)
+    fetch("http://127.0.0.1:8005/mqtt/set-script", requestOptions)
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.error(error));
