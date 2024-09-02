@@ -39,7 +39,9 @@ var (
 	MaintenanceStartNotification MessageType = 7
 	// MaintenanceEndNotification 维修结束通知
 	MaintenanceEndNotification MessageType = 8
+	// sim卡超时通知
 	SimCardExpireTime          MessageType = 9
+	// 设备掉线通知
 	DeviceOffMessage           MessageType = 10
 )
 
