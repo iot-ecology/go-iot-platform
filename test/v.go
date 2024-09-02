@@ -21,7 +21,7 @@ func main2() {
 	mqtt.CRITICAL = log.New(getWriteSync(), "[CRIT] ", 0)
 	//mqtt.WARN = log.New(getWriteSync(), "[WARN]  ", 0)
 	//mqtt.DEBUG = log.New(getWriteSync(), "[DEBUG] ", 0)
-	var broker = "172.17.0.1"
+	var broker = "192.168.3.101"
 	var port = 1883
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
@@ -44,15 +44,7 @@ func main2() {
 			publish(client, vc.Topic, vc.ID, vc.ID)
 
 		}
-		time.Sleep(1*time.Second)
-	}
-
-}
-func c(client mqtt.Client, vc Vc) {
-
-	ticker := time.NewTicker(1 * time.Second)
-	for range ticker.C {
-		publish(client, vc.Topic, vc.ID, vc.ID)
+		time.Sleep(30*time.Second)
 	}
 
 }

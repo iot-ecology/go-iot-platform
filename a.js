@@ -89,5 +89,5 @@ function main(){
     }
 }
 // callCreateMqtt()
-// callSetScript()
-main()
+callSetScript()
+// main()
