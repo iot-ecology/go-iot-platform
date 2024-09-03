@@ -40,11 +40,13 @@ nc -v 127.0.0.1 22122
 Connection to 127.0.0.1 port 22122 [tcp/*] succeeded!
 1
 请发送uid:xxx格式的消息进行设备ID映射。
-uid:1
+uid:1:username:password
 成功识别设备编码.
 datadata
 数据已处理.
 ```
+
+> 注意： 账号密码不能常出现冒号 `:`
 
 
 ## HTTP

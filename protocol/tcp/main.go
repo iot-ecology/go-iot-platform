@@ -41,7 +41,7 @@ func main() {
 	go ListenerTcp()
 
 	server := New(&Config{
-		Host: "localhost",
+		Host: "0.0.0.0",
 		Port: strconv.Itoa(globalConfig.NodeInfo.Port),
 	})
 	server.Run()
