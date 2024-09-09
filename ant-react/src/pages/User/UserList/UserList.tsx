@@ -4,20 +4,33 @@ import {
   ModalForm,
   PageContainer,
   type ProColumns,
-  ProDescriptions,
-  type ProDescriptionsItemProps,
   ProFormText,
   ProTable
 } from '@ant-design/pro-components';
 import React, {useRef, useState} from 'react';
-import {Button, Drawer} from 'antd';
+import {Button, message} from 'antd';
 import {useIntl} from '@umijs/max';
 import {FormattedMessage} from "@@/exports";
 import {PlusOutlined} from "@ant-design/icons";
-import {rule} from "@/services/ant-design-pro/api";
-import UpdateForm from "@/pages/TableList/components/UpdateForm";
+import {addUser, userList} from "@/services/ant-design-pro/api";
 
+const handleAdd = async (fields: API.UserListItem) => {
+  const hide = message.loading('正在添加');
+  try {
+    await addUser({...fields});
+    hide();
+    message.success('Added successfully');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('Adding failed, please try again!');
+    return false;
+  }
+};
 
+const handleRemove = async (id: any) => {
+  console.log("删除数据")
+}
 const Admin: React.FC = () => {
   const intl = useIntl();
   /**
@@ -34,17 +47,15 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.UserListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.UserListItem[]>([]);
 
-  const columns: ProColumns<API.RuleListItem>[] = [{
+  const columns: ProColumns<API.UserListItem>[] = [{
     title: (<FormattedMessage
       id="pages.id"
       defaultMessage="唯一码"
 
-    />),
-    hideInSearch:true,
-    dataIndex: 'name', // @ts-ignore
+    />), hideInSearch: true, dataIndex: 'name', // @ts-ignore
     tip: 'The rule name is the unique key', render: (dom, entity) => {
       return (<a
         onClick={() => {
@@ -67,7 +78,7 @@ const Admin: React.FC = () => {
         id="pages.user-list.password"
         defaultMessage="密码"
       />), hideInSearch: true, dataIndex: 'password',
-    },{
+    }, {
       title: (<FormattedMessage
         id="pages.user-list.mail"
         defaultMessage="邮箱"
@@ -90,7 +101,7 @@ const Admin: React.FC = () => {
     },];
 
   return (<PageContainer>
-    <ProTable<API.RuleListItem, API.PageParams>
+    <ProTable<API.UserListItem, API.PageParams>
       headerTitle={intl.formatMessage({
         id: 'pages.searchTable.title', defaultMessage: 'Enquiry form',
       })}
@@ -108,7 +119,7 @@ const Admin: React.FC = () => {
       >
         <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
       </Button>,]}
-      request={rule}
+      request={userList}
       columns={columns}
       rowSelection={{
         onChange: (_, selectedRows) => {
@@ -153,13 +164,15 @@ const Admin: React.FC = () => {
     </FooterToolbar>)}
     <ModalForm
       title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newRule', defaultMessage: 'New rule',
+        id: 'pages.new', defaultMessage: '新增',
       })}
       width="75%"
       open={createModalOpen}
       onOpenChange={handleModalOpen}
       onFinish={async (value) => {
-        const success = await handleAdd(value as API.RuleListItem);
+        console.log(value)
+        debugger
+        const success = await handleAdd(value as API.UserListItem);
         if (success) {
           handleModalOpen(false);
           if (actionRef.current) {
@@ -170,9 +183,23 @@ const Admin: React.FC = () => {
     >
       <ProFormText
         label={<FormattedMessage
-          id="pages.name"
+          id="pages.user-list.username"
         />}
-        name="name"
+        name="username"
+      />
+      <ProFormText
+        label={<FormattedMessage
+          id="pages.user-list.mail"
+        />}
+        name="mail"
+      />
+      <ProFormText
+        label={<FormattedMessage
+          id="pages.user-list.password"
+        />}
+
+
+        name="password"
       />
 
     </ModalForm>

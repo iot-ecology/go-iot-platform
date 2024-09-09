@@ -20,7 +20,7 @@ var dashBiz = biz.DashboardBiz{}
 // @Accept json
 // @Produce json
 // @Param dashboard body models.Dashboard true "面板"
-// @Success 201 {object} servlet.JSONResult{data=models.Dashboard} "创建成功的面板"
+// @Success 200 {object} servlet.JSONResult{data=models.Dashboard} "创建成功的面板"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /dashboard/create [post]

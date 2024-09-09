@@ -23,7 +23,7 @@ var FeiShuBiz = notice.FeiShuBiz{}
 // @Accept json
 // @Produce json
 // @Param FeiShuId body models.FeiShu true "飞书通道"
-// @Success 201 {object} servlet.JSONResult{data=models.FeiShu} "创建成功的飞书通道"
+// @Success 200 {object} servlet.JSONResult{data=models.FeiShu} "创建成功的飞书通道"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /FeiShuId/create [post]

@@ -20,7 +20,7 @@ var KafkaTransmitBindBiz = transmit.KafkaTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param KafkaTransmitBind body models.KafkaTransmitBind true "KafkaTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.KafkaTransmitBind} "创建成功的KafkaTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.KafkaTransmitBind} "创建成功的KafkaTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /KafkaTransmitBind/create [post]

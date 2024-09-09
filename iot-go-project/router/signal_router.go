@@ -23,7 +23,7 @@ var bizSignal = biz.SignalBiz{}
 // @Accept json
 // @Produce json
 // @Param signal body models.Signal true "信号信息"
-// @Success 201 {object} servlet.JSONResult{data=models.Signal} "创建成功的信号"
+// @Success 200 {object} servlet.JSONResult{data=models.Signal} "创建成功的信号"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal/create [post]

@@ -20,7 +20,7 @@ var CoapHandlerBiz = biz.CoapHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param CoapHandler body models.CoapHandler true "Coap数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.CoapHandler} "创建成功的Coap数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.CoapHandler} "创建成功的Coap数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CoapHandler/create [post]

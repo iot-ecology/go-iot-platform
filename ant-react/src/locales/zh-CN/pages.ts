@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
+
+  'pages.new': '新增',
+
   'pages.name': '名称',
 
   'pages.id': "唯一码",

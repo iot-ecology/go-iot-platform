@@ -21,7 +21,7 @@ var simCardBiz = biz.SimCardBiz{}
 // @Accept json
 // @Produce json
 // @Param SimCard body models.SimCard true "SIM卡"
-// @Success 201 {object} servlet.JSONResult{data=models.SimCard} "创建成功的SIM卡"
+// @Success 200 {object} servlet.JSONResult{data=models.SimCard} "创建成功的SIM卡"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /SimCard/create [post]
@@ -186,7 +186,7 @@ func (api *SimCardApi) ByIdSimCard(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param SimCard body models.SimUseHistory true "SIM卡历史"
-// @Success 201 {object} servlet.JSONResult{data=models.SimUseHistory} ""
+// @Success 200 {object} servlet.JSONResult{data=models.SimUseHistory} ""
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /SimCard/BindDeviceInfo [post]
@@ -215,7 +215,7 @@ func (api *SimCardApi) BindDeviceInfo(c *gin.Context) {
 // @Param sim_id query int false "sim卡id"
 // @Param page_size query int false "每页大小" default(10)
 // @Param page_size query int false "每页大小" default(10)
-// @Success 201 {object} servlet.JSONResult{data=servlet.SimUseHistoryResp} ""
+// @Success 200 {object} servlet.JSONResult{data=servlet.SimUseHistoryResp} ""
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /SimCard/history [get]

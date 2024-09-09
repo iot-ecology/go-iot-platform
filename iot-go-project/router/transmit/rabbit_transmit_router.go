@@ -20,7 +20,7 @@ var RabbitmqTransmitBiz = transmit.RabbitTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param RabbitmqTransmit body models.RabbitmqTransmit true "Rabbit消息队列管理"
-// @Success 201 {object} servlet.JSONResult{data=models.RabbitmqTransmit} "创建成功的Rabbit消息队列管理"
+// @Success 200 {object} servlet.JSONResult{data=models.RabbitmqTransmit} "创建成功的Rabbit消息队列管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /RabbitmqTransmit/create [post]

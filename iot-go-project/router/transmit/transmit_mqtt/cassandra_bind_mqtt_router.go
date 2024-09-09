@@ -20,7 +20,7 @@ var dashBiz = transmit.CassandraTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param CassandraTransmitBind body models.CassandraTransmitBind true "CassandraTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.CassandraTransmitBind} "创建成功的CassandraTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.CassandraTransmitBind} "创建成功的CassandraTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CassandraTransmitBind/create [post]

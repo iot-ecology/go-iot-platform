@@ -49,11 +49,33 @@ declare namespace API {
     progress?: number;
   };
 
+  type UserListItem = {
+    ID?:number;
+    username?:string;
+    password?:string;
+    mail?:string;
+
+  };
+
+
   type RuleList = {
     data?: RuleListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
+  };
+
+  type PageList<T>= {
+    data ?: T[]
+    total?: number;
+    page?: number;
+    size?: number;
+  }
+  type UserList = {
+    data?: PageList<UserListItem>;
+    /** 列表的内容总数 */
+    message?: string;
+    code?: number;
   };
 
   type FakeCaptcha = {

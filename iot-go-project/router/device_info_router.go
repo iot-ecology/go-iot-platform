@@ -25,7 +25,7 @@ var deviceInfoBiz = biz.DeviceInfoBiz{}
 // @Accept json
 // @Produce json
 // @Param DeviceInfo body models.DeviceInfo true "设备详情"
-// @Success 201 {object} servlet.JSONResult{data=models.DeviceInfo} "创建成功的设备详情"
+// @Success 200 {object} servlet.JSONResult{data=models.DeviceInfo} "创建成功的设备详情"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /DeviceInfo/create [post]

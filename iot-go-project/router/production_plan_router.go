@@ -22,7 +22,7 @@ var ProductionPlanBiz = biz.ProductionPlanBiz{}
 // @Accept json
 // @Produce json
 // @Param ProductionPlan body servlet.ProductionPlanCreateParam true "生产计划"
-// @Success 201 {object} servlet.JSONResult{data=models.ProductionPlan} "创建成功的生产计划"
+// @Success 200 {object} servlet.JSONResult{data=models.ProductionPlan} "创建成功的生产计划"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ProductionPlan/create [post]

@@ -20,7 +20,7 @@ var calcParamBiz = biz.CalcParamBiz{}
 // @Accept json
 // @Produce json
 // @Param CalcParam body models.CalcParam true "计算参数"
-// @Success 201 {object} servlet.JSONResult{data=models.CalcParam} "创建成功的计算参数"
+// @Success 200 {object} servlet.JSONResult{data=models.CalcParam} "创建成功的计算参数"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /calc-param/create [post]

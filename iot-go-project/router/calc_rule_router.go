@@ -22,7 +22,7 @@ var calcRunBiz = biz.CalcRunBiz{}
 // @Accept json
 // @Produce json
 // @Param CalcRule body models.CalcRule true "计算规则"
-// @Success 201 {object} servlet.JSONResult{data=models.CalcRule} "创建成功的计算规则"
+// @Success 200 {object} servlet.JSONResult{data=models.CalcRule} "创建成功的计算规则"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /calc-rule/create [post]

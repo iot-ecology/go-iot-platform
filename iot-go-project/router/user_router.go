@@ -24,7 +24,7 @@ var userBiz = biz.UserBiz{}
 // @Accept json
 // @Produce json
 // @Param User body models.User true "用户"
-// @Success 201 {object} servlet.JSONResult{data=models.User} "创建成功的用户"
+// @Success 200 {object} servlet.JSONResult{data=models.User} "创建成功的用户"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /User/create [post]

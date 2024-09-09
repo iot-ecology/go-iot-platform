@@ -60,6 +60,30 @@ export async function rule(
   });
 }
 
+
+export async function userList(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+){
+  var request1 = request<API.UserList>('/api/User/page', {
+    method: 'GET',
+    params: {
+      page:params.current,
+      page_size:params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return request1;
+}
+
+
 /** 更新规则 PUT /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
@@ -74,6 +98,17 @@ export async function updateRule(options?: { [key: string]: any }) {
 /** 新建规则 POST /api/rule */
 export async function addRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
+    method: 'POST',
+    data:{
+      method: 'post',
+      ...(options || {}),
+    }
+  });
+}
+
+
+export async function addUser(options?: { [key: string]: any }) {
+  return request<API.RuleListItem>('/User/create', {
     method: 'POST',
     data:{
       method: 'post',

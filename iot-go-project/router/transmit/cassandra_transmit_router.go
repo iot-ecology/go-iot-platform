@@ -20,7 +20,7 @@ var CassandraTransmitBiz = transmit.CassandraTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param CassandraTransmit body models.CassandraTransmit true "Cassandra数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.CassandraTransmit} "创建成功的Cassandra数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.CassandraTransmit} "创建成功的Cassandra数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CassandraTransmit/create [post]
@@ -127,6 +127,8 @@ func (api *CassandraTransmitApi) PageCassandraTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CassandraTransmit/delete/:id [post]
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.CassandraTransmit}} "Cassandra"
+
 func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 	var CassandraTransmit models.CassandraTransmit
 

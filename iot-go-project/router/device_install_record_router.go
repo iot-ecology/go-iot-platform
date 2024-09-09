@@ -20,7 +20,7 @@ var installRecordBiz = biz.DeviceInstallRecordBiz{}
 // @Accept json
 // @Produce json
 // @Param DeviceInstallRecord body models.DeviceInstallRecord true "安装记录"
-// @Success 201 {object} servlet.JSONResult{data=models.DeviceInstallRecord} "创建成功的安装记录"
+// @Success 200 {object} servlet.JSONResult{data=models.DeviceInstallRecord} "创建成功的安装记录"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /DeviceInstallRecord/create [post]

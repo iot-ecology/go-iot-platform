@@ -29,7 +29,7 @@ var SignalDelayWaringBiz = biz.SignalDelayWaringBiz{}
 // @Accept json
 // @Produce json
 // @Param SignalDelayWaring body models.SignalDelayWaring true "脚本报警"
-// @Success 201 {object} servlet.JSONResult{data=models.SignalDelayWaring} "创建成功的脚本报警"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalDelayWaring} "创建成功的脚本报警"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal-delay-waring/create [post]

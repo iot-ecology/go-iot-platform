@@ -20,7 +20,7 @@ var MySQLTransmitBindBiz = transmit.MySQLTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param MySQLTransmitBind body models.MySQLTransmitBind true "MySQLTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.MySQLTransmitBind} "创建成功的MySQLTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.MySQLTransmitBind} "创建成功的MySQLTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /MySQLTransmitBind/create [post]

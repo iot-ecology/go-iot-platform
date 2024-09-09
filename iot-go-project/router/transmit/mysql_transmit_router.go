@@ -20,7 +20,7 @@ var mySQLTransmit = transmit.MySQLTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param MySQLTransmit body models.MySQLTransmit true "MySql数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.MySQLTransmit} "创建成功的MySql数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.MySQLTransmit} "创建成功的MySql数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /MySQLTransmit/create [post]

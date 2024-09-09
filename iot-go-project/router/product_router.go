@@ -21,7 +21,7 @@ var productBiz = biz.ProductBiz{}
 // @Accept json
 // @Produce json
 // @Param Product body models.Product true "产品"
-// @Success 201 {object} servlet.JSONResult{data=models.Product} "创建成功的产品"
+// @Success 200 {object} servlet.JSONResult{data=models.Product} "创建成功的产品"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /product/create [post]

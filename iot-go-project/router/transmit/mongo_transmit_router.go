@@ -20,7 +20,7 @@ var MongoTransmitBiz = transmit.MongoTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param MongoTransmit body models.MongoTransmit true "Mongo数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.MongoTransmit} "创建成功的Mongo数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.MongoTransmit} "创建成功的Mongo数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /MongoTransmit/create [post]

@@ -20,7 +20,7 @@ var InfluxdbTransmitBiz = transmit.InfluxdbTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param InfluxdbTransmit body models.InfluxdbTransmit true "Influxdb数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /InfluxdbTransmit/create [post]

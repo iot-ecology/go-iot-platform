@@ -23,7 +23,7 @@ var DingDingBiz = notice.DingDingBiz{}
 // @Accept json
 // @Produce json
 // @Param DingDing body models.DingDing true "钉钉通道"
-// @Success 201 {object} servlet.JSONResult{data=models.DingDing} "创建成功的钉钉通道"
+// @Success 200 {object} servlet.JSONResult{data=models.DingDing} "创建成功的钉钉通道"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /DingDing/create [post]

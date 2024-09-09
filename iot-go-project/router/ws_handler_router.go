@@ -20,7 +20,7 @@ var WebsocketHandlerBiz = biz.WebsocketHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param WebsocketHandler body models.WebsocketHandler true "Websocket数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.WebsocketHandler} "创建成功的Websocket数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.WebsocketHandler} "创建成功的Websocket数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /WebsocketHandler/create [post]

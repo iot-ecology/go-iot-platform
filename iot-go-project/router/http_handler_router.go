@@ -20,7 +20,7 @@ var HttpHandlerBiz = biz.HttpHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param HttpHandler body models.HttpHandler true "Http数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.HttpHandler} "创建成功的Http数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.HttpHandler} "创建成功的Http数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /HttpHandler/create [post]

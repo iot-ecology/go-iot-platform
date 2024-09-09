@@ -20,7 +20,7 @@ var clickhouseTransmitBindBiz = transmit.ClickhouseTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param ClickhouseTransmitBind body models.ClickhouseTransmitBind true "ClickhouseTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.ClickhouseTransmitBind} "创建成功的ClickhouseTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.ClickhouseTransmitBind} "创建成功的ClickhouseTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ClickhouseTransmitBind/create [post]

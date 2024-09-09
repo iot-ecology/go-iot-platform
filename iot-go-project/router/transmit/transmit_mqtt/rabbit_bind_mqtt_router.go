@@ -20,7 +20,7 @@ var RabbitmqTransmitBindBiz = transmit.RabbitmqTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param RabbitmqTransmitBind body models.RabbitmqTransmitBind true "RabbitmqTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.RabbitmqTransmitBind} "创建成功的RabbitmqTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.RabbitmqTransmitBind} "创建成功的RabbitmqTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /RabbitmqTransmitBind/create [post]

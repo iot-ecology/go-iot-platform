@@ -23,7 +23,7 @@ var shipmentRecordBiz = biz.ShipmentRecordBiz{}
 // @Accept json
 // @Produce json
 // @Param ShipmentRecord body models.ShipmentRecord true "发货记录"
-// @Success 201 {object} servlet.JSONResult{data=models.ShipmentRecord} "创建成功的发货记录"
+// @Success 200 {object} servlet.JSONResult{data=models.ShipmentRecord} "创建成功的发货记录"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ShipmentRecord/create [post]

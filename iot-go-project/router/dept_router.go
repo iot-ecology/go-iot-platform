@@ -21,7 +21,7 @@ var deptBiz = biz.DeptBiz{}
 // @Accept json
 // @Produce json
 // @Param Dept body models.Dept true "部门"
-// @Success 201 {object} servlet.JSONResult{data=models.Dept} "创建成功的部门"
+// @Success 200 {object} servlet.JSONResult{data=models.Dept} "创建成功的部门"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /Dept/create [post]

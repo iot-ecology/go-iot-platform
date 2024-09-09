@@ -21,7 +21,7 @@ var deviceGroupBiz = biz.DeviceGroupBiz{}
 // @Accept json
 // @Produce json
 // @Param DeviceGroup body models.DeviceGroup true "设备组"
-// @Success 201 {object} servlet.JSONResult{data=models.DeviceGroup} "创建成功的设备组"
+// @Success 200 {object} servlet.JSONResult{data=models.DeviceGroup} "创建成功的设备组"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /device_group/create [post]

@@ -24,7 +24,7 @@ type SignalWaringConfigApi struct{}
 // @Accept json
 // @Produce json
 // @Param config body models.SignalWaringConfig true "信号报警配置信息"
-// @Success 201 {object} servlet.JSONResult{data=models.SignalWaringConfig}  "创建成功的信号报警配置"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalWaringConfig}  "创建成功的信号报警配置"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal-waring-config/create [post]

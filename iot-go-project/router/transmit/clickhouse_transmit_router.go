@@ -20,7 +20,7 @@ var ClickhouseTransmitBiz = transmit.ClickhouseTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param ClickhouseTransmit body models.ClickhouseTransmit true "Clickhouse数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.ClickhouseTransmit} "创建成功的Clickhouse数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.ClickhouseTransmit} "创建成功的Clickhouse数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ClickhouseTransmit/create [post]
