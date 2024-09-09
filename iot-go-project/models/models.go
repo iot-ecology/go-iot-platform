@@ -342,3 +342,11 @@ type SimUseHistory struct {
 	DeviceInfoId uint   `json:"device_info_id" structs:"device_info_id"` // 设备ID
 	Description  string `json:"description" structs:"description"`       // 描述
 }
+
+// ScriptList 脚本列表，用于快速选择
+type ScriptList struct {
+	gorm.Model  `structs:"-"`
+	Content string `json:"content" structs:"content" gorm:"type:text"` // 脚本内容
+	Name string `json:"name" structs:"name" `
+
+}

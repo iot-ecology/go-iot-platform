@@ -32,6 +32,7 @@ import (
 
 var (
 	mqttApi                   = router.MqttApi{}
+	scriptListApi                   = router.ScriptListApi{}
 	signalApi                 = router.SignalApi{}
 	signalWaringConfigApi     = router.SignalWaringConfigApi{}
 	influxdbApi               = router.InfluxDbApi{}
@@ -774,6 +775,14 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/protocol/ws_info", protocolServiceApi.WsServerInfo)
 	r.GET("/protocol/tcp_info", protocolServiceApi.TcpServerInfo)
 	r.GET("/protocol/coap_info", protocolServiceApi.CoapServerInfo)
+
+
+
+	r.POST("/ScriptListId/create", scriptListApi.CreateScriptList)
+	r.POST("/ScriptListId/update", scriptListApi.UpdateScriptList)
+	r.GET("/ScriptListId/:id", scriptListApi.ByIdScriptList)
+	r.GET("/ScriptListId/page", scriptListApi.PageScriptList)
+	r.POST("/ScriptListId/delete/:id", scriptListApi.DeleteScriptList)
 }
 func initGlobalRedisClient() {
 	zap.S().Info("初始化Redis")
