@@ -53,7 +53,7 @@ declare namespace API {
     ID?:number;
     username?:string;
     password?:string;
-    mail?:string;
+    email?:string;
 
   };
 
@@ -64,6 +64,8 @@ declare namespace API {
     total?: number;
     success?: boolean;
   };
+
+
 
   type PageList<T>= {
     data ?: T[]
@@ -77,6 +79,12 @@ declare namespace API {
     message?: string;
     code?: number;
   };
+
+  type CommonResp = {
+    data?:any ;
+    message?: string;
+    code?: number;
+  }
 
   type FakeCaptcha = {
     code?: number;

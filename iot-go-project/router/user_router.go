@@ -122,7 +122,7 @@ func (api *UserApi) UpdateUser(c *gin.Context) {
 // @Failure 500 {string} string "查询异常"
 // @Router /User/page [get]
 func (api *UserApi) PageUser(c *gin.Context) {
-	var name = c.Query("name")
+	var name = c.Query("username")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)

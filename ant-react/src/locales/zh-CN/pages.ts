@@ -67,6 +67,8 @@ export default {
 
 
   'pages.new': '新增',
+  'pages.deleted': '删除',
+  'pages.update': '修改',
 
   'pages.name': '名称',
 

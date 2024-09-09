@@ -71,7 +71,7 @@ export async function userList(
   },
   options?: { [key: string]: any },
 ){
-  var request1 = request<API.UserList>('/api/User/page', {
+  const  request1 = await request<API.UserList>('/api/User/page', {
     method: 'GET',
     params: {
       page:params.current,
@@ -80,7 +80,11 @@ export async function userList(
     },
     ...(options || {}),
   });
-  return request1;
+  return {
+    data: request1.data?.data,
+    success:request1.code ===20000,
+    total: request1.data?.total
+  };
 }
 
 
@@ -108,12 +112,17 @@ export async function addRule(options?: { [key: string]: any }) {
 
 
 export async function addUser(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/User/create', {
+  return request<API.RuleListItem>('/api/User/create', {
     method: 'POST',
     data:{
       method: 'post',
       ...(options || {}),
     }
+  });
+}
+export async function deleteUser(id: any) {
+  return request<API.CommonResp>('/api/User/delete/' + id , {
+    method: 'POST',
   });
 }
 

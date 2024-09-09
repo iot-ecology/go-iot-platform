@@ -4,15 +4,18 @@ import {
   ModalForm,
   PageContainer,
   type ProColumns,
+  ProDescriptions,
+  type ProDescriptionsItemProps,
   ProFormText,
   ProTable
 } from '@ant-design/pro-components';
 import React, {useRef, useState} from 'react';
-import {Button, message} from 'antd';
+import {Button, Drawer, message} from 'antd';
 import {useIntl} from '@umijs/max';
 import {FormattedMessage} from "@@/exports";
 import {PlusOutlined} from "@ant-design/icons";
-import {addUser, userList} from "@/services/ant-design-pro/api";
+import {addUser, deleteUser, userList} from "@/services/ant-design-pro/api";
+import UserUpdateForm from "@/pages/User/UserList/UserUpdateForm";
 
 const handleAdd = async (fields: API.UserListItem) => {
   const hide = message.loading('正在添加');
@@ -29,7 +32,18 @@ const handleAdd = async (fields: API.UserListItem) => {
 };
 
 const handleRemove = async (id: any) => {
-  console.log("删除数据")
+  const hide = message.loading('正在添加');
+  try {
+    await deleteUser(id);
+    hide();
+    message.success('Delete successfully');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('Delete failed, please try again!');
+    return false;
+  }
+
 }
 const Admin: React.FC = () => {
   const intl = useIntl();
@@ -55,8 +69,9 @@ const Admin: React.FC = () => {
       id="pages.id"
       defaultMessage="唯一码"
 
-    />), hideInSearch: true, dataIndex: 'name', // @ts-ignore
-    tip: 'The rule name is the unique key', render: (dom, entity) => {
+    />), hideInSearch: true, dataIndex: 'ID', // @ts-ignore
+
+    render: (dom, entity) => {
       return (<a
         onClick={() => {
           setCurrentRow(entity);
@@ -72,7 +87,7 @@ const Admin: React.FC = () => {
       title: (<FormattedMessage
         id="pages.user-list.username"
         defaultMessage="用户名"
-      />), hideInSearch: true, dataIndex: 'username',
+      />), hideInSearch: false, dataIndex: 'username',
     }, {
       title: (<FormattedMessage
         id="pages.user-list.password"
@@ -82,22 +97,43 @@ const Admin: React.FC = () => {
       title: (<FormattedMessage
         id="pages.user-list.mail"
         defaultMessage="邮箱"
-      />), hideInSearch: true, dataIndex: 'mail',
+      />), hideInSearch: true, dataIndex: 'email',
     },
 
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating"/>,
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a
-        key="config"
-        onClick={() => {
-          handleUpdateModalOpen(true);
-          setCurrentRow(record);
+      render: (_, record) => [
+
+        <Button
+
+          key="update"
+          onClick={ () => {
+            // todo: 修改
+            handleUpdateModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.update" defaultMessage="修改"/>
+        </Button>,
+
+        <Button
+
+        key="delete"
+        onClick={async () => {
+          // todo: 删除接口
+          var success = await handleRemove(record.ID);
+          if (success) {
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
         }}
+        danger={true}
       >
-        <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration"/>
-      </a>,],
+        <FormattedMessage id="pages.deleted" defaultMessage="删除"/>
+      </Button>,],
     },];
 
   return (<PageContainer>
@@ -110,6 +146,7 @@ const Admin: React.FC = () => {
       search={{
         labelWidth: 120,
       }}
+
       toolBarRender={() => [<Button
         type="primary"
         key="primary"
@@ -121,47 +158,13 @@ const Admin: React.FC = () => {
       </Button>,]}
       request={userList}
       columns={columns}
+
       rowSelection={{
         onChange: (_, selectedRows) => {
           setSelectedRows(selectedRows);
         },
       }}
     />
-    {selectedRowsState?.length > 0 && (<FooterToolbar
-      extra={<div>
-        <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen"/>{' '}
-        <a style={{fontWeight: 600}}>{selectedRowsState.length}</a>{' '}
-        <FormattedMessage id="pages.searchTable.item" defaultMessage="项"/>
-        &nbsp;&nbsp;
-        <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-          {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-          <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万"/>
-              </span>
-      </div>}
-    >
-      <Button
-        onClick={async () => {
-          await handleRemove(selectedRowsState);
-          setSelectedRows([]);
-          actionRef.current?.reloadAndRest?.();
-        }}
-      >
-        <FormattedMessage
-          id="pages.searchTable.batchDeletion"
-          defaultMessage="Batch deletion"
-        />
-      </Button>
-      <Button type="primary">
-        <FormattedMessage
-          id="pages.searchTable.batchApproval"
-          defaultMessage="Batch approval"
-        />
-      </Button>
-    </FooterToolbar>)}
     <ModalForm
       title={intl.formatMessage({
         id: 'pages.new', defaultMessage: '新增',
@@ -170,8 +173,6 @@ const Admin: React.FC = () => {
       open={createModalOpen}
       onOpenChange={handleModalOpen}
       onFinish={async (value) => {
-        console.log(value)
-        debugger
         const success = await handleAdd(value as API.UserListItem);
         if (success) {
           handleModalOpen(false);
@@ -204,6 +205,43 @@ const Admin: React.FC = () => {
 
     </ModalForm>
 
+
+    <UserUpdateForm
+      updateModalOpen={updateModalOpen}
+      values={currentRow || {}}
+      onCancel={()=>{
+        if (!showDetail) {
+          setCurrentRow(undefined);
+        }
+      }}
+      onSubmit={ async  (value)=>{
+        console.log(value)
+        handleUpdateModalOpen(false)
+      }}
+  />
+
+
+    <Drawer
+      width={600}
+      open={showDetail}
+      onClose={() => {
+        setCurrentRow(undefined);
+        setShowDetail(false);
+      }}
+      closable={false}
+    >
+      {currentRow?.ID && (<ProDescriptions<API.UserListItem>
+          column={2}
+          title={currentRow?.ID}
+          request={async () => ({
+            data: currentRow || {},
+          })}
+          params={{
+            id: currentRow?.ID,
+          }}
+          columns={columns as ProDescriptionsItemProps<API.UserListItem>[]}
+        />)}
+    </Drawer>
 
   </PageContainer>);
 
