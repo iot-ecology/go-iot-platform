@@ -67,6 +67,9 @@ export default {
 
   'pages.name': '名称',
 
+  'pages.id': "唯一码",
+  'pages.desc': "描述",
+  'pages.pic': "图片",
 
   'pages.device-group': '设备组',
   'pages.device-info.id': '唯一码',
@@ -79,6 +82,13 @@ export default {
   'pages.device-info.push-time-error': '推送时间误差（秒）',
   'pages.device-info.push-interval': '推送间隔（秒）',
 
+
+  'pages.user-list.username': "用户名",
+  "pages.user-list.mail": "邮箱",
+  "pages.user-list.password": "密码",
+
+
+  'pages.dept-list.pname': "上级部门",
 
 
 
