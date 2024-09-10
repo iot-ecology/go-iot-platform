@@ -225,6 +225,7 @@ func (api *ProductionPlanApi) PageProductionPlan(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ProductionPlan/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductionPlanApi) DeleteProductionPlan(c *gin.Context) {
 	var ProductionPlan models.ProductionPlan
 
@@ -294,6 +295,7 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 // @Param ProductionPlan body servlet.ProductionPlanChangeParam true "修改参数"
 // @Produce   application/json
 // @Router    /ProductionPlan/change_state [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductionPlanApi) ChangeProductionPlanState(c *gin.Context) {
 	var param servlet.ProductionPlanChangeParam
 	if err := c.ShouldBindJSON(&param); err != nil {

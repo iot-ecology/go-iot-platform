@@ -152,8 +152,7 @@ func (api *RoleApi) PageRole(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /Role/delete/:id [post]
-// @Success 200 {object} servlet.JSONResult{data=""} ""
-
+// @Success 200 {object} servlet.JSONResult{data=string} ""
 func (api *RoleApi) DeleteRole(c *gin.Context) {
 	var Role models.Role
 
@@ -180,6 +179,7 @@ func (api *RoleApi) DeleteRole(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Role/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Role} 
 func (api *RoleApi) ByIdRole(c *gin.Context) {
 	var Role models.Role
 
@@ -200,6 +200,7 @@ func (api *RoleApi) ByIdRole(c *gin.Context) {
 // @Summary   角色列表
 // @Produce   application/json
 // @Router    /Role/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Role[]}
 func (api *RoleApi) ListRole(c *gin.Context) {
 	var roles []models.Role
 	result := glob.GDb.Find(&roles)

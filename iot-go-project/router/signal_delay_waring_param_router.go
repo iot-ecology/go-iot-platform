@@ -159,6 +159,7 @@ func (api *SignalDelayWaringParamApi) PageSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring-param/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalDelayWaringParamApi) DeleteSignalDelayWaring(c *gin.Context) {
 	var SignalDelayWaringParam models.SignalDelayWaringParam
 

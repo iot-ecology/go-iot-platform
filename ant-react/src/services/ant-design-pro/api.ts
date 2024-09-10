@@ -124,6 +124,11 @@ export async function deleteUser(id: any) {
   return request<API.CommonResp>('/api/User/delete/' + id , {
     method: 'POST',
   });
+}export async function updateUser(dt: any) {
+  return request<API.CommonResp>('/api/User/update', {
+    method: 'POST',
+    data: dt
+  });
 }
 
 /** 删除规则 DELETE /api/rule */

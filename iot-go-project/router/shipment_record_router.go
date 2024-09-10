@@ -228,6 +228,7 @@ func (api *ShipmentRecordApi) PageShipmentRecord(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ShipmentRecord/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ShipmentRecordApi) DeleteShipmentRecord(c *gin.Context) {
 	var ShipmentRecord models.ShipmentRecord
 
@@ -254,6 +255,7 @@ func (api *ShipmentRecordApi) DeleteShipmentRecord(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ShipmentRecord/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ShipmentRecord} 
 func (api *ShipmentRecordApi) ByIdShipmentRecord(c *gin.Context) {
 	var ShipmentRecord models.ShipmentRecord
 

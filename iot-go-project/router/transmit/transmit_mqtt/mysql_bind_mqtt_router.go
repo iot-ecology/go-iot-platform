@@ -132,6 +132,7 @@ func (api *MySQLTransmitBindApi) PageMySQLTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /MySQLTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MySQLTransmitBindApi) DeleteMySQLTransmitBind(c *gin.Context) {
 	var MySQLTransmitBind models.MySQLTransmitBind
 
@@ -159,6 +160,7 @@ func (api *MySQLTransmitBindApi) DeleteMySQLTransmitBind(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /MySQLTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MySQLTransmitBind} 
 func (api *MySQLTransmitBindApi) ByIdMySQLTransmitBind(c *gin.Context) {
 	var MySQLTransmitBind models.MySQLTransmitBind
 
@@ -183,6 +185,7 @@ func (api *MySQLTransmitBindApi) ByIdMySQLTransmitBind(c *gin.Context) {
 // @Param MySQLTransmit body servlet.TransmitScriptParam true "执行参数"
 // @Produce   application/json
 // @Router    /MySQLTransmitBind/mockScript [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MySQLTransmitBindApi) MockScript(c *gin.Context) {
 	var req servlet.TransmitScriptParam
 	if err := c.ShouldBindJSON(&req); err != nil {

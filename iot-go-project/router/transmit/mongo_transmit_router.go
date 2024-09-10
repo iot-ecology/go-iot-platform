@@ -128,6 +128,7 @@ func (api *MongoTransmitApi) PageMongoTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /MongoTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 	var MongoTransmit models.MongoTransmit
 
@@ -155,6 +156,7 @@ func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /MongoTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmit} 
 func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 	var MongoTransmit models.MongoTransmit
 

@@ -135,6 +135,7 @@ func (api *DeptApi) PageDept(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /Dept/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept} 
 func (api *DeptApi) DeleteDept(c *gin.Context) {
 	var Dept models.Dept
 
@@ -161,6 +162,7 @@ func (api *DeptApi) DeleteDept(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Dept/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept} 
 func (api *DeptApi) ByIdDept(c *gin.Context) {
 	var Dept models.Dept
 
@@ -182,6 +184,7 @@ func (api *DeptApi) ByIdDept(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Dept/subs [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept[]} 
 func (api *DeptApi) FindByIdSubs(c *gin.Context) {
 	param := c.Query("id")
 	var subDepts []models.Dept

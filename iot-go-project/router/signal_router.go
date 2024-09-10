@@ -176,6 +176,7 @@ func (api *SignalApi) PageSignal(c *gin.Context) {
 // @Summary   删除信号
 // @Produce   application/json
 // @Router    /signal/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalApi) DeleteSignal(c *gin.Context) {
 	var signal models.Signal
 

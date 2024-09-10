@@ -132,6 +132,7 @@ func (api *MongoTransmitBindApi) PageMongoTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /MongoTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MongoTransmitBindApi) DeleteMongoTransmitBind(c *gin.Context) {
 	var MongoTransmitBind models.MongoTransmitBind
 
@@ -159,6 +160,7 @@ func (api *MongoTransmitBindApi) DeleteMongoTransmitBind(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /MongoTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmitBind} 
 func (api *MongoTransmitBindApi) ByIdMongoTransmitBind(c *gin.Context) {
 	var MongoTransmitBind models.MongoTransmitBind
 
@@ -182,6 +184,7 @@ func (api *MongoTransmitBindApi) ByIdMongoTransmitBind(c *gin.Context) {
 // @Param MongoTransmit body servlet.TransmitScriptParam true "执行参数"
 // @Produce   application/json
 // @Router    /MongoTransmitBind/mockScript [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MongoTransmitBindApi) MockScript(c *gin.Context) {
 	var req servlet.TransmitScriptParam
 	if err := c.ShouldBindJSON(&req); err != nil {

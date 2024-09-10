@@ -144,6 +144,7 @@ func (api *FeiShuApi) PageFeiShu(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /FeiShuId/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *FeiShuApi) DeleteFeiShu(c *gin.Context) {
 	var FeiShu models.FeiShu
 
@@ -171,6 +172,7 @@ func (api *FeiShuApi) DeleteFeiShu(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /FeiShuId/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.FeiShu} 
 func (api *FeiShuApi) ByIdFeiShu(c *gin.Context) {
 	var FeiShu models.FeiShu
 
@@ -192,6 +194,7 @@ func (api *FeiShuApi) ByIdFeiShu(c *gin.Context) {
 // @Param FeiShuId body []models.FeiShuBindProduct true "飞书通道"
 // @Produce   application/json
 // @Router    /FeiShuId/bind [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *FeiShuApi) Bind(c *gin.Context) {
 	var req []models.FeiShuBindProduct
 	if err := c.ShouldBindJSON(&req); err != nil {

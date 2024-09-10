@@ -132,6 +132,7 @@ func (api *RabbitmqTransmitApi) PageRabbitmqTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /RabbitmqTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *RabbitmqTransmitApi) DeleteRabbitmqTransmit(c *gin.Context) {
 	var RabbitmqTransmit models.RabbitmqTransmit
 
@@ -158,6 +159,7 @@ func (api *RabbitmqTransmitApi) DeleteRabbitmqTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /RabbitmqTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.RabbitmqTransmit} 
 func (api *RabbitmqTransmitApi) ByIdRabbitmqTransmit(c *gin.Context) {
 	var RabbitmqTransmit models.RabbitmqTransmit
 

@@ -1,26 +1,25 @@
+import UserUpdateForm from '@/pages/User/UserList/UserUpdateForm';
+import { addUser, deleteUser, updateUser, userList } from '@/services/ant-design-pro/api';
+import { FormattedMessage } from '@@/exports';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
-  FooterToolbar,
   ModalForm,
   PageContainer,
   type ProColumns,
   ProDescriptions,
   type ProDescriptionsItemProps,
   ProFormText,
-  ProTable
+  ProTable,
 } from '@ant-design/pro-components';
-import React, {useRef, useState} from 'react';
-import {Button, Drawer, message} from 'antd';
-import {useIntl} from '@umijs/max';
-import {FormattedMessage} from "@@/exports";
-import {PlusOutlined} from "@ant-design/icons";
-import {addUser, deleteUser, userList} from "@/services/ant-design-pro/api";
-import UserUpdateForm from "@/pages/User/UserList/UserUpdateForm";
+import { useIntl } from '@umijs/max';
+import { Button, Drawer, message } from 'antd';
+import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.UserListItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addUser({...fields});
+    await addUser({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -32,19 +31,32 @@ const handleAdd = async (fields: API.UserListItem) => {
 };
 
 const handleRemove = async (id: any) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading('正在删除');
   try {
     await deleteUser(id);
     hide();
-    message.success('Delete successfully');
+    message.success('删除 successfully');
     return true;
   } catch (error) {
     hide();
     message.error('Delete failed, please try again!');
     return false;
   }
+};
 
-}
+const handlerUpdate = async (fields: API.UserListItem) => {
+  const hide = message.loading('正在更新');
+  try {
+    await updateUser(fields);
+    hide();
+    message.success('更新成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('更新 failed, please try again!');
+    return false;
+  }
+};
 const Admin: React.FC = () => {
   const intl = useIntl();
   /**
@@ -64,187 +76,204 @@ const Admin: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.UserListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.UserListItem[]>([]);
 
-  const columns: ProColumns<API.UserListItem>[] = [{
-    title: (<FormattedMessage
-      id="pages.id"
-      defaultMessage="唯一码"
-
-    />), hideInSearch: true, dataIndex: 'ID', // @ts-ignore
-
-    render: (dom, entity) => {
-      return (<a
-        onClick={() => {
-          setCurrentRow(entity);
-          setShowDetail(true);
-        }}
-      >
-        {dom}
-      </a>);
-    },
-  },
-
+  const columns: ProColumns<API.UserListItem>[] = [
     {
-      title: (<FormattedMessage
-        id="pages.user-list.username"
-        defaultMessage="用户名"
-      />), hideInSearch: false, dataIndex: 'username',
-    }, {
-      title: (<FormattedMessage
-        id="pages.user-list.password"
-        defaultMessage="密码"
-      />), hideInSearch: true, dataIndex: 'password',
-    }, {
-      title: (<FormattedMessage
-        id="pages.user-list.mail"
-        defaultMessage="邮箱"
-      />), hideInSearch: true, dataIndex: 'email',
+      key: 'ID',
+      title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
+      hideInSearch: true,
+      dataIndex: 'ID', // @ts-ignore
+
+      render: (dom, entity) => {
+        return (
+          <a
+            onClick={() => {
+              setCurrentRow(entity);
+              setShowDetail(true);
+            }}
+          >
+            {dom}
+          </a>
+        );
+      },
     },
 
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating"/>,
+      key: 'username',
+      title: <FormattedMessage id="pages.user-list.username" defaultMessage="用户名" />,
+      hideInSearch: false,
+      dataIndex: 'username',
+    },
+    {
+      key: 'password',
+      title: <FormattedMessage id="pages.user-list.password" defaultMessage="密码" />,
+      hideInSearch: true,
+      dataIndex: 'password',
+      render: (dom, entity) => {
+        return (
+          <div>****</div>
+        )
+      },
+    },
+    {
+      key: 'email',
+      title: <FormattedMessage id="pages.user-list.mail" defaultMessage="邮箱" />,
+      hideInSearch: true,
+      dataIndex: 'email',
+    },
+
+    {
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-
         <Button
-
           key="update"
-          onClick={ () => {
+          onClick={() => {
             // todo: 修改
             handleUpdateModalOpen(true);
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.update" defaultMessage="修改"/>
+          <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
 
         <Button
+          key="delete"
+          onClick={async () => {
+            // todo: 删除接口
+            const success = await handleRemove(record.ID);
+            if (success) {
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+          }}
+          danger={true}
+        >
+          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
+        </Button>,
+      ],
+    },
+  ];
 
-        key="delete"
-        onClick={async () => {
-          // todo: 删除接口
-          var success = await handleRemove(record.ID);
+  return (
+    <PageContainer>
+      <ProTable<API.UserListItem, API.PageParams>
+        headerTitle={intl.formatMessage({
+          id: 'pages.searchTable.title',
+          defaultMessage: 'Enquiry form',
+        })}
+        actionRef={actionRef}
+        rowKey="key"
+        search={{
+          labelWidth: 120,
+        }}
+        toolBarRender={() => [
+          <Button
+            type="primary"
+            key="primary"
+            onClick={() => {
+              handleModalOpen(true);
+            }}
+          >
+            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          </Button>,
+        ]}
+        request={userList}
+        columns={columns}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
+      />
+      <ModalForm
+        key={'add'}
+        title={intl.formatMessage({
+          id: 'pages.new',
+          defaultMessage: '新增',
+        })}
+        width="75%"
+        open={createModalOpen}
+        onOpenChange={handleModalOpen}
+        onFinish={async (value) => {
+          const success = await handleAdd(value as API.UserListItem);
           if (success) {
+            handleModalOpen(false);
             if (actionRef.current) {
               actionRef.current.reload();
             }
           }
         }}
-        danger={true}
       >
-        <FormattedMessage id="pages.deleted" defaultMessage="删除"/>
-      </Button>,],
-    },];
+        <ProFormText
+          key={'username'}
+          label={<FormattedMessage id="pages.user-list.username" />}
+          name="username"
+        />
+        <ProFormText
+          key={'email'}
+          label={<FormattedMessage id="pages.user-list.mail" />}
+          name="email"
+        />
+        <ProFormText.Password
+          key={'password'}
+          label={<FormattedMessage id="pages.user-list.password" />}
+          name="password"
+        />
+      </ModalForm>
 
-  return (<PageContainer>
-    <ProTable<API.UserListItem, API.PageParams>
-      headerTitle={intl.formatMessage({
-        id: 'pages.searchTable.title', defaultMessage: 'Enquiry form',
-      })}
-      actionRef={actionRef}
-      rowKey="key"
-      search={{
-        labelWidth: 120,
-      }}
-
-      toolBarRender={() => [<Button
-        type="primary"
-        key="primary"
-        onClick={() => {
-          handleModalOpen(true);
-        }}
-      >
-        <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
-      </Button>,]}
-      request={userList}
-      columns={columns}
-
-      rowSelection={{
-        onChange: (_, selectedRows) => {
-          setSelectedRows(selectedRows);
-        },
-      }}
-    />
-    <ModalForm
-      title={intl.formatMessage({
-        id: 'pages.new', defaultMessage: '新增',
-      })}
-      width="75%"
-      open={createModalOpen}
-      onOpenChange={handleModalOpen}
-      onFinish={async (value) => {
-        const success = await handleAdd(value as API.UserListItem);
-        if (success) {
-          handleModalOpen(false);
-          if (actionRef.current) {
-            actionRef.current.reload();
+      <UserUpdateForm
+        key={'update'}
+        updateModalOpen={updateModalOpen}
+        values={currentRow || {}}
+        onCancel={() => {
+          handleUpdateModalOpen(false);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+            setShowDetail(false);
           }
-        }
-      }}
-    >
-      <ProFormText
-        label={<FormattedMessage
-          id="pages.user-list.username"
-        />}
-        name="username"
-      />
-      <ProFormText
-        label={<FormattedMessage
-          id="pages.user-list.mail"
-        />}
-        name="mail"
-      />
-      <ProFormText
-        label={<FormattedMessage
-          id="pages.user-list.password"
-        />}
+        }}
+        onSubmit={async (value) => {
+          console.log(value);
+          var success = await handlerUpdate(value);
+          if (success) {
+            handleUpdateModalOpen(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
 
 
-        name="password"
+        }}
       />
 
-    </ModalForm>
-
-
-    <UserUpdateForm
-      updateModalOpen={updateModalOpen}
-      values={currentRow || {}}
-      onCancel={()=>{
-        if (!showDetail) {
+      <Drawer
+        key={'detail'}
+        width={600}
+        open={showDetail}
+        onClose={() => {
           setCurrentRow(undefined);
-        }
-      }}
-      onSubmit={ async  (value)=>{
-        console.log(value)
-        handleUpdateModalOpen(false)
-      }}
-  />
-
-
-    <Drawer
-      width={600}
-      open={showDetail}
-      onClose={() => {
-        setCurrentRow(undefined);
-        setShowDetail(false);
-      }}
-      closable={false}
-    >
-      {currentRow?.ID && (<ProDescriptions<API.UserListItem>
-          column={2}
-          title={currentRow?.ID}
-          request={async () => ({
-            data: currentRow || {},
-          })}
-          params={{
-            id: currentRow?.ID,
-          }}
-          columns={columns as ProDescriptionsItemProps<API.UserListItem>[]}
-        />)}
-    </Drawer>
-
-  </PageContainer>);
-
+          setShowDetail(false);
+        }}
+        closable={false}
+      >
+        {currentRow?.ID && (
+          <ProDescriptions<API.UserListItem>
+            column={2}
+            title={currentRow?.ID}
+            request={async () => ({
+              data: currentRow || {},
+            })}
+            params={{
+              id: currentRow?.ID,
+            }}
+            columns={columns as ProDescriptionsItemProps<API.UserListItem>[]}
+          />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
 };
 
 export default Admin;

@@ -133,6 +133,7 @@ func (api *MySQLTransmitApi) PageMySQLTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /MySQLTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MySQLTransmitApi) DeleteMySQLTransmit(c *gin.Context) {
 	var MySQLTransmit models.MySQLTransmit
 
@@ -159,6 +160,7 @@ func (api *MySQLTransmitApi) DeleteMySQLTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /MySQLTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MySQLTransmit} 
 func (api *MySQLTransmitApi) ByIdMySQLTransmit(c *gin.Context) {
 	var MySQLTransmit models.MySQLTransmit
 

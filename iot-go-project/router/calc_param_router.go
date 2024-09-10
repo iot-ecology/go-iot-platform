@@ -147,6 +147,7 @@ func (api *CalcParamApi) PageCalcParam(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /calc-param/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcParamApi) DeleteCalcParam(c *gin.Context) {
 	var CalcParam models.CalcParam
 

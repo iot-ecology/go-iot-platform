@@ -1,12 +1,13 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type WebsocketHandlerApi struct{}
@@ -135,6 +136,7 @@ func (api *WebsocketHandlerApi) PageWebsocketHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /WebsocketHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *WebsocketHandlerApi) DeleteWebsocketHandler(c *gin.Context) {
 	var WebsocketHandler models.WebsocketHandler
 
@@ -162,6 +164,7 @@ func (api *WebsocketHandlerApi) DeleteWebsocketHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /WebsocketHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.WebsocketHandler}
 func (api *WebsocketHandlerApi) ByIdWebsocketHandler(c *gin.Context) {
 	var WebsocketHandler models.WebsocketHandler
 
@@ -176,6 +179,3 @@ func (api *WebsocketHandlerApi) ByIdWebsocketHandler(c *gin.Context) {
 
 	servlet.Resp(c, WebsocketHandler)
 }
-
-
-

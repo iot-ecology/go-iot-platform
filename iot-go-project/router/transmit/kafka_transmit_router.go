@@ -132,6 +132,7 @@ func (api *KafkaTransmitApi) PageKafkaTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /KafkaTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *KafkaTransmitApi) DeleteKafkaTransmit(c *gin.Context) {
 	var KafkaTransmit models.KafkaTransmit
 
@@ -158,6 +159,7 @@ func (api *KafkaTransmitApi) DeleteKafkaTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /KafkaTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.KafkaTransmit} 
 func (api *KafkaTransmitApi) ByIdKafkaTransmit(c *gin.Context) {
 	var KafkaTransmit models.KafkaTransmit
 

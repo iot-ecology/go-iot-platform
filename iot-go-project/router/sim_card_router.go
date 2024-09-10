@@ -138,6 +138,7 @@ func (api *SimCardApi) PageSimCard(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /SimCard/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SimCardApi) DeleteSimCard(c *gin.Context) {
 	var SimCard models.SimCard
 
@@ -164,6 +165,7 @@ func (api *SimCardApi) DeleteSimCard(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /SimCard/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.SimCard} 
 func (api *SimCardApi) ByIdSimCard(c *gin.Context) {
 	var SimCard models.SimCard
 

@@ -135,6 +135,7 @@ func (api *HttpHandlerApi) PageHttpHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /HttpHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *HttpHandlerApi) DeleteHttpHandler(c *gin.Context) {
 	var HttpHandler models.HttpHandler
 
@@ -162,6 +163,7 @@ func (api *HttpHandlerApi) DeleteHttpHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /HttpHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.HttpHandler} 
 func (api *HttpHandlerApi) ByIdHttpHandler(c *gin.Context) {
 	var HttpHandler models.HttpHandler
 

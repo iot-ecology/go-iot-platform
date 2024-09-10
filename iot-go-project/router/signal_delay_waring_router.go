@@ -157,6 +157,7 @@ func (api *SignalDelayWaringApi) PageSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalDelayWaringApi) DeleteSignalDelayWaring(c *gin.Context) {
 	var SignalDelayWaring models.SignalDelayWaring
 
@@ -183,6 +184,7 @@ func (api *SignalDelayWaringApi) DeleteSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/Mock/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalDelayWaringApi) Mock(c *gin.Context) {
 
 	param := c.Param("id")
@@ -201,6 +203,7 @@ func (api *SignalDelayWaringApi) Mock(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/GenParam/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalDelayWaringApi) GenParam(c *gin.Context) {
 
 	param := c.Param("id")
@@ -219,6 +222,7 @@ func (api *SignalDelayWaringApi) GenParam(c *gin.Context) {
 // @Param config body servlet.WaringRowQuery true "查询参数"
 // @Produce   application/json
 // @Router    /signal-delay-waring/query-row [post]
+// @Success 200 {object}  servlet.JSONResult{data=servlet.WaringRowQuery} 
 func (api *SignalDelayWaringApi) QueryWaringList(c *gin.Context) {
 
 	var req servlet.WaringRowQuery

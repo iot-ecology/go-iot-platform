@@ -147,6 +147,7 @@ func (api *DingDingApi) PageDingDing(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /DingDing/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DingDingApi) DeleteDingDing(c *gin.Context) {
 	var DingDing models.DingDing
 
@@ -174,6 +175,7 @@ func (api *DingDingApi) DeleteDingDing(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /DingDing/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DingDing} 
 func (api *DingDingApi) ByIdDingDing(c *gin.Context) {
 	var DingDing models.DingDing
 
@@ -195,6 +197,7 @@ func (api *DingDingApi) ByIdDingDing(c *gin.Context) {
 // @Param DingDing body []models.DingDingBindProduct true "钉钉通道"
 // @Produce   application/json
 // @Router    /DingDing/bind [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DingDingApi) Bind(c *gin.Context) {
 	var req  []models.DingDingBindProduct
 	if err := c.ShouldBindJSON(&req); err != nil {

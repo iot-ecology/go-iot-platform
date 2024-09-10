@@ -147,6 +147,7 @@ func (api *CalcRuleApi) PageCalcRule(c *gin.Context) {
 // @Summary   删除计算规则
 // @Produce   application/json
 // @Router    /calc-rule/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) DeleteCalcRule(c *gin.Context) {
 	var CalcRule models.CalcRule
 
@@ -172,6 +173,7 @@ func (api *CalcRuleApi) DeleteCalcRule(c *gin.Context) {
 // @Summary   启动任务
 // @Produce   application/json
 // @Router    /calc-rule/start/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) StartCalcRule(c *gin.Context) {
 
 	param := c.Param("id")
@@ -194,6 +196,7 @@ func (api *CalcRuleApi) StartCalcRule(c *gin.Context) {
 // @Param CalcRule body servlet.Event true "模拟参数"
 // @Produce   application/json
 // @Router    /calc-rule/mock [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) MockCalcRule(c *gin.Context) {
 
 	var req servlet.Event
@@ -214,6 +217,7 @@ func (api *CalcRuleApi) MockCalcRule(c *gin.Context) {
 // @Summary   刷新规则
 // @Produce   application/json
 // @Router    /calc-rule/refresh/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) Refresh(c *gin.Context) {
 	param := c.Param("id")
 
@@ -227,6 +231,7 @@ func (api *CalcRuleApi) Refresh(c *gin.Context) {
 // @Summary   停止任务
 // @Produce   application/json
 // @Router    /calc-rule/stop/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) StopCalcRule(c *gin.Context) {
 
 	param := c.Param("id")
@@ -251,6 +256,7 @@ func (api *CalcRuleApi) StopCalcRule(c *gin.Context) {
 // @Param end_time path int true "结束时间"
 // @Produce   application/json
 // @Router    /calc-rule/rd [get]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) CalcRuleResult(c *gin.Context) {
 	ruleIdstr := c.Query("rule_id")
 	startTimestr := c.Query("start_time")

@@ -135,6 +135,7 @@ func (api *CoapHandlerApi) PageCoapHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CoapHandler/delete/:id [post]
+// @Success 200 {object} servlet.JSONResult{data=string}
 func (api *CoapHandlerApi) DeleteCoapHandler(c *gin.Context) {
 	var CoapHandler models.CoapHandler
 
@@ -162,6 +163,7 @@ func (api *CoapHandlerApi) DeleteCoapHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /CoapHandler/:id [get]
+// @Success 200 {object} servlet.JSONResult{data=models.CoapHandler}
 func (api *CoapHandlerApi) ByIdCoapHandler(c *gin.Context) {
 	var CoapHandler models.CoapHandler
 

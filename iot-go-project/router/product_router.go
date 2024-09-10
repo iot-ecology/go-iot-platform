@@ -142,6 +142,7 @@ func (api *ProductApi) PageProduct(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /product/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductApi) DeleteProduct(c *gin.Context) {
 	var Product models.Product
 
@@ -168,6 +169,7 @@ func (api *ProductApi) DeleteProduct(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /product/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Product} 
 func (api *ProductApi) ByIdProduct(c *gin.Context) {
 	var Product models.Product
 

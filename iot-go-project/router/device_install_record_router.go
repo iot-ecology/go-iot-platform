@@ -127,6 +127,7 @@ func (api *DeviceInstallRecordApi) PageDeviceInstallRecord(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /DeviceInstallRecord/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DeviceInstallRecordApi) DeleteDeviceInstallRecord(c *gin.Context) {
 	var DeviceInstallRecord models.DeviceInstallRecord
 
@@ -153,6 +154,7 @@ func (api *DeviceInstallRecordApi) DeleteDeviceInstallRecord(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /DeviceInstallRecord/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInstallRecord} 
 func (api *DeviceInstallRecordApi) ByIdDeviceInstallRecord(c *gin.Context) {
 	var DeviceInstallRecord models.DeviceInstallRecord
 

@@ -135,6 +135,7 @@ func (api *TcpHandlerApi) PageTcpHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /TcpHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *TcpHandlerApi) DeleteTcpHandler(c *gin.Context) {
 	var TcpHandler models.TcpHandler
 
@@ -162,6 +163,7 @@ func (api *TcpHandlerApi) DeleteTcpHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /TcpHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.TcpHandler} 
 func (api *TcpHandlerApi) ByIdTcpHandler(c *gin.Context) {
 	var TcpHandler models.TcpHandler
 

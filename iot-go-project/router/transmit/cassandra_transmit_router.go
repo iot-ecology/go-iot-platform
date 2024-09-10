@@ -127,7 +127,7 @@ func (api *CassandraTransmitApi) PageCassandraTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CassandraTransmit/delete/:id [post]
-// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.CassandraTransmit}} "Cassandra"
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=string} 
 
 func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 	var CassandraTransmit models.CassandraTransmit
@@ -155,6 +155,7 @@ func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /CassandraTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit} 
 func (api *CassandraTransmitApi) ByIdCassandraTransmit(c *gin.Context) {
 	var CassandraTransmit models.CassandraTransmit
 

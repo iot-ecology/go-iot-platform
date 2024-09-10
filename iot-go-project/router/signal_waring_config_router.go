@@ -158,6 +158,7 @@ func (api *SignalWaringConfigApi) PageSignalWaringConfig(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-waring-config/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalWaringConfigApi) DeleteSignalWaringConfig(c *gin.Context) {
 	var config models.SignalWaringConfig
 
@@ -184,6 +185,7 @@ func (api *SignalWaringConfigApi) DeleteSignalWaringConfig(c *gin.Context) {
 // @Param config body servlet.WaringRowQuery true "查询参数"
 // @Produce   application/json
 // @Router    /signal-waring-config/query-row [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalWaringConfigApi) QueryWaringList(c *gin.Context) {
 
 	var req servlet.WaringRowQuery

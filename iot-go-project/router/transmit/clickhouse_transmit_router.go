@@ -126,6 +126,7 @@ func (api *ClickhouseTransmitApi) PageClickhouseTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ClickhouseTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 	var ClickhouseTransmit models.ClickhouseTransmit
 
@@ -152,6 +153,7 @@ func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ClickhouseTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmit} 
 func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 	var ClickhouseTransmit models.ClickhouseTransmit
 
