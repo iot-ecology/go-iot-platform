@@ -110,6 +110,7 @@ func (api *SimCardApi) UpdateSimCard(c *gin.Context) {
 // @Router /SimCard/page [get]
 func (api *SimCardApi) PageSimCard(c *gin.Context) {
 	var accessNumber = c.Query("AccessNumber")
+	var iccid = c.Query("iccid")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -124,7 +125,7 @@ func (api *SimCardApi) PageSimCard(c *gin.Context) {
 		return
 	}
 
-	data, err := simCardBiz.PageData(accessNumber, parseUint, u)
+	data, err := simCardBiz.PageData(accessNumber,iccid, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
