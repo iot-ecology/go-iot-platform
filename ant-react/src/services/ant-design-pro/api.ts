@@ -61,7 +61,39 @@ export async function rule(
 }
 
 
-export async function userList(
+export async function deptPage(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+){
+  const  request1 = await request<API.CommonPage<API.DeptListItem>>('/api/Dept/page', {
+    method: 'GET',
+    params: {
+      page:params.current,
+      page_size:params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success:request1.code ===20000,
+    total: request1.data?.total
+  };
+}
+
+export async function deptList(){
+  return request<API.CommonResp<API.DeptListItem[]>>('/api/Dept/list', {
+    method: 'GET',
+  });
+}
+
+export async function userPage(
   params: {
     // query
     /** 当前的页码 */
@@ -119,13 +151,27 @@ export async function addUser(options?: { [key: string]: any }) {
       ...(options || {}),
     }
   });
+}export async function addDept(options?: { [key: string]: any }) {
+  return request<API.CommonResp<any>>('/api/Dept/create', {
+    method: 'POST',
+    data:{
+      method: 'post',
+      ...(options || {}),
+    }
+  });
 }
+
 export async function deleteUser(id: any) {
-  return request<API.CommonResp>('/api/User/delete/' + id , {
+  return request<API.CommonResp<string>>('/api/User/delete/' + id , {
     method: 'POST',
   });
 }export async function updateUser(dt: any) {
-  return request<API.CommonResp>('/api/User/update', {
+  return request<API.CommonResp<string>>('/api/User/update', {
+    method: 'POST',
+    data: dt
+  });
+}export async function updateDept(dt: any) {
+  return request<API.CommonResp<string>>('/api/Dept/update', {
     method: 'POST',
     data: dt
   });

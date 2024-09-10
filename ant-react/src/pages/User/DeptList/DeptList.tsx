@@ -1,22 +1,19 @@
+import { addDept, deptList, deptPage, updateDept, updateUser } from '@/services/ant-design-pro/api';
+import { FormattedMessage } from '@@/exports';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
-  FooterToolbar,
   ModalForm,
   PageContainer,
-  type ProColumns,
-  ProDescriptions,
-  type ProDescriptionsItemProps,
+  type ProColumns, ProDescriptions, type ProDescriptionsItemProps,
+  ProFormSelect,
   ProFormText,
-  ProTable
+  ProTable,
 } from '@ant-design/pro-components';
-import React, {useRef, useState} from 'react';
-import {Button, Drawer} from 'antd';
-import {useIntl} from '@umijs/max';
-import {FormattedMessage} from "@@/exports";
-import {PlusOutlined} from "@ant-design/icons";
-import {rule} from "@/services/ant-design-pro/api";
-import UpdateForm from "@/pages/TableList/components/UpdateForm";
-
+import { useIntl } from '@umijs/max';
+import { Button, Drawer, message } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import DeptUpdateForm from '@/pages/User/DeptList/DeptUpdateForm';
 
 const Admin: React.FC = () => {
   const intl = useIntl();
@@ -34,146 +31,222 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.DeptListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.DeptListItem[]>([]);
 
-  const columns: ProColumns<API.RuleListItem>[] = [{
-    title: (<FormattedMessage
-      id="pages.id"
-      defaultMessage="唯一码"
-
-    />),
-    hideInSearch:true,
-    dataIndex: 'id', // @ts-ignore
-    tip: 'The rule name is the unique key', render: (dom, entity) => {
-      return (<a
-        onClick={() => {
-          setCurrentRow(entity);
-          setShowDetail(true);
-        }}
-      >
-        {dom}
-      </a>);
-    },
-  },
+  const columns: ProColumns<API.DeptListItem>[] = [
     {
-      title: (<FormattedMessage
-        id="pages.name"
-        defaultMessage="名称"
-      />), hideInSearch: false, dataIndex: 'name',
+      title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
+      hideInSearch: true,
+      dataIndex: 'ID', // @ts-ignore
+      render: (dom, entity) => {
+        return (
+          <a
+            onClick={() => {
+              setCurrentRow(entity);
+              setShowDetail(true);
+            }}
+          >
+            {dom}
+          </a>
+        );
+      },
     },
     {
-      title: (<FormattedMessage
-        id="pages.dept-list.pname"
-        defaultMessage="上级部门"
-      />), hideInSearch: true, dataIndex: 'pname',
+      title: <FormattedMessage id="pages.name" defaultMessage="名称" />,
+      hideInSearch: false,
+      dataIndex: 'name',
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating"/>,
+      title: <FormattedMessage id="pages.dept-list.pname" defaultMessage="上级部门" />,
+      hideInSearch: true,
+      dataIndex: 'parent_name',
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a
-        key="config"
-        onClick={() => {
-          handleUpdateModalOpen(true);
-          setCurrentRow(record);
-        }}
-      >
-        <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration"/>
-      </a>,],
-    },];
+      render: (_, record) => [
+        <Button
+          key="update"
+          onClick={() => {
+            // todo: 修改
+            handleUpdateModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.update" defaultMessage="修改" />
+        </Button>,
+      ],
+    },
+  ];
 
-  return (<PageContainer>
-    <ProTable<API.RuleListItem, API.PageParams>
-      headerTitle={intl.formatMessage({
-        id: 'pages.searchTable.title', defaultMessage: 'Enquiry form',
-      })}
-      actionRef={actionRef}
-      rowKey="key"
-      search={{
-        labelWidth: 120,
-      }}
-      toolBarRender={() => [<Button
-        type="primary"
-        key="primary"
-        onClick={() => {
-          handleModalOpen(true);
+  async function handleAdd(value1: API.DeptListItem) {
+    const hide = message.loading('正在添加');
+    try {
+      await addDept({ ...value1 });
+      hide();
+      message.success('Added successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Adding failed, please try again!');
+      return false;
+    }
+  }
+
+  const [options, setOptions] = useState<{ label: string; value: string | number }[]>([]);
+
+  const loadDeptList = async () => {
+    try {
+      const result = await deptList(); // 调用API获取数据
+      if (result && result.data && Array.isArray(result.data)) {
+        const formattedOptions = result.data.map((item) => ({
+          label: item.name, // 假设每项数据都有一个name属性
+          value: item.ID, // 假设每项数据都有一个id属性
+        }));
+
+        setOptions(formattedOptions);
+      }
+    } catch (error) {
+      message.error('请求数据失败，请稍后再试！');
+    }
+
+  };
+
+  useEffect( ()=>{
+
+
+    loadDeptList()
+  },[])
+
+  async function handlerUpdate(value: API.DeptListItem) {
+    const hide = message.loading('正在更新');
+    try {
+      await updateDept({ ...value });
+      hide();
+      message.success('更新成功');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('更新 failed, please try again!');
+      return false;
+    }
+  }
+
+  return (
+    <PageContainer>
+      <ProTable<API.DeptListItem, API.PageParams>
+        headerTitle={intl.formatMessage({
+          id: 'pages.searchTable.title',
+          defaultMessage: 'Enquiry form',
+        })}
+        actionRef={actionRef}
+        rowKey="key"
+        search={{
+          labelWidth: 120,
         }}
-      >
-        <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
-      </Button>,]}
-      request={rule}
-      columns={columns}
-      rowSelection={{
-        onChange: (_, selectedRows) => {
-          setSelectedRows(selectedRows);
-        },
-      }}
-    />
-    {selectedRowsState?.length > 0 && (<FooterToolbar
-      extra={<div>
-        <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen"/>{' '}
-        <a style={{fontWeight: 600}}>{selectedRowsState.length}</a>{' '}
-        <FormattedMessage id="pages.searchTable.item" defaultMessage="项"/>
-        &nbsp;&nbsp;
-        <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-          {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-          <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万"/>
-              </span>
-      </div>}
-    >
-      <Button
-        onClick={async () => {
-          await handleRemove(selectedRowsState);
-          setSelectedRows([]);
-          actionRef.current?.reloadAndRest?.();
+        toolBarRender={() => [
+          <Button
+            type="primary"
+            key="primary"
+            onClick={() => {
+              handleModalOpen(true);
+            }}
+          >
+            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          </Button>,
+        ]}
+        request={deptPage}
+        columns={columns}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
         }}
-      >
-        <FormattedMessage
-          id="pages.searchTable.batchDeletion"
-          defaultMessage="Batch deletion"
-        />
-      </Button>
-      <Button type="primary">
-        <FormattedMessage
-          id="pages.searchTable.batchApproval"
-          defaultMessage="Batch approval"
-        />
-      </Button>
-    </FooterToolbar>)}
-    <ModalForm
-      title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newRule', defaultMessage: 'New rule',
-      })}
-      width="75%"
-      open={createModalOpen}
-      onOpenChange={handleModalOpen}
-      onFinish={async (value) => {
-        const success = await handleAdd(value as API.RuleListItem);
-        if (success) {
-          handleModalOpen(false);
-          if (actionRef.current) {
-            actionRef.current.reload();
-          }
-        }
-      }}
-    >
-      <ProFormText
-        label={<FormattedMessage
-          id="pages.name"
-        />}
-        name="name"
       />
+      <ModalForm
+        key={'add'}
+        title={intl.formatMessage({
+          id: 'pages.new',
+          defaultMessage: '新增',
+        })}
+        width="75%"
+        open={createModalOpen}
+        onOpenChange={handleModalOpen}
+        onFinish={async (value) => {
+          const success = await handleAdd(value as API.DeptListItem);
+          if (success) {
+            await loadDeptList();
+            handleModalOpen(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
+        }}
+      >
+        <ProFormText key={'name'} label={<FormattedMessage id="pages.name" />} name="name" />
 
-    </ModalForm>
+        <ProFormSelect
+          key={'parent_id'}
+          label={<FormattedMessage id="pages.dept-top" />}
+          name="parent_id"
+          options={options}
+        />
+      </ModalForm>
+
+      <Drawer
+        key={'detail'}
+        width={600}
+        open={showDetail}
+        onClose={() => {
+          setCurrentRow(undefined);
+          setShowDetail(false);
+        }}
+        closable={false}
+      >
+        {currentRow?.name && (
+          <ProDescriptions<API.DeptListItem>
+            column={2}
+            title={currentRow?.name}
+            request={async () => ({
+              data: currentRow || {},
+            })}
+            params={{
+              id: currentRow?.ID,
+            }}
+            columns={columns as ProDescriptionsItemProps<API.DeptListItem>[]}
+          />
+        )}
+      </Drawer>
 
 
-  </PageContainer>);
+      <DeptUpdateForm
+        key={'update'}
+        updateModalOpen={updateModalOpen}
+        values={currentRow || {}}
+        onCancel={() => {
+          handleUpdateModalOpen(false);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+            setShowDetail(false);
+          }
+        }}
+        onSubmit={async (value) => {
+          console.log(value);
+          const  success = await handlerUpdate(value);
+          if (success) {
+            handleUpdateModalOpen(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
 
+
+        }}
+      />
+    </PageContainer>
+  );
 };
 
 export default Admin;

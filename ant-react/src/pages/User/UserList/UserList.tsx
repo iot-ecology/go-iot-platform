@@ -1,5 +1,5 @@
 import UserUpdateForm from '@/pages/User/UserList/UserUpdateForm';
-import { addUser, deleteUser, updateUser, userList } from '@/services/ant-design-pro/api';
+import { addUser, deleteUser, updateUser, userPage } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
 import {
@@ -47,7 +47,7 @@ const handleRemove = async (id: any) => {
 const handlerUpdate = async (fields: API.UserListItem) => {
   const hide = message.loading('正在更新');
   try {
-    await updateUser(fields);
+    await updateUser({ ...fields });
     hide();
     message.success('更新成功');
     return true;
@@ -179,7 +179,7 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={userList}
+        request={userPage}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -236,7 +236,7 @@ const Admin: React.FC = () => {
         }}
         onSubmit={async (value) => {
           console.log(value);
-          var success = await handlerUpdate(value);
+          const success = await handlerUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
             if (actionRef.current) {

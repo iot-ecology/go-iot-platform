@@ -657,6 +657,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/Dept/delete/:id", deptApi.DeleteDept)
 	r.GET("/Dept/:id", deptApi.ByIdDept)
 	r.GET("/Dept/subs", deptApi.FindByIdSubs)
+	r.GET("/Dept/list", deptApi.ListDept)
 
 	r.POST("/Role/create", roleApi.CreateRole)
 	r.POST("/Role/update", roleApi.UpdateRole)

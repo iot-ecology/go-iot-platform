@@ -387,8 +387,9 @@ func (api *UserApi) QueryBindDeviceInfo(c *gin.Context) {
 // @Summary   用户绑定设备
 // @Param User body servlet.UserBindDeviceInfoParam true "绑定参数"
 // @Produce   application/json
-// @Router    /User/BindDeviceInfo [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Router    /User/BindDeviceInfo [post
+
+// @Success 200 {object}  servlet.JSONResult{data=models.UserRole[]}
 func (api *UserApi) BindDeviceInfo(c *gin.Context) {
 
 	var param servlet.UserBindDeviceInfoParam

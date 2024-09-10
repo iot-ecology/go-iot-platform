@@ -71,6 +71,7 @@ export default {
   'pages.update': '修改',
 
   'pages.name': '名称',
+  'pages.dept-top': '上级部门',
 
   'pages.id': "唯一码",
   'pages.desc': "描述",

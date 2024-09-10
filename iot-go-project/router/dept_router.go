@@ -135,7 +135,7 @@ func (api *DeptApi) PageDept(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /Dept/delete/:id [post]
-// @Success 200 {object}  servlet.JSONResult{data=models.Dept} 
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept}
 func (api *DeptApi) DeleteDept(c *gin.Context) {
 	var Dept models.Dept
 
@@ -162,7 +162,7 @@ func (api *DeptApi) DeleteDept(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Dept/:id [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.Dept} 
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept}
 func (api *DeptApi) ByIdDept(c *gin.Context) {
 	var Dept models.Dept
 
@@ -184,7 +184,7 @@ func (api *DeptApi) ByIdDept(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Dept/subs [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.Dept[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept[]}
 func (api *DeptApi) FindByIdSubs(c *gin.Context) {
 	param := c.Query("id")
 	var subDepts []models.Dept
@@ -196,4 +196,24 @@ func (api *DeptApi) FindByIdSubs(c *gin.Context) {
 		return
 	}
 	servlet.Resp(c, subDepts)
+}
+
+// ListDept
+// @Summary 部门列表
+// @Description 部门列表
+// @Tags Depts
+// @Accept json
+// @Produce json
+// @Param Dept body models.Dept true "部门"
+// @Success 200 {object}  servlet.JSONResult{data=models.Dept} "部门"
+// @Failure 400 {string} string "请求数据错误"
+// @Failure 404 {string} string "部门未找到"
+// @Failure 500 {string} string "内部服务器错误"
+// @Router /Dept/list [post]
+func (api *DeptApi) ListDept(c *gin.Context) {
+
+	var depts []models.Dept
+	glob.GDb.Find(&depts)
+
+	servlet.Resp(c, depts)
 }

@@ -57,6 +57,13 @@ declare namespace API {
 
   };
 
+  type DeptListItem = {
+    ID?:number;
+    name?:string;
+    parent_id?:number;
+    parent_name?:string;
+
+  };
 
   type RuleList = {
     data?: RuleListItem[];
@@ -79,9 +86,15 @@ declare namespace API {
     message?: string;
     code?: number;
   };
+  type CommonPage<T> = {
+    data?: PageList<T>;
+    /** 列表的内容总数 */
+    message?: string;
+    code?: number;
+  }
 
-  type CommonResp = {
-    data?:any ;
+  type CommonResp <T>= {
+    data?: T ;
     message?: string;
     code?: number;
   }
