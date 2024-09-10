@@ -1,11 +1,14 @@
-import { addDept, deptList, deptPage, updateDept, updateUser } from '@/services/ant-design-pro/api';
+import DeptUpdateForm from '@/pages/User/DeptList/DeptUpdateForm';
+import { addDept, deptList, deptPage, updateDept } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
   ModalForm,
   PageContainer,
-  type ProColumns, ProDescriptions, type ProDescriptionsItemProps,
+  type ProColumns,
+  ProDescriptions,
+  type ProDescriptionsItemProps,
   ProFormSelect,
   ProFormText,
   ProTable,
@@ -13,7 +16,6 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import DeptUpdateForm from '@/pages/User/DeptList/DeptUpdateForm';
 
 const Admin: React.FC = () => {
   const intl = useIntl();
@@ -32,7 +34,6 @@ const Admin: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.DeptListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.DeptListItem[]>([]);
 
   const columns: ProColumns<API.DeptListItem>[] = [
     {
@@ -106,19 +107,17 @@ const Admin: React.FC = () => {
           value: item.ID, // 假设每项数据都有一个id属性
         }));
 
+        // @ts-ignore
         setOptions(formattedOptions);
       }
     } catch (error) {
       message.error('请求数据失败，请稍后再试！');
     }
-
   };
 
-  useEffect( ()=>{
-
-
-    loadDeptList()
-  },[])
+  useEffect(() => {
+    loadDeptList();
+  }, []);
 
   async function handlerUpdate(value: API.DeptListItem) {
     const hide = message.loading('正在更新');
@@ -159,11 +158,6 @@ const Admin: React.FC = () => {
         ]}
         request={deptPage}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
       />
       <ModalForm
         key={'add'}
@@ -220,7 +214,6 @@ const Admin: React.FC = () => {
         )}
       </Drawer>
 
-
       <DeptUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}
@@ -234,15 +227,13 @@ const Admin: React.FC = () => {
         }}
         onSubmit={async (value) => {
           console.log(value);
-          const  success = await handlerUpdate(value);
+          const success = await handlerUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
             if (actionRef.current) {
               actionRef.current.reload();
             }
           }
-
-
         }}
       />
     </PageContainer>

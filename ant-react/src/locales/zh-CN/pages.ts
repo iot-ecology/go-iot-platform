@@ -1,5 +1,6 @@
 export default {
-  'pages.layouts.userLayout.title': 'Go IoT 开发平台 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。 ',
+  'pages.layouts.userLayout.title':
+    'Go IoT 开发平台 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。 ',
   'pages.login.accountLogin.tab': '账户密码登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码(admin/admin)',
   'pages.login.failure': '登录失败，请重试！',
@@ -65,17 +66,18 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
-
   'pages.new': '新增',
   'pages.deleted': '删除',
   'pages.update': '修改',
 
   'pages.name': '名称',
+  'pages.content': '内容',
+  'pages.message.type': '消息类型',
   'pages.dept-top': '上级部门',
 
-  'pages.id': "唯一码",
-  'pages.desc': "描述",
-  'pages.pic': "图片",
+  'pages.id': '唯一码',
+  'pages.desc': '描述',
+  'pages.pic': '图片',
 
   'pages.device-group': '设备组',
   'pages.device-info.id': '唯一码',
@@ -88,14 +90,9 @@ export default {
   'pages.device-info.push-time-error': '推送时间误差（秒）',
   'pages.device-info.push-interval': '推送间隔（秒）',
 
+  'pages.user-list.username': '用户名',
+  'pages.user-list.mail': '邮箱',
+  'pages.user-list.password': '密码',
 
-  'pages.user-list.username': "用户名",
-  "pages.user-list.mail": "邮箱",
-  "pages.user-list.password": "密码",
-
-
-  'pages.dept-list.pname': "上级部门",
-
-
-
+  'pages.dept-list.pname': '上级部门',
 };

@@ -24,13 +24,16 @@ const DeptUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const fetchData = async () => {
     try {
       const result = await deptList(); // 调用API获取数据
-      if (result && result.data && Array.isArray(result.data)) {
-        const formattedOptions = result.data.map((item) => ({
-          label: item.name, // 假设每项数据都有一个name属性
-          value: item.ID, // 假设每项数据都有一个id属性
-        }));
+      if (result && result.data) {
+        if (Array.isArray(result.data)) {
+          const formattedOptions = result.data.map((item) => ({
+            label: item.name, // 假设每项数据都有一个name属性
+            value: item.ID, // 假设每项数据都有一个id属性
+          }));
 
-        setOptions(formattedOptions);
+          // @ts-ignore
+          setOptions(formattedOptions);
+        }
       }
     } catch (error) {
       message.error('请求数据失败，请稍后再试！');

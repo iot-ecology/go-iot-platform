@@ -50,19 +50,28 @@ declare namespace API {
   };
 
   type UserListItem = {
-    ID?:number;
-    username?:string;
-    password?:string;
-    email?:string;
-
+    ID?: number;
+    username?: string;
+    password?: string;
+    email?: string;
   };
 
   type DeptListItem = {
-    ID?:number;
-    name?:string;
-    parent_id?:number;
-    parent_name?:string;
-
+    ID?: number;
+    name?: string;
+    parent_id?: number;
+    parent_name?: string;
+  };
+  type RoleListItem = {
+    ID?: number;
+    name?: string;
+    description?: string;
+  };
+  type MessageListItem = {
+    ID?: number;
+    content?: string;
+    en_content?: string;
+    message_type_id?: number;
   };
 
   type RuleList = {
@@ -72,14 +81,12 @@ declare namespace API {
     success?: boolean;
   };
 
-
-
-  type PageList<T>= {
-    data ?: T[]
+  type PageList<T> = {
+    data?: T[];
     total?: number;
     page?: number;
     size?: number;
-  }
+  };
   type UserList = {
     data?: PageList<UserListItem>;
     /** 列表的内容总数 */
@@ -91,13 +98,13 @@ declare namespace API {
     /** 列表的内容总数 */
     message?: string;
     code?: number;
-  }
+  };
 
-  type CommonResp <T>= {
-    data?: T ;
+  type CommonResp<T> = {
+    data?: T;
     message?: string;
     code?: number;
-  }
+  };
 
   type FakeCaptcha = {
     code?: number;

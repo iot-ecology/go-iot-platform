@@ -74,7 +74,6 @@ const Admin: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.UserListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserListItem[]>([]);
 
   const columns: ProColumns<API.UserListItem>[] = [
     {
@@ -109,9 +108,7 @@ const Admin: React.FC = () => {
       hideInSearch: true,
       dataIndex: 'password',
       render: (dom, entity) => {
-        return (
-          <div>****</div>
-        )
+        return <div>****</div>;
       },
     },
     {
@@ -181,11 +178,6 @@ const Admin: React.FC = () => {
         ]}
         request={userPage}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
       />
       <ModalForm
         key={'add'}
@@ -243,8 +235,6 @@ const Admin: React.FC = () => {
               actionRef.current.reload();
             }
           }
-
-
         }}
       />
 
@@ -258,15 +248,15 @@ const Admin: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.ID && (
+        {currentRow?.username && (
           <ProDescriptions<API.UserListItem>
             column={2}
-            title={currentRow?.ID}
+            title={currentRow?.username}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.ID,
+              id: currentRow?.username,
             }}
             columns={columns as ProDescriptionsItemProps<API.UserListItem>[]}
           />

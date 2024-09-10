@@ -1,22 +1,20 @@
+import RoleUpdateForm from '@/pages/User/RoleList/RoleUpdateForm';
+import { addRole, rolePage, updateRole } from '@/services/ant-design-pro/api';
+import { FormattedMessage } from '@@/exports';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
-  FooterToolbar,
   ModalForm,
   PageContainer,
   type ProColumns,
   ProDescriptions,
   type ProDescriptionsItemProps,
   ProFormText,
-  ProTable
+  ProTable,
 } from '@ant-design/pro-components';
-import React, {useRef, useState} from 'react';
-import {Button, Drawer} from 'antd';
-import {useIntl} from '@umijs/max';
-import {FormattedMessage} from "@@/exports";
-import {PlusOutlined} from "@ant-design/icons";
-import {rule} from "@/services/ant-design-pro/api";
-import UpdateForm from "@/pages/TableList/components/UpdateForm";
-
+import { useIntl } from '@umijs/max';
+import { Button, Drawer, message } from 'antd';
+import React, { useRef, useState } from 'react';
 
 const Admin: React.FC = () => {
   const intl = useIntl();
@@ -34,146 +32,180 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.RoleListItem>();
 
-  const columns: ProColumns<API.RuleListItem>[] = [{
-    title: (<FormattedMessage
-      id="pages.id"
-      defaultMessage="唯一码"
+  async function handleAdd(value1: API.DeptListItem) {
+    const hide = message.loading('正在添加');
+    try {
+      await addRole({ ...value1 });
+      hide();
+      message.success('Added successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Adding failed, please try again!');
+      return false;
+    }
+  }
 
-    />),
-    hideInSearch:true,
-    dataIndex: 'id', // @ts-ignore
-    tip: 'The rule name is the unique key', render: (dom, entity) => {
-      return (<a
-        onClick={() => {
-          setCurrentRow(entity);
-          setShowDetail(true);
-        }}
-      >
-        {dom}
-      </a>);
-    },
-  },
+  const columns: ProColumns<API.RoleListItem>[] = [
     {
-      title: (<FormattedMessage
-        id="pages.name"
-        defaultMessage="名称"
-      />), hideInSearch: false, dataIndex: 'name',
+      title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
+      hideInSearch: true,
+      dataIndex: 'ID', // @ts-ignor
+      render: (dom, entity) => {
+        return (
+          <a
+            onClick={() => {
+              setCurrentRow(entity);
+              setShowDetail(true);
+            }}
+          >
+            {dom}
+          </a>
+        );
+      },
     },
     {
-      title: (<FormattedMessage
-        id="pages.desc"
-        defaultMessage="描述"
-      />), hideInSearch: true, dataIndex: 'desc',
+      title: <FormattedMessage id="pages.name" defaultMessage="名称" />,
+      hideInSearch: false,
+      dataIndex: 'name',
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating"/>,
+      title: <FormattedMessage id="pages.desc" defaultMessage="描述" />,
+      hideInSearch: true,
+      dataIndex: 'description',
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [<a
-        key="config"
-        onClick={() => {
-          handleUpdateModalOpen(true);
-          setCurrentRow(record);
-        }}
-      >
-        <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration"/>
-      </a>,],
-    },];
+      render: (_, record) => [
+        <Button
+          key="update"
+          onClick={() => {
+            // todo: 修改
+            handleUpdateModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.update" defaultMessage="修改" />
+        </Button>,
+      ],
+    },
+  ];
 
-  return (<PageContainer>
-    <ProTable<API.RuleListItem, API.PageParams>
-      headerTitle={intl.formatMessage({
-        id: 'pages.searchTable.title', defaultMessage: 'Enquiry form',
-      })}
-      actionRef={actionRef}
-      rowKey="key"
-      search={{
-        labelWidth: 120,
-      }}
-      toolBarRender={() => [<Button
-        type="primary"
-        key="primary"
-        onClick={() => {
-          handleModalOpen(true);
+  async function handlerUpdate(value: API.DeptListItem) {
+    const hide = message.loading('正在修改');
+    try {
+      await updateRole({ ...value });
+      hide();
+      message.success('Update successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Update failed, please try again!');
+      return false;
+    }
+  }
+
+  return (
+    <PageContainer>
+      <ProTable<API.RoleListItem, API.PageParams>
+        headerTitle={intl.formatMessage({
+          id: 'pages.searchTable.title',
+          defaultMessage: 'Enquiry form',
+        })}
+        actionRef={actionRef}
+        rowKey="key"
+        search={{
+          labelWidth: 120,
         }}
-      >
-        <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
-      </Button>,]}
-      request={rule}
-      columns={columns}
-      rowSelection={{
-        onChange: (_, selectedRows) => {
-          setSelectedRows(selectedRows);
-        },
-      }}
-    />
-    {selectedRowsState?.length > 0 && (<FooterToolbar
-      extra={<div>
-        <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen"/>{' '}
-        <a style={{fontWeight: 600}}>{selectedRowsState.length}</a>{' '}
-        <FormattedMessage id="pages.searchTable.item" defaultMessage="项"/>
-        &nbsp;&nbsp;
-        <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-          {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-          <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万"/>
-              </span>
-      </div>}
-    >
-      <Button
-        onClick={async () => {
-          await handleRemove(selectedRowsState);
-          setSelectedRows([]);
-          actionRef.current?.reloadAndRest?.();
-        }}
-      >
-        <FormattedMessage
-          id="pages.searchTable.batchDeletion"
-          defaultMessage="Batch deletion"
-        />
-      </Button>
-      <Button type="primary">
-        <FormattedMessage
-          id="pages.searchTable.batchApproval"
-          defaultMessage="Batch approval"
-        />
-      </Button>
-    </FooterToolbar>)}
-    <ModalForm
-      title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newRule', defaultMessage: 'New rule',
-      })}
-      width="75%"
-      open={createModalOpen}
-      onOpenChange={handleModalOpen}
-      onFinish={async (value) => {
-        const success = await handleAdd(value as API.RuleListItem);
-        if (success) {
-          handleModalOpen(false);
-          if (actionRef.current) {
-            actionRef.current.reload();
-          }
-        }
-      }}
-    >
-      <ProFormText
-        label={<FormattedMessage
-          id="pages.name"
-        />}
-        name="name"
+        toolBarRender={() => [
+          <Button
+            type="primary"
+            key="primary"
+            onClick={() => {
+              handleModalOpen(true);
+            }}
+          >
+            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          </Button>,
+        ]}
+        request={rolePage}
+        columns={columns}
       />
+      <ModalForm
+        title={intl.formatMessage({
+          id: 'pages.searchTable.createForm.newRule',
+          defaultMessage: 'New rule',
+        })}
+        width="75%"
+        open={createModalOpen}
+        onOpenChange={handleModalOpen}
+        onFinish={async (value) => {
+          const success = await handleAdd(value as API.RoleListItem);
+          if (success) {
+            handleModalOpen(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
+        }}
+      >
+        <ProFormText label={<FormattedMessage id="pages.name" />} name="name" />{' '}
+        <ProFormText label={<FormattedMessage id="pages.desc" />} name="description" />
+      </ModalForm>
 
-    </ModalForm>
+      <Drawer
+        key={'detail'}
+        width={600}
+        open={showDetail}
+        onClose={() => {
+          setCurrentRow(undefined);
+          setShowDetail(false);
+        }}
+        closable={false}
+      >
+        {currentRow?.name && (
+          <ProDescriptions<API.DeptListItem>
+            column={2}
+            title={currentRow?.name}
+            request={async () => ({
+              data: currentRow || {},
+            })}
+            params={{
+              id: currentRow?.ID,
+            }}
+            columns={columns as ProDescriptionsItemProps<API.DeptListItem>[]}
+          />
+        )}
+      </Drawer>
 
-
-  </PageContainer>);
-
+      <RoleUpdateForm
+        key={'update'}
+        updateModalOpen={updateModalOpen}
+        values={currentRow || {}}
+        onCancel={() => {
+          handleUpdateModalOpen(false);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+            setShowDetail(false);
+          }
+        }}
+        onSubmit={async (value) => {
+          console.log(value);
+          const success = await handlerUpdate(value);
+          if (success) {
+            handleUpdateModalOpen(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
+        }}
+      />
+    </PageContainer>
+  );
 };
 
 export default Admin;
