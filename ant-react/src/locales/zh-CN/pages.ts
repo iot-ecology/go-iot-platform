@@ -95,4 +95,10 @@ export default {
   'pages.user-list.password': '密码',
 
   'pages.dept-list.pname': '上级部门',
+
+  'pages.sim.access_number': '接入号',
+  'pages.sim.iccid': '集成电路卡识别码',
+  'pages.sim.imsi': '国际移动用户识别码',
+  'pages.sim.operator': '运营商名称',
+  'pages.sim.expiration': '到期时间',
 };

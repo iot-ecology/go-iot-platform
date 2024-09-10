@@ -4,7 +4,7 @@
     {
       "name": "iotPrometheus",
       "type": "prometheus",
-      "url": "http://172.17.0.1:9090",
+      "url": "http://192.168.3.101:9090",
       "isDefault": true
     }
   ]

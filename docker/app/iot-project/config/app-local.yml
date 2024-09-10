@@ -1,19 +1,19 @@
 node_info:
   port: 8080
-  host: 172.17.0.1
+  host: 192.168.3.101
 redis_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 6379
   db: 10
   password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
 mq_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 5672
   username: guest
   password: guest
 influx_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 8086
   token: mytoken
   org: myorg
@@ -22,11 +22,11 @@ influx_config:
 mysql_config:
   username: app
   password: iot123456
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 3306
   dbname: iot
 mongo_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 27017
   username: admin
   password: admin

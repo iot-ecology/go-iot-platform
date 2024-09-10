@@ -55,6 +55,14 @@ declare namespace API {
     password?: string;
     email?: string;
   };
+  type SimListItem = {
+    ID?: number;
+    access_number?: string;
+    iccid?: string;
+    imsi?: string;
+    operator?: string;
+    expiration?: string;
+  };
 
   type DeptListItem = {
     ID?: number;

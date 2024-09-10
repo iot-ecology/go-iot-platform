@@ -164,6 +164,33 @@ export async function userPage(
     total: request1.data?.total,
   };
 }
+export async function simCardPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    access_number?: string;
+    iccid?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SimListItem>('/api/SimCard/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      AccessNumber: params.access_number ? params.access_number : '',
+
+      iccid: params.iccid ? params.iccid : '',
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
 
 /** 更新规则 PUT /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
@@ -189,6 +216,15 @@ export async function addRule(options?: { [key: string]: any }) {
 
 export async function addUser(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/User/create', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+export async function addSim(options?: { [key: string]: any }) {
+  return request<API.RuleListItem>('/api/SimCard/create', {
     method: 'POST',
     data: {
       method: 'post',
@@ -223,8 +259,20 @@ export async function deleteUser(id: any) {
   });
 }
 
+export async function deleteSimCard(id: any) {
+  return request<API.CommonResp<string>>('/api/SimCard/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function updateUser(dt: any) {
   return request<API.CommonResp<string>>('/api/User/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+export async function updateSimCard(dt: any) {
+  return request<API.CommonResp<string>>('/api/SimCard/update', {
     method: 'POST',
     data: dt,
   });
