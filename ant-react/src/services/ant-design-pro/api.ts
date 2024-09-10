@@ -115,6 +115,7 @@ export async function messagePage(
     /** 当前的页码 */
     current?: number /** 页面的容量 */;
     pageSize?: number;
+    message_type_id?: number;
   },
   options?: { [key: string]: any },
 ) {
@@ -123,7 +124,7 @@ export async function messagePage(
     params: {
       page: params.current,
       page_size: params.pageSize,
-      ...params,
+      message_type_id: params.message_type_id,
     },
     ...(options || {}),
   });
@@ -402,6 +403,20 @@ enum MessageType {
   MaintenanceEndNotification = 8, // SIM卡超时通知
   SimCardExpireTime = 9, // 设备掉线通知
   DeviceOffMessage = 10,
+}
+export function cc() {
+  const maap = [];
+  maap.push({ label: getMessageTypeDescription(1), value: 1 });
+  maap.push({ label: getMessageTypeDescription(2), value: 2 });
+  maap.push({ label: getMessageTypeDescription(3), value: 3 });
+  maap.push({ label: getMessageTypeDescription(4), value: 4 });
+  maap.push({ label: getMessageTypeDescription(5), value: 5 });
+  maap.push({ label: getMessageTypeDescription(6), value: 6 });
+  maap.push({ label: getMessageTypeDescription(7), value: 7 });
+  maap.push({ label: getMessageTypeDescription(8), value: 8 });
+  maap.push({ label: getMessageTypeDescription(9), value: 9 });
+  maap.push({ label: getMessageTypeDescription(10), value: 10 });
+  return maap;
 }
 
 // 获取枚举值对应的中文描述

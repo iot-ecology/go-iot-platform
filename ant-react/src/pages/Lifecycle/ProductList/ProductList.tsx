@@ -14,6 +14,7 @@ import {
   type ProColumns,
   ProDescriptions,
   type ProDescriptionsItemProps,
+  ProForm,
   ProFormDigit,
   ProFormText,
   ProTable,
@@ -249,42 +250,46 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText
-          key={'name'}
-          label={<FormattedMessage id="pages.product.name" />}
-          name="name"
-        />
-        <ProFormText
-          key={'description'}
-          label={<FormattedMessage id="pages.product.description" />}
-          name="description"
-        />
-        <ProFormText key={'sku'} label={<FormattedMessage id="pages.product.sku" />} name="sku" />
-        <ProFormDigit
-          key={'price'}
-          label={<FormattedMessage id="pages.product.price" />}
-          name="price"
-        />
-        <ProFormDigit
-          key={'cost'}
-          label={<FormattedMessage id="pages.product.cost" />}
-          name="cost"
-        />
-        <ProFormDigit
-          key={'quantity'}
-          label={<FormattedMessage id="pages.product.quantity" />}
-          name="quantity"
-        />
-        <ProFormDigit
-          key={'minimum_stock'}
-          label={<FormattedMessage id="pages.product.minimum_stock" />}
-          name="minimum_stock"
-        />
-        <ProFormDigit
-          key={'warranty_period'}
-          label={<FormattedMessage id="pages.product.warranty_period" />}
-          name="warranty_period"
-        />
+        <ProForm.Group>
+          <ProFormText
+            key={'name'}
+            label={<FormattedMessage id="pages.product.name" />}
+            name="name"
+          />
+          <ProFormText
+            key={'description'}
+            label={<FormattedMessage id="pages.product.description" />}
+            name="description"
+          />
+          <ProFormText key={'sku'} label={<FormattedMessage id="pages.product.sku" />} name="sku" />
+        </ProForm.Group>
+        <ProForm.Group>
+          <ProFormDigit
+            key={'price'}
+            label={<FormattedMessage id="pages.product.price" />}
+            name="price"
+          />
+          <ProFormDigit
+            key={'cost'}
+            label={<FormattedMessage id="pages.product.cost" />}
+            name="cost"
+          />
+          <ProFormDigit
+            key={'quantity'}
+            label={<FormattedMessage id="pages.product.quantity" />}
+            name="quantity"
+          />
+          <ProFormDigit
+            key={'minimum_stock'}
+            label={<FormattedMessage id="pages.product.minimum_stock" />}
+            name="minimum_stock"
+          />
+          <ProFormDigit
+            key={'warranty_period'}
+            label={<FormattedMessage id="pages.product.warranty_period" />}
+            name="warranty_period"
+          />
+        </ProForm.Group>
         <ProFormText
           key={'status'}
           label={<FormattedMessage id="pages.product.status" />}
