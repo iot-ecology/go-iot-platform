@@ -1,8 +1,8 @@
+import { deptList } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { Form, message, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { deptList } from '@/services/ant-design-pro/api';
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: API.DeptListItem) => void;
@@ -19,7 +19,6 @@ const DeptUpdateForm: React.FC<UpdateFormProps> = (props) => {
     form.resetFields();
     form.setFieldsValue(props.values);
   });
-
 
   const fetchData = async () => {
     try {
@@ -40,15 +39,10 @@ const DeptUpdateForm: React.FC<UpdateFormProps> = (props) => {
     }
   };
 
-
-  useEffect( ()=>{
-
-    fetchData()
-  },[])
   return (
     <Modal
-      afterOpenChange={ async (flag:boolean ) => {
-        await  fetchData()
+      afterOpenChange={async (flag: boolean) => {
+        await fetchData();
       }}
       key="userupdateform"
       destroyOnClose
