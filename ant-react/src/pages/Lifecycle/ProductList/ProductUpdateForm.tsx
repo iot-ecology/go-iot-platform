@@ -11,7 +11,7 @@ export type UpdateFormProps = {
 
   values: API.SimListItem;
 };
-const SimUpdateForm: React.FC<UpdateFormProps> = (props) => {
+const ProductUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
@@ -66,4 +66,4 @@ const SimUpdateForm: React.FC<UpdateFormProps> = (props) => {
   );
 };
 
-export default SimUpdateForm;
+export default ProductUpdateForm;

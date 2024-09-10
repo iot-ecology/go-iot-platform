@@ -191,6 +191,53 @@ export async function simCardPage(
     total: request1.data?.total,
   };
 }
+export async function productPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.ProductItem>('/api/product/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function deviceGroupPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.DeviceGroupItem>('/api/device_group/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
 
 /** 更新规则 PUT /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
@@ -232,6 +279,24 @@ export async function addSim(options?: { [key: string]: any }) {
     },
   });
 }
+export async function addProduct(options?: { [key: string]: any }) {
+  return request<API.ProductItem>('/api/product/create', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+export async function addDeviceGroup(options?: { [key: string]: any }) {
+  return request<API.RuleListItem>('/api/device_group/create', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
 
 export async function addDept(options?: { [key: string]: any }) {
   return request<API.CommonResp<any>>('/api/Dept/create', {
@@ -264,6 +329,16 @@ export async function deleteSimCard(id: any) {
     method: 'POST',
   });
 }
+export async function deleteProduct(id: any) {
+  return request<API.CommonResp<string>>('/api/product/delete/' + id, {
+    method: 'POST',
+  });
+}
+export async function deleteDeviceGroup(id: any) {
+  return request<API.CommonResp<string>>('/api/device_group/delete/' + id, {
+    method: 'POST',
+  });
+}
 
 export async function updateUser(dt: any) {
   return request<API.CommonResp<string>>('/api/User/update', {
@@ -273,6 +348,18 @@ export async function updateUser(dt: any) {
 }
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+export async function updateProduct(dt: any) {
+  return request<API.CommonResp<string>>('/api/product/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+export async function updateDeviceGroup(dt: any) {
+  return request<API.CommonResp<string>>('/api/device_group/update', {
     method: 'POST',
     data: dt,
   });

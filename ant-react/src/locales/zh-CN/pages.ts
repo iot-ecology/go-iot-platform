@@ -71,6 +71,7 @@ export default {
   'pages.update': '修改',
 
   'pages.name': '名称',
+  'pages.bind': '绑定',
   'pages.content': '内容',
   'pages.message.type': '消息类型',
   'pages.dept-top': '上级部门',
@@ -101,4 +102,16 @@ export default {
   'pages.sim.imsi': '国际移动用户识别码',
   'pages.sim.operator': '运营商名称',
   'pages.sim.expiration': '到期时间',
+
+  'pages.product.name': '产品名称',
+  'pages.product.description': '产品描述',
+  'pages.product.sku': '库存单位',
+  'pages.product.price': '销售价格',
+  'pages.product.cost': '成本',
+  'pages.product.quantity': '库存数量',
+  'pages.product.minimum_stock': '最低库存量',
+  'pages.product.warranty_period': '质保时间（天）',
+  'pages.product.status': '产品状态',
+  'pages.product.tags': '标签',
+  'pages.product.image_url': '图片URL',
 };

@@ -206,7 +206,7 @@ const Admin: React.FC = () => {
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
-              actionRef.current.reload();
+              await actionRef.current.reload();
             }
           }
         }}
@@ -250,7 +250,7 @@ const Admin: React.FC = () => {
           if (success) {
             handleUpdateModalOpen(false);
             if (actionRef.current) {
-              actionRef.current.reload();
+              await actionRef.current.reload();
             }
           }
         }}

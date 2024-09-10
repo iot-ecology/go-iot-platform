@@ -63,6 +63,24 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type DeviceGroupItem = {
+    ID?: number;
+    name?: string;
+  };
+  type ProductItem = {
+    ID?: number;
+    name?: string;
+    description?: string;
+    sku?: string;
+    price?: number;
+    cost?: number;
+    quantity?: number;
+    minimum_stock?: number;
+    warranty_period?: number;
+    status?: string;
+    tags?: string;
+    image_url?: string;
+  };
 
   type DeptListItem = {
     ID?: number;
@@ -83,8 +101,7 @@ declare namespace API {
   };
 
   type RuleList = {
-    data?: RuleListItem[];
-    /** 列表的内容总数 */
+    data?: RuleListItem[] /** 列表的内容总数 */;
     total?: number;
     success?: boolean;
   };
@@ -96,14 +113,12 @@ declare namespace API {
     size?: number;
   };
   type UserList = {
-    data?: PageList<UserListItem>;
-    /** 列表的内容总数 */
+    data?: PageList<UserListItem> /** 列表的内容总数 */;
     message?: string;
     code?: number;
   };
   type CommonPage<T> = {
-    data?: PageList<T>;
-    /** 列表的内容总数 */
+    data?: PageList<T> /** 列表的内容总数 */;
     message?: string;
     code?: number;
   };
@@ -128,16 +143,13 @@ declare namespace API {
 
   type ErrorResponse = {
     /** 业务约定的错误码 */
-    errorCode: string;
-    /** 业务上的错误信息 */
-    errorMessage?: string;
-    /** 业务上的请求是否成功 */
+    errorCode: string /** 业务上的错误信息 */;
+    errorMessage?: string /** 业务上的请求是否成功 */;
     success?: boolean;
   };
 
   type NoticeIconList = {
-    data?: NoticeIconItem[];
-    /** 列表的内容总数 */
+    data?: NoticeIconItem[] /** 列表的内容总数 */;
     total?: number;
     success?: boolean;
   };
