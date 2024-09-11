@@ -79,9 +79,15 @@ declare namespace API {
     warranty_period?: number;
     status?: string;
     tags?: string;
-    image_url?: string;
+    image_url?: string | FileItemUpload[];
   };
-
+  type FileItemUpload = {
+    response: FileUpdateResponse;
+  };
+  type FileUpdateResponse = {
+    file_path: string;
+    message: string;
+  };
   type DeptListItem = {
     ID?: number;
     name?: string;

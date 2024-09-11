@@ -1,4 +1,5 @@
 import ProductUpdateForm from '@/pages/Lifecycle/ProductList/ProductUpdateForm';
+import RenderTags from '@/pages/Lifecycle/ProductList/TagsRow';
 import {
   addProduct,
   deleteProduct,
@@ -17,16 +18,27 @@ import {
   ProForm,
   ProFormDigit,
   ProFormText,
+  ProFormUploadDragger,
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, Form, Image, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.ProductItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addProduct({ ...fields });
+    let image_string = '';
+    if (typeof fields.image_url === 'string') {
+    } else if (Array.isArray(fields.image_url)) {
+      fields.image_url.forEach((file) => {
+        image_string += file.response.file_path;
+      });
+    }
+    // 拷贝
+    const req = { ...fields };
+    req.image_url = image_string;
+    await addProduct(req);
     hide();
     message.success('Added successfully');
     return true;
@@ -54,6 +66,8 @@ const handleRemove = async (id: any) => {
 const handlerUpdate = async (fields: API.ProductItem) => {
   const hide = message.loading('正在更新');
   try {
+    console.log(fields);
+    debugger;
     await updateProduct({ ...fields });
     hide();
     message.success('更新成功');
@@ -162,12 +176,22 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.product.tags" />,
       hideInSearch: false,
       dataIndex: 'tags',
+      render: (e, r) => {
+        if (r.tags) {
+          return RenderTags(r.tags);
+        } else {
+          return <div>-</div>;
+        }
+      },
     },
     {
       key: 'pages.product.image_url',
       title: <FormattedMessage id="pages.product.image_url" />,
       hideInSearch: false,
       dataIndex: 'image_url',
+      render: (e, r) => {
+        return <Image src={'http://localhost:8080' + '/file/download?path=' + r.image_url}></Image>;
+      },
     },
 
     {
@@ -205,6 +229,8 @@ const Admin: React.FC = () => {
     },
   ];
 
+  const [form] = Form.useForm();
+
   return (
     <PageContainer>
       <ProTable<API.ProductItem, API.PageParams>
@@ -232,6 +258,7 @@ const Admin: React.FC = () => {
         columns={columns}
       />
       <ModalForm
+        form={form}
         key={'add'}
         title={intl.formatMessage({
           id: 'pages.new',
@@ -298,12 +325,18 @@ const Admin: React.FC = () => {
         <ProFormText
           key={'tags'}
           label={<FormattedMessage id="pages.product.tags" />}
+          placeholder={'请输入,如果存在多个请用逗号分割'}
           name="tags"
         />
-        <ProFormText
-          key={'image_url'}
-          label={<FormattedMessage id="pages.product.image_url" />}
+        <ProFormUploadDragger
           name="image_url"
+          label={<FormattedMessage id="pages.product.image_url" />}
+          fieldProps={{
+            accept: '.jpg,.png', // 设置接受的文件类型
+            name: 'file',
+            action: '/api/file/update',
+            multiple: false,
+          }}
         />
       </ModalForm>
 

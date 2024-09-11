@@ -113,5 +113,5 @@ export default {
   'pages.product.warranty_period': '质保时间（天）',
   'pages.product.status': '产品状态',
   'pages.product.tags': '标签',
-  'pages.product.image_url': '图片URL',
+  'pages.product.image_url': '图片',
 };

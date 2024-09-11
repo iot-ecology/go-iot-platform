@@ -15,8 +15,6 @@ const Admin: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
 
-  const ss = cc();
-
   const columns: ProColumns<API.MessageListItem>[] = [
     {
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
@@ -32,18 +30,11 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.message.type" defaultMessage="消息类型" />,
       hideInSearch: false,
       dataIndex: 'message_type_id',
-      valueEnum: {
-        1: { text: '计划开始通知', status: 'Default' },
-        2: { text: '计划临期通知', status: 'Default' },
-        3: { text: '计划到期通知', status: 'Default' },
-        4: { text: '生产开始通知', status: 'Default' },
-        5: { text: '生产完成通知', status: 'Default' },
-        6: { text: '维修通知', status: 'Default' },
-        7: { text: '维修开始通知', status: 'Default' },
-        8: { text: '维修结束通知', status: 'Default' },
-        9: { text: 'SIM卡超时通知', status: 'Default' },
-        10: { text: '设备掉线通知', status: 'Default' },
+      valueType: 'select',
+      request: async () => {
+        return cc();
       },
+
       render: (e, record) => (
         <Tag color="success">{getMessageTypeDescription(record.message_type_id)}</Tag>
       ),
