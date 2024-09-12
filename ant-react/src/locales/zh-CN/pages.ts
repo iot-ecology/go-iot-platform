@@ -144,4 +144,9 @@ export default {
   'pages.script': '脚本',
   'pages.mock-param': '模拟参数',
   'pages.mock-result': '模拟执行结果',
+
+  'pages.mqtt.payload': '消息内容',
+  'pages.mqtt.qos': '服务质量',
+  'pages.mqtt.topic': '主题',
+  'pages.mqtt.retained': '保留消息',
 };

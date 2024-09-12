@@ -4,6 +4,7 @@ import {
   deleteMQTT,
   mqttPage,
   mqttScriptCheck,
+  sendMqttClientMessage,
   setMqttScriptCheck,
   startMqttClient,
   stopMqttClient,
@@ -19,6 +20,8 @@ import {
   ProDescriptions,
   type ProDescriptionsItemProps,
   ProFormDigit,
+  ProFormRadio,
+  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProTable,
@@ -90,6 +93,7 @@ const Admin: React.FC = () => {
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [sendMqttMessage, setSendMqttMessage] = useState<boolean>(false);
 
   const [setScriptModalOpen, handleSetScriptModalOpen] = useState<boolean>(false);
 
@@ -204,7 +208,14 @@ const Admin: React.FC = () => {
         <Button key="update" onClick={() => {}}>
           <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />
         </Button>,
-        <Button key="update" onClick={() => {}}>
+        <Button
+          key="update"
+          onClick={() => {
+            setCurMqttClientId(record.ID);
+            setSendMqttMessage(true);
+            setCurrentRow(record);
+          }}
+        >
           <FormattedMessage id="pages.mock-send" defaultMessage="模拟发送" />
         </Button>,
 
@@ -301,6 +312,72 @@ const Admin: React.FC = () => {
         request={mqttPage}
         columns={columns}
       />
+
+      <ModalForm
+        title={'模拟发送'}
+        open={sendMqttMessage}
+        onOpenChange={setSendMqttMessage}
+        onFinish={async (value) => {
+          console.log('设置脚本参数');
+        }}
+        submitter={{
+          render: (props, defaultDoms) => {
+            return [
+              <Button
+                key="submmit"
+                type={'primary'}
+                onClick={async () => {
+                  console.log(props.form?.getFieldsValue());
+                  let fieldsValue = props.form?.getFieldsValue();
+                  fieldsValue.qos = Number(fieldsValue.qos);
+                  let newVar = await sendMqttClientMessage(currentRow?.client_id, fieldsValue);
+                  if (newVar.code === 20000) {
+                    setSendMqttMessage(false);
+                    message.success('模拟发送成功');
+                  }
+                }}
+              >
+                发送
+              </Button>,
+            ];
+          },
+        }}
+      >
+        <ProFormText
+          label={<FormattedMessage id={'pages.mqtt.payload'} />}
+          name={'payload'}
+          key={'payload'}
+        />{' '}
+        <ProFormSelect
+          valueEnum={{
+            0: { text: '最多发送一次，可能会丢失', status: 'success' },
+            1: { text: '至少发送一次，可能会重复', status: 'success' },
+            2: { text: '发送一次，确保消息不会重复', status: 'success' },
+          }}
+          label={<FormattedMessage id={'pages.mqtt.qos'} />}
+          name={'qos'}
+          key={'qos'}
+        />{' '}
+        <ProFormText
+          label={<FormattedMessage id={'pages.mqtt.topic'} />}
+          name={'topic'}
+          key={'topic'}
+        />{' '}
+        <ProFormRadio.Group
+          initialValue={false}
+          options={[
+            {
+              label: '是',
+              value: true,
+            },
+            { label: '否', value: false },
+          ]}
+          label={<FormattedMessage id={'pages.mqtt.retained'} />}
+          name={'retained'}
+          key={'retained'}
+        />
+      </ModalForm>
+
       <ModalForm
         title={'设置数据解析脚本'}
         open={setScriptModalOpen}

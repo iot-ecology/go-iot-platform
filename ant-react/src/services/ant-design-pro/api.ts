@@ -282,13 +282,13 @@ export async function setMqttScriptCheck(id: number, script: string) {
   return request1;
 }
 
-export async function sendMqttMessage(id: number, script: string) {
+export async function sendMqttClientMessage(id: string, data: any) {
   const request1 = await request<API.CommonResp<string>>('/api/mqtt/send', {
     method: 'POST',
-    data: {
+    params: {
       id: id,
-      script: script,
     },
+    data: data,
   });
   return request1;
 }
