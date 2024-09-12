@@ -168,6 +168,12 @@ export async function deptList() {
   });
 }
 
+export async function mqttList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/mqtt/list', {
+    method: 'GET',
+  });
+}
+
 export async function productList() {
   return request<API.CommonResp<API.ProductItem[]>>('/api/product/list', {
     method: 'GET',
@@ -226,6 +232,30 @@ export async function simCardPage(
       AccessNumber: params.access_number ? params.access_number : '',
 
       iccid: params.iccid ? params.iccid : '',
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function signalPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SimListItem>('/api/signal/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
     },
     ...(options || {}),
   });
@@ -429,6 +459,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addSignal(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/signal/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addMQTT(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/mqtt/create', {
     method: 'POST',
@@ -508,6 +547,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteSignal(id: any) {
+  return request<API.CommonResp<string>>('/api/signal/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteMQTT(id: any) {
   return request<API.CommonResp<string>>('/api/mqtt/delete/' + id, {
     method: 'POST',
@@ -547,6 +592,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateSignal(dt: any) {
+  return request<API.CommonResp<string>>('/api/signal/update', {
     method: 'POST',
     data: dt,
   });

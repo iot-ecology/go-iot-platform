@@ -12,6 +12,8 @@ import {
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
+import { history } from 'umi';
+
 import {
   type ActionType,
   ModalForm,
@@ -205,7 +207,14 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-        <Button key="update" onClick={() => {}}>
+        <Button
+          key="update"
+          onClick={() => {
+            history.push({
+              pathname: '/data/signal?id=' + record.ID + '&protocol=mqtt',
+            });
+          }}
+        >
           <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />
         </Button>,
         <Button

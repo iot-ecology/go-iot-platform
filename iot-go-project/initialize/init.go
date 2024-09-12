@@ -511,6 +511,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
+	r.GET("/mqtt/list", mqttApi.ListMqtt)
 	r.GET("/mqtt/start", mqttApi.StartMqtt)
 	r.GET("/mqtt/stop", mqttApi.StopMqtt)
 	r.POST("/mqtt/update", mqttApi.UpdateMqtt)

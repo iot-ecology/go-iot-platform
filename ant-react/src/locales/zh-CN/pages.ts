@@ -149,4 +149,13 @@ export default {
   'pages.mqtt.qos': '服务质量',
   'pages.mqtt.topic': '主题',
   'pages.mqtt.retained': '保留消息',
+
+  'pages.signal.protocol': '协议',
+  'pages.signal.identification_code': '设备标识码',
+  'pages.signal.device_uid': '联网设备ID',
+  'pages.signal.name': '名称',
+  'pages.signal.alias': '别名',
+  'pages.signal.type': '类型',
+  'pages.signal.unit': '单位',
+  'pages.signal.cache_size': '缓存大小',
 };

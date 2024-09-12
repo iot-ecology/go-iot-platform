@@ -63,6 +63,17 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type SignalListItem = {
+    ID?: number;
+    protocol?: string;
+    identification_code?: string;
+    device_uid?: string;
+    name?: string;
+    alias?: string;
+    type?: string;
+    unit?: string;
+    cache_size?: string;
+  };
   type MqttListItem = {
     ID?: number;
     host?: string;
