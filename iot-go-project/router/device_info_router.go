@@ -44,7 +44,7 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	}
 
 	sn := deviceInfoBiz.FindBySn(DeviceInfo.SN)
-	if sn != nil {
+	if sn.ID >0 {
 		servlet.Error(c, "设备已存在")
 		return
 	}
@@ -118,6 +118,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 	newV.WarrantyExpiry = req.WarrantyExpiry
 	newV.PushInterval = req.PushInterval
 	newV.ErrorRate = req.ErrorRate
+	newV.Protocol = req.Protocol
 
 	var Product models.Product
 	result = glob.GDb.First(&Product, newV.ProductId)
@@ -165,6 +166,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Router /DeviceInfo/page [get]
 func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 	var sn = c.Query("sn")
+	var protocol = c.Query("protocol")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -179,7 +181,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := deviceInfoBiz.PageData(sn, parseUint, u)
+	data, err := deviceInfoBiz.PageData(sn,protocol, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

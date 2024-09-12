@@ -119,6 +119,18 @@ declare namespace API {
     parent_id?: number;
     parent_name?: string;
   };
+  type DeviceInfoItem = {
+    ID?: number;
+    product_id?: number;
+    sn?: string;
+    manufacturing_date?: string;
+    procurement_date?: string;
+    source?: number;
+    warranty_expiry?: string;
+    push_interval?: string;
+    error_rate?: number;
+    protocol?: string;
+  };
   type RoleListItem = {
     ID?: number;
     name?: string;

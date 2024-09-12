@@ -14,7 +14,7 @@ type DeviceInfoBiz struct{}
 
 var productBiz = ProductBiz{}
 
-func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *DeviceInfoBiz) PageData(sn, protocol string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var dt []models.DeviceInfo
 
@@ -22,6 +22,10 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 
 	if sn != "" {
 		db = db.Where("sn like ?", "%"+sn+"%")
+	}
+	if protocol !=""{
+		db = db.Where("sn = ?", protocol)
+
 	}
 
 	db.Model(&models.DeviceInfo{}).Count(&pagination.Total)
@@ -43,6 +47,7 @@ func (biz *DeviceInfoBiz) PageData(sn string, page, size int) (*servlet.Paginati
 			ErrorRate:         info.ErrorRate,
 			Model:             info.Model,
 			ProductName:       ProductName,
+			Protocol: info.Protocol,
 		})
 
 	}

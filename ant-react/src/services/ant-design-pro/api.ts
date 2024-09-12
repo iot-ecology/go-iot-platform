@@ -84,6 +84,33 @@ export async function deptPage(
   };
 }
 
+export async function devicePage(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    sn?: string;
+    protocol?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.DeviceInfoItem>>('/api/DeviceInfo/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function rolePage(
   params: {
     // query
@@ -334,6 +361,15 @@ export async function addShipmentRecord(options?: { [key: string]: any }) {
   });
 }
 
+export async function addDevice(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/DeviceInfo/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addProduct(options?: { [key: string]: any }) {
   return request<API.ProductItem>('/api/product/create', {
     method: 'POST',
@@ -386,6 +422,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteDeviceInfo(id: any) {
+  return request<API.CommonResp<string>>('/api/DeviceInfo/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteShipmentRecord(id: any) {
   return request<API.CommonResp<string>>('/api/ShipmentRecord/delete/' + id, {
     method: 'POST',
@@ -413,6 +455,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateDeviceInfo(dt: any) {
+  return request<API.CommonResp<string>>('/api/DeviceInfo/update', {
     method: 'POST',
     data: dt,
   });

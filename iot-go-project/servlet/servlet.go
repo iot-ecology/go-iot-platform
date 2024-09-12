@@ -344,5 +344,7 @@ type DeviceInfoRes struct {
 	ErrorRate         float64      `json:"error_rate,omitempty" structs:"error_rate"`                                                     // 推送时间误差（秒）
 	gorm.Model        `structs:"-"`
 	ProductName       string `gorm:"-" json:"product_name,omitempty" ` // 产品名称
+	Protocol          string `json:"protocol,omitempty" structs:"protocol,omitempty"`                                                                         // 协议
+
 
 }

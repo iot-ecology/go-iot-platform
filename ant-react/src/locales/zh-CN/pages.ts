@@ -82,14 +82,16 @@ export default {
 
   'pages.device-group': '设备组',
   'pages.device-info.id': '唯一码',
-  'pages.device-info.product-id': '产品id',
-  'pages.device-info.make-time': '制造日期',
+
+  'pages.device-info.product_id': '产品ID',
+  'pages.device-info.sn': '设备编号',
+  'pages.device-info.manufacturing_date': '制造日期',
+  'pages.device-info.procurement_date': '采购日期',
   'pages.device-info.source': '设备来源',
-  'pages.device-info.number': '设备编号',
-  'pages.device-info.procure-time': '采购日期',
-  'pages.device-info.warranty-expiration-date': '保修截止日期',
-  'pages.device-info.push-time-error': '推送时间误差（秒）',
-  'pages.device-info.push-interval': '推送间隔（秒）',
+  'pages.device-info.warranty_expiry': '保修截止日期',
+  'pages.device-info.push_interval': '推送间隔(秒)',
+  'pages.device-info.error_rate': '推送时间误差(秒)',
+  'pages.device-info.protocol': '协议',
 
   'pages.user-list.username': '用户名',
   'pages.user-list.mail': '邮箱',
