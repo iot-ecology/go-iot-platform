@@ -78,6 +78,7 @@ func (api *ProductApi) UpdateProduct(c *gin.Context) {
 
 	var newV models.Product
 	newV = old
+	newV.Name = req.Name
 	newV.Description = req.Description
 	newV.SKU = req.SKU
 	newV.Price = req.Price
@@ -183,4 +184,22 @@ func (api *ProductApi) ByIdProduct(c *gin.Context) {
 	}
 
 	servlet.Resp(c, Product)
+}
+
+
+
+// ListProduct
+// @Summary 产品列表
+// @Description 产品列表
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=models.Product[]} "产品"
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /product/list [get]
+func (api *ProductApi) ListProduct(c *gin.Context) {
+	var list  [] models.Product
+	glob.GDb.Find(&list)
+	servlet.Resp(c, list)
 }

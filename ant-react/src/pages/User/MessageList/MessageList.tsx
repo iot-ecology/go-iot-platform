@@ -34,6 +34,9 @@ const Admin: React.FC = () => {
       request: async () => {
         return cc();
       },
+      fieldProps: {
+        showSearch: true,
+      },
 
       render: (e, record) => (
         <Tag color="success">{getMessageTypeDescription(record.message_type_id)}</Tag>

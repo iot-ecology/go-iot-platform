@@ -574,6 +574,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
 	r.GET("/product/:id", productApi.ByIdProduct)
+	r.GET("/product/list", productApi.ListProduct)
 	r.GET("/product/page", productApi.PageProduct)
 	r.POST("/product/delete/:id", productApi.DeleteProduct)
 
@@ -671,6 +672,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/ShipmentRecord/page", shipmentRecordApi.PageShipmentRecord)
 	r.POST("/ShipmentRecord/delete/:id", shipmentRecordApi.DeleteShipmentRecord)
 	r.GET("/ShipmentRecord/:id", shipmentRecordApi.ByIdShipmentRecord)
+	r.GET("/ShipmentRecord/FindByShipmentProductDetail/:id", shipmentRecordApi.FindByShipmentProductDetail)
 
 	r.POST("/signal-delay-waring-param/create", signalDelayWaringParamApi.CreateSignalDelayWaring)
 	r.POST("/signal-delay-waring-param/update", signalDelayWaringParamApi.UpdateSignalDelayWaring)

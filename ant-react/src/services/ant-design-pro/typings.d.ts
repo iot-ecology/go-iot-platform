@@ -63,6 +63,31 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type RecordInfo = {
+    product_id: ?number;
+    quantity?: number;
+  };
+
+  type ShipmentRecordListItem = {
+    ID?: number;
+    shipment_date?: string;
+    technician?: string;
+    customer_name?: string;
+    customer_phone?: string;
+    customer_address?: string;
+    tracking_number?: string;
+    status?: string;
+    description?: string;
+
+    product_plans?: ProductPlanCreateParam[] | [];
+  };
+
+  type ProductPlanCreateParam = {
+    product_id?: number;
+    quantity?: number;
+    shipment_record_id?: number;
+    device_info_id?: number;
+  };
   type DeviceGroupItem = {
     ID?: number;
     name?: string;

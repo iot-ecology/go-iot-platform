@@ -42,7 +42,8 @@ export default [
         path: '/device/device-info',
         name: 'device-info',
         component: './Device/DeviceInfo/DeviceInfo',
-      }, {
+      },
+      {
         path: '/device/device-group',
         name: 'device-group',
         component: './Device/DeviceGroup/DeviceGroup',
@@ -63,22 +64,24 @@ export default [
         path: '/user/user-list',
         name: 'user-list',
         component: './User/UserList/UserList',
-      }, {
+      },
+      {
         path: '/user/dept-list',
         name: 'dept-list',
         component: './User/DeptList/DeptList',
-      },  {
+      },
+      {
         path: '/user/role-list',
         name: 'role-list',
         component: './User/RoleList/RoleList',
-      }, {
+      },
+      {
         path: '/user/message-list',
         name: 'message-list',
         component: './User/MessageList/MessageList',
       },
     ],
   },
-
 
   {
     path: '/lifecycle',
@@ -94,19 +97,23 @@ export default [
         path: '/lifecycle/product-list',
         name: 'product-list',
         component: './Lifecycle/ProductList/ProductList',
-      }, {
-        path: '/lifecycle/send-list',
-        name: 'send-list',
-        component: './Lifecycle/SendList/SendList',
-      },{
+      },
+      {
+        path: '/lifecycle/ShipmentRecord-list',
+        name: 'ShipmentRecord',
+        component: './Lifecycle/ShipmentRecord/ShipmentRecord',
+      },
+      {
         path: '/lifecycle/produce-list',
         name: 'produce-list',
         component: './Lifecycle/ProduceList/ProduceList',
-      },{
+      },
+      {
         path: '/lifecycle/operation-list',
         name: 'operation-list',
         component: './Lifecycle/OperationList/OperationList',
-      },{
+      },
+      {
         path: '/lifecycle/sim-list',
         name: 'sim-list',
         component: './Lifecycle/SimList/SimList',
@@ -127,12 +134,13 @@ export default [
             path: '/protocol/mqtt/clients',
             name: 'clients',
             component: './Protocol/mqtt/clients',
-          }, {
+          },
+          {
             path: '/protocol/mqtt/nodes',
             name: 'nodes',
             component: './Protocol/mqtt/nodes',
           },
-        ]
+        ],
       },
       {
         path: '/protocol/http',
@@ -143,8 +151,9 @@ export default [
             name: 'clients',
             component: './Protocol/http/clients',
           },
-        ]
-      },{
+        ],
+      },
+      {
         path: '/protocol/tcp',
         name: 'tcp',
         routes: [
@@ -153,8 +162,9 @@ export default [
             name: 'clients',
             component: './Protocol/tcp/clients',
           },
-        ]
-      },{
+        ],
+      },
+      {
         path: '/protocol/coap',
         name: 'coap',
         routes: [
@@ -163,8 +173,9 @@ export default [
             name: 'clients',
             component: './Protocol/coap/clients',
           },
-        ]
-      },{
+        ],
+      },
+      {
         path: '/protocol/ws',
         name: 'ws',
         routes: [
@@ -173,9 +184,9 @@ export default [
             name: 'clients',
             component: './Protocol/ws/clients',
           },
-        ]
+        ],
       },
-    ]
+    ],
   },
 
   {
@@ -188,51 +199,57 @@ export default [
         path: '/data/signal',
         name: 'signal',
         component: './Data/Signal',
-      },  {
+      },
+      {
         path: '/data/signal-waring',
         name: 'signal-waring',
         component: './Data/SignalWaring',
-      },  {
+      },
+      {
         path: '/data/signal-vis',
         name: 'signal-vis',
         component: './Data/SignalVis',
-      },  {
+      },
+      {
         path: '/data/calc',
         name: 'calc',
         component: './Data/Calc',
-      },  {
+      },
+      {
         path: '/data/calc-param',
         name: 'calc-param',
         component: './Data/CalcParam',
-      },  {
+      },
+      {
         path: '/data/script-waring',
         name: 'script-waring',
         component: './Data/ScriptWaring',
-      },  {
+      },
+      {
         path: '/data/script-param',
         name: 'script-param',
         component: './Data/ScriptParam',
       },
-    ]
+    ],
   },
-
 
   {
     path: '/notice',
     name: 'notice',
-    icon: "NotificationOutlined",
+    icon: 'NotificationOutlined',
     access: 'canAdmin',
     routes: [
       {
         path: '/notice/feishu',
         name: 'feishu',
         component: './notice/feishu',
-      },{
+      },
+      {
         path: '/notice/dingding',
         name: 'dingding',
         component: './notice/dingding',
       },
-    ]
+    ],
   },
   {
     path: '/forward',
@@ -244,24 +261,28 @@ export default [
         path: '/forward/cassandra',
         name: 'cassandra',
         component: './forward/cassandra',
-      },{
+      },
+      {
         path: '/forward/clickhouse',
         name: 'clickhouse',
         component: './forward/clickhouse',
-      },{
+      },
+      {
         path: '/forward/influxdb2',
         name: 'influxdb2',
         component: './forward/influxdb2',
-      },{
+      },
+      {
         path: '/forward/mongo',
         name: 'mongo',
         component: './forward/mongo',
-      },{
+      },
+      {
         path: '/forward/mysql',
         name: 'mysql',
         component: './forward/mysql',
       },
-    ]
+    ],
   },
   {
     name: 'list.table-list',

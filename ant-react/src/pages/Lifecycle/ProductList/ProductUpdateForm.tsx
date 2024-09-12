@@ -18,6 +18,14 @@ export type UpdateFormProps = {
   values: API.ProductItem;
 };
 
+function generateUUID() {
+  return 'xxxx-xxxx-4xxx-xxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 const ProductUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [form] = Form.useForm();
   useEffect(() => {
@@ -36,7 +44,13 @@ const ProductUpdateForm: React.FC<UpdateFormProps> = (props) => {
     })
       .then((res) => res.json())
       .then((vvv) => {
-        setFileList([]);
+        setFileList([
+          {
+            name: vvv.file_path,
+            uid: generateUUID(),
+            fileName: vvv.file_path,
+          },
+        ]);
         props.values.image_url = vvv.file_path;
         message.success('upload successfully.');
       })

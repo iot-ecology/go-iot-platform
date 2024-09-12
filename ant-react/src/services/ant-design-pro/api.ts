@@ -141,6 +141,21 @@ export async function deptList() {
   });
 }
 
+export async function productList() {
+  return request<API.CommonResp<API.ProductItem[]>>('/api/product/list', {
+    method: 'GET',
+  });
+}
+
+export async function FindByShipmentProductDetail(id) {
+  return request<API.CommonResp<API.ProductItem[]>>(
+    '/api/ShipmentRecord/FindByShipmentProductDetail/' + id,
+    {
+      method: 'GET',
+    },
+  );
+}
+
 export async function userPage(
   params: {
     // query
@@ -165,6 +180,7 @@ export async function userPage(
     total: request1.data?.total,
   };
 }
+
 export async function simCardPage(
   params: {
     /** 当前的页码 */
@@ -192,6 +208,34 @@ export async function simCardPage(
     total: request1.data?.total,
   };
 }
+
+export async function shipmentPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    customer_name?: string;
+    status?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.ShipmentRecordListItem>('/api/ShipmentRecord/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      customer_name: params.customer_name,
+      status: params.status,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function productPage(
   params: {
     /** 当前的页码 */
@@ -263,7 +307,7 @@ export async function addRule(options?: { [key: string]: any }) {
 }
 
 export async function addUser(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/User/create', {
+  return request<API.CommonResp<string>>('/api/User/create', {
     method: 'POST',
     data: {
       method: 'post',
@@ -271,15 +315,25 @@ export async function addUser(options?: { [key: string]: any }) {
     },
   });
 }
+
 export async function addSim(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/SimCard/create', {
+  return request<API.CommonResp<string>>('/api/SimCard/create', {
     method: 'POST',
     data: {
-      method: 'post',
       ...(options || {}),
     },
   });
 }
+
+export async function addShipmentRecord(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/ShipmentRecord/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addProduct(options?: { [key: string]: any }) {
   return request<API.ProductItem>('/api/product/create', {
     method: 'POST',
@@ -289,6 +343,7 @@ export async function addProduct(options?: { [key: string]: any }) {
     },
   });
 }
+
 export async function addDeviceGroup(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/device_group/create', {
     method: 'POST',
@@ -330,11 +385,19 @@ export async function deleteSimCard(id: any) {
     method: 'POST',
   });
 }
+
+export async function deleteShipmentRecord(id: any) {
+  return request<API.CommonResp<string>>('/api/ShipmentRecord/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteProduct(id: any) {
   return request<API.CommonResp<string>>('/api/product/delete/' + id, {
     method: 'POST',
   });
 }
+
 export async function deleteDeviceGroup(id: any) {
   return request<API.CommonResp<string>>('/api/device_group/delete/' + id, {
     method: 'POST',
@@ -347,18 +410,28 @@ export async function updateUser(dt: any) {
     data: dt,
   });
 }
+
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
     method: 'POST',
     data: dt,
   });
 }
+
+export async function updateShipmentRecord(dt: any) {
+  return request<API.CommonResp<string>>('/api/ShipmentRecord/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
 export async function updateProduct(dt: any) {
   return request<API.CommonResp<string>>('/api/product/update', {
     method: 'POST',
     data: dt,
   });
 }
+
 export async function updateDeviceGroup(dt: any) {
   return request<API.CommonResp<string>>('/api/device_group/update', {
     method: 'POST',
@@ -404,6 +477,7 @@ enum MessageType {
   SimCardExpireTime = 9, // 设备掉线通知
   DeviceOffMessage = 10,
 }
+
 export function cc() {
   const maap = [];
   maap.push({ label: getMessageTypeDescription(1), value: 1 });

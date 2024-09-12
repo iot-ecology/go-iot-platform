@@ -67,7 +67,6 @@ const handlerUpdate = async (fields: API.ProductItem) => {
   const hide = message.loading('正在更新');
   try {
     console.log(fields);
-    debugger;
     await updateProduct({ ...fields });
     hide();
     message.success('更新成功');

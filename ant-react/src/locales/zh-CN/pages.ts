@@ -114,4 +114,13 @@ export default {
   'pages.product.status': '产品状态',
   'pages.product.tags': '标签',
   'pages.product.image_url': '图片',
+
+  'pages.shipment.shipment_date': '发货日期',
+  'pages.shipment.technician': '发货人员',
+  'pages.shipment.customer_name': '客户名称',
+  'pages.shipment.customer_phone': '客户手机',
+  'pages.shipment.customer_address': '客户地址',
+  'pages.shipment.tracking_number': '跟踪号码',
+  'pages.shipment.status': '发货状态',
+  'pages.shipment.description': '发货描述',
 };
