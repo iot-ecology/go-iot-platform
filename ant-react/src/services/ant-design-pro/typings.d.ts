@@ -63,6 +63,18 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type MqttListItem = {
+    ID?: number;
+    host?: string;
+    port?: number;
+    client_id?: string;
+    username?: string;
+    password?: string;
+    subtopic?: string;
+    start?: boolean;
+    last_push_time?: string;
+    script?: string;
+  };
   type RecordInfo = {
     product_id: ?number;
     quantity?: number;

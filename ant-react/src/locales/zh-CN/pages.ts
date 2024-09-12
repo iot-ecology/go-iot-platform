@@ -69,6 +69,8 @@ export default {
   'pages.new': '新增',
   'pages.deleted': '删除',
   'pages.update': '修改',
+  'pages.config-signal': '信号配置',
+  'pages.mock-send': '模拟发送',
 
   'pages.name': '名称',
   'pages.bind': '绑定',
@@ -125,4 +127,21 @@ export default {
   'pages.shipment.tracking_number': '跟踪号码',
   'pages.shipment.status': '发货状态',
   'pages.shipment.description': '发货描述',
+
+  'pages.mqtt.host': '主机',
+  'pages.mqtt.port': '端口',
+  'pages.mqtt.client_id': '客户端id',
+  'pages.mqtt.username': '账号',
+  'pages.mqtt.password': '密码',
+  'pages.mqtt.subtopic': '订阅的主题',
+  'pages.mqtt.start': '是否启动',
+  'pages.mqtt.script': '数据处理脚本',
+  'pages.set-script': '设置脚本',
+
+  'pages.start': '启动',
+  'pages.stop': '停止',
+
+  'pages.script': '脚本',
+  'pages.mock-param': '模拟参数',
+  'pages.mock-result': '模拟执行结果',
 };

@@ -236,6 +236,83 @@ export async function simCardPage(
   };
 }
 
+export async function mqttPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SimListItem>('/api/mqtt/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function mqttScriptCheck(param: string, script: string) {
+  const request1 = await request<API.CommonResp<string>>('/api/mqtt/check-script', {
+    method: 'POST',
+    data: {
+      param: param,
+      script: script,
+    },
+  });
+  return request1;
+}
+
+export async function setMqttScriptCheck(id: number, script: string) {
+  const request1 = await request<API.CommonResp<string>>('/api/mqtt/set-script', {
+    method: 'POST',
+    data: {
+      id: id,
+      script: script,
+    },
+  });
+  return request1;
+}
+
+export async function sendMqttMessage(id: number, script: string) {
+  const request1 = await request<API.CommonResp<string>>('/api/mqtt/send', {
+    method: 'POST',
+    data: {
+      id: id,
+      script: script,
+    },
+  });
+  return request1;
+}
+
+export async function startMqttClient(id: number) {
+  const request1 = await request<API.CommonResp<string>>('/api/mqtt/start', {
+    method: 'GET',
+    params: {
+      id: id,
+    },
+  });
+  return request1;
+}
+
+export async function stopMqttClient(id: number) {
+  const request1 = await request<API.CommonResp<string>>('/api/mqtt/stop', {
+    method: 'GET',
+    params: {
+      id: id,
+    },
+  });
+  return request1;
+}
+
 export async function shipmentPage(
   params: {
     /** 当前的页码 */
@@ -352,6 +429,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addMQTT(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/mqtt/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addShipmentRecord(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/ShipmentRecord/create', {
     method: 'POST',
@@ -422,6 +508,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteMQTT(id: any) {
+  return request<API.CommonResp<string>>('/api/mqtt/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteDeviceInfo(id: any) {
   return request<API.CommonResp<string>>('/api/DeviceInfo/delete/' + id, {
     method: 'POST',
@@ -455,6 +547,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMQTT(dt: any) {
+  return request<API.CommonResp<string>>('/api/mqtt/update', {
     method: 'POST',
     data: dt,
   });
