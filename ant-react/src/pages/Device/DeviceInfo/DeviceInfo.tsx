@@ -22,7 +22,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, Form, message } from 'antd';
 import dayjs from 'dayjs';
 import React, { useRef, useState } from 'react';
 
@@ -87,6 +87,7 @@ const Admin: React.FC = () => {
    * @zh-CN 新建窗口的弹窗
    *  */
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
+  const [sourceValue, setSourceValue] = React.useState(1);
   /**
    * @en-US The pop-up window of the distribution update window
    * @zh-CN 分布更新窗口的弹窗
@@ -153,7 +154,11 @@ const Admin: React.FC = () => {
       hideInSearch: true,
       dataIndex: 'procurement_date',
       render: (_, record) => {
-        return dayjs(record.procurement_date).format('YYYY-MM-DD');
+        if (record.procurement_date) {
+          return dayjs(record.procurement_date).format('YYYY-MM-DD');
+        } else {
+          return '-';
+        }
       },
     },
     {
@@ -234,6 +239,7 @@ const Admin: React.FC = () => {
       ],
     },
   ];
+  const [form] = Form.useForm();
 
   return (
     <PageContainer>
@@ -267,6 +273,7 @@ const Admin: React.FC = () => {
         }}
       />
       <ModalForm
+        form={form}
         title={intl.formatMessage({
           id: 'pages.searchTable.createForm.newRule',
           defaultMessage: 'New rule',
@@ -301,38 +308,50 @@ const Admin: React.FC = () => {
           name="product_id"
         />
         <ProFormText label={<FormattedMessage id="pages.device-info.sn" />} name="sn" />
-        <ProFormDatePicker
-          initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
-          transform={(value) => {
-            return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
-          }}
-          label={<FormattedMessage id="pages.device-info.manufacturing_date" />}
-          name="manufacturing_date"
-        />
-        <ProFormDatePicker
-          initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
-          transform={(value) => {
-            return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
-          }}
-          label={<FormattedMessage id="pages.device-info.procurement_date" />}
-          name="procurement_date"
-        />
+
         <ProFormSelect
           valueEnum={{
             1: { text: '自产', status: 'success' },
             2: { text: '采购', status: 'success' },
           }}
+          onChange={(value) => {
+            console.log('source change', value);
+            setSourceValue(value); // 更新 sourceValue 状态
+          }}
           label={<FormattedMessage id="pages.device-info.source" />}
           name="source"
         />
-        <ProFormDatePicker
-          initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
-          transform={(value) => {
-            return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
-          }}
-          label={<FormattedMessage id="pages.device-info.warranty_expiry" />}
-          name="warranty_expiry"
-        />
+
+        {sourceValue === '1' && (
+          <ProFormDatePicker
+            initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
+            transform={(value) => {
+              return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
+            }}
+            label={<FormattedMessage id="pages.device-info.manufacturing_date" />}
+            name="manufacturing_date"
+          />
+        )}
+        {sourceValue === '2' && (
+          <ProFormDatePicker
+            initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
+            transform={(value) => {
+              return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
+            }}
+            label={<FormattedMessage id="pages.device-info.procurement_date" />}
+            name="procurement_date"
+          />
+        )}
+        {sourceValue === '1' && (
+          <ProFormDatePicker
+            initialValue={dayjs().format('YYYY-MM-DDTHH:mm:ssZ')}
+            transform={(value) => {
+              return dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ');
+            }}
+            label={<FormattedMessage id="pages.device-info.warranty_expiry" />}
+            name="warranty_expiry"
+          />
+        )}
         <ProFormDigit
           label={<FormattedMessage id="pages.device-info.push_interval" />}
           name="push_interval"
