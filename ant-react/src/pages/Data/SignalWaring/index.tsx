@@ -99,7 +99,6 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
       hideInSearch: true,
       dataIndex: 'ID', // @ts-ignore
-
       render: (dom, entity) => {
         return (
           <a
@@ -289,6 +288,9 @@ const Admin: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<API.SignalWaringItem, API.PageParams>
+        form={{
+          ignoreRules: false,
+        }}
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',

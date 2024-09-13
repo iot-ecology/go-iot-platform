@@ -149,10 +149,11 @@ const Admin: React.FC = () => {
       hideInSearch: false,
       dataIndex: 'device_uid',
       valueType: 'select',
-      onChange: (value) => {
-        setSearchDeviceUid(value);
-      },
+
       fieldProps: {
+        onChange: (value) => {
+          setSearchDeviceUid(Number(value));
+        },
         value: searchDeviceUid,
         showSearch: true,
         allowClear: false,
@@ -304,8 +305,6 @@ const Admin: React.FC = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          // console.log(searchProtocol);
-          // console.log(searchDeviceUid);
           if (searchProtocol) {
             params.protocol = searchProtocol;
           }
