@@ -178,4 +178,5 @@ export default {
   'pages.signal.waring.protocol': '协议',
   'pages.signal.waring.identification_code': '设备标识码',
   'pages.signal.waring.device_uid': '联网设备ID',
+  'pages.signal.waring.history': '报警历史',
 };

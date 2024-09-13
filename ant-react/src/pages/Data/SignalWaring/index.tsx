@@ -8,7 +8,7 @@ import {
   signalWaringPage,
   updateSignalWaring,
 } from '@/services/ant-design-pro/api';
-import { FormattedMessage } from '@@/exports';
+import { FormattedMessage, useLocation } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
@@ -24,7 +24,7 @@ import {
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.SignalWaringItem) => {
   const hide = message.loading('正在添加');
@@ -75,6 +75,7 @@ const handlerUpdate = async (fields: API.SignalWaringItem) => {
 };
 const Admin: React.FC = () => {
   const intl = useIntl();
+  const location = useLocation();
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -92,6 +93,14 @@ const Admin: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.SignalWaringItem>();
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
   const [searchDeviceUid, setSearchDeviceUid] = useState<number>();
+  const [searchSignalId, setSearchSignalId] = useState<number>();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    setSearchProtocol(queryParams.get('protocol'));
+    setSearchDeviceUid(Number(queryParams.get('client_id')));
+    setSearchSignalId(Number(queryParams.get('id')));
+  }, []);
 
   const columns: ProColumns<API.SignalWaringItem>[] = [
     {
@@ -121,6 +130,7 @@ const Admin: React.FC = () => {
       order: 3,
       fieldProps: {
         onChange: (value) => {
+          debugger;
           setSearchProtocol(value);
         },
       },
@@ -157,8 +167,10 @@ const Admin: React.FC = () => {
       },
       fieldProps: {
         onChange: (value) => {
-          setSearchDeviceUid(value);
+          setSearchDeviceUid(Number(value));
         },
+        value: searchDeviceUid,
+
         showSearch: true,
         allowClear: false,
         fieldNames: {
@@ -168,7 +180,7 @@ const Admin: React.FC = () => {
       },
       request: async (params, props) => {
         console.log(searchProtocol);
-
+        debugger;
         if (searchProtocol === 'MQTT') {
           let res = await mqttList();
           return res.data;
@@ -208,7 +220,12 @@ const Admin: React.FC = () => {
           },
         ],
       },
+      initialValue: searchSignalId,
       fieldProps: {
+        value: searchSignalId,
+        onChange: (value) => {
+          setSearchSignalId(Number(value));
+        },
         required: true,
         showSearch: true,
         allowClear: false,
@@ -218,6 +235,7 @@ const Admin: React.FC = () => {
         },
       },
       request: async (params, props) => {
+        debugger;
         let res = await signalList({
           protocol: searchProtocol,
           device_uid: searchDeviceUid,
@@ -264,6 +282,16 @@ const Admin: React.FC = () => {
           }}
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
+        </Button>,
+        <Button
+          key="history"
+          onClick={() => {
+            // todo: 修改
+            handleUpdateModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.signal.waring.history" defaultMessage="报警历史" />
         </Button>,
 
         <Button
