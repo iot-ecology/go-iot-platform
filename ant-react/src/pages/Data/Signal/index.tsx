@@ -70,16 +70,18 @@ const handlerUpdate = async (fields: API.SignalListItem) => {
   }
 };
 
-async function initSearchDeviceUid(
+export async function initSearchDeviceUidForMqtt(
   setSearchDeviceUid: (
     value: ((prevState: number | string) => number | string) | number | string,
   ) => void,
   setOpDeviceUid: (value: any) => void,
 ) {
   let res = await mqttList();
-  var data = res.data;
-  setSearchDeviceUid(data[0].ID);
+  let data = res.data;
+  var value1 = data[0].ID;
+  setSearchDeviceUid(value1);
   setOpDeviceUid(data);
+  return value1;
 }
 
 const Admin: React.FC = () => {
@@ -111,7 +113,7 @@ const Admin: React.FC = () => {
     if (queryParams.get('id')) {
       setSearchDeviceUid(Number(queryParams.get('id')));
     } else {
-      initSearchDeviceUid(setSearchDeviceUid, setOpDeviceUid);
+      initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
     }
   }, []);
   const actionRef = useRef<ActionType>();
@@ -145,13 +147,12 @@ const Admin: React.FC = () => {
       dataIndex: 'protocol',
       initialValue: 'MQTT',
       onChange: (value) => {
-        debugger;
         setSearchProtocol(value);
       },
       fieldProps: (form, config: any) => ({
         onChange: async (value) => {
           if (value === 'MQTT') {
-            await initSearchDeviceUid(setSearchDeviceUid, setOpDeviceUid);
+            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
           } else {
             setSearchDeviceUid('');
             setOpDeviceUid([
@@ -161,6 +162,7 @@ const Admin: React.FC = () => {
               },
             ]);
           }
+          setSearchProtocol(value);
         },
       }),
       valueEnum: {
@@ -196,7 +198,6 @@ const Admin: React.FC = () => {
         },
         options: opDeviceUid,
         placeholder: '请选择',
-        dependencies: ['protocol'],
       }),
       render: (dom, entity) => {
         return (

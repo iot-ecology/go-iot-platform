@@ -1,4 +1,5 @@
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
+import WaringHistoryList from '@/pages/Data/SignalWaring/History';
 import SignalWaringUpdateForm from '@/pages/Data/SignalWaring/SignalWaringUpdateForm';
 import {
   addSignalWaring,
@@ -25,6 +26,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import { initSearchDeviceUidForMqtt } from '../Signal';
 
 const handleAdd = async (fields: API.SignalWaringItem) => {
   const hide = message.loading('正在添加');
@@ -73,6 +75,26 @@ const handlerUpdate = async (fields: API.SignalWaringItem) => {
     return false;
   }
 };
+
+async function initSearchSignalId(
+  searchProtocol: string,
+  value,
+  setOpSignal: (value: any) => void,
+  setSearchSignalId: (
+    value: ((prevState: number | undefined) => number | undefined) | number | undefined,
+  ) => void,
+) {
+  let res = await signalList({
+    protocol: searchProtocol,
+    device_uid: Number(value),
+    type: '数字',
+  });
+  setOpSignal(res.data);
+  if (res.data.length > 0) {
+    setSearchSignalId(res.data[0].ID);
+  }
+}
+
 const Admin: React.FC = () => {
   const intl = useIntl();
   const location = useLocation();
@@ -92,14 +114,33 @@ const Admin: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.SignalWaringItem>();
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
-  const [searchDeviceUid, setSearchDeviceUid] = useState<number>();
-  const [searchSignalId, setSearchSignalId] = useState<number>();
+  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string>();
+  const [searchSignalId, setSearchSignalId] = useState<number | string>();
+  const [opDeviceUid, setOpDeviceUid] = useState<any>();
+  const [historyModalOpen, handleHistoryModalOpen] = useState<boolean>(false);
+
+  const [opSignal, setOpSignal] = useState<any>();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    setSearchProtocol(queryParams.get('protocol'));
-    setSearchDeviceUid(Number(queryParams.get('client_id')));
-    setSearchSignalId(Number(queryParams.get('id')));
+    if (queryParams.get('protocol')) {
+      setSearchProtocol(queryParams.get('protocol'));
+    }
+
+    async function extracted() {
+      let v = await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+      initSearchSignalId('MQTT', v, setOpSignal, setSearchSignalId);
+    }
+
+    if (queryParams.get('client_id')) {
+      setSearchDeviceUid(Number(queryParams.get('client_id')));
+    } else {
+      extracted();
+      // debugger;
+    }
+    if (queryParams.get('id')) {
+      setSearchSignalId(Number(queryParams.get('id')));
+    }
   }, []);
 
   const columns: ProColumns<API.SignalWaringItem>[] = [
@@ -129,9 +170,20 @@ const Admin: React.FC = () => {
       initialValue: 'MQTT',
       order: 3,
       fieldProps: {
-        onChange: (value) => {
-          debugger;
+        onChange: async (value) => {
           setSearchProtocol(value);
+          if (value === 'MQTT') {
+            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+          } else {
+            setSearchDeviceUid('');
+            setSearchSignalId('');
+            setOpDeviceUid([
+              {
+                client_id: 'ccc',
+                ID: '1',
+              },
+            ]);
+          }
         },
       },
       formItemProps: {
@@ -166,8 +218,9 @@ const Admin: React.FC = () => {
         ],
       },
       fieldProps: {
-        onChange: (value) => {
+        onChange: async (value) => {
           setSearchDeviceUid(Number(value));
+          await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
         },
         value: searchDeviceUid,
 
@@ -177,16 +230,8 @@ const Admin: React.FC = () => {
           label: 'client_id',
           value: 'ID',
         },
-      },
-      request: async (params, props) => {
-        console.log(searchProtocol);
-        debugger;
-        if (searchProtocol === 'MQTT') {
-          let res = await mqttList();
-          return res.data;
-        } else {
-          return [];
-        }
+        options: opDeviceUid,
+        placeholder: '请选择',
       },
       render: (dom, entity) => {
         return (
@@ -220,7 +265,6 @@ const Admin: React.FC = () => {
           },
         ],
       },
-      initialValue: searchSignalId,
       fieldProps: {
         value: searchSignalId,
         onChange: (value) => {
@@ -233,15 +277,7 @@ const Admin: React.FC = () => {
           label: 'alias',
           value: 'ID',
         },
-      },
-      request: async (params, props) => {
-        debugger;
-        let res = await signalList({
-          protocol: searchProtocol,
-          device_uid: searchDeviceUid,
-          type: '数字',
-        });
-        return res.data;
+        options: opSignal,
       },
     },
     {
@@ -286,9 +322,8 @@ const Admin: React.FC = () => {
         <Button
           key="history"
           onClick={() => {
-            // todo: 修改
-            handleUpdateModalOpen(true);
             setCurrentRow(record);
+            handleHistoryModalOpen(true);
           }}
         >
           <FormattedMessage id="pages.signal.waring.history" defaultMessage="报警历史" />
@@ -317,7 +352,7 @@ const Admin: React.FC = () => {
     <PageContainer>
       <ProTable<API.SignalWaringItem, API.PageParams>
         form={{
-          ignoreRules: false,
+          ignoreRules: true,
         }}
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
@@ -339,7 +374,18 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={signalWaringPage}
+        request={async (params, sorter, filter) => {
+          if (searchProtocol) {
+            params.protocol = searchProtocol;
+          }
+          if (searchDeviceUid) {
+            params.device_uid = Number(searchDeviceUid);
+          }
+          if (searchSignalId) {
+            params.signal_id = Number(searchSignalId);
+          }
+          return signalWaringPage(params);
+        }}
         columns={columns}
       />
       <ModalForm
@@ -469,7 +515,13 @@ const Admin: React.FC = () => {
           }
         }}
       />
-
+      <WaringHistoryList
+        updateModalOpen={historyModalOpen}
+        onCancel={() => {
+          handleHistoryModalOpen(false);
+        }}
+        values={currentRow || {}}
+      />
       <Drawer
         key={'detail'}
         width={600}

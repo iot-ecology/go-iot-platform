@@ -829,6 +829,13 @@ export async function removeRule(options?: { [key: string]: any }) {
   });
 }
 
+export async function waringHistory(d: any) {
+  return request<API.CommonResp<string>>('/api/signal-waring-config/query-row', {
+    method: 'POST',
+    data: d,
+  });
+}
+
 enum MessageType {
   // 计划开始通知
   StartNotification = 1, // 计划临期通知
