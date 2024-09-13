@@ -1,3 +1,5 @@
+import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
+import HistoryList from '@/pages/Data/Signal/History';
 import SignalUpdateForm from '@/pages/Data/Signal/SignalUpdateForm';
 import {
   addSignal,
@@ -77,7 +79,7 @@ const Admin: React.FC = () => {
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-  const [prop, handlerProp] = useState<string>('MQTT');
+  const [historyModalOpen, handleHistoryModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -130,6 +132,16 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.signal.device_uid" />,
       hideInSearch: false,
       dataIndex: 'device_uid',
+      render: (dom, entity) => {
+        return (
+          <>
+            <DeviceUidShow
+              protocol={entity.protocol}
+              device_uid={entity.device_uid}
+            ></DeviceUidShow>
+          </>
+        );
+      },
     },
     {
       key: 'name',
@@ -183,6 +195,19 @@ const Admin: React.FC = () => {
           }}
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
+        </Button>,
+        <Button
+          key="history"
+          onClick={async () => {
+            setCurrentRow(record);
+            handleHistoryModalOpen(true);
+          }}
+        >
+          <FormattedMessage id="pages.history" defaultMessage="历史数据" />
+        </Button>,
+        <Button key="waring-setting" onClick={async () => {
+        }}>
+          <FormattedMessage id="pages.waring-setting" defaultMessage="报警配置" />
         </Button>,
 
         <Button
@@ -316,6 +341,13 @@ const Admin: React.FC = () => {
         />
       </ModalForm>
 
+      <HistoryList
+        updateModalOpen={historyModalOpen}
+        onCancel={() => {
+          handleHistoryModalOpen(false);
+        }}
+        values={currentRow || {}}
+      />
       <SignalUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}
@@ -349,16 +381,13 @@ const Admin: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.access_number && (
+        {currentRow?.ID && (
           <ProDescriptions<API.SignalListItem>
             column={2}
-            title={currentRow?.access_number}
+            title={currentRow?.name}
             request={async () => ({
               data: currentRow || {},
             })}
-            params={{
-              id: currentRow?.access_number,
-            }}
             columns={columns as ProDescriptionsItemProps<API.SignalListItem>[]}
           />
         )}

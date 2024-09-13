@@ -42,6 +42,7 @@ const SignalUpdateForm: React.FC<UpdateFormProps> = (props) => {
           name="ID"
         />
         <ProFormSelect
+          disabled={true}
           valueEnum={{
             MQTT: { text: 'MQTT', status: 'success' },
             HTTP: { text: 'HTTP', status: 'success' },
@@ -55,6 +56,7 @@ const SignalUpdateForm: React.FC<UpdateFormProps> = (props) => {
         />
         <ProFormSelect
           multiple={false}
+          disabled={true}
           dependencies={['protocol']}
           request={async (params) => {
             console.log(params);

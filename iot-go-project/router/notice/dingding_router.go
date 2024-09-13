@@ -119,6 +119,8 @@ func (api *DingDingApi) UpdateDingDing(c *gin.Context) {
 // @Router /DingDing/page [get]
 func (api *DingDingApi) PageDingDing(c *gin.Context) {
 	var name = c.Query("name")
+	var accessToken = c.Query("access_token")
+	var cot = c.Query("content")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -133,7 +135,7 @@ func (api *DingDingApi) PageDingDing(c *gin.Context) {
 		return
 	}
 
-	data, err := DingDingBiz.PageData(name, parseUint, u)
+	data, err := DingDingBiz.PageData(name,accessToken,cot, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

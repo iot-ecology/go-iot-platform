@@ -168,4 +168,6 @@ export default {
   'pages.dingding.access_token': '访问令牌',
   'pages.dingding.secret': '密钥',
   'pages.dingding.content': '模板内容',
+  'pages.history': '历史数据',
+  'pages.waring-setting': '报警配置',
 };

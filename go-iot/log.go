@@ -31,7 +31,7 @@ func InitLog() {
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfig), // 使用 Console 编码器
 		getWriteSync(),
-		zap.NewAtomicLevelAt(zap.ErrorLevel),      // 设置日志级别为 Debug
+		zap.NewAtomicLevelAt(zap.InfoLevel),      // 设置日志级别为 Debug
 
 	)
 

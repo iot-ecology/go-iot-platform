@@ -174,6 +174,20 @@ export async function mqttList() {
   });
 }
 
+export async function mqttById(id: any) {
+  return request<API.CommonResp<API.MqttListItem>>('/api/mqtt/byId/' + id, {
+    method: 'GET',
+  });
+}
+
+export async function influxdbQuery(data: any) {
+  const request1 = await request<API.CommonResp<string>>('/api/query/influxdb', {
+    method: 'POST',
+    data: data,
+  });
+  return request1;
+}
+
 export async function productList() {
   return request<API.CommonResp<API.ProductItem[]>>('/api/product/list', {
     method: 'GET',

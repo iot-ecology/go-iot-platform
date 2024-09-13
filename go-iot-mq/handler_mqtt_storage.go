@@ -75,7 +75,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row, "mqtt")
+			StorageDataRowList(row, "MQTT")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 

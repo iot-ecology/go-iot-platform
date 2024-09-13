@@ -512,6 +512,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
 	r.GET("/mqtt/list", mqttApi.ListMqtt)
+	r.GET("/mqtt/byId/:id", mqttApi.ByIdMqtt)
 	r.GET("/mqtt/start", mqttApi.StartMqtt)
 	r.GET("/mqtt/stop", mqttApi.StopMqtt)
 	r.POST("/mqtt/update", mqttApi.UpdateMqtt)

@@ -187,7 +187,7 @@ const Admin: React.FC = () => {
       key: 'script',
       title: <FormattedMessage id="pages.mqtt.script" />,
       hideInSearch: true,
-      hideInTable: true,
+      hideInTable: false,
       dataIndex: 'script',
       valueType: 'code',
     },
@@ -249,8 +249,8 @@ const Admin: React.FC = () => {
           <Button
             key="set-script"
             onClick={async () => {
-              handleSetScriptModalOpen(true);
               setCurMqttClientId(record.ID);
+              handleSetScriptModalOpen(true);
             }}
           >
             <FormattedMessage id="pages.set-script" defaultMessage="设置脚本" />
@@ -427,6 +427,7 @@ const Admin: React.FC = () => {
                   );
                   if (newVar.code === 20000) {
                     setSubmmitScript(false);
+                    await actionRef.current?.reload();
                     handleSetScriptModalOpen(false);
                     message.success('数据解析脚本设置成功');
                   }
@@ -450,8 +451,12 @@ const Admin: React.FC = () => {
             '    var result = {\n' +
             '        "Time":  Math.floor(Date.now() / 1000),\n' +
             '        "DataRows": dataRows,\n' +
-            '        "IdentificationCode": "1",\n' +
-            '        "DeviceUid": "1",\n' +
+            '        "IdentificationCode": "' +
+            curMqttClientId +
+            '",\n' +
+            '        "DeviceUid": "' +
+            curMqttClientId +
+            '",\n' +
             '        "Nc": nc\n' +
             '    };\n' +
             '    return [result];\n' +

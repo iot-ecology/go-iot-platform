@@ -83,6 +83,7 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 	bizSignal.RemoveSignalCache(&old)
 	var newV models.Signal
 	newV = old
+	newV.IdentificationCode = req.IdentificationCode
 	newV.Name = req.Name
 	newV.Type = req.Type
 	newV.Alias = req.Alias
