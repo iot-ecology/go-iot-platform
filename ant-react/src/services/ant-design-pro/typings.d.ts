@@ -63,6 +63,15 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type CalcRuleListItem = {
+    ID?: number;
+    name?: string;
+    cron?: string;
+    script?: string;
+    offset?: string;
+    start?: string;
+    mock_value?: string;
+  };
   type SignalWaringItem = {
     ID?: number;
     signal_id?: number;

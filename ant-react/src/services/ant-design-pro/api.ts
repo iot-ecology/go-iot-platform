@@ -264,6 +264,30 @@ export async function simCardPage(
   };
 }
 
+export async function calcRulePage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SimListItem>('/api/calc-rule/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function signalWaringPage(
   params: {
     /** 当前的页码 */
@@ -558,6 +582,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addCalcRule(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/calc-rule/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addSignalWaring(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/signal-waring-config/create', {
     method: 'POST',
@@ -673,6 +706,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteCalcRule(id: any) {
+  return request<API.CommonResp<string>>('/api/calc-rule/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteSignalWaring(id: any) {
   return request<API.CommonResp<string>>('/api/signal-waring-config/delete/' + id, {
     method: 'POST',
@@ -743,6 +782,13 @@ export async function updateSimCard(dt: any) {
 
 export async function updateSignalWaring(dt: any) {
   return request<API.CommonResp<string>>('/api/signal-waring-config/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCalcRule(dt: any) {
+  return request<API.CommonResp<string>>('/api/calc-rule/update', {
     method: 'POST',
     data: dt,
   });

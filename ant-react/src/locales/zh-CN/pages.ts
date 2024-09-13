@@ -68,7 +68,10 @@ export default {
 
   'pages.new': '新增',
   'pages.deleted': '删除',
+  'pages.set-param': '参数设置',
   'pages.update': '修改',
+  'pages.start': '启动',
+  'pages.stop': '暂停',
   'pages.config-signal': '信号配置',
   'pages.mock-send': '模拟发送',
 
@@ -179,4 +182,11 @@ export default {
   'pages.signal.waring.identification_code': '设备标识码',
   'pages.signal.waring.device_uid': '联网设备ID',
   'pages.signal.waring.history': '报警历史',
+
+  'pages.calc-rule.name': '任务名称',
+  'pages.calc-rule.cron': '执行周期',
+  'pages.calc-rule.script': '处理脚本',
+  'pages.calc-rule.offset': '前移时间(秒)',
+  'pages.calc-rule.start': '是否启动',
+  'pages.calc-rule.mock_value': '模拟数据',
 };
