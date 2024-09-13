@@ -8,6 +8,8 @@ import {
   signalPage,
   updateSignal,
 } from '@/services/ant-design-pro/api';
+import { history, useLocation } from 'umi';
+
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
 import {
@@ -24,7 +26,7 @@ import {
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.SignalListItem) => {
   const hide = message.loading('正在添加');
@@ -69,6 +71,7 @@ const handlerUpdate = async (fields: API.SignalListItem) => {
 };
 const Admin: React.FC = () => {
   const intl = useIntl();
+  const location = useLocation();
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -82,7 +85,14 @@ const Admin: React.FC = () => {
   const [historyModalOpen, handleHistoryModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
+  const [searchDeviceUid, setSearchDeviceUid] = useState<number | undefined>('');
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    setSearchProtocol(queryParams.get('protocol'));
+    setSearchDeviceUid(Number(queryParams.get('id')));
+  }, []);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.SignalListItem>();
 
@@ -113,6 +123,12 @@ const Admin: React.FC = () => {
       hideInSearch: false,
       dataIndex: 'protocol',
       initialValue: 'MQTT',
+
+      fieldProps: {
+        onChange: (value) => {
+          setSearchProtocol(value);
+        },
+      },
       valueEnum: {
         MQTT: { text: 'MQTT', status: 'success' },
         HTTP: { text: 'HTTP', status: 'success' },
@@ -132,6 +148,30 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.signal.device_uid" />,
       hideInSearch: false,
       dataIndex: 'device_uid',
+      valueType: 'select',
+      onChange: (value) => {
+        setSearchDeviceUid(value);
+      },
+      fieldProps: {
+        value: searchDeviceUid,
+        showSearch: true,
+        allowClear: false,
+        fieldNames: {
+          label: 'client_id',
+          value: 'ID',
+        },
+      },
+
+      request: async (params, props) => {
+        console.log(searchProtocol);
+
+        if (searchProtocol === 'MQTT') {
+          let res = await mqttList();
+          return res.data;
+        } else {
+          return [];
+        }
+      },
       render: (dom, entity) => {
         return (
           <>
@@ -161,7 +201,6 @@ const Admin: React.FC = () => {
       hideInSearch: false,
       dataIndex: 'type',
       valueType: 'select',
-      initialValue: '数字',
       valueEnum: {
         数字: { text: '数字', status: 'success' },
         文本: { text: '文本', status: 'success' },
@@ -205,8 +244,14 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.history" defaultMessage="历史数据" />
         </Button>,
-        <Button key="waring-setting" onClick={async () => {
-        }}>
+        <Button
+          key="waring-setting"
+          onClick={async () => {
+            history.push({
+              pathname: '/data/signal-waring?id=' + record.ID + '&protocol=mqtt',
+            });
+          }}
+        >
           <FormattedMessage id="pages.waring-setting" defaultMessage="报警配置" />
         </Button>,
 
@@ -240,6 +285,10 @@ const Admin: React.FC = () => {
         })}
         actionRef={actionRef}
         rowKey="key"
+        onReset={() => {
+          setSearchProtocol('MQTT');
+          setSearchDeviceUid('');
+        }}
         search={{
           labelWidth: 120,
         }}
@@ -254,7 +303,17 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={signalPage}
+        request={async (params, sorter, filter) => {
+          // console.log(searchProtocol);
+          // console.log(searchDeviceUid);
+          if (searchProtocol) {
+            params.protocol = searchProtocol;
+          }
+          if (searchDeviceUid) {
+            params.device_uid = Number(searchDeviceUid);
+          }
+          return signalPage(params);
+        }}
         columns={columns}
       />
       <ModalForm

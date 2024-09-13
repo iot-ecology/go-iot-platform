@@ -170,4 +170,12 @@ export default {
   'pages.dingding.content': '模板内容',
   'pages.history': '历史数据',
   'pages.waring-setting': '报警配置',
+
+  'pages.signal.waring.signal_id': '信号',
+  'pages.signal.waring.min': '范围(小值)',
+  'pages.signal.waring.max': '范围(大值)',
+  'pages.signal.waring.in_or_out': '报警模式',
+  'pages.signal.waring.protocol': '协议',
+  'pages.signal.waring.identification_code': '设备标识码',
+  'pages.signal.waring.device_uid': '联网设备ID',
 };

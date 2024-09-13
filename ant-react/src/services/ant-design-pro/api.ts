@@ -174,6 +174,14 @@ export async function mqttList() {
   });
 }
 
+export async function signalList(data: any) {
+  const request1 = await request<API.CommonResp<string>>('/api/signal/list', {
+    method: 'GET',
+    params: data,
+  });
+  return request1;
+}
+
 export async function mqttById(id: any) {
   return request<API.CommonResp<API.MqttListItem>>('/api/mqtt/byId/' + id, {
     method: 'GET',
@@ -246,6 +254,30 @@ export async function simCardPage(
       AccessNumber: params.access_number ? params.access_number : '',
 
       iccid: params.iccid ? params.iccid : '',
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function signalWaringPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SignalWaringItem>('/api/signal-waring-config/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
     },
     ...(options || {}),
   });
@@ -526,6 +558,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addSignalWaring(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/signal-waring-config/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addFeishu(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/FeiShuId/create', {
     method: 'POST',
@@ -632,6 +673,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteSignalWaring(id: any) {
+  return request<API.CommonResp<string>>('/api/signal-waring-config/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteFeishu(id: any) {
   return request<API.CommonResp<string>>('/api/FeiShuId/delete/' + id, {
     method: 'POST',
@@ -689,6 +736,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateSignalWaring(dt: any) {
+  return request<API.CommonResp<string>>('/api/signal-waring-config/update', {
     method: 'POST',
     data: dt,
   });

@@ -530,6 +530,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal/delete/:id", signalApi.DeleteSignal)
 	r.GET("/signal/page", signalApi.PageSignal)
 	r.GET("/signal/initCache", signalApi.InitCache)
+	r.GET("/signal/list", signalApi.ListSignal)
 
 	r.POST("/signal-waring-config/create", signalWaringConfigApi.CreateSignalWaringConfig)
 	r.POST("/signal-waring-config/delete/:id", signalWaringConfigApi.DeleteSignalWaringConfig)

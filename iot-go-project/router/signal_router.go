@@ -208,3 +208,33 @@ func (api *SignalApi) InitCache(c *gin.Context){
 	}
 	servlet.Resp(c,"缓存初始化成功")
 }
+
+
+// ListSignal
+// @Tags      signals
+// @Summary   信号列表
+// @Produce   application/json
+// @Router    /signal/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *SignalApi) ListSignal(c *gin.Context) {
+	var deviceUid = c.Query("device_uid")
+	var protocol = c.Query("protocol")
+	var ty = c.Query("type")
+	var mm []models.Signal
+
+	db := glob.GDb.Model(&models.Signal{})
+
+	// 添加条件判断，只有当参数不为空字符串时才进行过滤
+	if deviceUid != "" {
+		db = db.Where("device_uid = ?", deviceUid)
+	}
+	if protocol != "" {
+		db = db.Where("protocol = ?", protocol)
+	}
+	if ty !=""{
+		db = db.Where("type = ?" , ty)
+	}
+
+	db.Find(&mm)
+	servlet.Resp(c, mm)
+}

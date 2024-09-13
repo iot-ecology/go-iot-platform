@@ -211,7 +211,7 @@ const Admin: React.FC = () => {
           key="update"
           onClick={() => {
             history.push({
-              pathname: '/data/signal?id=' + record.ID + '&protocol=mqtt',
+              pathname: '/data/signal?id=' + record.ID + '&protocol=MQTT',
             });
           }}
         >

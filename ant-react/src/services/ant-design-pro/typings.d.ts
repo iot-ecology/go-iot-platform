@@ -63,6 +63,16 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type SignalWaringItem = {
+    ID?: number;
+    signal_id?: number;
+    min?: number;
+    max?: number;
+    in_or_out?: number;
+    protocol?: string;
+    identification_code?: string;
+    device_uid?: number;
+  };
   type FeiShuListItem = {
     ID?: number;
     name?: string;
