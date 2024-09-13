@@ -146,7 +146,7 @@ func removeOldCache(threshold int, signalId uint, deviceUid int, code string) {
 // @Router /signal/page [get]
 func (api *SignalApi) PageSignal(c *gin.Context) {
 	var deviceUid = c.Query("device_uid")
-	var protocol = c.DefaultQuery("protocol","mqtt")
+	var protocol = c.DefaultQuery("protocol","MQTT")
 	var ty = c.DefaultQuery("type","数字")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")

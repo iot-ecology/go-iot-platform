@@ -24,7 +24,7 @@ import { useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
-const handleAdd = async (fields: API.SimListItem) => {
+const handleAdd = async (fields: API.SignalListItem) => {
   const hide = message.loading('正在添加');
   try {
     await addSignal({ ...fields });
@@ -52,7 +52,7 @@ const handleRemove = async (id: any) => {
   }
 };
 
-const handlerUpdate = async (fields: API.SimListItem) => {
+const handlerUpdate = async (fields: API.SignalListItem) => {
   const hide = message.loading('正在更新');
   try {
     await updateSignal({ ...fields });
@@ -82,9 +82,9 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.SimListItem>();
+  const [currentRow, setCurrentRow] = useState<API.SignalListItem>();
 
-  const columns: ProColumns<API.SimListItem>[] = [
+  const columns: ProColumns<API.SignalListItem>[] = [
     {
       key: 'ID',
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
@@ -208,7 +208,7 @@ const Admin: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.SimListItem, API.PageParams>
+      <ProTable<API.SignalListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
@@ -243,7 +243,7 @@ const Admin: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.SimListItem);
+          const success = await handleAdd(value as API.SignalListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -350,7 +350,7 @@ const Admin: React.FC = () => {
         closable={false}
       >
         {currentRow?.access_number && (
-          <ProDescriptions<API.SimListItem>
+          <ProDescriptions<API.SignalListItem>
             column={2}
             title={currentRow?.access_number}
             request={async () => ({
@@ -359,7 +359,7 @@ const Admin: React.FC = () => {
             params={{
               id: currentRow?.access_number,
             }}
-            columns={columns as ProDescriptionsItemProps<API.SimListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.SignalListItem>[]}
           />
         )}
       </Drawer>

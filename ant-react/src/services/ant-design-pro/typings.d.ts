@@ -63,6 +63,20 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type FeiShuListItem = {
+    ID?: number;
+    name?: string;
+    access_token?: string;
+    secret?: string;
+    content?: string;
+  };
+  type DingDingListItem = {
+    ID?: number;
+    name?: string;
+    access_token?: string;
+    secret?: string;
+    content?: string;
+  };
   type SignalListItem = {
     ID?: number;
     protocol?: string;

@@ -158,4 +158,14 @@ export default {
   'pages.signal.type': '类型',
   'pages.signal.unit': '单位',
   'pages.signal.cache_size': '缓存大小',
+
+  'pages.feishu.name': '名称',
+  'pages.feishu.access_token': '访问令牌',
+  'pages.feishu.secret': '密钥',
+  'pages.feishu.content': '模板内容',
+
+  'pages.dingding.name': '名称',
+  'pages.dingding.access_token': '访问令牌',
+  'pages.dingding.secret': '密钥',
+  'pages.dingding.content': '模板内容',
 };

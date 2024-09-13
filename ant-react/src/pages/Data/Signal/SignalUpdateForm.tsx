@@ -5,11 +5,11 @@ import { Form, Modal } from 'antd';
 import React, { useEffect } from 'react';
 
 export type UpdateFormProps = {
-  onCancel: (flag?: boolean, formVals?: API.SimListItem) => void;
-  onSubmit: (values: API.SimListItem) => Promise<void>;
+  onCancel: (flag?: boolean, formVals?: API.SignalListItem) => void;
+  onSubmit: (values: API.SignalListItem) => Promise<void>;
   updateModalOpen: boolean;
 
-  values: API.SimListItem;
+  values: API.SignalListItem;
 };
 const SignalUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [form] = Form.useForm();

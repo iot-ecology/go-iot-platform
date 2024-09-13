@@ -11,7 +11,7 @@ import (
 
 type FeiShuBiz struct{}
 
-func (biz *FeiShuBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *FeiShuBiz) PageData(name, token, cot string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var feishu []models.FeiShu
 
@@ -20,6 +20,12 @@ func (biz *FeiShuBiz) PageData(name string, page, size int) (*servlet.Pagination
 	if name != "" {
 		db = db.Where("name like ?", "%"+name+"%")
 	}
+	if token != "" {
+		db = db.Where("token like ?", "%"+token +"%")
+	}
+	if cot != "" {
+        db = db.Where("content like ?", "%"+cot +"%")
+    }
 
 	db.Model(&models.FeiShu{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size

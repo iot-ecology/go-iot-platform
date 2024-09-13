@@ -19,9 +19,9 @@ type MqttClient struct {
 }
 
 type Signal struct {
-	Protocol   string `json:"protocol"`
+	Protocol   string `json:"protocol"` // 协议
 	IdentificationCode string `json:"identification_code"` // 设备标识码
-	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
+	DeviceUid int    `json:"device_uid"`                                        // 联网设备ID
 	Name           string `json:"name"`                            // 信号的名称，用于标识不同的信号
 	Alias          string `json:"alias" structs:"alias"`           // 信号的别名，用于显示
 	Type           string `json:"type"`                            // 信号的数据类型，如整数、字符串等

@@ -316,3 +316,21 @@ func (s *MqttApi) CheckScript(c *gin.Context) {
 	}
 
 }
+
+// ListMqtt
+// @Summary  MQTT客户端列表
+// @Description MQTT客户端列表
+// @Tags MQTT
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=models.MqttClient[]} "产品"
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /mqtt/list [get]
+func (s *MqttApi) ListMqtt(c *gin.Context){
+
+	var list  [] models.MqttClient
+	glob.GDb.Find(&list)
+	servlet.Resp(c, list)
+
+}

@@ -242,6 +242,59 @@ export async function simCardPage(
   };
 }
 
+export async function feishuPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    access_token?: string;
+    content?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.FeiShuListItem>('/api/FeiShuId/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function dingDingPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    access_token?: string;
+
+    content?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.DingDingListItem>('/api/DingDing/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function signalPage(
   params: {
     /** 当前的页码 */
@@ -459,6 +512,24 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addFeishu(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/FeiShuId/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addDingDing(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/DingDing/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addSignal(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/signal/create', {
     method: 'POST',
@@ -547,6 +618,18 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteFeishu(id: any) {
+  return request<API.CommonResp<string>>('/api/FeiShuId/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteDingDing(id: any) {
+  return request<API.CommonResp<string>>('/api/DingDing/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteSignal(id: any) {
   return request<API.CommonResp<string>>('/api/signal/delete/' + id, {
     method: 'POST',
@@ -592,6 +675,20 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateFeishu(dt: any) {
+  return request<API.CommonResp<string>>('/api/FeiShuId/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateDingDing(dt: any) {
+  return request<API.CommonResp<string>>('/api/DingDing/update', {
     method: 'POST',
     data: dt,
   });

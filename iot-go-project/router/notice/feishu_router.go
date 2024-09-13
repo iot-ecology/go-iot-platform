@@ -116,6 +116,8 @@ func (api *FeiShuApi) UpdateFeiShu(c *gin.Context) {
 // @Router /FeiShuId/page [get]
 func (api *FeiShuApi) PageFeiShu(c *gin.Context) {
 	var name = c.Query("name")
+	var accessToken = c.Query("access_token")
+	var cot = c.Query("content")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -130,7 +132,7 @@ func (api *FeiShuApi) PageFeiShu(c *gin.Context) {
 		return
 	}
 
-	data, err := FeiShuBiz.PageData(name, parseUint, u)
+	data, err := FeiShuBiz.PageData(name, accessToken, cot, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -144,7 +146,7 @@ func (api *FeiShuApi) PageFeiShu(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /FeiShuId/delete/:id [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *FeiShuApi) DeleteFeiShu(c *gin.Context) {
 	var FeiShu models.FeiShu
 
@@ -172,7 +174,7 @@ func (api *FeiShuApi) DeleteFeiShu(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /FeiShuId/:id [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.FeiShu} 
+// @Success 200 {object}  servlet.JSONResult{data=models.FeiShu}
 func (api *FeiShuApi) ByIdFeiShu(c *gin.Context) {
 	var FeiShu models.FeiShu
 
@@ -194,7 +196,7 @@ func (api *FeiShuApi) ByIdFeiShu(c *gin.Context) {
 // @Param FeiShuId body []models.FeiShuBindProduct true "飞书通道"
 // @Produce   application/json
 // @Router    /FeiShuId/bind [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *FeiShuApi) Bind(c *gin.Context) {
 	var req []models.FeiShuBindProduct
 	if err := c.ShouldBindJSON(&req); err != nil {
