@@ -37,7 +37,7 @@ func (s *MqttApi) CreateMqtt(c *gin.Context) {
 		panic(err)
 	}
 	mqtt := bizMqtt.CreateMqtt(mqttClient)
-	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "mqtt", mqtt.ID)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "MQTT", mqtt.ID)
 	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, mqtt)
 }

@@ -63,6 +63,14 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type HttpHandlerListItem = {
+    ID?: number;
+    device_info_id?: string;
+    name?: string;
+    username?: string;
+    password?: string;
+    script?: string;
+  };
   type ScriptWaringListItem = {
     ID?: number;
     name?: string;
@@ -144,6 +152,10 @@ declare namespace API {
     start?: boolean;
     last_push_time?: string;
     script?: string;
+  };
+  type DeviceInfoListItem = {
+    ID?: number;
+    name?: string;
   };
   type RecordInfo = {
     product_id: ?number;

@@ -73,6 +73,7 @@ const HistoryList: React.FC<Props> = (props) => {
   return (
     <Modal
       form={form}
+      width={'75%'}
       destroyOnClose
       title={'历史数据'}
       forceRender={true}

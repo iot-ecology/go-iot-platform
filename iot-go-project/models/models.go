@@ -274,6 +274,7 @@ type DeviceBindTcpHandler struct {
 // TcpHandler 表示TCP数据处理器
 type TcpHandler struct {
 	gorm.Model `structs:"-"`
+	DeviceInfoId       uint   `json:"device_info_id" structs:"device_info_id"`           // 设备ID
 	Name       string `json:"name" structs:"name"`     // 处理器名
 	Script     string `json:"script" structs:"script"` // 处理器脚本
 }

@@ -4,6 +4,7 @@ import SignalUpdateForm from '@/pages/Data/Signal/SignalUpdateForm';
 import {
   addSignal,
   deleteSignal,
+  deviceList,
   mqttList,
   signalPage,
   updateSignal,
@@ -155,12 +156,18 @@ const Admin: React.FC = () => {
             await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
           } else {
             setSearchDeviceUid('');
-            setOpDeviceUid([
-              {
-                client_id: 'ccc',
-                ID: '1',
-              },
-            ]);
+
+            let c = await deviceList();
+            let r = [];
+            c.data.forEach((e) => {
+              if (e.protocol === value) {
+                r.push({
+                  client_id: e.sn,
+                  ID: e.ID,
+                });
+              }
+            });
+            setOpDeviceUid(r);
           }
           setSearchProtocol(value);
         },
@@ -382,14 +389,34 @@ const Admin: React.FC = () => {
         <ProFormSelect
           multiple={false}
           dependencies={['protocol']}
+          onChange={async (value) => {
+            form.setFieldValue('device_uid', value);
+            debugger;
+          }}
           request={async (params) => {
             console.log(params);
             if (params.protocol === 'MQTT') {
               let res = await mqttList();
               return res.data;
+            } else {
+              let c = await deviceList();
+              let r = [];
+              c.data.forEach((e) => {
+                if (e.protocol === params.protocol) {
+                  r.push({
+                    client_id: e.sn,
+                    ID: e.ID,
+                  });
+                }
+              });
+              return r;
             }
           }}
           fieldProps={{
+            onClick: (v) => {
+              console.log(v);
+              debugger;
+            },
             showSearch: true,
             allowClear: false,
             fieldNames: {

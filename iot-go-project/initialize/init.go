@@ -594,6 +594,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
 
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
+	r.GET("/DeviceInfo/list", deviceInfoApi.ListDeviceInfo)
 	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)

@@ -174,6 +174,12 @@ export async function mqttList() {
   });
 }
 
+export async function deviceList() {
+  return request<API.CommonResp<API.DeviceInfoListItem[]>>('/api/DeviceInfo/list', {
+    method: 'GET',
+  });
+}
+
 export async function scriptWaringList() {
   return request<API.CommonResp<API.MqttListItem[]>>('/api/signal-delay-waring/list', {
     method: 'GET',
@@ -335,6 +341,30 @@ export async function simCardPage(
       AccessNumber: params.access_number ? params.access_number : '',
 
       iccid: params.iccid ? params.iccid : '',
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function httpHandlerPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.HttpHandlerListItem>('/api/HttpHandler/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
     },
     ...(options || {}),
   });
@@ -735,6 +765,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addHttpHandler(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/HttpHandler/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addScriptWaring(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/signal-delay-waring/create', {
     method: 'POST',
@@ -886,6 +925,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function delteHttpHandler(id: any) {
+  return request<API.CommonResp<string>>('/api/HttpHandler/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteScriptWaring(id: any) {
   return request<API.CommonResp<string>>('/api/signal-delay-waring/delete/' + id, {
     method: 'POST',
@@ -973,6 +1018,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateHttpHandler(dt: any) {
+  return request<API.CommonResp<string>>('/api/HttpHandler/update', {
     method: 'POST',
     data: dt,
   });

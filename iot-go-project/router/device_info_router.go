@@ -44,7 +44,7 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	}
 
 	sn := deviceInfoBiz.FindBySn(DeviceInfo.SN)
-	if sn.ID >0 {
+	if sn.ID > 0 {
 		servlet.Error(c, "设备已存在")
 		return
 	}
@@ -181,7 +181,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := deviceInfoBiz.PageData(sn,protocol, parseUint, u)
+	data, err := deviceInfoBiz.PageData(sn, protocol, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -195,7 +195,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /DeviceInfo/delete/:id [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 
@@ -223,7 +223,7 @@ func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /DeviceInfo/:id [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo} 
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo}
 func (api *DeviceInfoApi) ByIdDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 
@@ -246,7 +246,7 @@ func (api *DeviceInfoApi) ByIdDeviceInfo(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindMqtt [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindMqttClient[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindMqttClient[]}
 func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -269,7 +269,7 @@ func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindHTTP [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]}
 func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -292,7 +292,7 @@ func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindCoap [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.CoapHandler[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.CoapHandler[]}
 func (api *DeviceInfoApi) QueryBindCoap(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -315,7 +315,7 @@ func (api *DeviceInfoApi) QueryBindCoap(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindWebsocket [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.WebsocketHandler[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.WebsocketHandler[]}
 func (api *DeviceInfoApi) QueryBindWebsocket(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -338,7 +338,7 @@ func (api *DeviceInfoApi) QueryBindWebsocket(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindTcp [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]} 
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]}
 func (api *DeviceInfoApi) QueryBindTcp(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -361,7 +361,7 @@ func (api *DeviceInfoApi) QueryBindTcp(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body servlet.DeviceBindMqttClientParam true "绑定参数"
 // @Router    /DeviceInfo/BindMqtt [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	var param servlet.DeviceBindMqttClientParam
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -451,7 +451,7 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body servlet.DeviceBindTcpParam true "绑定参数"
 // @Router    /DeviceInfo/BindTcp [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 	var param servlet.DeviceBindTcpParam
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -538,7 +538,7 @@ func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body models.HttpHandler true "绑定参数"
 // @Router    /DeviceInfo/BindHTTP [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindHTTP(c *gin.Context) {
 	var param models.HttpHandler
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -564,11 +564,11 @@ func (api *DeviceInfoApi) BindHTTP(c *gin.Context) {
 		newV.Script = param.Script
 		// 更新记录
 		result = glob.GDb.Model(&newV).Updates(newV)
-		setHttpHandlerRedis(newV)
+		SetHttpHandlerRedis(newV)
 	} else {
 		// 新增
 		glob.GDb.Model(models.HttpHandler{}).Create(&param)
-		setHttpHandlerRedis(param)
+		SetHttpHandlerRedis(param)
 
 	}
 
@@ -585,7 +585,7 @@ func (api *DeviceInfoApi) BindHTTP(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body models.CoapHandler true "绑定参数"
 // @Router    /DeviceInfo/BindHCoap [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
 	var param models.CoapHandler
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -632,7 +632,7 @@ func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body models.CoapHandler true "绑定参数"
 // @Router    /DeviceInfo/BindWebsocket [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
 	var param models.WebsocketHandler
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -662,7 +662,7 @@ func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
 	} else {
 		// 新增
 		glob.GDb.Model(models.CoapHandler{}).Create(&param)
-		setWebsocketHandlerRedis(param)
+		SetWebsocketHandlerRedis(param)
 
 	}
 
@@ -672,7 +672,21 @@ func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
 
 }
 
-func setHttpHandlerRedis(config models.HttpHandler) {
+// ListDeviceInfo
+// @Tags      DeviceInfos
+// @Summary   设备列表
+// @Accept json
+// @Produce json
+// @Router    /DeviceInfo/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo[]}
+func (api *DeviceInfoApi) ListDeviceInfo(c *gin.Context) {
+	var res []models.DeviceInfo
+	glob.GDb.Find(&res)
+	servlet.Resp(c, res)
+
+}
+
+func SetHttpHandlerRedis(config models.HttpHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:http", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }
@@ -680,7 +694,7 @@ func setCoapHandlerRedis(config models.CoapHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:coap", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }
-func setWebsocketHandlerRedis(config models.WebsocketHandler) {
+func SetWebsocketHandlerRedis(config models.WebsocketHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:ws", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }

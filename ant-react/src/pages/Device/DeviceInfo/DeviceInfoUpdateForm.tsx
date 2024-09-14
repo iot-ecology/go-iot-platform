@@ -66,7 +66,7 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
           label={<FormattedMessage id="pages.device-info.sn" />}
           name="sn"
         />
-       
+
         <ProFormSelect
           valueEnum={{
             1: { text: '自产', status: 'success' },
@@ -115,6 +115,7 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
           name="error_rate"
         />
         <ProFormSelect
+          disabled={true}
           valueEnum={{
             MQTT: { text: 'MQTT', status: 'success' },
             HTTP: { text: 'HTTP', status: 'success' },

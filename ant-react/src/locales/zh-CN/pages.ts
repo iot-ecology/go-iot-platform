@@ -204,4 +204,12 @@ export default {
   'pages.waring-param.signal_name': '信号名称',
   'pages.waring-param.signal_id': '信号',
   'pages.waring-param.signal_delay_waring_id': '报警脚本',
+
+  'pages.http.device_info_id': '设备ID',
+  'pages.http.name': '处理器名称',
+  'pages.http.username': '用户名',
+  'pages.http.password': '密码',
+  'pages.http.script': '脚本',
+
+  'pages.check-script': '检查脚本',
 };
