@@ -60,12 +60,6 @@ const CalcRuleUpdateForm: React.FC<UpdateFormProps> = (props) => {
           label={<FormattedMessage id="pages.calc-rule.offset" />}
           name="offset"
         />
-
-        <ProFormText
-          key={'mock_value'}
-          label={<FormattedMessage id="pages.calc-rule.mock_value" />}
-          name="mock_value"
-        />
       </Form>
     </Modal>
   );

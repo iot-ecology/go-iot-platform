@@ -18,6 +18,7 @@ import {
   type ProColumns,
   ProDescriptions,
   type ProDescriptionsItemProps,
+  ProForm,
   ProFormDigit,
   ProFormSelect,
   ProFormText,
@@ -347,11 +348,12 @@ const Admin: React.FC = () => {
       ],
     },
   ];
-
+  const form = ProForm.useFormInstance();
   return (
     <PageContainer>
       <ProTable<API.SignalWaringItem, API.PageParams>
         form={{
+          formRef: form,
           ignoreRules: true,
         }}
         headerTitle={intl.formatMessage({

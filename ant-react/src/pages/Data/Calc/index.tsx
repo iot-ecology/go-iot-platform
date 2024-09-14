@@ -1,7 +1,11 @@
+import CalcRuleResult from '@/pages/Data/Calc/CalcRuleResult';
 import CalcRuleUpdateForm from '@/pages/Data/Calc/CalcRuleUpdateForm';
+import MockRun from '@/pages/Data/Calc/MockRun';
 import {
   addCalcRule,
   calcRulePage,
+  calcRuleStart,
+  calcRuleStop,
   deleteCalcRule,
   updateCalcRule,
 } from '@/services/ant-design-pro/api';
@@ -84,6 +88,8 @@ const Admin: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.CalcRuleListItem>();
+  const [historyModalOpen, handleHistoryModalOpen] = useState<boolean>(false);
+  const [calcRuleResultModalOpen, handleCalcRuleResultModalOpen] = useState<boolean>(false);
 
   const columns: ProColumns<API.CalcRuleListItem>[] = [
     {
@@ -141,7 +147,7 @@ const Admin: React.FC = () => {
         return (
           <>
             {entity.start ? (
-              <Tag>
+              <Tag color={'blue'}>
                 <FormattedMessage id="pages.calc-rule.start.true" defaultMessage="已启动" />
               </Tag>
             ) : (
@@ -179,9 +185,11 @@ const Admin: React.FC = () => {
           <>
             <Button
               key="start"
-              onClick={() => {
+              onClick={async () => {
                 // todo: 修改
                 setCurrentRow(record);
+                await calcRuleStop(record.ID);
+                await actionRef.current?.reload();
               }}
             >
               <FormattedMessage id="pages.stop" defaultMessage="暂停" />
@@ -191,15 +199,36 @@ const Admin: React.FC = () => {
           <>
             <Button
               key="start"
-              onClick={() => {
+              onClick={async () => {
                 // todo: 修改
                 setCurrentRow(record);
+                await calcRuleStart(record.ID);
+                await actionRef.current?.reload();
               }}
             >
               <FormattedMessage id="pages.start" defaultMessage="启动" />
             </Button>
           </>
         ),
+        <Button
+          key="mock-start"
+          onClick={() => {
+            // todo: 修改
+            handleHistoryModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.mock.start" defaultMessage="模拟执行" />
+        </Button>,
+        <Button
+          key="set-param"
+          onClick={async () => {
+            setCurrentRow(record);
+            handleCalcRuleResultModalOpen(true);
+          }}
+        >
+          <FormattedMessage id="pages.history" defaultMessage="历史数据" />
+        </Button>,
         <Button key="set-param" onClick={async () => {}}>
           <FormattedMessage id="pages.set-param" defaultMessage="参数设置" />
         </Button>,
@@ -287,14 +316,7 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id="pages.calc-rule.offset" />}
           name="offset"
         />
-
-        <ProFormText
-          key={'mock_value'}
-          label={<FormattedMessage id="pages.calc-rule.mock_value" />}
-          name="mock_value"
-        />
       </ModalForm>
-
       <CalcRuleUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}
@@ -317,7 +339,24 @@ const Admin: React.FC = () => {
           }
         }}
       />
+      <MockRun
+        updateModalOpen={historyModalOpen}
+        onCancel={async () => {
+          handleHistoryModalOpen(false);
 
+          await actionRef.current?.reload();
+        }}
+        values={currentRow || {}}
+      />{' '}
+      <CalcRuleResult
+        updateModalOpen={calcRuleResultModalOpen}
+        onCancel={async () => {
+          handleCalcRuleResultModalOpen(false);
+
+          await actionRef.current?.reload();
+        }}
+        values={currentRow || {}}
+      />
       <Drawer
         key={'detail'}
         width={600}

@@ -74,6 +74,7 @@ export default {
   'pages.stop': '暂停',
   'pages.config-signal': '信号配置',
   'pages.mock-send': '模拟发送',
+  'pages.mock-run': '模拟执行',
 
   'pages.name': '名称',
   'pages.bind': '绑定',
@@ -140,9 +141,6 @@ export default {
   'pages.mqtt.start': '是否启动',
   'pages.mqtt.script': '数据处理脚本',
   'pages.set-script': '设置脚本',
-
-  'pages.start': '启动',
-  'pages.stop': '停止',
 
   'pages.script': '脚本',
   'pages.mock-param': '模拟参数',

@@ -200,6 +200,28 @@ export async function signalById(id: any) {
   });
 }
 
+export async function calcRuleMockRun(data: any) {
+  const request1 = await request<API.CommonResp<string>>('/api/calc-rule/mock', {
+    method: 'POST',
+    data: data,
+  });
+  return request1;
+}
+
+export async function calcRuleStart(data: string | number) {
+  const request1 = await request<API.CommonResp<string>>('/api/calc-rule/start/' + data, {
+    method: 'POST',
+  });
+  return request1;
+}
+
+export async function calcRuleStop(data: string | number) {
+  const request1 = await request<API.CommonResp<string>>('/api/calc-rule/stop/' + data, {
+    method: 'POST',
+  });
+  return request1;
+}
+
 export async function influxdbQuery(data: any) {
   const request1 = await request<API.CommonResp<string>>('/api/query/influxdb', {
     method: 'POST',
@@ -246,6 +268,24 @@ export async function userPage(
     success: request1.code === 20000,
     total: request1.data?.total,
   };
+}
+
+export async function calcRuleResultQuery(
+  params: {
+    rule_id?: number;
+    start_time?: number;
+    end_time?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonResp<string>>('/api/calc-rule/rd', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return request1;
 }
 
 export async function simCardPage(
