@@ -63,6 +63,11 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type ScriptWaringListItem = {
+    ID?: number;
+    name?: string;
+    script?: string;
+  };
   type CalcParamListItem = {
     ID?: number;
     protocol?: string;

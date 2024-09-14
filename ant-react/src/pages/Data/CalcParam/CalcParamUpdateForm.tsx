@@ -107,7 +107,6 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
               };
               let newVar = await signalList(params);
               setOpSignal(newVar.data);
-              debugger;
             }
           }}
           fieldProps={{
@@ -135,7 +134,6 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
           dependencies={['device_uid', 'protocol']}
           request={async (params) => {
             console.log(params);
-            debugger;
             if (params.device_uid && params.protocol) {
               params.ty = '数字';
               let newVar = await signalList(params);

@@ -368,7 +368,6 @@ const Admin: React.FC = () => {
           dependencies={['device_uid', 'protocol']}
           request={async (params) => {
             console.log(params);
-            debugger;
             if (params.device_uid && params.protocol) {
               params.ty = '数字';
               let newVar = await signalList(params);

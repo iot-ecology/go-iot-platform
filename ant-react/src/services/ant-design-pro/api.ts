@@ -316,6 +316,31 @@ export async function simCardPage(
   };
 }
 
+export async function scriptWaringPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+    name?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.SimListItem>('/api/signal-delay-waring/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function calcParamPage(
   params: {
     /** 当前的页码 */
@@ -657,6 +682,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addScriptWaring(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/signal-delay-waring/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addCalcParam(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/calc-param/create', {
     method: 'POST',
@@ -790,6 +824,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteScriptWaring(id: any) {
+  return request<API.CommonResp<string>>('/api/signal-delay-waring/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteCalcParam(id: any) {
   return request<API.CommonResp<string>>('/api/calc-param/delete/' + id, {
     method: 'POST',
@@ -865,6 +905,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateScriptWaring(dt: any) {
+  return request<API.CommonResp<string>>('/api/signal-delay-waring/update', {
     method: 'POST',
     data: dt,
   });

@@ -188,6 +188,7 @@ export default {
   'pages.calc-rule.start': '是否启动',
   'pages.calc-rule.mock_value': '模拟数据',
 
+  'pages.debug': '调试脚本',
   'pages.calc-param.protocol': '协议',
   'pages.calc-param.identification_code': '设备标识码',
   'pages.calc-param.device_uid': '联网设备',

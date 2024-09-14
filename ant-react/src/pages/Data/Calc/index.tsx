@@ -25,6 +25,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
+import { history } from 'umi';
 
 const handleAdd = async (fields: API.CalcRuleListItem) => {
   const hide = message.loading('正在添加');
@@ -229,7 +230,14 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.history" defaultMessage="历史数据" />
         </Button>,
-        <Button key="set-param" onClick={async () => {}}>
+        <Button
+          key="set-param"
+          onClick={async () => {
+            history.push({
+              pathname: '/data/calc-param?id=' + record.ID,
+            });
+          }}
+        >
           <FormattedMessage id="pages.set-param" defaultMessage="参数设置" />
         </Button>,
         <Button

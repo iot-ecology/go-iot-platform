@@ -137,7 +137,6 @@ const Admin: React.FC = () => {
       setSearchDeviceUid(Number(queryParams.get('client_id')));
     } else {
       extracted();
-      // debugger;
     }
     if (queryParams.get('id')) {
       setSearchSignalId(Number(queryParams.get('id')));
