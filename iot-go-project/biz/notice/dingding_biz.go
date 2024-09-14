@@ -12,7 +12,7 @@ import (
 
 type DingDingBiz struct{}
 
-func (biz *DingDingBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *DingDingBiz) PageData(name, token, cot string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var dingding []models.DingDing
 
@@ -20,6 +20,12 @@ func (biz *DingDingBiz) PageData(name string, page, size int) (*servlet.Paginati
 
 	if name != "" {
 		db = db.Where("name like ?", "%"+name+"%")
+	}
+	if token != "" {
+		db = db.Where("token like ?", "%"+token +"%")
+	}
+	if cot != "" {
+		db = db.Where("content like ?", "%"+cot +"%")
 	}
 
 	db.Model(&models.DingDing{}).Count(&pagination.Total) // 计算总记录数

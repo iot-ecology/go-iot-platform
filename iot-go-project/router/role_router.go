@@ -18,13 +18,13 @@ type RoleApi struct{}
 var roleBiz = biz.RoleBiz{}
 
 // CreateRole
-// @Summary 创建面板
-// @Description 创建面板
+// @Summary 创建角色
+// @Description 创建角色
 // @Tags Roles
 // @Accept json
 // @Produce json
-// @Param Role body models.Role true "面板"
-// @Success 201 {object} servlet.JSONResult{data=models.Role} "创建成功的面板"
+// @Param Role body models.Role true "角色"
+// @Success 200 {object} servlet.JSONResult{data=models.Role} "创建成功的角色"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /Role/create [post]
@@ -50,7 +50,7 @@ func (api *RoleApi) CreateRole(c *gin.Context) {
 			servlet.Error(c, result.Error.Error())
 			return
 		}
-		// 返回创建成功的面板
+		// 返回创建成功的角色
 		servlet.Resp(c, Role)
 	} else {
 		if err != nil {
@@ -66,15 +66,15 @@ func (api *RoleApi) CreateRole(c *gin.Context) {
 }
 
 // UpdateRole
-// @Summary 更新一个面板
-// @Description 更新一个面板
+// @Summary 更新一个角色
+// @Description 更新一个角色
 // @Tags Roles
 // @Accept json
 // @Produce json
-// @Param Role body models.Role true "面板"
-// @Success 200 {object}  servlet.JSONResult{data=models.Role} "面板"
+// @Param Role body models.Role true "角色"
+// @Success 200 {object}  servlet.JSONResult{data=models.Role} "角色"
 // @Failure 400 {string} string "请求数据错误"
-// @Failure 404 {string} string "面板未找到"
+// @Failure 404 {string} string "角色未找到"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /Role/update [post]
 func (api *RoleApi) UpdateRole(c *gin.Context) {
@@ -110,15 +110,15 @@ func (api *RoleApi) UpdateRole(c *gin.Context) {
 }
 
 // PageRole
-// @Summary 分页查询面板
-// @Description 分页查询面板
+// @Summary 分页查询角色
+// @Description 分页查询角色
 // @Tags Roles
 // @Accept json
 // @Produce json
 // @Param name query string false "名称"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
-// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Role}} "面板"
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Role}} "角色"
 // @Failure 400 {string} string "请求参数错误"
 // @Failure 500 {string} string "查询异常"
 // @Router /Role/page [get]
@@ -148,10 +148,11 @@ func (api *RoleApi) PageRole(c *gin.Context) {
 
 // DeleteRole
 // @Tags      Roles
-// @Summary   删除面板
+// @Summary   删除角色
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /Role/delete/:id [post]
+// @Success 200 {object} servlet.JSONResult{data=string} ""
 func (api *RoleApi) DeleteRole(c *gin.Context) {
 	var Role models.Role
 
@@ -178,6 +179,7 @@ func (api *RoleApi) DeleteRole(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /Role/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Role} 
 func (api *RoleApi) ByIdRole(c *gin.Context) {
 	var Role models.Role
 
@@ -198,6 +200,7 @@ func (api *RoleApi) ByIdRole(c *gin.Context) {
 // @Summary   角色列表
 // @Produce   application/json
 // @Router    /Role/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Role[]}
 func (api *RoleApi) ListRole(c *gin.Context) {
 	var roles []models.Role
 	result := glob.GDb.Find(&roles)

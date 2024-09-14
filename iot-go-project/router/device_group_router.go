@@ -21,7 +21,7 @@ var deviceGroupBiz = biz.DeviceGroupBiz{}
 // @Accept json
 // @Produce json
 // @Param DeviceGroup body models.DeviceGroup true "设备组"
-// @Success 201 {object} servlet.JSONResult{data=models.DeviceGroup} "创建成功的设备组"
+// @Success 200 {object} servlet.JSONResult{data=models.DeviceGroup} "创建成功的设备组"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /device_group/create [post]
@@ -132,6 +132,7 @@ func (api *DeviceGroupApi) PageDeviceGroup(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /device_group/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DeviceGroupApi) DeleteDeviceGroup(c *gin.Context) {
 	var DeviceGroup models.DeviceGroup
 
@@ -158,6 +159,7 @@ func (api *DeviceGroupApi) DeleteDeviceGroup(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /device_group/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceGroup} 
 func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 	var DeviceGroup models.DeviceGroup
 
@@ -180,6 +182,7 @@ func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 // @Produce json
 // @Param group_id query int true "主键"
 // @Router    /device_group/query_bind_device [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceGroupDevice[]} 
 func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
 	param := c.Query("group_id")
 
@@ -202,6 +205,7 @@ func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
 // @Router    /device_group/bind_device [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 	var param servlet.DeviceGroupCreateParam
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -257,6 +261,7 @@ func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 // @Produce json
 // @Param group_id path int true "主键"
 // @Router    /device_group/QueryBindMqtt [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceGroupBindMqttClient[]} 
 func (api *DeviceGroupApi) QueryBindMqtt(c *gin.Context) {
 	param := c.Param("group_id")
 
@@ -279,6 +284,7 @@ func (api *DeviceGroupApi) QueryBindMqtt(c *gin.Context) {
 // @Produce json
 // @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
 // @Router    /device_group/BindMqtt [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DeviceGroupApi) BindMqtt(c *gin.Context) {
 	var param servlet.DeviceGroupBindMqttClientParam
 	if err := c.ShouldBindJSON(&param); err != nil {

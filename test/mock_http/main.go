@@ -13,18 +13,18 @@ func main() {
 	for {
 		send()
 
-		time.Sleep(30*time.Second)
+		time.Sleep(10*time.Second)
 
 	}
 
 }
 func send() {
-	url := "http://192.168.3.101:8888/handler"
+	url := "http://localhost:8888/handler"
 	method := "POST"
 
 	// 手动设置用户名和密码
-	username := "admin"
-	password := "admin"
+	username := "afff"
+	password := "fff"
 	authStr := username + ":" + password
 	auth := base64.StdEncoding.EncodeToString([]byte(authStr))
 
@@ -39,7 +39,7 @@ func send() {
 		fmt.Println(err)
 		return
 	}
-	req.Header.Add("device_id", "aaa")
+	req.Header.Add("device_id", "6")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Basic "+auth)
 

@@ -8,13 +8,16 @@ import (
 
 type SimCardBiz struct{}
 
-func (biz *SimCardBiz) PageData(accessNumber string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SimCardBiz) PageData(accessNumber ,iccid string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var dt []models.SimCard
 
 	db := glob.GDb
 	if accessNumber != "" {
 		db = db.Where("access_number like ?", "%"+accessNumber+"%")
+	}
+	if iccid !=""{
+		db = db.Where("iccid like ?" ,"%" + iccid +"%")
 	}
 	db.Model(&models.SimCard{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size

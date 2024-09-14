@@ -38,7 +38,7 @@ func main() {
 }
 
 func auth() string {
-	url := "http://192.168.3.101:13332/auth"
+	url := "http://localhost:13332/auth"
 	method := "GET"
 
 	// 手动设置用户名和密码
@@ -58,7 +58,7 @@ func auth() string {
 		fmt.Println(err)
 		return ""
 	}
-	req.Header.Add("device_id", "321")
+	req.Header.Add("device_id", "7")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Basic "+auth)
 
@@ -82,7 +82,7 @@ func wsclient(uid string) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	conn, _, err := websocket.DefaultDialer.Dial("ws://192.168.3.101:13332/ws?id="+uid, nil)
+	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:13332/ws?id="+uid, nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
@@ -102,7 +102,7 @@ func wsclient(uid string) {
 		}
 	}()
 
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for {

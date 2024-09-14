@@ -106,7 +106,6 @@ func (b CalcRunBiz) RefreshRule(id any) {
 			IdentificationCode: param.IdentificationCode,
 			SignalId:           param.SignalId,
 			Name:               param.Name,
-			SignalName:         param.SignalName,
 			Reduce:             param.Reduce,
 			CalcRuleId:         param.CalcRuleId,
 		})
@@ -233,7 +232,8 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			var fd []string
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := servlet.InfluxQueryConfig{}
-			config.Bucket = glob.GConfig.InfluxConfig.Bucket
+			config.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
+
 			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = servlet.AggregationConfig{
@@ -271,7 +271,8 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 
 			config := servlet.InfluxQueryConfig{}
-			config.Bucket = glob.GConfig.InfluxConfig.Bucket
+			config.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
+
 			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.StartTime = startTime

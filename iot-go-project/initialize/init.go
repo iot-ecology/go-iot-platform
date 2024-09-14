@@ -512,6 +512,8 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
+	r.GET("/mqtt/list", mqttApi.ListMqtt)
+	r.GET("/mqtt/byId/:id", mqttApi.ByIdMqtt)
 	r.GET("/mqtt/start", mqttApi.StartMqtt)
 	r.GET("/mqtt/stop", mqttApi.StopMqtt)
 	r.POST("/mqtt/update", mqttApi.UpdateMqtt)
@@ -528,7 +530,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal/update", signalApi.UpdateSignal)
 	r.POST("/signal/delete/:id", signalApi.DeleteSignal)
 	r.GET("/signal/page", signalApi.PageSignal)
+	r.GET("/signal/byId/:id", signalApi.SignalById)
 	r.GET("/signal/initCache", signalApi.InitCache)
+	r.GET("/signal/list", signalApi.ListSignal)
 
 	r.POST("/signal-waring-config/create", signalWaringConfigApi.CreateSignalWaringConfig)
 	r.POST("/signal-waring-config/delete/:id", signalWaringConfigApi.DeleteSignalWaringConfig)
@@ -575,6 +579,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
 	r.GET("/product/:id", productApi.ByIdProduct)
+	r.GET("/product/list", productApi.ListProduct)
 	r.GET("/product/page", productApi.PageProduct)
 	r.POST("/product/delete/:id", productApi.DeleteProduct)
 
@@ -590,6 +595,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
 
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
+	r.GET("/DeviceInfo/list", deviceInfoApi.ListDeviceInfo)
 	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
@@ -633,6 +639,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/calc-rule/refresh/:id", calcRuleApi.Refresh)
 	r.POST("/calc-rule/mock", calcRuleApi.MockCalcRule)
 	r.GET("/calc-rule/rd", calcRuleApi.CalcRuleResult)
+	r.GET("/calc-rule/list", calcRuleApi.ListCalcRule)
 
 	r.POST("/calc-param/create", calcParamApi.CreateCalcParam)
 	r.POST("/calc-param/update", calcParamApi.UpdateCalcParam)
@@ -658,6 +665,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/Dept/delete/:id", deptApi.DeleteDept)
 	r.GET("/Dept/:id", deptApi.ByIdDept)
 	r.GET("/Dept/subs", deptApi.FindByIdSubs)
+	r.GET("/Dept/list", deptApi.ListDept)
 
 	r.POST("/Role/create", roleApi.CreateRole)
 	r.POST("/Role/update", roleApi.UpdateRole)
@@ -671,6 +679,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/ShipmentRecord/page", shipmentRecordApi.PageShipmentRecord)
 	r.POST("/ShipmentRecord/delete/:id", shipmentRecordApi.DeleteShipmentRecord)
 	r.GET("/ShipmentRecord/:id", shipmentRecordApi.ByIdShipmentRecord)
+	r.GET("/ShipmentRecord/FindByShipmentProductDetail/:id", shipmentRecordApi.FindByShipmentProductDetail)
 
 	r.POST("/signal-delay-waring-param/create", signalDelayWaringParamApi.CreateSignalDelayWaring)
 	r.POST("/signal-delay-waring-param/update", signalDelayWaringParamApi.UpdateSignalDelayWaring)
@@ -684,6 +693,8 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal-delay-waring/Mock/:id", signalDelayWaringApi.Mock)
 	r.POST("/signal-delay-waring/GenParam/:id", signalDelayWaringApi.GenParam)
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
+	r.GET("/signal-delay-waring/list", signalDelayWaringApi.ListSignalDelayWaring)
+	r.GET("/signal-delay-waring/byId/:id", signalDelayWaringApi.ByIdSignalDelayWaring)
 
 	r.POST("/file/update", fileApi.UpdateFile)
 	r.GET("/file/download", fileApi.DownloadFile)

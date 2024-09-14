@@ -75,7 +75,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row, "mqtt")
+			StorageDataRowList(row, "MQTT")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 
@@ -86,9 +86,9 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		zap.S().Debugf("推送报警原始数据: %s", jsonData)
 		HandlerMqttLastTime(*data)
-		// PushToQueue("waring_handler", jsonData)
-		// PushToQueue("waring_delay_handler", jsonData)
-		// PushToQueue("transmit_handler", jsonData)
+		PushToQueue("waring_handler", jsonData)
+		PushToQueue("waring_delay_handler", jsonData)
+		PushToQueue("transmit_handler", jsonData)
 	} else {
 		zap.S().Errorf("执行脚本为空")
 	}

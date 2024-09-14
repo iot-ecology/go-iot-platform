@@ -20,7 +20,7 @@ var dashBiz = transmit.CassandraTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param CassandraTransmitBind body models.CassandraTransmitBind true "CassandraTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.CassandraTransmitBind} "创建成功的CassandraTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.CassandraTransmitBind} "创建成功的CassandraTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /CassandraTransmitBind/create [post]
@@ -133,6 +133,7 @@ func (api *CassandraTransmitBindApi) PageCassandraTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CassandraTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CassandraTransmitBindApi) DeleteCassandraTransmitBind(c *gin.Context) {
 	var CassandraTransmitBind models.CassandraTransmitBind
 
@@ -160,6 +161,7 @@ func (api *CassandraTransmitBindApi) DeleteCassandraTransmitBind(c *gin.Context)
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /CassandraTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmitBind} 
 func (api *CassandraTransmitBindApi) ByIdCassandraTransmitBind(c *gin.Context) {
 	var CassandraTransmitBind models.CassandraTransmitBind
 
@@ -183,6 +185,7 @@ func (api *CassandraTransmitBindApi) ByIdCassandraTransmitBind(c *gin.Context) {
 // @Param CassandraTransmit body servlet.TransmitScriptParam true "执行参数"
 // @Produce   application/json
 // @Router    /CassandraTransmitBind/mockScript [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CassandraTransmitBindApi) MockScript(c *gin.Context) {
 	var req servlet.TransmitScriptParam
 	if err := c.ShouldBindJSON(&req); err != nil {

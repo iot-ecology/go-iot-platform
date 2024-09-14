@@ -23,7 +23,7 @@ var shipmentRecordBiz = biz.ShipmentRecordBiz{}
 // @Accept json
 // @Produce json
 // @Param ShipmentRecord body models.ShipmentRecord true "发货记录"
-// @Success 201 {object} servlet.JSONResult{data=models.ShipmentRecord} "创建成功的发货记录"
+// @Success 200 {object} servlet.JSONResult{data=models.ShipmentRecord} "创建成功的发货记录"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ShipmentRecord/create [post]
@@ -62,7 +62,7 @@ func (api *ShipmentRecordApi) CreateShipmentRecord(c *gin.Context) {
 		Description:     param.Description,
 	}
 
-	create := tx.Model(models.ShipmentRecord{}).Create(shipmentRecord)
+	create := tx.Model(models.ShipmentRecord{}).Create(&shipmentRecord)
 	if create.Error != nil {
 		tx.Rollback()
 		zap.S().Errorf("创建 ShipmentRecord 异常 %+v", create.Error)
@@ -200,6 +200,8 @@ func (api *ShipmentRecordApi) UpdateShipmentRecord(c *gin.Context) {
 // @Failure 500 {string} string "查询异常"
 // @Router /ShipmentRecord/page [get]
 func (api *ShipmentRecordApi) PageShipmentRecord(c *gin.Context) {
+	var customerName = c.Query("customer_name")
+	var status = c.Query("status")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -214,7 +216,7 @@ func (api *ShipmentRecordApi) PageShipmentRecord(c *gin.Context) {
 		return
 	}
 
-	data, err := shipmentRecordBiz.PageData("", parseUint, u)
+	data, err := shipmentRecordBiz.PageData(customerName,status, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -228,6 +230,7 @@ func (api *ShipmentRecordApi) PageShipmentRecord(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ShipmentRecord/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ShipmentRecordApi) DeleteShipmentRecord(c *gin.Context) {
 	var ShipmentRecord models.ShipmentRecord
 
@@ -254,6 +257,7 @@ func (api *ShipmentRecordApi) DeleteShipmentRecord(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ShipmentRecord/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ShipmentRecord} 
 func (api *ShipmentRecordApi) ByIdShipmentRecord(c *gin.Context) {
 	var ShipmentRecord models.ShipmentRecord
 
@@ -262,6 +266,29 @@ func (api *ShipmentRecordApi) ByIdShipmentRecord(c *gin.Context) {
 	result := glob.GDb.First(&ShipmentRecord, param)
 	if result.Error != nil {
 		servlet.Error(c, "ShipmentRecord not found")
+
+		return
+	}
+
+	servlet.Resp(c, ShipmentRecord)
+}
+// FindByShipmentProductDetail
+// @Tags      ShipmentRecords
+// @Summary   根据发货id查询所有内容
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /ShipmentRecord/FindByShipmentProductDetail/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ShipmentProductDetail[]}
+func (api *ShipmentRecordApi) FindByShipmentProductDetail(c *gin.Context) {
+
+	var ShipmentRecord []models.ShipmentProductDetail
+
+	param := c.Param("id")
+
+	result := glob.GDb.Model(&models.ShipmentProductDetail{}).Where("shipment_record_id = ?",
+		param).Find(&ShipmentRecord)
+	if result.Error != nil {
+		servlet.Error(c, "ShipmentProductDetail not found")
 
 		return
 	}

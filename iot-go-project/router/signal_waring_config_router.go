@@ -24,7 +24,7 @@ type SignalWaringConfigApi struct{}
 // @Accept json
 // @Produce json
 // @Param config body models.SignalWaringConfig true "信号报警配置信息"
-// @Success 201 {object} servlet.JSONResult{data=models.SignalWaringConfig}  "创建成功的信号报警配置"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalWaringConfig}  "创建成功的信号报警配置"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal-waring-config/create [post]
@@ -158,6 +158,7 @@ func (api *SignalWaringConfigApi) PageSignalWaringConfig(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-waring-config/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalWaringConfigApi) DeleteSignalWaringConfig(c *gin.Context) {
 	var config models.SignalWaringConfig
 
@@ -184,6 +185,7 @@ func (api *SignalWaringConfigApi) DeleteSignalWaringConfig(c *gin.Context) {
 // @Param config body servlet.WaringRowQuery true "查询参数"
 // @Produce   application/json
 // @Router    /signal-waring-config/query-row [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *SignalWaringConfigApi) QueryWaringList(c *gin.Context) {
 
 	var req servlet.WaringRowQuery

@@ -63,7 +63,7 @@ func HandlerDataCoapStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row, "coap")
+			StorageDataRowList(row, "COAP")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 

@@ -20,7 +20,7 @@ var InfluxdbTransmitBiz = transmit.InfluxdbTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param InfluxdbTransmit body models.InfluxdbTransmit true "Influxdb数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /InfluxdbTransmit/create [post]
@@ -126,6 +126,7 @@ func (api *InfluxdbTransmitApi) PageInfluxdbTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /InfluxdbTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 	var InfluxdbTransmit models.InfluxdbTransmit
 
@@ -152,6 +153,7 @@ func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /InfluxdbTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.InfluxdbTransmit} 
 func (api *InfluxdbTransmitApi) ByIdInfluxdbTransmit(c *gin.Context) {
 	var InfluxdbTransmit models.InfluxdbTransmit
 

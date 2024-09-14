@@ -20,7 +20,7 @@ var RabbitmqTransmitBiz = transmit.RabbitTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param RabbitmqTransmit body models.RabbitmqTransmit true "Rabbit消息队列管理"
-// @Success 201 {object} servlet.JSONResult{data=models.RabbitmqTransmit} "创建成功的Rabbit消息队列管理"
+// @Success 200 {object} servlet.JSONResult{data=models.RabbitmqTransmit} "创建成功的Rabbit消息队列管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /RabbitmqTransmit/create [post]
@@ -132,6 +132,7 @@ func (api *RabbitmqTransmitApi) PageRabbitmqTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /RabbitmqTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *RabbitmqTransmitApi) DeleteRabbitmqTransmit(c *gin.Context) {
 	var RabbitmqTransmit models.RabbitmqTransmit
 
@@ -158,6 +159,7 @@ func (api *RabbitmqTransmitApi) DeleteRabbitmqTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /RabbitmqTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.RabbitmqTransmit} 
 func (api *RabbitmqTransmitApi) ByIdRabbitmqTransmit(c *gin.Context) {
 	var RabbitmqTransmit models.RabbitmqTransmit
 

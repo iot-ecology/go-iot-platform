@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -20,7 +21,7 @@ var TcpHandlerBiz = biz.TcpHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param TcpHandler body models.TcpHandler true "Tcp数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.TcpHandler} "创建成功的Tcp数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.TcpHandler} "创建成功的Tcp数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /TcpHandler/create [post]
@@ -44,6 +45,9 @@ func (api *TcpHandlerApi) CreateTcpHandler(c *gin.Context) {
 		return
 	}
 	TcpHandlerBiz.SetRedis(TcpHandler)
+	SetTcpIpHandlerRedis(TcpHandler)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "tcp", TcpHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Tcp数据处理器
 	servlet.Resp(c, TcpHandler)
 }
@@ -78,6 +82,8 @@ func (api *TcpHandlerApi) UpdateTcpHandler(c *gin.Context) {
 
 	var newV models.TcpHandler
 	newV = old
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Name = req.Name
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -88,6 +94,9 @@ func (api *TcpHandlerApi) UpdateTcpHandler(c *gin.Context) {
 		return
 	}
 	TcpHandlerBiz.SetRedis(newV)
+	SetTcpIpHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "TCP", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 
@@ -135,6 +144,7 @@ func (api *TcpHandlerApi) PageTcpHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /TcpHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *TcpHandlerApi) DeleteTcpHandler(c *gin.Context) {
 	var TcpHandler models.TcpHandler
 
@@ -162,6 +172,7 @@ func (api *TcpHandlerApi) DeleteTcpHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /TcpHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.TcpHandler} 
 func (api *TcpHandlerApi) ByIdTcpHandler(c *gin.Context) {
 	var TcpHandler models.TcpHandler
 

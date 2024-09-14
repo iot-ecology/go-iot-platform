@@ -40,8 +40,8 @@ func (biz *CoapHandlerBiz) PageData(name string, page, size int) (*servlet.Pagin
 }
 
 func (biz *CoapHandlerBiz) SetRedis(data models.CoapHandler) {
-	glob.GRedis.HSet(context.Background(), "struct:Coap", strconv.Itoa(int(data.ID)), data.Script)
+	glob.GRedis.HSet(context.Background(), "struct:Coap", strconv.Itoa(int(data.DeviceInfoId)), data.Script)
 }
 func (biz *CoapHandlerBiz) RemoveRedis(data models.CoapHandler) {
-	glob.GRedis.HDel(context.Background(), "struct:Coap", strconv.Itoa(int(data.ID)))
+	glob.GRedis.HDel(context.Background(), "struct:Coap", strconv.Itoa(int(data.DeviceInfoId)))
 }

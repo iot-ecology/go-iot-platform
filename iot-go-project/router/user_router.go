@@ -24,7 +24,7 @@ var userBiz = biz.UserBiz{}
 // @Accept json
 // @Produce json
 // @Param User body models.User true "用户"
-// @Success 201 {object} servlet.JSONResult{data=models.User} "创建成功的用户"
+// @Success 200 {object} servlet.JSONResult{data=models.User} "创建成功的用户"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /User/create [post]
@@ -122,7 +122,7 @@ func (api *UserApi) UpdateUser(c *gin.Context) {
 // @Failure 500 {string} string "查询异常"
 // @Router /User/page [get]
 func (api *UserApi) PageUser(c *gin.Context) {
-	var name = c.Query("name")
+	var name = c.Query("username")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -151,6 +151,7 @@ func (api *UserApi) PageUser(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /User/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *UserApi) DeleteUser(c *gin.Context) {
 	var User models.User
 
@@ -177,6 +178,7 @@ func (api *UserApi) DeleteUser(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /User/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.User} 
 func (api *UserApi) ByIdUser(c *gin.Context) {
 	var User models.User
 
@@ -197,6 +199,7 @@ func (api *UserApi) ByIdUser(c *gin.Context) {
 // @Summary   用户列表
 // @Produce   application/json
 // @Router    /User/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.User[]} 
 func (api *UserApi) ListUser(c *gin.Context) {
 	var users []models.User
 	result := glob.GDb.Find(&users)
@@ -215,6 +218,7 @@ func (api *UserApi) ListUser(c *gin.Context) {
 // @Param User body servlet.UserBindRoleParam true "绑定参数"
 // @Produce   application/json
 // @Router    /User/BindRole [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *UserApi) BindRole(c *gin.Context) {
 
 	var param servlet.UserBindRoleParam
@@ -267,6 +271,7 @@ func (api *UserApi) BindRole(c *gin.Context) {
 // @Param User body servlet.UserBindDeptParam true "绑定参数"
 // @Produce   application/json
 // @Router    /User/BindDept [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *UserApi) BindDept(c *gin.Context) {
 
 	var param servlet.UserBindDeptParam
@@ -319,6 +324,7 @@ func (api *UserApi) BindDept(c *gin.Context) {
 // @Summary   查询绑定角色
 // @Param user_id query string false "用户id"
 // @Router    /User/QueryBindRole [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.UserRole[]} 
 func (api *UserApi) QueryBindRole(c *gin.Context) {
 	param := c.Query("user_id")
 
@@ -338,6 +344,7 @@ func (api *UserApi) QueryBindRole(c *gin.Context) {
 // @Summary   查询绑定部门
 // @Param user_id query string false "用户id"
 // @Router    /User/QueryBindDept [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.UserDept[]} 
 func (api *UserApi) QueryBindDept(c *gin.Context) {
 	param := c.Query("user_id")
 
@@ -357,7 +364,7 @@ func (api *UserApi) QueryBindDept(c *gin.Context) {
 // @Tags      Users
 // @Summary   查询绑定设备
 // @Param user_id path int true "主键"
-// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.UserBindDeviceInfo}} "绑定关系"
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.UserBindDeviceInfo[]}} "绑定关系"
 // @Produce   application/json
 // @Router    /User/QueryBindDeviceInfo [post]
 func (api *UserApi) QueryBindDeviceInfo(c *gin.Context) {
@@ -380,7 +387,9 @@ func (api *UserApi) QueryBindDeviceInfo(c *gin.Context) {
 // @Summary   用户绑定设备
 // @Param User body servlet.UserBindDeviceInfoParam true "绑定参数"
 // @Produce   application/json
-// @Router    /User/BindDeviceInfo [post]
+// @Router    /User/BindDeviceInfo [post
+
+// @Success 200 {object}  servlet.JSONResult{data=models.UserRole[]}
 func (api *UserApi) BindDeviceInfo(c *gin.Context) {
 
 	var param servlet.UserBindDeviceInfoParam

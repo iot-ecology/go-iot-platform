@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -20,7 +21,7 @@ var HttpHandlerBiz = biz.HttpHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param HttpHandler body models.HttpHandler true "Http数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.HttpHandler} "创建成功的Http数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.HttpHandler} "创建成功的Http数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /HttpHandler/create [post]
@@ -36,6 +37,15 @@ func (api *HttpHandlerApi) CreateHttpHandler(c *gin.Context) {
 		servlet.Error(c, "名称不能为空")
 		return
 	}
+	var old  models.HttpHandler
+
+	glob.GDb.Where("device_info_id  = ?" , HttpHandler.DeviceInfoId).Find(&old)
+
+	if old.ID > 0 {
+
+		servlet.Resp(c, "当前设备已有处理器")
+	}
+
 
 	result := glob.GDb.Create(&HttpHandler)
 
@@ -44,6 +54,10 @@ func (api *HttpHandlerApi) CreateHttpHandler(c *gin.Context) {
 		return
 	}
 	HttpHandlerBiz.SetRedis(HttpHandler)
+	SetHttpHandlerRedis(HttpHandler)
+
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "HTTP", HttpHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Http数据处理器
 	servlet.Resp(c, HttpHandler)
 }
@@ -79,6 +93,8 @@ func (api *HttpHandlerApi) UpdateHttpHandler(c *gin.Context) {
 	var newV models.HttpHandler
 	newV = old
 	newV.Name = req.Name
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
 
@@ -88,6 +104,9 @@ func (api *HttpHandlerApi) UpdateHttpHandler(c *gin.Context) {
 		return
 	}
 	HttpHandlerBiz.SetRedis(newV)
+	SetHttpHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "HTTP", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 
@@ -107,6 +126,7 @@ func (api *HttpHandlerApi) UpdateHttpHandler(c *gin.Context) {
 // @Router /HttpHandler/page [get]
 func (api *HttpHandlerApi) PageHttpHandler(c *gin.Context) {
 	var name = c.Query("name")
+	var device_info_id = c.Query("device_info_id")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -121,7 +141,7 @@ func (api *HttpHandlerApi) PageHttpHandler(c *gin.Context) {
 		return
 	}
 
-	data, err := HttpHandlerBiz.PageData(name, parseUint, u)
+	data, err := HttpHandlerBiz.PageData(name,device_info_id, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -135,6 +155,7 @@ func (api *HttpHandlerApi) PageHttpHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /HttpHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *HttpHandlerApi) DeleteHttpHandler(c *gin.Context) {
 	var HttpHandler models.HttpHandler
 
@@ -162,6 +183,7 @@ func (api *HttpHandlerApi) DeleteHttpHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /HttpHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.HttpHandler} 
 func (api *HttpHandlerApi) ByIdHttpHandler(c *gin.Context) {
 	var HttpHandler models.HttpHandler
 

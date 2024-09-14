@@ -14,7 +14,7 @@ type Auth struct {
 }
 
 func main() {
-	c, err := coap.Dial("udp", "192.168.3.101:5683")
+	c, err := coap.Dial("udp", "localhost:5683")
 	if err != nil {
 		log.Fatalf("Error dialing: %v", err)
 	}
@@ -23,7 +23,7 @@ func main() {
 	for {
 		data(c)
 
-		time.Sleep(30*time.Second)
+		time.Sleep(10*time.Second)
 
 	}
 
@@ -60,7 +60,7 @@ func auth( c *coap.Conn) {
 	auth := Auth{
 		Username: "admin",
 		Password: "admin",
-		DeviceId: "1234567890",
+		DeviceId: "8",
 	}
 	marshal, _ := json.Marshal(auth)
 	req := coap.Message{

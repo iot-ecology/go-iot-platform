@@ -20,7 +20,7 @@ var KafkaTransmitBindBiz = transmit.KafkaTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param KafkaTransmitBind body models.KafkaTransmitBind true "KafkaTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.KafkaTransmitBind} "创建成功的KafkaTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.KafkaTransmitBind} "创建成功的KafkaTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /KafkaTransmitBind/create [post]
@@ -132,6 +132,7 @@ func (api *KafkaTransmitBindApi) PageKafkaTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /KafkaTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *KafkaTransmitBindApi) DeleteKafkaTransmitBind(c *gin.Context) {
 	var KafkaTransmitBind models.KafkaTransmitBind
 
@@ -159,6 +160,7 @@ func (api *KafkaTransmitBindApi) DeleteKafkaTransmitBind(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /KafkaTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.KafkaTransmitBind} 
 func (api *KafkaTransmitBindApi) ByIdKafkaTransmitBind(c *gin.Context) {
 	var KafkaTransmitBind models.KafkaTransmitBind
 

@@ -2,11 +2,13 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"igp/biz"
 	"igp/servlet"
 	"strconv"
 )
 
 type MessageListApi struct{}
+var messageListBiz = biz.MessageListBiz{}
 
 // PageMessageList
 // @Summary 分页查询消息
@@ -37,7 +39,7 @@ func (api *MessageListApi) PageMessageList(c *gin.Context) {
 		return
 	}
 
-	data, err := dashBiz.PageData(messageTypeId, parseUint, u)
+	data, err := messageListBiz.PageData(messageTypeId, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

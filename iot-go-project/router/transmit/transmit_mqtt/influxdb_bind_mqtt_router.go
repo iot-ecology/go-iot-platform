@@ -20,7 +20,7 @@ var InfluxdbTransmitBindBiz = transmit.InfluxdbTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param InfluxdbTransmitBind body models.InfluxdbTransmitBind true "InfluxdbTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.InfluxdbTransmitBind} "创建成功的InfluxdbTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.InfluxdbTransmitBind} "创建成功的InfluxdbTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /InfluxdbTransmitBind/create [post]
@@ -132,6 +132,7 @@ func (api *InfluxdbTransmitBindApi) PageInfluxdbTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /InfluxdbTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *InfluxdbTransmitBindApi) DeleteInfluxdbTransmitBind(c *gin.Context) {
 	var InfluxdbTransmitBind models.InfluxdbTransmitBind
 
@@ -159,6 +160,7 @@ func (api *InfluxdbTransmitBindApi) DeleteInfluxdbTransmitBind(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /InfluxdbTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.InfluxdbTransmitBind} 
 func (api *InfluxdbTransmitBindApi) ByIdInfluxdbTransmitBind(c *gin.Context) {
 	var InfluxdbTransmitBind models.InfluxdbTransmitBind
 
@@ -181,6 +183,7 @@ func (api *InfluxdbTransmitBindApi) ByIdInfluxdbTransmitBind(c *gin.Context) {
 // @Param InfluxdbTransmit body servlet.TransmitScriptParam true "执行参数"
 // @Produce   application/json
 // @Router    /InfluxdbTransmitBind/mockScript [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *InfluxdbTransmitBindApi) MockScript(c *gin.Context) {
 	var req servlet.TransmitScriptParam
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -32,7 +32,7 @@ func InitLog() {
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfig), // 使用 Console 编码器
 		zapcore.AddSync(os.Stdout),               // 输出到标准输出
-		zap.NewAtomicLevelAt(zap.ErrorLevel),      // 设置日志级别为 Debug
+		zap.NewAtomicLevelAt(zap.InfoLevel),      // 设置日志级别为 Debug
 	)
 
 	logger := zap.New(core, zap.AddCaller())

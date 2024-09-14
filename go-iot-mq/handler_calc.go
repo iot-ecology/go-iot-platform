@@ -84,7 +84,7 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 			var fd []string
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := InfluxQueryConfig{}
-			config.Bucket = globalConfig.InfluxConfig.Bucket
+			config.Bucket = CalcBucketName(globalConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
 			config.Measurement = calcMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = AggregationConfig{
@@ -120,7 +120,8 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 
 			config := InfluxQueryConfig{}
-			config.Bucket = globalConfig.InfluxConfig.Bucket
+			config.Bucket = CalcBucketName(globalConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
+
 			config.Measurement = calcMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 
@@ -140,9 +141,9 @@ func HandlerCalcStr(d amqp.Delivery) bool {
 			}
 
 			for result.Next() {
-				if result.TableChanged() {
-					zap.S().Errorf("table: %s\n", result.TableMetadata().String())
-				}
+				//if result.TableChanged() {
+				//	zap.S().Errorf("table: %s\n", result.TableMetadata().String())
+				//}
 				values := result.Record().Values()
 				zap.S().Infof("value: %+v", values)
 				m[cache.Name] = values["_value"].(float64)

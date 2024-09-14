@@ -20,7 +20,7 @@ var RabbitmqTransmitBindBiz = transmit.RabbitmqTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param RabbitmqTransmitBind body models.RabbitmqTransmitBind true "RabbitmqTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.RabbitmqTransmitBind} "创建成功的RabbitmqTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.RabbitmqTransmitBind} "创建成功的RabbitmqTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /RabbitmqTransmitBind/create [post]
@@ -132,6 +132,7 @@ func (api *RabbitmqTransmitBindApi) PageRabbitmqTransmitBind(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /RabbitmqTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *RabbitmqTransmitBindApi) DeleteRabbitmqTransmitBind(c *gin.Context) {
 	var RabbitmqTransmitBind models.RabbitmqTransmitBind
 
@@ -160,6 +161,7 @@ func (api *RabbitmqTransmitBindApi) DeleteRabbitmqTransmitBind(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /RabbitmqTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.RabbitmqTransmitBind} 
 func (api *RabbitmqTransmitBindApi) ByIdRabbitmqTransmitBind(c *gin.Context) {
 	var RabbitmqTransmitBind models.RabbitmqTransmitBind
 

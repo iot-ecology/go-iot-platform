@@ -20,7 +20,7 @@ var RepairRecordBiz = biz.RepairRecordBiz{}
 // @Accept json
 // @Produce json
 // @Param RepairRecord body models.RepairRecord true "维修日志"
-// @Success 201 {object} servlet.JSONResult{data=models.RepairRecord} "创建成功的维修日志"
+// @Success 200 {object} servlet.JSONResult{data=models.RepairRecord} "创建成功的维修日志"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /RepairRecord/create [post]
@@ -123,6 +123,7 @@ func (api *RepairRecordApi) PageRepairRecord(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /RepairRecord/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *RepairRecordApi) DeleteRepairRecord(c *gin.Context) {
 	var RepairRecord models.RepairRecord
 
@@ -149,6 +150,7 @@ func (api *RepairRecordApi) DeleteRepairRecord(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /RepairRecord/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.RepairRecord} 
 func (api *RepairRecordApi) ByIdRepairRecord(c *gin.Context) {
 	var RepairRecord models.RepairRecord
 

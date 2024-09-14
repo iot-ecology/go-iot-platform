@@ -20,7 +20,7 @@ var KafkaTransmitBiz = transmit.KafkaTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param KafkaTransmit body models.KafkaTransmit true "Kafka数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.KafkaTransmit} "创建成功的Kafka数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.KafkaTransmit} "创建成功的Kafka数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /KafkaTransmit/create [post]
@@ -132,6 +132,7 @@ func (api *KafkaTransmitApi) PageKafkaTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /KafkaTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *KafkaTransmitApi) DeleteKafkaTransmit(c *gin.Context) {
 	var KafkaTransmit models.KafkaTransmit
 
@@ -158,6 +159,7 @@ func (api *KafkaTransmitApi) DeleteKafkaTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /KafkaTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.KafkaTransmit} 
 func (api *KafkaTransmitApi) ByIdKafkaTransmit(c *gin.Context) {
 	var KafkaTransmit models.KafkaTransmit
 

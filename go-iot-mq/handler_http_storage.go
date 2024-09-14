@@ -63,7 +63,7 @@ func HandlerDataHttpStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
-			StorageDataRowList(row, "http")
+			StorageDataRowList(row, "HTTP")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
 

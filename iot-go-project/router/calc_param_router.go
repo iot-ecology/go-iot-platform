@@ -20,7 +20,7 @@ var calcParamBiz = biz.CalcParamBiz{}
 // @Accept json
 // @Produce json
 // @Param CalcParam body models.CalcParam true "计算参数"
-// @Success 201 {object} servlet.JSONResult{data=models.CalcParam} "创建成功的计算参数"
+// @Success 200 {object} servlet.JSONResult{data=models.CalcParam} "创建成功的计算参数"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /calc-param/create [post]
@@ -82,8 +82,8 @@ func (api *CalcParamApi) UpdateCalcParam(c *gin.Context) {
 	newV = old
 	newV.Name = req.Name
 	newV.Reduce = req.Reduce
-	newV.SignalName = req.SignalName
 	newV.Protocol = req.Protocol
+	newV.SignalId = req.SignalId
 	newV.DeviceUid = req.DeviceUid
 	newV.IdentificationCode = req.IdentificationCode
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -147,6 +147,7 @@ func (api *CalcParamApi) PageCalcParam(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /calc-param/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcParamApi) DeleteCalcParam(c *gin.Context) {
 	var CalcParam models.CalcParam
 

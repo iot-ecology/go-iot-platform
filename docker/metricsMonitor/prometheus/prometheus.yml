@@ -6,59 +6,59 @@ global:
 scrape_configs:
 #  - job_name: prometheus
 #    static_configs:
-#      - targets: ['172.17.0.1:9090']
+#      - targets: ['192.168.3.101:9090']
   - job_name: iotgoproject
     static_configs:
-      - targets: ['172.17.0.1:8005']
+      - targets: ['192.168.3.101:8005']
         labels:
           namespace: iot-go-project
           pod: iot-go-project
           instance: iot-go-project
   - job_name: iotgomqtt1
     static_configs:
-      - targets: ['172.17.0.1:8006']
+      - targets: ['192.168.3.101:8006']
         labels:
           namespace: iot-mqtt
           pod: iot-mqtt1
           instance: iot-mqtt1
   - job_name: iotgomqtt2
     static_configs:
-      - targets: ['172.17.0.1:8007']
+      - targets: ['192.168.3.101:8007']
         labels:
           namespace: iot-mqtt
           pod: iot-mqtt2
           instance: iot-mqtt2
   - job_name: iotgomqtt3
     static_configs:
-      - targets: ['172.17.0.1:8008']
+      - targets: ['192.168.3.101:8008']
         labels:
           namespace: iot-mqtt
           pod: iot-mqtt3
           instance: iot-mqtt3
   - job_name: iotgomq-pre_handler
     static_configs:
-      - targets: ['172.17.0.1:8001']
+      - targets: ['192.168.3.101:8001']
         labels:
           namespace: iot-mq
           pod: iot-mq-pre_handler
           instance: iot-mq-pre_handler
   - job_name: calc_handler
     static_configs:
-      - targets: ['172.17.0.1:8002']
+      - targets: ['192.168.3.101:8002']
         labels:
           namespace: iot-mq
           pod: iot-mq-calc_handler
           instance: iot-mq-calc_handler
   - job_name: iotgomq-waring_handler
     static_configs:
-      - targets: ['172.17.0.1:8003']
+      - targets: ['192.168.3.101:8003']
         labels:
           namespace: iot-mq
           pod: iot-mq-waring_handler
           instance: iot-mq-waring_handler
   - job_name: iotgomq-wd_handler
     static_configs:
-      - targets: ['172.17.0.1:8004']
+      - targets: ['192.168.3.101:8004']
         labels:
           namespace: iot-mq
           pod: iot-mq-wd_handler
@@ -68,7 +68,7 @@ scrape_configs:
 
   - job_name: iotgomq-pre_handler-1
     static_configs:
-      - targets: ['172.17.0.1:10000']
+      - targets: ['192.168.3.101:10000']
         labels:
           namespace: iot-mq
           pod: iot-mq-pre_handler-1
@@ -76,7 +76,7 @@ scrape_configs:
 
   - job_name: iotgomq-pre_handler-2
     static_configs:
-      - targets: ['172.17.0.1:10001']
+      - targets: ['192.168.3.101:10001']
         labels:
           namespace: iot-mq
           pod: iot-mq-pre_handler-2
@@ -84,7 +84,7 @@ scrape_configs:
 
   - job_name: iotgomq-pre_handler-3
     static_configs:
-      - targets: ['172.17.0.1:10002']
+      - targets: ['192.168.3.101:10002']
         labels:
           namespace: iot-mq
           pod: iot-mq-pre_handler-3

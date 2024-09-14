@@ -1,11 +1,11 @@
 node_info:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 8006
   name: m1
   type: mqtt
   size: 300
 redis_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 6379
   db: 10
   password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
@@ -13,7 +13,7 @@ redis_config:
 
 
 mq_config:
-  host: 172.17.0.1
+  host: 192.168.3.101
   port: 5672
   username: guest
   password: guest

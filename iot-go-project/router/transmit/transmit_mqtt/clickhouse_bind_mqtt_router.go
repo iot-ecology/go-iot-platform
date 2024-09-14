@@ -20,7 +20,7 @@ var clickhouseTransmitBindBiz = transmit.ClickhouseTransmitBindBiz{}
 // @Accept json
 // @Produce json
 // @Param ClickhouseTransmitBind body models.ClickhouseTransmitBind true "ClickhouseTransmitBind"
-// @Success 201 {object} servlet.JSONResult{data=models.ClickhouseTransmitBind} "创建成功的ClickhouseTransmitBind"
+// @Success 200 {object} servlet.JSONResult{data=models.ClickhouseTransmitBind} "创建成功的ClickhouseTransmitBind"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ClickhouseTransmitBind/create [post]
@@ -132,6 +132,7 @@ func (api *ClickhouseTransmitBindApi) PageClickhouseTransmitBind(c *gin.Context)
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ClickhouseTransmitBind/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ClickhouseTransmitBindApi) DeleteClickhouseTransmitBind(c *gin.Context) {
 	var ClickhouseTransmitBind models.ClickhouseTransmitBind
 
@@ -159,6 +160,7 @@ func (api *ClickhouseTransmitBindApi) DeleteClickhouseTransmitBind(c *gin.Contex
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ClickhouseTransmitBind/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmitBind} 
 func (api *ClickhouseTransmitBindApi) ByIdClickhouseTransmitBind(c *gin.Context) {
 	var ClickhouseTransmitBind models.ClickhouseTransmitBind
 
@@ -180,6 +182,7 @@ func (api *ClickhouseTransmitBindApi) ByIdClickhouseTransmitBind(c *gin.Context)
 // @Param ClickhouseTransmit body servlet.TransmitScriptParam true "执行参数"
 // @Produce   application/json
 // @Router    /ClickhouseTransmitBind/mockScript [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ClickhouseTransmitBindApi) MockScript(c *gin.Context) {
 	var req servlet.TransmitScriptParam
 	if err := c.ShouldBindJSON(&req); err != nil {

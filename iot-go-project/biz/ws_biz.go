@@ -40,8 +40,8 @@ func (biz *WebsocketHandlerBiz) PageData(name string, page, size int) (*servlet.
 }
 
 func (biz *WebsocketHandlerBiz) SetRedis(data models.WebsocketHandler) {
-	glob.GRedis.HSet(context.Background(), "struct:Websocket", strconv.Itoa(int(data.ID)), data.Script)
+	glob.GRedis.HSet(context.Background(), "struct:Websocket", strconv.Itoa(int(data.DeviceInfoId)), data.Script)
 }
 func (biz *WebsocketHandlerBiz) RemoveRedis(data models.WebsocketHandler) {
-	glob.GRedis.HDel(context.Background(), "struct:Websocket", strconv.Itoa(int(data.ID)))
+	glob.GRedis.HDel(context.Background(), "struct:Websocket", strconv.Itoa(int(data.DeviceInfoId)))
 }

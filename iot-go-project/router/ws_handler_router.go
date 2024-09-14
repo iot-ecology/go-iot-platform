@@ -1,12 +1,14 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type WebsocketHandlerApi struct{}
@@ -20,7 +22,7 @@ var WebsocketHandlerBiz = biz.WebsocketHandlerBiz{}
 // @Accept json
 // @Produce json
 // @Param WebsocketHandler body models.WebsocketHandler true "Websocket数据处理器"
-// @Success 201 {object} servlet.JSONResult{data=models.WebsocketHandler} "创建成功的Websocket数据处理器"
+// @Success 200 {object} servlet.JSONResult{data=models.WebsocketHandler} "创建成功的Websocket数据处理器"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /WebsocketHandler/create [post]
@@ -44,6 +46,9 @@ func (api *WebsocketHandlerApi) CreateWebsocketHandler(c *gin.Context) {
 		return
 	}
 	WebsocketHandlerBiz.SetRedis(WebsocketHandler)
+	SetWebsocketHandlerRedis(WebsocketHandler)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "WebSocket", WebsocketHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Websocket数据处理器
 	servlet.Resp(c, WebsocketHandler)
 }
@@ -78,6 +83,8 @@ func (api *WebsocketHandlerApi) UpdateWebsocketHandler(c *gin.Context) {
 
 	var newV models.WebsocketHandler
 	newV = old
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Name = req.Name
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -88,6 +95,9 @@ func (api *WebsocketHandlerApi) UpdateWebsocketHandler(c *gin.Context) {
 		return
 	}
 	WebsocketHandlerBiz.SetRedis(newV)
+	SetWebsocketHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "WebSocket", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 
@@ -135,6 +145,7 @@ func (api *WebsocketHandlerApi) PageWebsocketHandler(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /WebsocketHandler/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *WebsocketHandlerApi) DeleteWebsocketHandler(c *gin.Context) {
 	var WebsocketHandler models.WebsocketHandler
 
@@ -162,6 +173,7 @@ func (api *WebsocketHandlerApi) DeleteWebsocketHandler(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /WebsocketHandler/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.WebsocketHandler}
 func (api *WebsocketHandlerApi) ByIdWebsocketHandler(c *gin.Context) {
 	var WebsocketHandler models.WebsocketHandler
 
@@ -176,6 +188,3 @@ func (api *WebsocketHandlerApi) ByIdWebsocketHandler(c *gin.Context) {
 
 	servlet.Resp(c, WebsocketHandler)
 }
-
-
-

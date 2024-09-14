@@ -22,7 +22,7 @@ var calcRunBiz = biz.CalcRunBiz{}
 // @Accept json
 // @Produce json
 // @Param CalcRule body models.CalcRule true "计算规则"
-// @Success 201 {object} servlet.JSONResult{data=models.CalcRule} "创建成功的计算规则"
+// @Success 200 {object} servlet.JSONResult{data=models.CalcRule} "创建成功的计算规则"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /calc-rule/create [post]
@@ -147,6 +147,7 @@ func (api *CalcRuleApi) PageCalcRule(c *gin.Context) {
 // @Summary   删除计算规则
 // @Produce   application/json
 // @Router    /calc-rule/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) DeleteCalcRule(c *gin.Context) {
 	var CalcRule models.CalcRule
 
@@ -172,6 +173,7 @@ func (api *CalcRuleApi) DeleteCalcRule(c *gin.Context) {
 // @Summary   启动任务
 // @Produce   application/json
 // @Router    /calc-rule/start/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) StartCalcRule(c *gin.Context) {
 
 	param := c.Param("id")
@@ -194,6 +196,7 @@ func (api *CalcRuleApi) StartCalcRule(c *gin.Context) {
 // @Param CalcRule body servlet.Event true "模拟参数"
 // @Produce   application/json
 // @Router    /calc-rule/mock [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) MockCalcRule(c *gin.Context) {
 
 	var req servlet.Event
@@ -214,6 +217,7 @@ func (api *CalcRuleApi) MockCalcRule(c *gin.Context) {
 // @Summary   刷新规则
 // @Produce   application/json
 // @Router    /calc-rule/refresh/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) Refresh(c *gin.Context) {
 	param := c.Param("id")
 
@@ -227,6 +231,7 @@ func (api *CalcRuleApi) Refresh(c *gin.Context) {
 // @Summary   停止任务
 // @Produce   application/json
 // @Router    /calc-rule/stop/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) StopCalcRule(c *gin.Context) {
 
 	param := c.Param("id")
@@ -251,6 +256,7 @@ func (api *CalcRuleApi) StopCalcRule(c *gin.Context) {
 // @Param end_time path int true "结束时间"
 // @Produce   application/json
 // @Router    /calc-rule/rd [get]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *CalcRuleApi) CalcRuleResult(c *gin.Context) {
 	ruleIdstr := c.Query("rule_id")
 	startTimestr := c.Query("start_time")
@@ -276,4 +282,27 @@ func (api *CalcRuleApi) CalcRuleResult(c *gin.Context) {
 	start := calcRunBiz.QueryRuleExData(ruleId, startTime, endTime)
 
 	servlet.Resp(c, start)
+}
+
+
+
+
+// ListCalcRule
+// @Summary 计算规则列表
+// @Description 计算规则列表
+// @Tags calc-rule
+// @Accept json
+// @Produce json
+// @Param CalcRule body models.CalcRule true "计算规则"
+// @Success 200 {object} servlet.JSONResult{data=models.CalcRule[]} "创建成功的计算规则"
+// @Failure 400 {string} string "请求数据错误"
+// @Failure 500 {string} string "内部服务器错误"
+// @Router /calc-rule/list [get]
+func (api *CalcRuleApi) ListCalcRule(c *gin.Context) {
+	var CalcRule []models.CalcRule
+
+
+	glob.GDb.Find(&CalcRule)
+
+	servlet.Resp(c, CalcRule)
 }
