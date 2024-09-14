@@ -1,4 +1,5 @@
 import CalcParamUpdateForm from '@/pages/Data/CalcParam/CalcParamUpdateForm';
+import { initSearchDeviceUidForMqtt } from '@/pages/Data/Signal';
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import SignalNameShow from '@/pages/Data/Signal/SignalNameShow';
 import {
@@ -86,6 +87,7 @@ const Admin: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.CalcParamListItem>();
   const [createDeviceUid, setCreateDeviceUid] = useState<string>();
+  const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
 
   const columns: ProColumns<API.CalcParamListItem>[] = [
     {
@@ -111,9 +113,37 @@ const Admin: React.FC = () => {
     {
       key: 'protocol',
       title: <FormattedMessage id="pages.calc-param.protocol" />,
-      hideInSearch: true,
+      hideInSearch: false,
       dataIndex: 'protocol',
+      initialValue: 'MQTT',
+      onChange: (value) => {
+        setSearchProtocol(value);
+      },
+      fieldProps: (form, config: any) => ({
+        onChange: async (value) => {
+          if (value === 'MQTT') {
+            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+          } else {
+            setSearchDeviceUid('');
+            setOpDeviceUid([
+              {
+                client_id: 'ccc',
+                ID: '1',
+              },
+            ]);
+          }
+          setSearchProtocol(value);
+        },
+      }),
+      valueEnum: {
+        MQTT: { text: 'MQTT', status: 'success' },
+        HTTP: { text: 'HTTP', status: 'success' },
+        WebSocket: { text: 'WebSocket', status: 'success' },
+        'TCP/IP': { text: 'TCP/IP', status: 'success' },
+        COAP: { text: 'COAP', status: 'success' },
+      },
     },
+
     {
       key: 'identification_code',
       title: <FormattedMessage id="pages.calc-param.identification_code" />,

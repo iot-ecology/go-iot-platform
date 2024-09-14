@@ -196,4 +196,12 @@ export default {
   'pages.calc-param.signal_id': '信号',
   'pages.calc-param.reduce': '数据聚合方式',
   'pages.calc-param.calc_rule_id': '计算规则',
+
+  'pages.waring-param.protocol': '协议',
+  'pages.waring-param.identification_code': '设备标识码',
+  'pages.waring-param.device_uid': '联网设备',
+  'pages.waring-param.name': '名称',
+  'pages.waring-param.signal_name': '信号名称',
+  'pages.waring-param.signal_id': '信号',
+  'pages.waring-param.signal_delay_waring_id': '报警脚本',
 };

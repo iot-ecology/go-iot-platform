@@ -88,6 +88,16 @@ declare namespace API {
     start?: string;
     mock_value?: string;
   };
+  type ScriptWaringParamListItem = {
+    ID?: number;
+    protocol?: string;
+    identification_code?: string;
+    device_uid?: number;
+    name?: string;
+    signal_name?: string;
+    signal_id?: number;
+    signal_delay_waring_id?: number;
+  };
   type SignalWaringItem = {
     ID?: number;
     signal_id?: number;

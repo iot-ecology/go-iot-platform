@@ -34,6 +34,10 @@ func (api *SignalDelayWaringParamApi) CreateSignalDelayWaring(c *gin.Context) {
 		servlet.Error(c, err.Error())
 		return
 	}
+	if !(SignalDelayWaringParam.SignalDelayWaringId > 0) {
+		servlet.Error(c, "脚本必选")
+
+	}
 
 	// 检查 SignalDelayWaringParam 是否被正确初始化
 	if SignalDelayWaringParam.Name == "" {
@@ -41,6 +45,11 @@ func (api *SignalDelayWaringParamApi) CreateSignalDelayWaring(c *gin.Context) {
 		return
 	}
 
+	var signal models.Signal
+	glob.GDb.First(&signal, SignalDelayWaringParam.SignalId)
+	SignalDelayWaringParam.SignalName = signal.Name
+
+	//fixme: 信号名称通过查询更新
 	result := glob.GDb.Create(&SignalDelayWaringParam)
 
 	if result.Error != nil {
@@ -159,7 +168,7 @@ func (api *SignalDelayWaringParamApi) PageSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring-param/delete/:id [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *SignalDelayWaringParamApi) DeleteSignalDelayWaring(c *gin.Context) {
 	var SignalDelayWaringParam models.SignalDelayWaringParam
 

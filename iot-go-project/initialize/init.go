@@ -691,6 +691,8 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal-delay-waring/Mock/:id", signalDelayWaringApi.Mock)
 	r.POST("/signal-delay-waring/GenParam/:id", signalDelayWaringApi.GenParam)
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
+	r.GET("/signal-delay-waring/list", signalDelayWaringApi.ListSignalDelayWaring)
+	r.GET("/signal-delay-waring/byId/:id", signalDelayWaringApi.ByIdSignalDelayWaring)
 
 	r.POST("/file/update", fileApi.UpdateFile)
 	r.GET("/file/download", fileApi.DownloadFile)
