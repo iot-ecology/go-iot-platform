@@ -5,7 +5,7 @@ import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import SignalNameShow from '@/pages/Data/Signal/SignalNameShow';
 import {
   addScriptWaringParam,
-  deleteScriptWaringParam,
+  deleteScriptWaringParam, deviceList,
   mqttList,
   scriptWaringList,
   scritpParamPage,
@@ -355,7 +355,17 @@ const Admin: React.FC = () => {
               let res = await mqttList();
               return res.data;
             } else {
-              return [];
+              let c = await deviceList();
+              let r = [];
+              c.data.forEach((e) => {
+                if (e.protocol === params.protocol) {
+                  r.push({
+                    client_id: e.sn,
+                    ID: e.ID,
+                  });
+                }
+              });
+              return r;
             }
           }}
           onChange={(v) => {

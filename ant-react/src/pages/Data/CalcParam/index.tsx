@@ -7,6 +7,7 @@ import {
   calcParamPage,
   calcRuleList,
   deleteCalcParam,
+  deviceList,
   mqttList,
   signalList,
   updateCalcParam,
@@ -88,6 +89,8 @@ const Admin: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.CalcParamListItem>();
   const [createDeviceUid, setCreateDeviceUid] = useState<string>();
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
+  const [opDeviceUid, setOpDeviceUid] = useState<any>();
+  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string>('');
 
   const columns: ProColumns<API.CalcParamListItem>[] = [
     {
@@ -367,7 +370,17 @@ const Admin: React.FC = () => {
               let res = await mqttList();
               return res.data;
             } else {
-              return [];
+              let c = await deviceList();
+              let r = [];
+              c.data.forEach((e) => {
+                if (e.protocol === params.protocol) {
+                  r.push({
+                    client_id: e.sn,
+                    ID: e.ID,
+                  });
+                }
+              });
+              return r;
             }
           }}
           onChange={(v) => {
