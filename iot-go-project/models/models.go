@@ -89,9 +89,9 @@ type CalcParam struct {
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
 	Name           string `json:"name"`                                                  // 参数名称
-	SignalName     string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId       int    `gorm:"signal_id"  json:"signal_id" structs:"signal_id"`       // 信号表的外键ID
-	Reduce         string `json:"reduce"`                                                // 数据聚合方式 1. mean 2. sum 3. max 4. min
+	Reduce         string `json:"reduce"`                                                // 数据聚合方式 1. mean 2. sum 3.
+	// max 4. min 5. 原始
 	CalcRuleId     int    `json:"calc_rule_id"`                                          // CalcRule 主键
 	MqttClientName string `gorm:"-" json:"mqtt_client_name"`                             // MQTT客户端的名称，不存储在数据库中
 	gorm.Model     `structs:"-"`

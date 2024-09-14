@@ -63,6 +63,17 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type CalcParamListItem = {
+    ID?: number;
+    protocol?: string;
+    identification_code?: string;
+    device_uid?: string;
+    name?: string;
+    signal_name?: string;
+    signal_id?: string;
+    reduce?: string;
+    calc_rule_id?: string;
+  };
   type CalcRuleListItem = {
     ID?: number;
     name?: string;

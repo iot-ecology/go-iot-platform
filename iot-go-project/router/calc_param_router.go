@@ -82,8 +82,8 @@ func (api *CalcParamApi) UpdateCalcParam(c *gin.Context) {
 	newV = old
 	newV.Name = req.Name
 	newV.Reduce = req.Reduce
-	newV.SignalName = req.SignalName
 	newV.Protocol = req.Protocol
+	newV.SignalId = req.SignalId
 	newV.DeviceUid = req.DeviceUid
 	newV.IdentificationCode = req.IdentificationCode
 	result = glob.GDb.Model(&newV).Updates(newV)

@@ -174,6 +174,12 @@ export async function mqttList() {
   });
 }
 
+export async function calcRuleList() {
+  return request<API.CommonResp<API.CalcRuleListItem[]>>('/api/calc-rule/list', {
+    method: 'GET',
+  });
+}
+
 export async function signalList(data: any) {
   const request1 = await request<API.CommonResp<string>>('/api/signal/list', {
     method: 'GET',
@@ -184,6 +190,12 @@ export async function signalList(data: any) {
 
 export async function mqttById(id: any) {
   return request<API.CommonResp<API.MqttListItem>>('/api/mqtt/byId/' + id, {
+    method: 'GET',
+  });
+}
+
+export async function signalById(id: any) {
+  return request<API.CommonResp<API.MqttListItem>>('/api/signal/byId/' + id, {
     method: 'GET',
   });
 }
@@ -254,6 +266,29 @@ export async function simCardPage(
       AccessNumber: params.access_number ? params.access_number : '',
 
       iccid: params.iccid ? params.iccid : '',
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function calcParamPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CalcParamListItem>('/api/calc-param/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
     },
     ...(options || {}),
   });
@@ -582,6 +617,15 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addCalcParam(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/calc-param/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addCalcRule(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/calc-rule/create', {
     method: 'POST',
@@ -706,6 +750,12 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteCalcParam(id: any) {
+  return request<API.CommonResp<string>>('/api/calc-param/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteCalcRule(id: any) {
   return request<API.CommonResp<string>>('/api/calc-rule/delete/' + id, {
     method: 'POST',
@@ -775,6 +825,13 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCalcParam(dt: any) {
+  return request<API.CommonResp<string>>('/api/calc-param/update', {
     method: 'POST',
     data: dt,
   });

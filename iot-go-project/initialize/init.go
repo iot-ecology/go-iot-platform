@@ -529,6 +529,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal/update", signalApi.UpdateSignal)
 	r.POST("/signal/delete/:id", signalApi.DeleteSignal)
 	r.GET("/signal/page", signalApi.PageSignal)
+	r.GET("/signal/byId/:id", signalApi.SignalById)
 	r.GET("/signal/initCache", signalApi.InitCache)
 	r.GET("/signal/list", signalApi.ListSignal)
 
@@ -636,6 +637,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/calc-rule/refresh/:id", calcRuleApi.Refresh)
 	r.POST("/calc-rule/mock", calcRuleApi.MockCalcRule)
 	r.GET("/calc-rule/rd", calcRuleApi.CalcRuleResult)
+	r.GET("/calc-rule/list", calcRuleApi.ListCalcRule)
 
 	r.POST("/calc-param/create", calcParamApi.CreateCalcParam)
 	r.POST("/calc-param/update", calcParamApi.UpdateCalcParam)

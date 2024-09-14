@@ -155,7 +155,7 @@ export default {
 
   'pages.signal.protocol': '协议',
   'pages.signal.identification_code': '设备标识码',
-  'pages.signal.device_uid': '联网设备ID',
+  'pages.signal.device_uid': '联网设备',
   'pages.signal.name': '名称',
   'pages.signal.alias': '别名',
   'pages.signal.type': '类型',
@@ -180,7 +180,7 @@ export default {
   'pages.signal.waring.in_or_out': '报警模式',
   'pages.signal.waring.protocol': '协议',
   'pages.signal.waring.identification_code': '设备标识码',
-  'pages.signal.waring.device_uid': '联网设备ID',
+  'pages.signal.waring.device_uid': '联网设备',
   'pages.signal.waring.history': '报警历史',
 
   'pages.calc-rule.name': '任务名称',
@@ -189,4 +189,12 @@ export default {
   'pages.calc-rule.offset': '前移时间(秒)',
   'pages.calc-rule.start': '是否启动',
   'pages.calc-rule.mock_value': '模拟数据',
+
+  'pages.calc-param.protocol': '协议',
+  'pages.calc-param.identification_code': '设备标识码',
+  'pages.calc-param.device_uid': '联网设备',
+  'pages.calc-param.name': '参数名称',
+  'pages.calc-param.signal_id': '信号',
+  'pages.calc-param.reduce': '数据聚合方式',
+  'pages.calc-param.calc_rule_id': '计算规则',
 };

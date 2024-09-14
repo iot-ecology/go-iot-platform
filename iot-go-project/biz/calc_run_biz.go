@@ -106,7 +106,6 @@ func (b CalcRunBiz) RefreshRule(id any) {
 			IdentificationCode: param.IdentificationCode,
 			SignalId:           param.SignalId,
 			Name:               param.Name,
-			SignalName:         param.SignalName,
 			Reduce:             param.Reduce,
 			CalcRuleId:         param.CalcRuleId,
 		})
