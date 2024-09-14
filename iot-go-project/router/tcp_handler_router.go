@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -44,6 +45,9 @@ func (api *TcpHandlerApi) CreateTcpHandler(c *gin.Context) {
 		return
 	}
 	TcpHandlerBiz.SetRedis(TcpHandler)
+	SetTcpIpHandlerRedis(TcpHandler)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "tcp", TcpHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Tcp数据处理器
 	servlet.Resp(c, TcpHandler)
 }
@@ -78,6 +82,8 @@ func (api *TcpHandlerApi) UpdateTcpHandler(c *gin.Context) {
 
 	var newV models.TcpHandler
 	newV = old
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Name = req.Name
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -88,6 +94,9 @@ func (api *TcpHandlerApi) UpdateTcpHandler(c *gin.Context) {
 		return
 	}
 	TcpHandlerBiz.SetRedis(newV)
+	SetTcpIpHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "TCP", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 

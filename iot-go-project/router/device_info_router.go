@@ -698,3 +698,7 @@ func SetWebsocketHandlerRedis(config models.WebsocketHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:ws", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }
+func SetTcpIpHandlerRedis(config models.TcpHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:tcp", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
+}

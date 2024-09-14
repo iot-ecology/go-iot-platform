@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	server := "192.168.3.101:3332"
+	server := "localhost:3332"
 	conn, err := net.Dial("tcp", server)
 	if err != nil {
 		fmt.Println("连接失败:", err)
@@ -26,7 +26,7 @@ func handleConnection(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 
-	message := "uid:1:admin:admin"
+	message := "uid:9:admin:admin"
 	fmt.Println("发送:", message)
 	writer.WriteString(message + "\n")
 	writer.Flush()

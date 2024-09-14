@@ -120,7 +120,7 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
             MQTT: { text: 'MQTT', status: 'success' },
             HTTP: { text: 'HTTP', status: 'success' },
             WebSocket: { text: 'WebSocket', status: 'success' },
-            'TCP/IP': { text: 'TCP/IP', status: 'success' },
+            TCP: { text: 'TCP', status: 'success' },
             COAP: { text: 'COAP', status: 'success' },
           }}
           label={<FormattedMessage id="pages.device-info.protocol" />}

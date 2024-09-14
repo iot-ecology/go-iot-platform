@@ -21,8 +21,8 @@ export default {
 
   'menu.protocol.http': 'HTTP协议',
   'menu.protocol.http.clients': 'HTTP处理器',
-  'menu.protocol.tcp': 'TCP/IP协议',
-  'menu.protocol.tcp.clients': 'TCP/IP处理器',
+  'menu.protocol.tcp': 'TCP协议',
+  'menu.protocol.tcp.clients': 'TCP处理器',
   'menu.protocol.coap': 'COAP协议',
   'menu.protocol.coap.clients': 'COAP处理器',
   'menu.protocol.ws': 'WebSocket协议',

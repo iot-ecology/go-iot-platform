@@ -399,6 +399,30 @@ export async function WebsocketHandlerPage(
   };
 }
 
+export async function TcpHandlerPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.HttpHandlerListItem>('/api/TcpHandler/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function CoapHandlerPage(
   params: {
     /** 当前的页码 */
@@ -831,6 +855,15 @@ export async function addWebsocketHandler(options?: { [key: string]: any }) {
   });
 }
 
+export async function addTcpHandler(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/TcpHandler/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addCoapHandler(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/CoapHandler/create', {
     method: 'POST',
@@ -1003,6 +1036,12 @@ export async function deltedWebsocketHandler(id: any) {
   });
 }
 
+export async function deltedTcpHandler(id: any) {
+  return request<API.CommonResp<string>>('/api/TcpHandler/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function delteCoapHandler(id: any) {
   return request<API.CommonResp<string>>('/api/CoapHandler/delete/' + id, {
     method: 'POST',
@@ -1110,6 +1149,13 @@ export async function updateHttpHandler(dt: any) {
 
 export async function updateWsHandler(dt: any) {
   return request<API.CommonResp<string>>('/api/WebsocketHandler/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateTcpHandler(dt: any) {
+  return request<API.CommonResp<string>>('/api/TcpHandler/update', {
     method: 'POST',
     data: dt,
   });
