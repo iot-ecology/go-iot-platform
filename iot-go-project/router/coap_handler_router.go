@@ -6,6 +6,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -44,6 +45,9 @@ func (api *CoapHandlerApi) CreateCoapHandler(c *gin.Context) {
 		return
 	}
 	CoapHandlerBiz.SetRedis(CoapHandler)
+	SetCoapHandlerRedis(CoapHandler)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "COAP", CoapHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Coap数据处理器
 	servlet.Resp(c, CoapHandler)
 }
@@ -78,6 +82,8 @@ func (api *CoapHandlerApi) UpdateCoapHandler(c *gin.Context) {
 
 	var newV models.CoapHandler
 	newV = old
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Name = req.Name
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -88,6 +94,9 @@ func (api *CoapHandlerApi) UpdateCoapHandler(c *gin.Context) {
 		return
 	}
 	CoapHandlerBiz.SetRedis(newV)
+	SetCoapHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "COAP", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 

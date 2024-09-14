@@ -399,6 +399,30 @@ export async function WebsocketHandlerPage(
   };
 }
 
+export async function CoapHandlerPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.HttpHandlerListItem>('/api/CoapHandler/page', {
+    method: 'GET',
+    params: {
+      page: params.current,
+      page_size: params.pageSize,
+      ...params,
+    },
+    ...(options || {}),
+  });
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function scriptWaringPage(
   params: {
     /** 当前的页码 */
@@ -807,6 +831,15 @@ export async function addWebsocketHandler(options?: { [key: string]: any }) {
   });
 }
 
+export async function addCoapHandler(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/CoapHandler/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addScriptWaring(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/signal-delay-waring/create', {
     method: 'POST',
@@ -970,6 +1003,12 @@ export async function deltedWebsocketHandler(id: any) {
   });
 }
 
+export async function delteCoapHandler(id: any) {
+  return request<API.CommonResp<string>>('/api/CoapHandler/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteScriptWaring(id: any) {
   return request<API.CommonResp<string>>('/api/signal-delay-waring/delete/' + id, {
     method: 'POST',
@@ -1071,6 +1110,13 @@ export async function updateHttpHandler(dt: any) {
 
 export async function updateWsHandler(dt: any) {
   return request<API.CommonResp<string>>('/api/WebsocketHandler/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCoapHandler(dt: any) {
+  return request<API.CommonResp<string>>('/api/CoapHandler/update', {
     method: 'POST',
     data: dt,
   });

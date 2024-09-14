@@ -96,7 +96,7 @@ func (api *WebsocketHandlerApi) UpdateWebsocketHandler(c *gin.Context) {
 	}
 	WebsocketHandlerBiz.SetRedis(newV)
 	SetWebsocketHandlerRedis(newV)
-	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "HTTP", newV.DeviceInfoId)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "WebSocket", newV.DeviceInfoId)
 	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }

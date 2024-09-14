@@ -611,11 +611,11 @@ func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
 		newV.Script = param.Script
 		// 更新记录
 		result = glob.GDb.Model(&newV).Updates(newV)
-		setCoapHandlerRedis(newV)
+		SetCoapHandlerRedis(newV)
 	} else {
 		// 新增
 		glob.GDb.Model(models.CoapHandler{}).Create(&param)
-		setCoapHandlerRedis(param)
+		SetCoapHandlerRedis(param)
 
 	}
 
@@ -658,7 +658,7 @@ func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
 		newV.Script = param.Script
 		// 更新记录
 		result = glob.GDb.Model(&newV).Updates(newV)
-		setCoapHandlerRedis(newV)
+		SetCoapHandlerRedis(newV)
 	} else {
 		// 新增
 		glob.GDb.Model(models.CoapHandler{}).Create(&param)
@@ -690,7 +690,7 @@ func SetHttpHandlerRedis(config models.HttpHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:http", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }
-func setCoapHandlerRedis(config models.CoapHandler) {
+func SetCoapHandlerRedis(config models.CoapHandler) {
 	jsonData, _ := json.Marshal(config)
 	glob.GRedis.HSet(context.Background(), "auth:coap", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }

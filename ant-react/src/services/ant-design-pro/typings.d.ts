@@ -79,6 +79,14 @@ declare namespace API {
     password?: string;
     script?: string;
   };
+  type CoapHandlerListItem = {
+    ID?: number;
+    device_info_id?: string;
+    name?: string;
+    username?: string;
+    password?: string;
+    script?: string;
+  };
   type ScriptWaringListItem = {
     ID?: number;
     name?: string;
