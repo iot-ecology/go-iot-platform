@@ -5,6 +5,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,9 @@ func (api *WebsocketHandlerApi) CreateWebsocketHandler(c *gin.Context) {
 		return
 	}
 	WebsocketHandlerBiz.SetRedis(WebsocketHandler)
+	SetWebsocketHandlerRedis(WebsocketHandler)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "WebSocket", WebsocketHandler.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	// 返回创建成功的Websocket数据处理器
 	servlet.Resp(c, WebsocketHandler)
 }
@@ -79,6 +83,8 @@ func (api *WebsocketHandlerApi) UpdateWebsocketHandler(c *gin.Context) {
 
 	var newV models.WebsocketHandler
 	newV = old
+	newV.Username = req.Username
+	newV.Password = req.Password
 	newV.Name = req.Name
 	newV.Script = req.Script
 	result = glob.GDb.Model(&newV).Updates(newV)
@@ -89,6 +95,9 @@ func (api *WebsocketHandlerApi) UpdateWebsocketHandler(c *gin.Context) {
 		return
 	}
 	WebsocketHandlerBiz.SetRedis(newV)
+	SetWebsocketHandlerRedis(newV)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "HTTP", newV.DeviceInfoId)
+	ut.CheckBucketNameAndCreate(name)
 	servlet.Resp(c, old)
 }
 

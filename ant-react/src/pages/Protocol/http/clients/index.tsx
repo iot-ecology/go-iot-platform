@@ -115,7 +115,9 @@ const Admin: React.FC = () => {
       valueType: 'select',
       request: async () => {
         let a = await deviceList();
-        return a.data;
+        return a.data.filter((e) => {
+          return e.protocol === 'HTTP';
+        });
       },
       fieldProps: {
         showSearch: true,
@@ -249,7 +251,9 @@ const Admin: React.FC = () => {
           name="device_info_id"
           request={async () => {
             let a = await deviceList();
-            return a.data;
+            return a.data.filter((e) => {
+              return e.protocol === 'HTTP';
+            });
           }}
           onChange={(v) => {
             var s =
@@ -383,16 +387,13 @@ const Admin: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.access_number && (
+        {currentRow?.ID && (
           <ProDescriptions<API.HttpHandlerListItem>
             column={2}
-            title={currentRow?.access_number}
+            title={currentRow?.name}
             request={async () => ({
               data: currentRow || {},
             })}
-            params={{
-              id: currentRow?.access_number,
-            }}
             columns={columns as ProDescriptionsItemProps<API.HttpHandlerListItem>[]}
           />
         )}

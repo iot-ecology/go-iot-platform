@@ -40,8 +40,8 @@ func (biz *TcpHandlerBiz) PageData(name string, page, size int) (*servlet.Pagina
 }
 
 func (biz *TcpHandlerBiz) SetRedis(data models.TcpHandler) {
-	glob.GRedis.HSet(context.Background(), "struct:tcp", strconv.Itoa(int(data.ID)), data.Script)
+	glob.GRedis.HSet(context.Background(), "struct:tcp", strconv.Itoa(int(data.DeviceInfoId)), data.Script)
 }
 func (biz *TcpHandlerBiz) RemoveRedis(data models.TcpHandler) {
-	glob.GRedis.HDel(context.Background(), "struct:tcp", strconv.Itoa(int(data.ID)))
+	glob.GRedis.HDel(context.Background(), "struct:tcp", strconv.Itoa(int(data.DeviceInfoId)))
 }
