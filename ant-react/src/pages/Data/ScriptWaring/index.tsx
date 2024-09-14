@@ -1,3 +1,5 @@
+import DebugScript from '@/pages/Data/ScriptWaring/DebugScript';
+import ScriptWaringHistoryList from '@/pages/Data/ScriptWaring/History';
 import ScriptWaringUpdateForm from '@/pages/Data/ScriptWaring/ScriptWaringUpdateForm';
 import {
   addScriptWaring,
@@ -75,6 +77,8 @@ const Admin: React.FC = () => {
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
+  const [debugModalOpen, handleDebugModalOpen] = useState<boolean>(false);
+  const [scriptHistoryModalOpen, handlerScriptHistoryModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -143,9 +147,8 @@ const Admin: React.FC = () => {
         <Button
           key="set-param"
           onClick={async () => {
-            history.push({
-              pathname: '/data/script-param?id=' + record.ID,
-            });
+            setCurrentRow(record);
+            handleDebugModalOpen(true);
           }}
         >
           <FormattedMessage id="pages.debug" defaultMessage="调试脚本" />
@@ -153,9 +156,8 @@ const Admin: React.FC = () => {
         <Button
           key="set-param"
           onClick={async () => {
-            history.push({
-              pathname: '/data/script-param?id=' + record.ID,
-            });
+            setCurrentRow(record);
+            handlerScriptHistoryModalOpen(true);
           }}
         >
           <FormattedMessage id="pages.signal.waring.history" defaultMessage="报警历史" />
@@ -228,6 +230,28 @@ const Admin: React.FC = () => {
         <ProFormText key={'script'} label={<FormattedMessage id="pages.script" />} name="script" />
       </ModalForm>
 
+      <DebugScript
+        updateModalOpen={debugModalOpen}
+        values={currentRow || {}}
+        onCancel={() => {
+          handleDebugModalOpen(false);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+            setShowDetail(false);
+          }
+        }}
+      />
+      <ScriptWaringHistoryList
+        updateModalOpen={scriptHistoryModalOpen}
+        values={currentRow || {}}
+        onCancel={() => {
+          handlerScriptHistoryModalOpen(false);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+            setShowDetail(false);
+          }
+        }}
+      />
       <ScriptWaringUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}

@@ -206,6 +206,23 @@ export async function signalById(id: any) {
   });
 }
 
+export async function genScriptParam(data: string | number) {
+  const request1 = await request<API.CommonResp<string>>(
+    '/api/signal-delay-waring/GenParam/' + data,
+    {
+      method: 'POST',
+    },
+  );
+  return request1;
+}
+
+export async function mockScriptWaringRun(data: string | number) {
+  const request1 = await request<API.CommonResp<string>>('/api/signal-delay-waring/Mock/' + data, {
+    method: 'POST',
+  });
+  return request1;
+}
+
 export async function scriptWaringById(id: any) {
   return request<API.CommonResp<API.MqttListItem>>('/api/signal-delay-waring/byId/' + id, {
     method: 'GET',
@@ -1079,6 +1096,13 @@ export async function removeRule(options?: { [key: string]: any }) {
 
 export async function waringHistory(d: any) {
   return request<API.CommonResp<string>>('/api/signal-waring-config/query-row', {
+    method: 'POST',
+    data: d,
+  });
+}
+
+export async function scriptWaringHistory(d: any) {
+  return request<API.CommonResp<string>>('/api/signal-delay-waring/query-row', {
     method: 'POST',
     data: d,
   });
