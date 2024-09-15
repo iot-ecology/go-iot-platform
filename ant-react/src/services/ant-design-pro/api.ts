@@ -271,7 +271,7 @@ export async function productList() {
   });
 }
 
-export async function FindByShipmentProductDetail(id) {
+export async function FindByShipmentProductDetail(id: string) {
   return request<API.CommonResp<API.ProductItem[]>>(
     '/api/ShipmentRecord/FindByShipmentProductDetail/' + id,
     {
@@ -333,7 +333,7 @@ export async function simCardPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/SimCard/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/SimCard/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -359,7 +359,7 @@ export async function httpHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/HttpHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/HttpHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -383,15 +383,18 @@ export async function WebsocketHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/WebsocketHandler/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>(
+    '/api/WebsocketHandler/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -407,7 +410,7 @@ export async function TcpHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/TcpHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/TcpHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -431,7 +434,7 @@ export async function CoapHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/CoapHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/CoapHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -456,7 +459,7 @@ export async function scriptWaringPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal-delay-waring/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/signal-delay-waring/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -480,7 +483,7 @@ export async function calcParamPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.CalcParamListItem>('/api/calc-param/page', {
+  const request1 = await request<API.CommonPage<API.CalcParamListItem>>('/api/calc-param/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -503,7 +506,7 @@ export async function calcRulePage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/calc-rule/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/calc-rule/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -527,15 +530,18 @@ export async function scritpParamPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal-delay-waring-param/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.SimListItem>>(
+    '/api/signal-delay-waring-param/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -551,15 +557,18 @@ export async function signalWaringPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SignalWaringItem>('/api/signal-waring-config/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.SignalWaringItem>>(
+    '/api/signal-waring-config/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -577,7 +586,7 @@ export async function feishuPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.FeiShuListItem>('/api/FeiShuId/page', {
+  const request1 = await request<API.CommonPage<API.FeiShuListItem>>('/api/FeiShuId/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -604,7 +613,7 @@ export async function dingDingPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.DingDingListItem>('/api/DingDing/page', {
+  const request1 = await request<API.CommonPage<API.DingDingListItem>>('/api/DingDing/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -628,7 +637,7 @@ export async function signalPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/signal/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -652,7 +661,7 @@ export async function mqttPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/mqtt/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/mqtt/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -731,16 +740,19 @@ export async function shipmentPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.ShipmentRecordListItem>('/api/ShipmentRecord/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      customer_name: params.customer_name,
-      status: params.status,
+  const request1 = await request<API.CommonPage<API.ShipmentRecordListItem>>(
+    '/api/ShipmentRecord/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        customer_name: params.customer_name,
+        status: params.status,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -756,7 +768,7 @@ export async function productPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.ProductItem>('/api/product/page', {
+  const request1 = await request<API.CommonPage<API.ProductItem>>('/api/product/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -780,7 +792,7 @@ export async function deviceGroupPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.DeviceGroupItem>('/api/device_group/page', {
+  const request1 = await request<API.CommonPage<API.DeviceGroupItem>>('/api/device_group/page', {
     method: 'GET',
     params: {
       page: params.current,
