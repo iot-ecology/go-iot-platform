@@ -212,4 +212,11 @@ export default {
   'pages.http.script': '脚本',
 
   'pages.check-script': '检查脚本',
+
+  'pages.CassandraTransmit.name': '名称',
+  'pages.CassandraTransmit.host': '主机',
+  'pages.CassandraTransmit.port': '端口',
+  'pages.CassandraTransmit.username': '账号',
+  'pages.CassandraTransmit.password': '密码',
+  'pages.MySQLTransmit.database': '数据库',
 };

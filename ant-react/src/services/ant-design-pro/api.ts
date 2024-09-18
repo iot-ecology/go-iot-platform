@@ -351,6 +351,90 @@ export async function simCardPage(
   };
 }
 
+export async function CassandraTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/CassandraTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function ClickhouseTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/ClickhouseTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MySQLTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MySQLTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function httpHandlerPage(
   params: {
     /** 当前的页码 */
@@ -849,6 +933,33 @@ export async function addSim(options?: { [key: string]: any }) {
   });
 }
 
+export async function addCassandraTransmitPage(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addClickhouseTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMySQLTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addHttpHandler(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/HttpHandler/create', {
     method: 'POST',
@@ -1036,6 +1147,24 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteCassandraTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteClickhouseTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMySQLTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function delteHttpHandler(id: any) {
   return request<API.CommonResp<string>>('/api/HttpHandler/delete/' + id, {
     method: 'POST',
@@ -1147,6 +1276,27 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCassandraTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateClickhouseTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMySQLTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/update', {
     method: 'POST',
     data: dt,
   });

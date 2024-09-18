@@ -63,6 +63,31 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type CassandraTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type ClickhouseTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type MySQLTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+    database?: string;
+  };
   type HttpHandlerListItem = {
     ID?: number;
     device_info_id?: string;
