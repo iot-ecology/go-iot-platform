@@ -79,6 +79,21 @@ declare namespace API {
     username?: string;
     password?: string;
   };
+  type MongoTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type InfluxdbTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    token?: string;
+  };
   type MySQLTransmitListItem = {
     ID?: number;
     name?: string;

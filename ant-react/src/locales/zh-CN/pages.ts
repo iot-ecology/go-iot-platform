@@ -219,4 +219,9 @@ export default {
   'pages.CassandraTransmit.username': '账号',
   'pages.CassandraTransmit.password': '密码',
   'pages.MySQLTransmit.database': '数据库',
+
+  'pages.InfluxdbTransmit.name': '名称',
+  'pages.InfluxdbTransmit.host': '主机',
+  'pages.InfluxdbTransmit.port': '端口',
+  'pages.InfluxdbTransmit.token': '令牌',
 };

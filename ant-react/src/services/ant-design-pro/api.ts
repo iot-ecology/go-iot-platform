@@ -407,6 +407,62 @@ export async function ClickhouseTransmitPage(
   };
 }
 
+export async function MongoTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MongoTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function InfluxdbTransmitUpdateFormPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/InfluxdbTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function MySQLTransmitPage(
   params: {
     /** 当前的页码 */
@@ -951,6 +1007,24 @@ export async function addClickhouseTransmit(options?: { [key: string]: any }) {
   });
 }
 
+export async function addMongoTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addInfluxdbTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addMySQLTransmit(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/MySQLTransmit/create', {
     method: 'POST',
@@ -1159,6 +1233,18 @@ export async function deleteClickhouseTransmit(id: any) {
   });
 }
 
+export async function deleteMongoTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteInfluxdbTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteMySQLTransmit(id: any) {
   return request<API.CommonResp<string>>('/api/MySQLTransmit/delete/' + id, {
     method: 'POST',
@@ -1290,6 +1376,20 @@ export async function updateCassandraTransmit(dt: any) {
 
 export async function updateClickhouseTransmit(dt: any) {
   return request<API.CommonResp<string>>('/api/ClickhouseTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMongoTransmitPage(dt: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateInfluxdbTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/update', {
     method: 'POST',
     data: dt,
   });
