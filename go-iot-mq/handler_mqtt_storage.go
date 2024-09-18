@@ -75,6 +75,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
+			(*data)[i].Protocol = "MQTT"
 			StorageDataRowList(row, "MQTT")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
@@ -303,6 +304,8 @@ func runScript(param string, script string) *[]DataRowList {
 
 	// 调用映射的函数
 	result = fn(param)
+
+
 	return result
 }
 

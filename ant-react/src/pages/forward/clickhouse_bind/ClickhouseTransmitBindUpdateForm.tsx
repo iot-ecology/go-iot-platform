@@ -1,4 +1,4 @@
-import { CassandraTransmitList, deviceList, mqttList } from '@/services/ant-design-pro/api';
+import { ClickhouseTransmitList, deviceList, mqttList } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import {
   ProFormRadio,
@@ -10,13 +10,13 @@ import { Form, Modal } from 'antd';
 import React, { useEffect } from 'react';
 
 export type UpdateFormProps = {
-  onCancel: (flag?: boolean, formVals?: API.CassandraTransmitBindListItem) => void;
-  onSubmit: (values: API.CassandraTransmitBindListItem) => Promise<void>;
+  onCancel: (flag?: boolean, formVals?: API.ClickhouseTransmitBindListItem) => void;
+  onSubmit: (values: API.ClickhouseTransmitBindListItem) => Promise<void>;
   updateModalOpen: boolean;
 
-  values: API.CassandraTransmitBindListItem;
+  values: API.ClickhouseTransmitBindListItem;
 };
-const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
+const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
@@ -108,7 +108,7 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
         />
         <ProFormSelect
           request={async () => {
-            let r = await CassandraTransmitList();
+            let r = await ClickhouseTransmitList();
             return r.data;
           }}
           fieldProps={{
@@ -119,9 +119,9 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
               value: 'ID',
             },
           }}
-          key={'cassandra_transmit_id'}
+          key={'clickhouse_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
-          name="cassandra_transmit_id"
+          name="clickhouse_transmit_id"
         />
         <ProFormText
           key={'database'}
@@ -146,11 +146,6 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
             '        }\n' +
             '\t\t\n' +
             '        arr.push(timeField)\n' +
-            '  \t\tvar idd = {\n' +
-            '            "FieldName": "id",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '        arr.push(idd)\n' +
             '        for (var e of jsonDatum.DataRows) {\n' +
             '            if (e.Name == "a") {\n' +
             '                var aField = {\n' +
@@ -163,7 +158,7 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
             '        c.push(arr)\n' +
             '    }\n' +
             '    return c;\n' +
-            '}\n'
+            '}'
           }
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
@@ -189,4 +184,4 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
   );
 };
 
-export default CassandraTransmitBindUpdateForm;
+export default ClickhouseTransmitBindUpdateForm;

@@ -231,7 +231,7 @@ export default {
   'pages.CassandraTransmitBind.cassandra_transmit_id': '传输表的外键ID',
   'pages.CassandraTransmitBind.database': '数据库',
   'pages.CassandraTransmitBind.table': '表',
-  'pages.CassandraTransmitBind.script': '转换insert语句的脚本',
+  'pages.CassandraTransmitBind.script': '脚本',
   'pages.CassandraTransmitBind.enable': '是否启用',
 
   'pages.CassandraTransmitBind.bucket': 'bucket',

@@ -1,13 +1,12 @@
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
-import CassandraTransmitBindUpdateForm from '@/pages/forward/cassandra_bind/CassandraTransmitBindUpdateForm';
 import {
-  addCassandraTransmitBind,
-  CassandraTransmitBindPage,
-  CassandraTransmitList,
-  deleteCassandraTransmitBind,
+  addMongoTransmitBind,
+  deleteMongoTransmitBind,
   deviceList,
+  MongoTransmitBindPage,
+  MongoTransmitList,
   mqttList,
-  updateCassandraTransmitBind,
+  updateMongoTransmitBind,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -27,11 +26,12 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import MongoTransmitBindUpdateForm from './MongoTransmitBindUpdateForm';
 
-const handleAdd = async (fields: API.CassandraTransmitBindListItem) => {
+const handleAdd = async (fields: API.MongoTransmitBindListItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addCassandraTransmitBind({ ...fields });
+    await addMongoTransmitBind({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -45,7 +45,7 @@ const handleAdd = async (fields: API.CassandraTransmitBindListItem) => {
 const handleRemove = async (id: any) => {
   const hide = message.loading('正在删除');
   try {
-    await deleteCassandraTransmitBind(id);
+    await deleteMongoTransmitBind(id);
     hide();
     message.success('删除 successfully');
     return true;
@@ -56,10 +56,10 @@ const handleRemove = async (id: any) => {
   }
 };
 
-const handlerUpdate = async (fields: API.CassandraTransmitBindListItem) => {
+const handlerUpdate = async (fields: API.MongoTransmitBindListItem) => {
   const hide = message.loading('正在更新');
   try {
-    await updateCassandraTransmitBind({ ...fields });
+    await updateMongoTransmitBind({ ...fields });
     hide();
     message.success('更新成功');
     return true;
@@ -85,9 +85,9 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.CassandraTransmitBindListItem>();
+  const [currentRow, setCurrentRow] = useState<API.MongoTransmitBindListItem>();
 
-  const columns: ProColumns<API.CassandraTransmitBindListItem>[] = [
+  const columns: ProColumns<API.MongoTransmitBindListItem>[] = [
     {
       key: 'ID',
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
@@ -145,10 +145,10 @@ const Admin: React.FC = () => {
       dataIndex: 'identification_code',
     },
     {
-      key: 'cassandra_transmit_id',
+      key: 'mongo_transmit_id_transmit_id',
       title: <FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />,
       hideInSearch: true,
-      dataIndex: 'cassandra_transmit_id',
+      dataIndex: 'mongo_transmit_id_transmit_id',
     },
     {
       key: 'database',
@@ -157,11 +157,12 @@ const Admin: React.FC = () => {
       dataIndex: 'database',
     },
     {
-      key: 'table',
-      title: <FormattedMessage id="pages.CassandraTransmitBind.table" />,
+      key: 'collection',
+      title: <FormattedMessage id="pages.CassandraTransmitBind.collection" />,
       hideInSearch: true,
-      dataIndex: 'table',
+      dataIndex: 'collection',
     },
+
     {
       key: 'script',
       title: <FormattedMessage id="pages.CassandraTransmitBind.script" />,
@@ -217,7 +218,7 @@ const Admin: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.CassandraTransmitBindListItem, API.PageParams>
+      <ProTable<API.MongoTransmitBindListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
@@ -238,7 +239,7 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={CassandraTransmitBindPage}
+        request={MongoTransmitBindPage}
         columns={columns}
       />
       <ModalForm
@@ -252,7 +253,7 @@ const Admin: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.CassandraTransmitBindListItem);
+          const success = await handleAdd(value as API.MongoTransmitBindListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -322,7 +323,7 @@ const Admin: React.FC = () => {
         />
         <ProFormSelect
           request={async () => {
-            let r = await CassandraTransmitList();
+            let r = await MongoTransmitList();
             return r.data;
           }}
           fieldProps={{
@@ -333,52 +334,23 @@ const Admin: React.FC = () => {
               value: 'ID',
             },
           }}
-          key={'cassandra_transmit_id'}
+          key={'mongo_transmit_id_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
-          name="cassandra_transmit_id"
+          name="mongo_transmit_id_transmit_id"
+        />
+        <ProFormText
+          key={'collection'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.collection" />}
+          name="collection"
         />
         <ProFormText
           key={'database'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.database" />}
           name="database"
         />
-        <ProFormText
-          key={'table'}
-          label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
-          name="table"
-        />
+
         <ProFormTextArea
-          tooltip={
-            'function main(jsonData) {\n' +
-            '    var c = []\n' +
-            '    for (var jsonDatum of jsonData) {\n' +
-            '        var time = jsonDatum.Time;\n' +
-            '        var arr = []\n' +
-            '        var timeField = {\n' +
-            '            "FieldName": "time",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '\t\t\n' +
-            '        arr.push(timeField)\n' +
-            '  \t\tvar idd = {\n' +
-            '            "FieldName": "id",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '        arr.push(idd)\n' +
-            '        for (var e of jsonDatum.DataRows) {\n' +
-            '            if (e.Name == "a") {\n' +
-            '                var aField = {\n' +
-            '                    "FieldName": "name",\n' +
-            '                    "Value": e.Value\n' +
-            '                }\n' +
-            '                arr.push(aField)\n' +
-            '            }\n' +
-            '        }\n' +
-            '        c.push(arr)\n' +
-            '    }\n' +
-            '    return c;\n' +
-            '}\n'
-          }
+          tooltip={'function main(jsonData) {\n' + '    return jsonData;\n' + '}'}
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
@@ -400,7 +372,7 @@ const Admin: React.FC = () => {
         />
       </ModalForm>
 
-      <CassandraTransmitBindUpdateForm
+      <MongoTransmitBindUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
@@ -434,13 +406,13 @@ const Admin: React.FC = () => {
         closable={false}
       >
         {currentRow?.ID && (
-          <ProDescriptions<API.CassandraTransmitBindListItem>
+          <ProDescriptions<API.MongoTransmitBindListItem>
             column={2}
             title={currentRow?.database}
             request={async () => ({
               data: currentRow || {},
             })}
-            columns={columns as ProDescriptionsItemProps<API.CassandraTransmitBindListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.MongoTransmitBindListItem>[]}
           />
         )}
       </Drawer>

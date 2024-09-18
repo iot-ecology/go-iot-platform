@@ -32,12 +32,12 @@ var (
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) Run(redis *redis.Client, dataRowList []common.DataRowList,Protocol string ) {
-	go biz.workMysql(redis, dataRowList ,Protocol)
-	go biz.workMongo(redis, dataRowList ,Protocol)
-	go biz.workCassandra(redis, dataRowList ,Protocol)
-	go biz.workClickhouse(redis, dataRowList ,Protocol)
-	go biz.workInfluxdb(redis, dataRowList ,Protocol)
+func (biz *TransmitCacheBiz) Run(redis *redis.Client, dataRowList []common.DataRowList) {
+	go biz.workMysql(redis, dataRowList)
+	go biz.workMongo(redis, dataRowList)
+	go biz.workCassandra(redis, dataRowList)
+	go biz.workClickhouse(redis, dataRowList)
+	go biz.workInfluxdb(redis, dataRowList)
 }
 
 // workInfluxdb 是TransmitCacheBiz结构体的一个方法，用于处理InfluxDB缓存的相关操作
@@ -48,15 +48,18 @@ func (biz *TransmitCacheBiz) Run(redis *redis.Client, dataRowList []common.DataR
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) workInfluxdb(redis *redis.Client, dataRowList []common.DataRowList, protocol string) {
+func (biz *TransmitCacheBiz) workInfluxdb(redis *redis.Client, dataRowList []common.DataRowList) {
 	for _, row := range dataRowList {
 
-		var influxdbCache = biz.findInfluxdb(redis, row.DeviceUid, row.IdentificationCode,protocol)
+		var influxdbCache = biz.findInfluxdb(redis, row.DeviceUid, row.IdentificationCode, row.Protocol)
 		for _, cache := range influxdbCache {
 			db := influxdb2.GetInfluxDb(cache.Host, cache.Token, cache.Port, cache.ID)
-			err := influxdbOp.HandleDataRowLists(cache.Bucket, cache.Org, cache.Measurement, cache.Script, dataRowList, db)
-			if err != nil {
-				zap.S().Errorf("influxdb 执行异常", zap.Error(err))
+			if db != nil {
+
+				err := influxdbOp.HandleDataRowLists(cache.Bucket, cache.Org, cache.Measurement, cache.Script, dataRowList, db)
+				if err != nil {
+					zap.S().Errorf("influxdb 执行异常", zap.Error(err))
+				}
 			}
 		}
 	}
@@ -71,16 +74,19 @@ func (biz *TransmitCacheBiz) workInfluxdb(redis *redis.Client, dataRowList []com
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) workClickhouse(redis *redis.Client, dataRowList []common.DataRowList, protocol string) {
+func (biz *TransmitCacheBiz) workClickhouse(redis *redis.Client, dataRowList []common.DataRowList) {
 	for _, row := range dataRowList {
-		var clickhouseCache = biz.findClickhouse(redis, row.DeviceUid, row.IdentificationCode,protocol)
+		var clickhouseCache = biz.findClickhouse(redis, row.DeviceUid, row.IdentificationCode, row.Protocol)
 		for _, cache := range clickhouseCache {
 			println(cache.Script)
 			house1, _ := clickhouse.GetClickHouse(row.DeviceUid, []string{fmt.Sprintf("%s:%d", cache.Host, cache.Port)}, cache.Database, cache.Username, cache.Password)
 
-			err := clickhouseOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, house1)
-			if err != nil {
-				zap.S().Errorf("clickhouse 执行异常", zap.Error(err))
+			if house1 != nil {
+
+				err := clickhouseOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, house1)
+				if err != nil {
+					zap.S().Errorf("clickhouse 执行异常", zap.Error(err))
+				}
 			}
 		}
 	}
@@ -94,17 +100,20 @@ func (biz *TransmitCacheBiz) workClickhouse(redis *redis.Client, dataRowList []c
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) workCassandra(redis *redis.Client, dataRowList []common.DataRowList, protocol string) {
+func (biz *TransmitCacheBiz) workCassandra(redis *redis.Client, dataRowList []common.DataRowList) {
 	for _, row := range dataRowList {
-		var cassandraCache = biz.findCassandra(redis, row.DeviceUid, row.IdentificationCode,protocol)
+		var cassandraCache = biz.findCassandra(redis, row.DeviceUid, row.IdentificationCode, row.Protocol)
 		for _, cache := range cassandraCache {
 			getCassandra, err := cassandra.GetCassandra([]string{fmt.Sprintf("%s:%d", cache.Host, cache.Port)}, cache.Username, cache.Password, cache.ID)
 			if err != nil {
 				zap.S().Errorf("cassandra 连接异常", zap.Error(err))
 			}
-			err = cassandraOp.HandleDataRowLists(cache.Database, cache.Table, cache.Script, dataRowList, getCassandra)
-			if err != nil {
-				zap.S().Errorf("cassandra 执行异常", zap.Error(err))
+			if getCassandra != nil {
+
+				err = cassandraOp.HandleDataRowLists(cache.Database, cache.Table, cache.Script, dataRowList, getCassandra)
+				if err != nil {
+					zap.S().Errorf("cassandra 执行异常", zap.Error(err))
+				}
 			}
 		}
 	}
@@ -119,17 +128,20 @@ func (biz *TransmitCacheBiz) workCassandra(redis *redis.Client, dataRowList []co
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) workMongo(redis *redis.Client, dataRowList []common.DataRowList, protocol string) {
+func (biz *TransmitCacheBiz) workMongo(redis *redis.Client, dataRowList []common.DataRowList) {
 	for _, row := range dataRowList {
-		var mongoCache = biz.findMongo(redis, row.DeviceUid, row.IdentificationCode,protocol)
+		var mongoCache = biz.findMongo(redis, row.DeviceUid, row.IdentificationCode, row.Protocol)
 		for _, cache := range mongoCache {
 			client, err := mongo.GetMongoDBClient(cache.Host, cache.Username, cache.Password, cache.Database, cache.Port, cache.ID)
 			if err != nil {
 				zap.S().Errorf("mongo 连接异常", zap.Error(err))
 			}
-			err = mongoOp.HandleDataRowLists(cache.Database, cache.Collection, cache.Script, dataRowList, client)
-			if err != nil {
-				zap.S().Errorf("mongo 执行异常", zap.Error(err))
+			if client != nil {
+
+				err = mongoOp.HandleDataRowLists(cache.Database, cache.Collection, cache.Script, dataRowList, client)
+				if err != nil {
+					zap.S().Errorf("mongo 执行异常", zap.Error(err))
+				}
 			}
 		}
 	}
@@ -147,18 +159,21 @@ func (biz *TransmitCacheBiz) workMongo(redis *redis.Client, dataRowList []common
 // 返回值：
 //
 //	无返回值
-func (biz *TransmitCacheBiz) workMysql(redis *redis.Client, dataRowList []common.DataRowList, protocol string) {
+func (biz *TransmitCacheBiz) workMysql(redis *redis.Client, dataRowList []common.DataRowList) {
 
 	for _, row := range dataRowList {
-		var mysqlCache = biz.findMysql(redis, row.DeviceUid, row.IdentificationCode,protocol)
+		var mysqlCache = biz.findMysql(redis, row.DeviceUid, row.IdentificationCode, row.Protocol)
 		for _, cache := range mysqlCache {
 			connection, err := mysql.InitMySQLConnection(cache.Username, cache.Host, cache.Password, cache.Database, cache.Port, cache.ID)
 			if err != nil {
 				zap.S().Errorf("mysql 连接异常", zap.Error(err))
 			}
-			err = mysqlOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, connection)
-			if err != nil {
-				zap.S().Errorf("mysql 执行异常", zap.Error(err))
+			if connection != nil {
+
+				err = mysqlOp.HandleDataRowLists(cache.Table, cache.Script, dataRowList, connection)
+				if err != nil {
+					zap.S().Errorf("mysql 执行异常", zap.Error(err))
+				}
 			}
 		}
 	}
@@ -175,8 +190,7 @@ func (biz *TransmitCacheBiz) workMysql(redis *redis.Client, dataRowList []common
 // 返回值：
 // []MySQLTransmitCache: MySQLTransmitCache的切片
 func (biz *TransmitCacheBiz) findMysql(redis *redis.Client, DeviceUid, IdentificationCode, protocol string) []MySQLTransmitCache {
-	val := redis.LRange(context.Background(), "transmit:mysql:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0,
-		-1).Val()
+	val := redis.LRange(context.Background(), "transmit:mysql:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0, -1).Val()
 	var c []MySQLTransmitCache
 
 	for _, s := range val {
@@ -227,8 +241,7 @@ func (biz *TransmitCacheBiz) findMongo(redis *redis.Client, DeviceUid, Identific
 // 返回值:
 // []CassandraTransmitCache类型切片，包含从Redis中获取的CassandraTransmitCache对象
 func (biz *TransmitCacheBiz) findCassandra(redis *redis.Client, DeviceUid, IdentificationCode, protocol string) []CassandraTransmitCache {
-	val := redis.LRange(context.Background(), "transmit:cassandra:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0,
-		-1).Val()
+	val := redis.LRange(context.Background(), "transmit:cassandra:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0, -1).Val()
 	var c []CassandraTransmitCache
 
 	for _, s := range val {
@@ -253,8 +266,7 @@ func (biz *TransmitCacheBiz) findCassandra(redis *redis.Client, DeviceUid, Ident
 // 返回值：
 // []ClickhouseTransmitCache - ClickhouseTransmitCache类型的切片，包含从Redis中获取的ClickhouseTransmitCache对象
 func (biz *TransmitCacheBiz) findClickhouse(redis *redis.Client, DeviceUid, IdentificationCode, protocol string) []ClickhouseTransmitCache {
-	val := redis.LRange(context.Background(), "transmit:clickhouse:" +protocol+":"+DeviceUid+":"+IdentificationCode, 0,
-		-1).Val()
+	val := redis.LRange(context.Background(), "transmit:clickhouse:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0, -1).Val()
 	var c []ClickhouseTransmitCache
 
 	for _, s := range val {
@@ -281,8 +293,7 @@ func (biz *TransmitCacheBiz) findClickhouse(redis *redis.Client, DeviceUid, Iden
 //
 //	[]InfluxTransmitCache：InfluxTransmitCache类型的切片，包含从Redis中获取的InfluxTransmitCache对象
 func (biz *TransmitCacheBiz) findInfluxdb(redis *redis.Client, DeviceUid, IdentificationCode, protocol string) []InfluxTransmitCache {
-	val := redis.LRange(context.Background(), "transmit:influxdb:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0,
-		-1).Val()
+	val := redis.LRange(context.Background(), "transmit:influxdb:"+protocol+":"+DeviceUid+":"+IdentificationCode, 0, -1).Val()
 	var c []InfluxTransmitCache
 
 	for _, s := range val {

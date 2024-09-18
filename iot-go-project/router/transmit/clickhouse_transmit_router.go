@@ -72,7 +72,12 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 
 	var newV models.ClickhouseTransmit
 	newV = old
-	newV.Name=req.Name
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Username = req.Username
+	newV.Password = req.Password
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

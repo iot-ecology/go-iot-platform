@@ -74,6 +74,11 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 	newV = old
 
 	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Username = req.Username
+	newV.Password = req.Password
+	newV.Port = req.Port
+
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

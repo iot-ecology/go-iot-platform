@@ -61,6 +61,7 @@ func HandlerDataTcpStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
+			(*data)[i].Protocol = "TCP"
 			StorageDataRowList(row,"TCP")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)

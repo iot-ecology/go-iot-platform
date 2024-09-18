@@ -1,13 +1,12 @@
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
-import CassandraTransmitBindUpdateForm from '@/pages/forward/cassandra_bind/CassandraTransmitBindUpdateForm';
 import {
-  addCassandraTransmitBind,
-  CassandraTransmitBindPage,
-  CassandraTransmitList,
-  deleteCassandraTransmitBind,
+  addInfluxdbTransmitBind,
+  deleteInfluxdbTransmitBind,
   deviceList,
+  InfluxdbTransmitBindPage,
+  InfluxdbTransmitList,
   mqttList,
-  updateCassandraTransmitBind,
+  updateInfluxdbTransmitBind,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -21,17 +20,17 @@ import {
   ProFormRadio,
   ProFormSelect,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import InfluxdbTransmitBindUpdateForm from './InfluxdbTransmitBindUpdateForm';
 
-const handleAdd = async (fields: API.CassandraTransmitBindListItem) => {
+const handleAdd = async (fields: API.InfluxdbTransmitBindListItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addCassandraTransmitBind({ ...fields });
+    await addInfluxdbTransmitBind({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -45,7 +44,7 @@ const handleAdd = async (fields: API.CassandraTransmitBindListItem) => {
 const handleRemove = async (id: any) => {
   const hide = message.loading('正在删除');
   try {
-    await deleteCassandraTransmitBind(id);
+    await deleteInfluxdbTransmitBind(id);
     hide();
     message.success('删除 successfully');
     return true;
@@ -56,10 +55,10 @@ const handleRemove = async (id: any) => {
   }
 };
 
-const handlerUpdate = async (fields: API.CassandraTransmitBindListItem) => {
+const handlerUpdate = async (fields: API.InfluxdbTransmitBindListItem) => {
   const hide = message.loading('正在更新');
   try {
-    await updateCassandraTransmitBind({ ...fields });
+    await updateInfluxdbTransmitBind({ ...fields });
     hide();
     message.success('更新成功');
     return true;
@@ -85,9 +84,9 @@ const Admin: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.CassandraTransmitBindListItem>();
+  const [currentRow, setCurrentRow] = useState<API.InfluxdbTransmitBindListItem>();
 
-  const columns: ProColumns<API.CassandraTransmitBindListItem>[] = [
+  const columns: ProColumns<API.InfluxdbTransmitBindListItem>[] = [
     {
       key: 'ID',
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
@@ -145,23 +144,31 @@ const Admin: React.FC = () => {
       dataIndex: 'identification_code',
     },
     {
-      key: 'cassandra_transmit_id',
+      key: 'influxdb_transmit_id',
       title: <FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />,
       hideInSearch: true,
-      dataIndex: 'cassandra_transmit_id',
+      dataIndex: 'influxdb_transmit_id',
     },
     {
-      key: 'database',
-      title: <FormattedMessage id="pages.CassandraTransmitBind.database" />,
+      key: 'org',
+      title: <FormattedMessage id="pages.CassandraTransmitBind.org" />,
       hideInSearch: true,
-      dataIndex: 'database',
+      dataIndex: 'org',
     },
     {
-      key: 'table',
-      title: <FormattedMessage id="pages.CassandraTransmitBind.table" />,
+      key: 'bucket',
+      title: <FormattedMessage id="pages.CassandraTransmitBind.bucket" />,
       hideInSearch: true,
-      dataIndex: 'table',
+      dataIndex: 'bucket',
     },
+
+    {
+      key: 'measurement',
+      title: <FormattedMessage id="pages.CassandraTransmitBind.measurement" />,
+      hideInSearch: true,
+      dataIndex: 'measurement',
+    },
+
     {
       key: 'script',
       title: <FormattedMessage id="pages.CassandraTransmitBind.script" />,
@@ -217,7 +224,7 @@ const Admin: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.CassandraTransmitBindListItem, API.PageParams>
+      <ProTable<API.InfluxdbTransmitBindListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
@@ -238,7 +245,7 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={CassandraTransmitBindPage}
+        request={InfluxdbTransmitBindPage}
         columns={columns}
       />
       <ModalForm
@@ -252,7 +259,7 @@ const Admin: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.CassandraTransmitBindListItem);
+          const success = await handleAdd(value as API.InfluxdbTransmitBindListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -322,7 +329,7 @@ const Admin: React.FC = () => {
         />
         <ProFormSelect
           request={async () => {
-            let r = await CassandraTransmitList();
+            let r = await InfluxdbTransmitList();
             return r.data;
           }}
           fieldProps={{
@@ -333,52 +340,26 @@ const Admin: React.FC = () => {
               value: 'ID',
             },
           }}
-          key={'cassandra_transmit_id'}
+          key={'influxdb_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
-          name="cassandra_transmit_id"
+          name="influxdb_transmit_id"
         />
         <ProFormText
-          key={'database'}
-          label={<FormattedMessage id="pages.CassandraTransmitBind.database" />}
-          name="database"
+          key={'org'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.org" />}
+          name="org"
         />
         <ProFormText
-          key={'table'}
-          label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
-          name="table"
+          key={'bucket'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.bucket" />}
+          name="bucket"
         />
-        <ProFormTextArea
-          tooltip={
-            'function main(jsonData) {\n' +
-            '    var c = []\n' +
-            '    for (var jsonDatum of jsonData) {\n' +
-            '        var time = jsonDatum.Time;\n' +
-            '        var arr = []\n' +
-            '        var timeField = {\n' +
-            '            "FieldName": "time",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '\t\t\n' +
-            '        arr.push(timeField)\n' +
-            '  \t\tvar idd = {\n' +
-            '            "FieldName": "id",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '        arr.push(idd)\n' +
-            '        for (var e of jsonDatum.DataRows) {\n' +
-            '            if (e.Name == "a") {\n' +
-            '                var aField = {\n' +
-            '                    "FieldName": "name",\n' +
-            '                    "Value": e.Value\n' +
-            '                }\n' +
-            '                arr.push(aField)\n' +
-            '            }\n' +
-            '        }\n' +
-            '        c.push(arr)\n' +
-            '    }\n' +
-            '    return c;\n' +
-            '}\n'
-          }
+        <ProFormText
+          key={'measurement'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.measurement" />}
+          name="measurement"
+        />
+        <ProFormText
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
@@ -400,7 +381,7 @@ const Admin: React.FC = () => {
         />
       </ModalForm>
 
-      <CassandraTransmitBindUpdateForm
+      <InfluxdbTransmitBindUpdateForm
         key={'update'}
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
@@ -434,13 +415,13 @@ const Admin: React.FC = () => {
         closable={false}
       >
         {currentRow?.ID && (
-          <ProDescriptions<API.CassandraTransmitBindListItem>
+          <ProDescriptions<API.InfluxdbTransmitBindListItem>
             column={2}
             title={currentRow?.database}
             request={async () => ({
               data: currentRow || {},
             })}
-            columns={columns as ProDescriptionsItemProps<API.CassandraTransmitBindListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.InfluxdbTransmitBindListItem>[]}
           />
         )}
       </Drawer>

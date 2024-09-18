@@ -20,6 +20,7 @@ import {
   ProFormRadio,
   ProFormSelect,
   ProFormText,
+  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
@@ -346,7 +347,33 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
           name="table"
         />
-        <ProFormText
+        <ProFormTextArea
+          tooltip={
+            'function main(jsonData) {\n' +
+            '    var c = []\n' +
+            '    for (var jsonDatum of jsonData) {\n' +
+            '        var time = jsonDatum.Time;\n' +
+            '        var arr = []\n' +
+            '        var timeField = {\n' +
+            '            "FieldName": "time",\n' +
+            '            "Value": time\n' +
+            '        }\n' +
+            '\t\t\n' +
+            '        arr.push(timeField)\n' +
+            '        for (var e of jsonDatum.DataRows) {\n' +
+            '            if (e.Name == "a") {\n' +
+            '                var aField = {\n' +
+            '                    "FieldName": "name",\n' +
+            '                    "Value": e.Value\n' +
+            '                }\n' +
+            '                arr.push(aField)\n' +
+            '            }\n' +
+            '        }\n' +
+            '        c.push(arr)\n' +
+            '    }\n' +
+            '    return c;\n' +
+            '}'
+          }
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"

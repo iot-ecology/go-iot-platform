@@ -38,7 +38,7 @@ func (biz *CassandraTransmitBiz) SetRedis(param models.CassandraTransmit) {
 	if err != nil {
 		panic(err)
 	}
-	glob.GRedis.HSet(context.Background(), "transmit:cassandra:"+strconv.Itoa(int(param.ID)), jsonData)
+	glob.GRedis.HSet(context.Background(), "transmit:cassandra:"  +strconv.Itoa(int(param.ID)), jsonData)
 }
 
 func (biz *CassandraTransmitBiz) DeleteRedis(param models.CassandraTransmit) {

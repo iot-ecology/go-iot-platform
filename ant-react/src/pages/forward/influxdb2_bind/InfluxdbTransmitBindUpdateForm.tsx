@@ -1,22 +1,17 @@
-import { CassandraTransmitList, deviceList, mqttList } from '@/services/ant-design-pro/api';
+import { CassandraTransmitList, ClickhouseTransmitList, deviceList, InfluxdbTransmitList, mqttList } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
-import {
-  ProFormRadio,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ProFormRadio, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { Form, Modal } from 'antd';
 import React, { useEffect } from 'react';
 
 export type UpdateFormProps = {
-  onCancel: (flag?: boolean, formVals?: API.CassandraTransmitBindListItem) => void;
-  onSubmit: (values: API.CassandraTransmitBindListItem) => Promise<void>;
+  onCancel: (flag?: boolean, formVals?: API.InfluxdbTransmitBindListItem) => void;
+  onSubmit: (values: API.InfluxdbTransmitBindListItem) => Promise<void>;
   updateModalOpen: boolean;
 
-  values: API.CassandraTransmitBindListItem;
+  values: API.InfluxdbTransmitBindListItem;
 };
-const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
+const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
@@ -108,7 +103,7 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
         />
         <ProFormSelect
           request={async () => {
-            let r = await CassandraTransmitList();
+            let r = await InfluxdbTransmitList();
             return r.data;
           }}
           fieldProps={{
@@ -119,52 +114,26 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
               value: 'ID',
             },
           }}
-          key={'cassandra_transmit_id'}
+          key={'influxdb_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
-          name="cassandra_transmit_id"
+          name="influxdb_transmit_id"
         />
         <ProFormText
-          key={'database'}
-          label={<FormattedMessage id="pages.CassandraTransmitBind.database" />}
-          name="database"
+          key={'org'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.org" />}
+          name="org"
         />
         <ProFormText
-          key={'table'}
-          label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
-          name="table"
+          key={'bucket'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.bucket" />}
+          name="bucket"
         />
-        <ProFormTextArea
-          tooltip={
-            'function main(jsonData) {\n' +
-            '    var c = []\n' +
-            '    for (var jsonDatum of jsonData) {\n' +
-            '        var time = jsonDatum.Time;\n' +
-            '        var arr = []\n' +
-            '        var timeField = {\n' +
-            '            "FieldName": "time",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '\t\t\n' +
-            '        arr.push(timeField)\n' +
-            '  \t\tvar idd = {\n' +
-            '            "FieldName": "id",\n' +
-            '            "Value": time\n' +
-            '        }\n' +
-            '        arr.push(idd)\n' +
-            '        for (var e of jsonDatum.DataRows) {\n' +
-            '            if (e.Name == "a") {\n' +
-            '                var aField = {\n' +
-            '                    "FieldName": "name",\n' +
-            '                    "Value": e.Value\n' +
-            '                }\n' +
-            '                arr.push(aField)\n' +
-            '            }\n' +
-            '        }\n' +
-            '        c.push(arr)\n' +
-            '    }\n' +
-            '    return c;\n' +
-            '}\n'
-          }
+        <ProFormText
+          key={'measurement'}
+          label={<FormattedMessage id="pages.CassandraTransmitBind.measurement" />}
+          name="measurement"
+        />
+        <ProFormText
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
@@ -189,4 +158,4 @@ const CassandraTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
   );
 };
 
-export default CassandraTransmitBindUpdateForm;
+export default InfluxdbTransmitBindUpdateForm;

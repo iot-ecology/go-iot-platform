@@ -48,7 +48,7 @@ func (biz *CassandraTransmitBindBiz) Bind(req models.CassandraTransmitBind) {
 	if req.Enable == true {
 		jsonData := biz.toByte(req)
 		// 缓存构造
-		glob.GRedis.LPush(context.Background(), "transmit:cassandra:" + req.Protocol +":" +string(req.
+		glob.GRedis.LPush(context.Background(), "transmit:cassandra:" + req.Protocol +":" +strconv.Itoa(req.
 			DeviceUid)+":"+req.
 			IdentificationCode, jsonData)
 	}
@@ -102,7 +102,7 @@ func (biz *CassandraTransmitBindBiz) ChangeEnable(req models.CassandraTransmitBi
 //	无
 func (biz *CassandraTransmitBindBiz) HandlerRedis(req models.CassandraTransmitBind) {
 	if req.Enable == false {
-		glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+ req.Protocol +":"+string(req.DeviceUid)+":"+req.
+		glob.GRedis.LRem(context.Background(), "transmit:cassandra:"+ req.Protocol +":"+strconv.Itoa(req.DeviceUid)+":"+req.
 			IdentificationCode, 1,
 			biz.toByte(req))
 	} else {
