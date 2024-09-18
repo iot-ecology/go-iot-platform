@@ -168,3 +168,18 @@ func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 
 	servlet.Resp(c, ClickhouseTransmit)
 }
+
+// ListClickhouseTransmit
+// @Tags      ClickhouseTransmits
+// @Summary   单个详情
+// @Produce   application/json
+// @Router    /ClickhouseTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmit[]}
+func (api *ClickhouseTransmitApi) ListClickhouseTransmit(c *gin.Context) {
+	var ClickhouseTransmit []models.ClickhouseTransmit
+
+ glob.GDb.Find(&ClickhouseTransmit)
+
+
+	servlet.Resp(c, ClickhouseTransmit)
+}

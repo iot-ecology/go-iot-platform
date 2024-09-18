@@ -78,6 +78,14 @@ func (api *CassandraTransmitBindApi) UpdateCassandraTransmitBind(c *gin.Context)
 
 	var newV models.CassandraTransmitBind
 	newV = old
+	newV.DeviceUid = req.DeviceUid
+	newV.Protocol = req.Protocol
+	newV.IdentificationCode = req.IdentificationCode
+	newV.CassandraTransmitId = req.CassandraTransmitId
+	newV.Database = req.Database
+	newV.Table = req.Table
+	newV.Script = req.Script
+	newV.Enable = req.Enable
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

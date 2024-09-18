@@ -263,9 +263,19 @@ export default [
         component: './forward/cassandra',
       },
       {
+        path: '/forward/cassandra_bind',
+        name: 'cassandra_bind',
+        component: './forward/cassandra_bind',
+      },
+      {
         path: '/forward/clickhouse',
         name: 'clickhouse',
         component: './forward/clickhouse',
+      },
+      {
+        path: '/forward/clickhouse_bind',
+        name: 'clickhouse_bind',
+        component: './forward/clickhouse_bind',
       },
       {
         path: '/forward/influxdb2',
@@ -273,14 +283,29 @@ export default [
         component: './forward/influxdb2',
       },
       {
+        path: '/forward/influxdb2_bind',
+        name: 'influxdb2_bind',
+        component: './forward/influxdb2_bind',
+      },
+      {
         path: '/forward/mongo',
         name: 'mongo',
         component: './forward/mongo',
       },
       {
+        path: '/forward/mongo_bind',
+        name: 'mongo_bind',
+        component: './forward/mongo_bind',
+      },
+      {
         path: '/forward/mysql',
         name: 'mysql',
         component: './forward/mysql',
+      },
+      {
+        path: '/forward/mysql_bind',
+        name: 'mysql_bind',
+        component: './forward/mysql_bind',
       },
     ],
   },

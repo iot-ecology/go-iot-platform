@@ -224,4 +224,18 @@ export default {
   'pages.InfluxdbTransmit.host': '主机',
   'pages.InfluxdbTransmit.port': '端口',
   'pages.InfluxdbTransmit.token': '令牌',
+
+  'pages.CassandraTransmitBind.device_uid': '联网设备',
+  'pages.CassandraTransmitBind.protocol': '协议',
+  'pages.CassandraTransmitBind.identification_code': '设备标识码',
+  'pages.CassandraTransmitBind.cassandra_transmit_id': '传输表的外键ID',
+  'pages.CassandraTransmitBind.database': '数据库',
+  'pages.CassandraTransmitBind.table': '表',
+  'pages.CassandraTransmitBind.script': '转换insert语句的脚本',
+  'pages.CassandraTransmitBind.enable': '是否启用',
+
+  'pages.CassandraTransmitBind.bucket': 'bucket',
+  'pages.CassandraTransmitBind.collection': 'collection',
+  'pages.CassandraTransmitBind.org': 'org',
+  'pages.CassandraTransmitBind.measurement': 'measurement',
 };

@@ -40,7 +40,7 @@ func (biz *ClickhouseTransmitBindBiz) Bind(req models.ClickhouseTransmitBind) {
 
 		jsonData := biz.toByte(req)
 		// 缓存构造
-		glob.GRedis.LPush(context.Background(), "transmit:clickhouse:"+req.DeviceUid +":" +req.IdentificationCode,
+		glob.GRedis.LPush(context.Background(), "transmit:clickhouse:"+ req.Protocol +":"+string(req.DeviceUid) +":" +req.IdentificationCode,
 			jsonData)
 	}
 }
@@ -79,7 +79,7 @@ func (biz *ClickhouseTransmitBindBiz) HandlerRedis(req models.ClickhouseTransmit
 	if req.Enable {
 		biz.Bind(req)
 	} else {
-		glob.GRedis.LRem(context.Background(), "transmit:clickhouse:"+req.DeviceUid +":" +req.IdentificationCode, 1, biz.toByte(req))
+		glob.GRedis.LRem(context.Background(), "transmit:clickhouse:"+ req.Protocol +":"+string(req.DeviceUid) +":" +req.IdentificationCode, 1, biz.toByte(req))
 	}
 }
 

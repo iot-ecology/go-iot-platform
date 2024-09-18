@@ -171,3 +171,16 @@ func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 
 	servlet.Resp(c, MongoTransmit)
 }
+// ListMongoTransmit
+// @Tags      MongoTransmits
+// @Summary   单个详情
+// @Produce   application/json
+// @Router    /MongoTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmit[]}
+func (api *MongoTransmitApi) ListMongoTransmit(c *gin.Context) {
+	var MongoTransmit []models.MongoTransmit
+
+glob.GDb.Find(&MongoTransmit, )
+
+	servlet.Resp(c, MongoTransmit)
+}

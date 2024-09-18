@@ -78,6 +78,15 @@ func (api *InfluxdbTransmitBindApi) UpdateInfluxdbTransmitBind(c *gin.Context) {
 
 	var newV models.InfluxdbTransmitBind
 	newV = old
+	newV.DeviceUid = req.DeviceUid
+	newV.Protocol = req.Protocol
+	newV.IdentificationCode = req.IdentificationCode
+	newV.InfluxdbTransmitId = req.InfluxdbTransmitId
+	newV.Bucket = req.Bucket
+	newV.Org = req.Org
+	newV.Measurement = req.Measurement
+	newV.Script = req.Script
+	newV.Enable = req.Enable
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

@@ -168,3 +168,18 @@ func (api *InfluxdbTransmitApi) ByIdInfluxdbTransmit(c *gin.Context) {
 
 	servlet.Resp(c, InfluxdbTransmit)
 }
+
+// ListInfluxdbTransmit
+// @Tags      InfluxdbTransmits
+// @Summary   单个详情
+// @Produce   application/json
+// @Router    /InfluxdbTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.InfluxdbTransmit[]}
+func (api *InfluxdbTransmitApi) ListInfluxdbTransmit(c *gin.Context) {
+	var InfluxdbTransmit []models.InfluxdbTransmit
+
+	glob.GDb.Find(&InfluxdbTransmit)
+
+
+	servlet.Resp(c, InfluxdbTransmit)
+}

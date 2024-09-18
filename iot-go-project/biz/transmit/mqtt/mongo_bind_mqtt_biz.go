@@ -40,7 +40,7 @@ func (biz *MongoTransmitBindBiz) Bind(req models.MongoTransmitBind) {
 	if req.Enable {
 		jsonData := biz.toByte(req)
 		// 缓存构造
-		glob.GRedis.LPush(context.Background(), "transmit:mongo:"+req.DeviceUid +":" +req.IdentificationCode, jsonData)
+		glob.GRedis.LPush(context.Background(), "transmit:mongo:"+req.Protocol +":"+string(req.DeviceUid) +":" +req.IdentificationCode, jsonData)
 	}
 }
 
@@ -77,7 +77,7 @@ func (biz *MongoTransmitBindBiz) HandlerRedis(req models.MongoTransmitBind) {
 	if req.Enable {
 		biz.Bind(req)
 	} else {
-		glob.GRedis.LRem(context.Background(), "transmit:mongo:"+req.DeviceUid +":" +req.IdentificationCode, 1, biz.toByte(req))
+		glob.GRedis.LRem(context.Background(), "transmit:mongo:"+req.Protocol +":"+string(req.DeviceUid) +":" +req.IdentificationCode, 1, biz.toByte(req))
 	}
 }
 

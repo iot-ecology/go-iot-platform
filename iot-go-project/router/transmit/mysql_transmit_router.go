@@ -176,3 +176,20 @@ func (api *MySQLTransmitApi) ByIdMySQLTransmit(c *gin.Context) {
 	servlet.Resp(c, MySQLTransmit)
 }
 
+
+// ListMySQLTransmit
+// @Tags      MySQLTransmits
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /MySQLTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MySQLTransmit[]}
+func (api *MySQLTransmitApi) ListMySQLTransmit(c *gin.Context) {
+	var MySQLTransmit []models.MySQLTransmit
+
+	glob.GDb.Find(&MySQLTransmit)
+
+
+	servlet.Resp(c, MySQLTransmit)
+}
+

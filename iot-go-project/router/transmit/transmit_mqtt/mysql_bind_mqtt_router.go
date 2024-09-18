@@ -78,6 +78,13 @@ func (api *MySQLTransmitBindApi) UpdateMySQLTransmitBind(c *gin.Context) {
 
 	var newV models.MySQLTransmitBind
 	newV = old
+	newV.Protocol = req.Protocol
+	newV.DeviceUid = req.DeviceUid
+	newV.IdentificationCode = req.IdentificationCode
+	newV.MySQLTransmitId = req.MySQLTransmitId
+	newV.Table = req.Table
+	newV.Script = req.Script
+	newV.Enable = req.Enable
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

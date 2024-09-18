@@ -277,16 +277,13 @@ const Admin: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.access_number && (
+        {currentRow?.ID && (
           <ProDescriptions<API.CassandraTransmitListItem>
             column={2}
-            title={currentRow?.access_number}
+            title={currentRow?.name}
             request={async () => ({
               data: currentRow || {},
             })}
-            params={{
-              id: currentRow?.access_number,
-            }}
             columns={columns as ProDescriptionsItemProps<API.CassandraTransmitListItem>[]}
           />
         )}

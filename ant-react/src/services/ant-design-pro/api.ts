@@ -174,6 +174,36 @@ export async function mqttList() {
   });
 }
 
+export async function CassandraTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/CassandraTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function ClickhouseTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/ClickhouseTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function InfluxdbTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/InfluxdbTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function MongoTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/MongoTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function MySQLTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/MySQLTransmit/list', {
+    method: 'GET',
+  });
+}
+
 export async function deviceList() {
   return request<API.CommonResp<API.DeviceInfoListItem[]>>('/api/DeviceInfo/list', {
     method: 'GET',
@@ -361,6 +391,146 @@ export async function CassandraTransmitPage(
 ) {
   const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
     '/api/CassandraTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function CassandraTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/CassandraTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function ClickhouseTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/ClickhouseTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function InfluxdbTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/InfluxdbTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MongoTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MongoTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MySQLTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MySQLTransmitBind/page',
     {
       method: 'GET',
       params: {
@@ -998,6 +1168,51 @@ export async function addCassandraTransmitPage(options?: { [key: string]: any })
   });
 }
 
+export async function addCassandraTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addClickhouseTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addInfluxdbTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMongoTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMySQLTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
 export async function addClickhouseTransmit(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/ClickhouseTransmit/create', {
     method: 'POST',
@@ -1227,6 +1442,36 @@ export async function deleteCassandraTransmit(id: any) {
   });
 }
 
+export async function deleteCassandraTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteClickhouseTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteInfluxdbTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMongoTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMySQLTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function deleteClickhouseTransmit(id: any) {
   return request<API.CommonResp<string>>('/api/ClickhouseTransmit/delete/' + id, {
     method: 'POST',
@@ -1369,6 +1614,41 @@ export async function updateSimCard(dt: any) {
 
 export async function updateCassandraTransmit(dt: any) {
   return request<API.CommonResp<string>>('/api/CassandraTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCassandraTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateClickhouseTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateInfluxdbTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMongoTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMySQLTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/update', {
     method: 'POST',
     data: dt,
   });

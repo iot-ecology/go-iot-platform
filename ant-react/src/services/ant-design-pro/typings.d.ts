@@ -71,6 +71,61 @@ declare namespace API {
     username?: string;
     password?: string;
   };
+  type CassandraTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    cassandra_transmit_id?: string;
+    database?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
+  type ClickhouseTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    clickhouse_transmit_id?: string;
+    database?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
+  type InfluxdbTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    influxdb_transmit_id?: string;
+    bucket?: string;
+    org?: string;
+    tameasurementborgle?: string;
+    script?: string;
+    enable?: string;
+  };
+  type MongoTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    mongo_transmit_id_transmit_id?: string;
+    database?: string;
+    collection?: string;
+    script?: string;
+    enable?: string;
+  };
+  type MySQLTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    mysql_transmit_id?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
   type ClickhouseTransmitListItem = {
     ID?: number;
     name?: string;
