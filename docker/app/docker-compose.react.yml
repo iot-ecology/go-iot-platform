@@ -1,0 +1,15 @@
+services:
+  iot-admin-react:
+    build:
+      context: ../../
+      dockerfile: deploy/IotAdminReact.Dockerfile
+    image: go-iot-admin-react:latest
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 18081:80
+    networks:
+      - iot-net
+networks:
+  iot-net:
+    driver: bridge

@@ -3,12 +3,14 @@
 import { request } from '@umijs/max';
 
 /** 获取当前的用户 GET /api/currentUser */
-export async function currentUser(options?: { [key: string]: any }) {
+export async function currentUser(token: any) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
-    method: 'GET',
-    ...(options || {}),
+  }>('/api/userinfo', {
+    method: 'post',
+    headers: {
+      Authorization: token,
+    },
   });
 }
 
@@ -23,6 +25,18 @@ export async function outLogin(options?: { [key: string]: any }) {
 /** 登录接口 POST /api/login/account */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
   return request<API.LoginResult>('/api/login/account', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function rellogin(body: API.LoginParams, options?: { [key: string]: any }) {
+  body.user_name = body.username;
+  return request<API.CommonResp<API.LoginResult>>('/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

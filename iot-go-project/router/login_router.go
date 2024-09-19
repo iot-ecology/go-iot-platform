@@ -151,9 +151,11 @@ func (v LoginApi) UserInfo(c *gin.Context) {
 
 	servlet.Resp(c, gin.H{
 		"uid":      userInfos.Uid,
+		"name":     userInfos.UserName,
 		"username": userInfos.UserName,
 		"roleIds":  userInfos.RoleIds,
 		"token":    tokenObj.Raw,
+		"avatar":   "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
 	})
 
 }

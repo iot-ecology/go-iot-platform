@@ -49,10 +49,9 @@ func Beat(g *gin.Context) {
 // @BasePath /
 func main() {
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-
 	group := r.Group("/")
-
 	group.Use(CORSMiddleware())
 	group.Use(ExceptionMiddleware)
 

@@ -32,7 +32,7 @@ export default [
     path: '/device',
     name: 'device',
     icon: 'crown',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/device',
@@ -54,7 +54,7 @@ export default [
     path: '/user',
     name: 'user',
     icon: 'TeamOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/user',
@@ -87,7 +87,7 @@ export default [
     path: '/lifecycle',
     name: 'lifecycle',
     icon: 'UnorderedListOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/lifecycle',
@@ -124,7 +124,7 @@ export default [
     path: '/protocol',
     name: 'protocol',
     icon: 'ReadOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/protocol/mqtt',
@@ -193,7 +193,7 @@ export default [
     path: '/data',
     name: 'data',
     icon: 'TableOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/data/signal',
@@ -237,7 +237,7 @@ export default [
     path: '/notice',
     name: 'notice',
     icon: 'NotificationOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/notice/feishu',
@@ -255,7 +255,7 @@ export default [
     path: '/forward',
     name: 'forward',
     icon: 'DeliveredProcedureOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/forward/cassandra',
@@ -309,12 +309,7 @@ export default [
       },
     ],
   },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
+
   {
     path: '/',
     redirect: '/welcome',
