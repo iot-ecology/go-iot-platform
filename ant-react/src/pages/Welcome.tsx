@@ -1,6 +1,6 @@
-import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
-import { Card, theme } from 'antd';
+import {PageContainer} from '@ant-design/pro-components';
+import {useIntl, useModel} from '@umijs/max';
+import {Card, theme} from 'antd';
 import React from 'react';
 
 /**
@@ -13,10 +13,11 @@ const InfoCard: React.FC<{
   index: number;
   desc: string;
   href?: string;
-}> = ({ title, href, index, desc }) => {
-  const { useToken } = theme;
+}> = ({title, href, index, desc}) => {
+  const {useToken} = theme;
+  const intl = useIntl();
 
-  const { token } = useToken();
+  const {token} = useToken();
 
   return (
     <div
@@ -79,7 +80,7 @@ const InfoCard: React.FC<{
 
       {href ? (
         <a href={href} target="_blank" rel="noreferrer">
-          了解更多 {'>'}
+          {intl.formatMessage({id: "pages.welcome.more"})} {'>'}
         </a>
       ) : (
         <div></div>
@@ -89,8 +90,9 @@ const InfoCard: React.FC<{
 };
 
 const Welcome: React.FC = () => {
-  const { token } = theme.useToken();
-  const { initialState } = useModel('@@initialState');
+  const {token} = theme.useToken();
+  const intl = useIntl();
+  const {initialState} = useModel('@@initialState');
   return (
     <PageContainer>
       <Card
@@ -119,7 +121,7 @@ const Welcome: React.FC = () => {
               color: token.colorTextHeading,
             }}
           >
-            欢迎使用 Go IoT 开发平台
+            {intl.formatMessage({id: "pages.welcome.a1"})}
           </div>
           <p
             style={{
@@ -131,8 +133,7 @@ const Welcome: React.FC = () => {
               width: '65%',
             }}
           >
-            Go IoT 开发平台 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。
-            该平台支持MQTT、HTTP、WebSocket、COAP、TCP协议传输，提供轻量化的配置工具完成数据的报警功能，提供基于JavaScript的数据统计服务。
+            {intl.formatMessage({id: "pages.welcome.a2"})}
           </p>
           <div
             style={{
@@ -144,21 +145,21 @@ const Welcome: React.FC = () => {
             <InfoCard
               index={1}
               href="https://iot-dev-egi.pages.dev/"
-              title="官网"
-              desc="访问项目官网可以得到更多内容。"
+              title={intl.formatMessage({id: "pages.welcome.a3"})}
+              desc={intl.formatMessage({id: "pages.welcome.a4"})}
             />
             <InfoCard
               index={2}
-              title="开源仓库"
               href="https://gitee.com/pychfarm_admin/go-iot-platform"
-              desc="Go IoT开发平台是一个开源的物联网开发平台，希望你可以加入我们一起完善这个项目。"
+              title={intl.formatMessage({id: "pages.welcome.a5"})}
+              desc={intl.formatMessage({id: "pages.welcome.a6"})}
             />
 
             <InfoCard
               index={3}
-              title="设计文档"
               href="https://gitee.com/pychfarm_admin/go-iot-platform/tree/dev/doc"
-              desc="我们将所有的设计文档全部公开以便用户进行随时查阅。"
+              title={intl.formatMessage({id: "pages.welcome.a7"})}
+              desc={intl.formatMessage({id: "pages.welcome.a8"})}
             />
             {/*   <InfoCard
             index={4}
