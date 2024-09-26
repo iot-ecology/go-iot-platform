@@ -309,7 +309,18 @@ export default [
       },
     ],
   },
-
+  {
+    path: '/mirror',
+    name: '性能',
+    icon: 'DeliveredProcedureOutlined',
+    routes: [
+      {
+        path: '/mirror/admin',
+        name: 'admin',
+        component: './mirror/admin',
+      },
+    ]
+  },
   {
     path: '/',
     redirect: '/welcome',

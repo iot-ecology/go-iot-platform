@@ -1822,7 +1822,11 @@ export async function updateDeviceGroupBind(dt: any) {
 }
 
 export async function queryDeviceGroupBind(dt:any){
-  return request<API.CommonResp<string>>('/device_group/query_bind_device?group_id='+dt, {
+  return request<API.CommonResp<string>>('/api/device_group/query_bind_device?group_id='+dt, {
+    method: 'get',
+  });
+}export async function adminMetrics(){
+  return request<string>('/api/metrics', {
     method: 'get',
   });
 }
