@@ -98,21 +98,21 @@ export default [
         name: 'product-list',
         component: './Lifecycle/ProductList/ProductList',
       },
-      {
-        path: '/lifecycle/ShipmentRecord-list',
-        name: 'ShipmentRecord',
-        component: './Lifecycle/ShipmentRecord/ShipmentRecord',
-      },
-      {
-        path: '/lifecycle/produce-list',
-        name: 'produce-list',
-        component: './Lifecycle/ProduceList/ProduceList',
-      },
-      {
-        path: '/lifecycle/operation-list',
-        name: 'operation-list',
-        component: './Lifecycle/OperationList/OperationList',
-      },
+      // {
+      //   path: '/lifecycle/ShipmentRecord-list',
+      //   name: 'ShipmentRecord',
+      //   component: './Lifecycle/ShipmentRecord/ShipmentRecord',
+      // },
+      // {
+      //   path: '/lifecycle/produce-list',
+      //   name: 'produce-list',
+      //   component: './Lifecycle/ProduceList/ProduceList',
+      // },
+      // {
+      //   path: '/lifecycle/operation-list',
+      //   name: 'operation-list',
+      //   component: './Lifecycle/OperationList/OperationList',
+      // },
       {
         path: '/lifecycle/sim-list',
         name: 'sim-list',
@@ -205,11 +205,11 @@ export default [
         name: 'signal-waring',
         component: './Data/SignalWaring',
       },
-      {
-        path: '/data/signal-vis',
-        name: 'signal-vis',
-        component: './Data/SignalVis',
-      },
+      // {
+      //   path: '/data/signal-vis',
+      //   name: 'signal-vis',
+      //   component: './Data/SignalVis',
+      // },
       {
         path: '/data/calc',
         name: 'calc',

@@ -1814,6 +1814,18 @@ export async function updateDeviceGroup(dt: any) {
     data: dt,
   });
 }
+export async function updateDeviceGroupBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/device_group/bind_device', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function queryDeviceGroupBind(dt:any){
+  return request<API.CommonResp<string>>('/device_group/query_bind_device?group_id='+dt, {
+    method: 'get',
+  });
+}
 
 export async function updateRole(dt: any) {
   return request<API.CommonResp<string>>('/api/Role/update', {

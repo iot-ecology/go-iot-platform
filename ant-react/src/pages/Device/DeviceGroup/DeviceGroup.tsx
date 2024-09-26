@@ -3,7 +3,7 @@ import {
   addDeviceGroup,
   deleteDeviceGroup,
   deviceGroupPage,
-  updateDeviceGroup,
+  updateDeviceGroup, updateDeviceGroupBind,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -20,6 +20,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import DeviceGroupBindForm from "@/pages/Device/DeviceGroup/DeviceGroupBindForm";
 
 const handleAdd = async (fields: API.DeviceGroupItem) => {
   const hide = message.loading('正在添加');
@@ -53,6 +54,19 @@ const handlerUpdate = async (fields: API.DeviceGroupItem) => {
   const hide = message.loading('正在更新');
   try {
     await updateDeviceGroup({ ...fields });
+    hide();
+    message.success('更新成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('更新 failed, please try again!');
+    return false;
+  }
+};
+const handlerBind = async (fields: API.DeviceGroupBindParam) => {
+  const hide = message.loading('正在更新');
+  try {
+    await updateDeviceGroupBind({ ...fields });
     hide();
     message.success('更新成功');
     return true;
@@ -127,6 +141,7 @@ const Admin: React.FC = () => {
         <Button
           key="bind"
           onClick={() => {
+            setCurrentRow(record);
             handleBindModalOpen(true);
           }}
         >
@@ -222,7 +237,7 @@ const Admin: React.FC = () => {
         }}
       />
 
-      <DeviceGroupUpdateForm
+      <DeviceGroupBindForm
         key={'bind'}
         updateModalOpen={bindModalOpen}
         values={currentRow || {}}
@@ -235,8 +250,11 @@ const Admin: React.FC = () => {
         }}
         onSubmit={async (value) => {
           console.log(value);
-          // const success = await handlerUpdate(value);
-          // if (success) {
+
+          await handlerBind({
+            group_id: value.ID,
+            device_id:value.device_id
+          } );
           handleBindModalOpen(false);
           if (actionRef.current) {
             await actionRef.current.reload();

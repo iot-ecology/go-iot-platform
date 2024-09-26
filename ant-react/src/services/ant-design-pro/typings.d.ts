@@ -303,7 +303,12 @@ declare namespace API {
   };
   type DeviceGroupItem = {
     ID?: number;
+    device_id?: number[];
     name?: string;
+  };
+  type DeviceGroupBindParam = {
+    group_id?: number;
+    device_id?: number[];
   };
   type ProductItem = {
     ID?: number;
