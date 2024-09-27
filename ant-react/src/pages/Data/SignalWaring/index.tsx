@@ -77,7 +77,7 @@ const handlerUpdate = async (fields: API.SignalWaringItem) => {
   }
 };
 
-async function initSearchSignalId(
+export async function initSearchSignalId(
   searchProtocol: string,
   value,
   setOpSignal: (value: any) => void,

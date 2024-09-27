@@ -28,6 +28,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import {initSearchSignalId} from "@/pages/Data/SignalWaring";
 
 const handleAdd = async (fields: API.ScriptWaringParamListItem) => {
   const hide = message.loading('正在添加');
@@ -91,6 +92,7 @@ const Admin: React.FC = () => {
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
+  const [searchSignalId, setSearchSignalId] = useState<number | string>();
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -101,6 +103,7 @@ const Admin: React.FC = () => {
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
   const [searchDeviceUid, setSearchDeviceUid] = useState<number | string>('');
   const [opDeviceUid, setOpDeviceUid] = useState<any>();
+  const [opSignal, setOpSignal] = useState<any>();
 
   const columns: ProColumns<API.ScriptWaringParamListItem>[] = [
     {
@@ -128,25 +131,23 @@ const Admin: React.FC = () => {
       hideInSearch: false,
       dataIndex: 'protocol',
       initialValue: 'MQTT',
-      onChange: (value) => {
-        setSearchProtocol(value);
-      },
-      fieldProps: (form, config: any) => ({
+      fieldProps: {
         onChange: async (value) => {
-          if (value === 'MQTT') {
-            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
-          } else {
-            setSearchDeviceUid('');
-            setOpDeviceUid([
-              {
-                client_id: 'ccc',
-                ID: '1',
-              },
-            ]);
-          }
-          setSearchProtocol(value);
+          setSearchDeviceUid(Number(value));
+          await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
         },
-      }),
+        value: searchDeviceUid,
+
+        showSearch: true,
+        allowClear: false,
+        fieldNames: {
+          label: 'client_id',
+          value: 'ID',
+        },
+        options: opDeviceUid,
+        placeholder: '请选择',
+      },
+      order:99,
       valueEnum: {
         MQTT: { text: 'MQTT', status: 'success' },
         HTTP: { text: 'HTTP', status: 'success' },
@@ -164,18 +165,28 @@ const Admin: React.FC = () => {
 
     {
       key: 'device_uid',
+      order:98,
       title: <FormattedMessage id="pages.waring-param.device_uid" />,
       hideInSearch: false,
       dataIndex: 'device_uid',
       valueType: 'select',
-      fieldProps: (form, config: any) => ({
+      fieldProps: {
+        onChange: async (value) => {
+          setSearchDeviceUid(Number(value));
+          await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
+
+        },
+        value: searchDeviceUid,
+
         showSearch: true,
         allowClear: false,
         fieldNames: {
           label: 'client_id',
           value: 'ID',
         },
-      }),
+        options: opDeviceUid,
+        placeholder: '请选择',
+      },
       render: (dom, entity) => {
         return (
           <>
@@ -198,10 +209,10 @@ const Admin: React.FC = () => {
     {
       key: 'signal_id',
       title: <FormattedMessage id="pages.waring-param.signal_id" />,
+      order:97,
       hideInSearch: false,
       dataIndex: 'signal_id',
       valueType: 'select',
-      order: 1,
       render: (dom, entity) => {
         return (
           <>
@@ -218,6 +229,10 @@ const Admin: React.FC = () => {
         ],
       },
       fieldProps: {
+        value: searchSignalId,
+        onChange: (value) => {
+          setSearchSignalId(Number(value));
+        },
         required: true,
         showSearch: true,
         allowClear: false,
@@ -225,6 +240,7 @@ const Admin: React.FC = () => {
           label: 'alias',
           value: 'ID',
         },
+        options: opSignal,
       },
     },
     {

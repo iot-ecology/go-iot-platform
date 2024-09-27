@@ -116,6 +116,7 @@ const Admin: React.FC = () => {
     {
       key: 'protocol',
       title: <FormattedMessage id="pages.calc-param.protocol" />,
+      order:99,
       hideInSearch: false,
       dataIndex: 'protocol',
       initialValue: 'MQTT',
@@ -157,6 +158,7 @@ const Admin: React.FC = () => {
     {
       key: 'device_uid',
       title: <FormattedMessage id="pages.calc-param.device_uid" />,
+      order:98,
       hideInSearch: false,
       dataIndex: 'device_uid',
       valueType: 'select',
@@ -228,6 +230,7 @@ const Admin: React.FC = () => {
     {
       key: 'calc_rule_id',
       title: <FormattedMessage id="pages.calc-param.calc_rule_id" />,
+      order:100,
       hideInSearch: false,
       dataIndex: 'calc_rule_id',
       request: async () => {
