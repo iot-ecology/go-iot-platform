@@ -31,6 +31,7 @@ import (
 )
 
 var (
+	podApi = router.PodApi{}
 	mqttApi                   = router.MqttApi{}
 	signalApi                 = router.SignalApi{}
 	signalWaringConfigApi     = router.SignalWaringConfigApi{}
@@ -790,6 +791,11 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/protocol/ws_info", protocolServiceApi.WsServerInfo)
 	r.GET("/protocol/tcp_info", protocolServiceApi.TcpServerInfo)
 	r.GET("/protocol/coap_info", protocolServiceApi.CoapServerInfo)
+
+
+	r.GET("/pod_info",podApi.PodInfo)
+	r.GET("/pod_mqtt",podApi.PodMqtt)
+	r.POST("/pod_metrics",podApi.PodMetrics)
 }
 func initGlobalRedisClient() {
 	zap.S().Info("初始化Redis")

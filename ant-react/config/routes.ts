@@ -135,11 +135,6 @@ export default [
             name: 'clients',
             component: './Protocol/mqtt/clients',
           },
-          {
-            path: '/protocol/mqtt/nodes',
-            name: 'nodes',
-            component: './Protocol/mqtt/nodes',
-          },
         ],
       },
       {
@@ -311,14 +306,19 @@ export default [
   },
   {
     path: '/mirror',
-    name: '性能',
+    name: '监控',
     icon: 'DeliveredProcedureOutlined',
     routes: [
       {
         path: '/mirror/admin',
-        name: 'admin',
+        name: '管理端监控',
         component: './mirror/admin',
       },
+      {
+        path: '/mirror/protocol',
+        name: '协议监控',
+        component: './mirror/protocol',
+      }
     ]
   },
   {

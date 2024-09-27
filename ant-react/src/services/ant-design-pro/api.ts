@@ -1829,6 +1829,15 @@ export async function queryDeviceGroupBind(dt:any){
   return request<string>('/api/metrics', {
     method: 'get',
   });
+}export async function podInfo(){
+  return request<API.CommonResp<string>>('/api/pod_info', {
+    method: 'get',
+  });
+}export async function podMetrics(data:any){
+  return request<API.CommonResp<string>>('/api/pod_metrics', {
+    method: 'post',
+data:data,
+  });
 }
 
 export async function updateRole(dt: any) {

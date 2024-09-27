@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v3"
@@ -42,6 +43,7 @@ func main() {
 	e.LoadHTMLGlob("template/*")
 	//静态文件位置
 	e.Static("/static", "./static")
+	e.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	e.GET("/", Index)
 	e.GET("/auth", AuthCtr)
