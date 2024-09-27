@@ -1833,6 +1833,10 @@ export async function queryDeviceGroupBind(dt:any){
   return request<API.CommonResp<string>>('/api/pod_info', {
     method: 'get',
   });
+}export async function deviceStats(){
+  return request<API.CommonResp<string>>('/api/device-stats', {
+    method: 'get',
+  });
 }export async function podMetrics(data:any){
   return request<API.CommonResp<string>>('/api/pod_metrics', {
     method: 'post',

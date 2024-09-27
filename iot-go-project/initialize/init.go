@@ -8,6 +8,7 @@ import (
 	"igp/models"
 	"igp/router"
 	"igp/router/notice"
+	"igp/router/statistics"
 	"igp/router/transmit"
 	"igp/router/transmit/transmit_mqtt"
 	"log"
@@ -31,6 +32,7 @@ import (
 )
 
 var (
+	statisticsApi  = statistics.StatisticsApi{}
 	podApi = router.PodApi{}
 	mqttApi                   = router.MqttApi{}
 	signalApi                 = router.SignalApi{}
@@ -796,6 +798,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/pod_info",podApi.PodInfo)
 	r.GET("/pod_mqtt",podApi.PodMqtt)
 	r.POST("/pod_metrics",podApi.PodMetrics)
+
+
+	r.GET("/device-stats",statisticsApi.GetDeviceStats)
 }
 func initGlobalRedisClient() {
 	zap.S().Info("初始化Redis")
