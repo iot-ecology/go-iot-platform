@@ -186,6 +186,9 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	timeFromUnix := time.Unix(dt.Time, 0).In(loc)
 
+	if CheckPushTime(dt.Protocol, dt.IdentificationCode, dt.DeviceUid, timeFromUnix.Unix()) {
+		zap.S().Errorf("推送时间间隔异常")
+	}
 	i, err := strconv.Atoi(dt.DeviceUid)
 	if err != nil {
 		zap.S().Debugf("转换错误: %+v", err)
@@ -261,6 +264,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	}
 
+	SetPushTime(dt.Protocol,dt.IdentificationCode,dt.DeviceUid,dt.Time)
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
 

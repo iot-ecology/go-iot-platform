@@ -11,7 +11,9 @@ const AlarmStatistics: React.FC = () => {
   ];
 
   return (
-    <Card title="报警数据统计" bordered={false} style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+    <Card title="报警数据统计" bordered={false} style={{ marginBottom:24, borderRadius: '12px', boxShadow: '0 4px 12px' +
+        ' rgba(0, 0, 0,' +
+        ' 0.1)' }}>
       <Row gutter={16}>
         {alarmData.map((data) => (
           <Col span={6} key={data.title}>

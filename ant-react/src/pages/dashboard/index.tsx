@@ -1,35 +1,26 @@
-import DeviceStatsChart from "@/pages/dashboard/DeviceStatsChart";
+import DeviceMap from "@/pages/dashboard/DeviceMap";
 import ProtocolStatsCards from "@/pages/dashboard/ProtocolStatsTable";
 import MessageList from "@/pages/dashboard/MessageList";
-import {Col, Row} from "antd";
-import DeviceMap from "@/pages/dashboard/DeviceMap";
-import ProductDeviceChart from "@/pages/dashboard/ProductDeviceCards";
+import { Col, Row } from "antd";
 import AlarmStatistics from "@/pages/dashboard/AlarmStatistics";
+import ProductDeviceChart from "@/pages/dashboard/ProductDeviceCards";
 
 const Dashboard = () => {
   return (
     <>
-      <DeviceMap />
-      <Row gutter={16}>
-        <Col span={12}>
-          <DeviceStatsChart />
+      <Row gutter={[16,16]} style={{height:"auto"}}>
+        <Col span={12} style={{height:"700px"}}>
+          <DeviceMap />
         </Col>
-        <Col span={12}>
+        <Col span={12}  >
           <ProtocolStatsCards />
-        </Col>
-      </Row>
-      <Row gutter={16}>
-        <Col span={8}>
-          <AlarmStatistics />
-        </Col>
-        <Col span={8}>
+          <AlarmStatistics  />
           <MessageList />
         </Col>
-        <Col span={8}>
-          <ProductDeviceChart />
-        </Col>
       </Row>
+
     </>
   );
 };
-export default Dashboard
+
+export default Dashboard;

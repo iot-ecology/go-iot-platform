@@ -39,7 +39,9 @@ const MessageCard: React.FC = () => {
   const [activeKey, setActiveKey] = useState("分类1");
 
   return (
-    <Card >
+    <Card style={{
+      marginBottom:24
+    }}>
       <Title level={4}>消息列表</Title>
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         {Object.keys(messages).map(category => (

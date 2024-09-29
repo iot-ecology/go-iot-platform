@@ -249,6 +249,8 @@ type FeiShu struct {
 }
 type DeviceInfo struct {
 	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // 联网设备ID
 	ProductName       string     `gorm:"-" json:"product_name" structs:"product_name"`                                                  // 产品名称
 	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
 	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
@@ -256,5 +258,7 @@ type DeviceInfo struct {
 	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
 	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
 	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                          // 推送间隔（秒）
+	ErrorRate         float64   `json:"error_rate,omitempty" structs:"error_rate"`                                                           // 推送时间误差（秒）
+
 	gorm.Model        `structs:"-"`
 }

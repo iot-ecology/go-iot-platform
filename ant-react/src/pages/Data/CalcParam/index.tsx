@@ -157,6 +157,7 @@ const Admin: React.FC = () => {
 
     {
       key: 'device_uid',
+      dependencies:["protocol"],
       title: <FormattedMessage id="pages.calc-param.device_uid" />,
       order:98,
       hideInSearch: false,
