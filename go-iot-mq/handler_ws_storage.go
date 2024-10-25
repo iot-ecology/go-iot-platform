@@ -63,6 +63,7 @@ func HandlerDataWsStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
+			(*data)[i].Protocol = "WebSocket"
 			StorageDataRowList(row, "WebSocket")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)

@@ -288,9 +288,6 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			}
 
 			for result.Next() {
-				if result.TableChanged() {
-					fmt.Printf("table: %s\n", result.TableMetadata().String())
-				}
 				values := result.Record().Values()
 				fmt.Printf("value: %v\n", values)
 				m[cache.Name] = values["_value"].(float64)

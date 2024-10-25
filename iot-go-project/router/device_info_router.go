@@ -9,7 +9,6 @@ import (
 	"igp/servlet"
 	"strconv"
 
-	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -66,9 +65,8 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		DeviceInfo.WarrantyExpiry = WarrantyExpiry
 	}
 
-	m := structs.Map(DeviceInfo)
 
-	result = glob.GDb.Model(models.DeviceInfo{}).Create(m)
+	result = glob.GDb.Model(models.DeviceInfo{}).Create(&DeviceInfo)
 
 	if result.Error != nil {
 		zap.S().Errorw("创建 DeviceInfo 失败", "error", result.Error)

@@ -130,7 +130,9 @@ type DeviceInfo struct {
 	WarrantyExpiry    time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`             // 保修截止日期
 	PushInterval      int       `json:"push_interval,omitempty" structs:"push_interval"`                                                     // 推送间隔（秒）
 	ErrorRate         float64   `json:"error_rate,omitempty" structs:"error_rate"`                                                           // 推送时间误差（秒）
-	Protocol          string    `json:"protocol,omitempty" structs:"protocol,omitempty"`                                                                         // 协议
+	Protocol          string `json:"protocol,omitempty" structs:"protocol,omitempty"`                                                                         // 协议
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // 联网设备ID
 	gorm.Model        `structs:"-"`
 }
 

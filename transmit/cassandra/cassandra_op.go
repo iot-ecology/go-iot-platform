@@ -39,7 +39,7 @@ func GetCassandra(ips []string, username, password string, id string) (*gocql.Se
 	// 创建会话
 	session, err := cluster.CreateSession()
 	if err != nil {
-		zap.S().Fatalf("error %+v", err)
+		zap.S().Errorf("error %+v", err)
 		return nil, err
 	}
 
@@ -74,14 +74,14 @@ func (op *CassandraOp) Save(dt []CassandraParam, table string, db string) string
 	var fields []string
 	var valueStrs []string
 	for _, param := range dt {
-		fields = append(fields, "\""+param.FieldName+"\"")        // 使用反引号包围字段名
+		fields = append(fields, "\""+param.FieldName+"\"")          // 使用反引号包围字段名
 		valueStrs = append(valueStrs, buildValueStr(param.Value)) // 使用自定义函数处理值的格式化
 	}
 
 	fieldStr := strings.Join(fields, ", ")
 	valueStr := strings.Join(valueStrs, ", ")
 
-	query := fmt.Sprintf("INSERT INTO %s.%s (%s) VALUES (%s);", db, table, fieldStr, valueStr)
+	query := fmt.Sprintf("INSERT INTO \"%s\".\"%s\" (%s) VALUES (%s);", db, table, fieldStr, valueStr)
 	return query
 }
 func buildValueStr(value interface{}) string {
@@ -105,15 +105,19 @@ func (op *CassandraOp) RunScript(dataRowList []common.DataRowList, script string
 		return nil
 	}
 	var fn func(string2 []common.DataRowList) [][]CassandraParam
-	err = vm.ExportTo(vm.Get("main"), &fn)
-	if err != nil {
-		zap.S().Errorf("Js函数映射到 Go 函数失败！")
-		return nil
+	get := vm.Get("main")
+	if get != nil {
+
+		err = vm.ExportTo(get, &fn)
+		if err != nil {
+			zap.S().Errorf("Js函数映射到 Go 函数失败！")
+			return nil
+		}
+		a := fn(dataRowList)
+
+		return a
 	}
-	a := fn(dataRowList)
-
-	return a
-
+	return nil
 }
 
 type CassandraParam struct {

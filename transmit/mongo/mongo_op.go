@@ -73,28 +73,37 @@ func (op *MongoOp) RunScript(param []common.DataRowList, script string) []map[st
 		return nil
 	}
 	var fn func(string2 []common.DataRowList) []map[string]interface{}
-	err = vm.ExportTo(vm.Get("main"), &fn)
-	if err != nil {
-		zap.S().Error("Js函数映射到 Go 函数失败！")
-		return nil
+	get := vm.Get("main")
+	if get != nil {
+
+		err = vm.ExportTo(get, &fn)
+		if err != nil {
+			zap.S().Error("Js函数映射到 Go 函数失败！")
+			return nil
+		}
+		a := fn(param)
+		return a
 	}
-	a := fn(param)
-	return a
+	return nil
 }
 
 func (op *MongoOp) HandleDataRowLists(
 
 	Database, Collection, Script string, dataRowList []common.DataRowList, client *mongo.Client) error {
 	res := op.RunScript(dataRowList, Script)
-	var toInsert []interface{}
+	if res != nil {
 
-	for _, v := range res {
-		toInsert = append(toInsert, v)
-	}
-	_, err := client.Database(Database).Collection(Collection).InsertMany(context.TODO(), toInsert)
+		var toInsert []interface{}
 
-	if err != nil {
-		zap.S().Errorf("插入数据失败！%+v", err)
+		for _, v := range res {
+			toInsert = append(toInsert, v)
+		}
+		_, err := client.Database(Database).Collection(Collection).InsertMany(context.TODO(), toInsert)
+
+		if err != nil {
+			zap.S().Errorf("插入数据失败！%+v", err)
+		}
 	}
 	return nil
+
 }

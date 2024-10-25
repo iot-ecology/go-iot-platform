@@ -10,6 +10,7 @@ enum ErrorShowType {
   NOTIFICATION = 3,
   REDIRECT = 9,
 }
+
 // 与后端约定的响应数据格式
 interface ResponseStructure {
   success: boolean;
@@ -19,12 +20,14 @@ interface ResponseStructure {
   showType?: ErrorShowType;
 }
 
+
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
+  // baseURL: "http://localhost:8080",
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
@@ -89,8 +92,16 @@ export const errorConfig: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = 123');
-      return { ...config, url };
+      let token = localStorage.getItem('go-iot-token');
+      console.log(process.env)
+      const isDev = process.env.NODE_ENV === 'development';
+      console.log(isDev)
+      console.log("12kl3j1l23j1l23j1lk3j1lkj312kl3j1kl3j1jkl");
+      console.log(process.env.domain)
+      config.baseURL = process.env.domain;
+      config.url = config.url.replace("/api","")
+      config.headers.Authorization = token;
+      return { ...config };
     },
   ],
 

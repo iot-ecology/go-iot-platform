@@ -1,6 +1,6 @@
 node_info:
   host: 127.0.0.1
-  port: 13332
+  port: 13333
   size: 10
   name: ws1
   type: websocket-server

@@ -20,7 +20,6 @@ func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string,
 		db = db.Where("name like ?", "%"+name+"%")
 	}
 
-
 	if ruleId != "" {
 		db = db.Where("calc_rule_id = ?", ruleId)
 
@@ -35,15 +34,18 @@ func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string,
 	db.Offset(offset).Limit(size).Find(&dt)
 
 	for i, calcParam := range dt {
+		if calcParam.Protocol == "MQTT" {
 
-		id, err := bizMqtt.FindById(strconv.Itoa(calcParam.DeviceUid))
-		if err != nil {
-			return nil, err
+			id, err := bizMqtt.FindById(strconv.Itoa(calcParam.DeviceUid))
+			if err != nil {
+				return nil, err
+			}
+			if id == nil {
+				return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(calcParam.DeviceUid))
+			}
+			dt[i].MqttClientName = id.ClientId
 		}
-		if id == nil {
-			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(calcParam.DeviceUid))
-		}
-		dt[i].MqttClientName = id.ClientId
+
 	}
 	pagination.Data = dt
 	pagination.Page = page

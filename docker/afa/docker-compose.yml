@@ -5,7 +5,7 @@ services:
     image: eclipse-mosquitto
     container_name: mqtt5
     ports:
-      - "11883:1883" #default mqtt port
+      - "1883:1883" #default mqtt port
       - "19001:9001" #default mqtt port for websockets
     volumes:
       - ./config:/mosquitto/config:rw

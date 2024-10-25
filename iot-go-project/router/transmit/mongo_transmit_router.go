@@ -74,6 +74,11 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 	newV = old
 
 	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Username = req.Username
+	newV.Password = req.Password
+	newV.Port = req.Port
+
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -168,6 +173,19 @@ func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 
 		return
 	}
+
+	servlet.Resp(c, MongoTransmit)
+}
+// ListMongoTransmit
+// @Tags      MongoTransmits
+// @Summary   单个详情
+// @Produce   application/json
+// @Router    /MongoTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmit[]}
+func (api *MongoTransmitApi) ListMongoTransmit(c *gin.Context) {
+	var MongoTransmit []models.MongoTransmit
+
+glob.GDb.Find(&MongoTransmit, )
 
 	servlet.Resp(c, MongoTransmit)
 }

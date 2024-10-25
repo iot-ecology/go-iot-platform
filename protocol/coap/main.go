@@ -4,10 +4,14 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v3"
+	"net/http"
 	"os"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -38,8 +42,44 @@ func main() {
 	globalRedisClient.Del(context.Background(), "coap_uid:"+globalConfig.NodeInfo.Name)
 	go BeatTask(globalConfig.NodeInfo)
 	go ListenerCoap()
+	go startHttp()
 
 	Create(globalConfig.NodeInfo.Port)
+}
+
+
+
+func startHttp() {
+	http.HandleFunc("/beat", HttpBeat)
+	http.Handle("/metrics", promhttp.Handler())
+
+	httpPort := globalConfig.NodeInfo.Port + 10000
+	zap.S().Infof("HTTP Server started Port %d", httpPort)
+
+	if err := http.ListenAndServe(":"+strconv.Itoa(httpPort), nil); err != nil {
+		zap.S().Fatalf("Failed to start server: %s", err)
+	}
+}
+
+func HttpBeat(w http.ResponseWriter, r *http.Request) {
+	// 检查请求方法
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	// 允许的请求方法
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	// 允许的请求头部
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+
+	// 非简单请求时，浏览器会先发送一个预检请求(OPTIONS)，这里处理预检请求
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusNoContent) // 200 OK 也可以
+		return
+	}
+	// 向客户端发送响应消息
+	_, _ = fmt.Fprintf(w, "ok")
 }
 
 var myTimeEncoder = zapcore.TimeEncoder(func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {

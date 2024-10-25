@@ -95,7 +95,7 @@ func (op *MysqlOp) Save(dt []MysqlParam, table string) string {
 	var fields []string
 	var valueStrs []string
 	for _, param := range dt {
-		fields = append(fields, "\""+param.FieldName+"\"")        // 使用反引号包围字段名
+		fields = append(fields, "`"+param.FieldName+"`")          // 使用反引号包围字段名
 		valueStrs = append(valueStrs, buildValueStr(param.Value)) // 使用自定义函数处理值的格式化
 	}
 
@@ -126,14 +126,18 @@ func (op *MysqlOp) RunScript(dataRowList []common.DataRowList, script string) []
 		return nil
 	}
 	var fn func(string2 []common.DataRowList) [][]MysqlParam
-	err = vm.ExportTo(vm.Get("main"), &fn)
-	if err != nil {
-		zap.S().Errorf("Js函数映射到 Go 函数失败！")
-		return nil
-	}
-	a := fn(dataRowList)
-	return a
+	get := vm.Get("main")
+	if get != nil {
 
+		err = vm.ExportTo(get, &fn)
+		if err != nil {
+			zap.S().Errorf("Js函数映射到 Go 函数失败！")
+			return nil
+		}
+		a := fn(dataRowList)
+		return a
+	}
+	return nil
 }
 
 type MysqlParam struct {

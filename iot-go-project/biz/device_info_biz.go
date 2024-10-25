@@ -91,7 +91,12 @@ func (biz *DeviceInfoBiz) FindByIdWithRedis(id uint) *models.DeviceInfo {
 
 func (biz *DeviceInfoBiz) SetRedis(newV models.DeviceInfo) {
 	jsonData, _ := json.Marshal(newV)
-	glob.GRedis.HSet(context.Background(), "struct:device_info", strconv.Itoa(int(newV.ID)), jsonData)
+	background := context.Background()
+	glob.GRedis.HSet(background, "struct:device_info", strconv.Itoa(int(newV.ID)), jsonData)
+
+	glob.GRedis.Set(background,"share:device_info:" + newV.Protocol +":"+strconv.Itoa(int(newV.
+		DeviceUid)) +":"+newV.IdentificationCode,
+		jsonData,0)
 }
 func (biz *DeviceInfoBiz) RemoveRedis(id uint) {
 	glob.GRedis.HDel(context.Background(), "struct:device_info", strconv.Itoa(int(id)))

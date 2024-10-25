@@ -30,7 +30,7 @@
     <users>
         <!-- If user name was not specified, 'default' user is used. -->
         <default>
-            <password></password>
+            <password>default</password>
 
             <networks>
                 <ip>::/0</ip>

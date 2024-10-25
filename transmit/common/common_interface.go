@@ -6,6 +6,7 @@ type DataRowList struct {
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 	DataRows  []DataRow `json:"data"`
 	Nc        string    `json:"nc"`
+	Protocol string `json:"protocol"`
 }
 type DataRow struct {
 	Name  string `json:"name"`

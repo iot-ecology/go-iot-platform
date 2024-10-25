@@ -75,6 +75,7 @@ func HandlerDataStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
+			(*data)[i].Protocol = "MQTT"
 			StorageDataRowList(row, "MQTT")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
@@ -185,6 +186,9 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	timeFromUnix := time.Unix(dt.Time, 0).In(loc)
 
+	if CheckPushTime(dt.Protocol, dt.IdentificationCode, dt.DeviceUid, timeFromUnix.Unix()) {
+		zap.S().Errorf("推送时间间隔异常")
+	}
 	i, err := strconv.Atoi(dt.DeviceUid)
 	if err != nil {
 		zap.S().Debugf("转换错误: %+v", err)
@@ -260,6 +264,7 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 
 	}
 
+	SetPushTime(dt.Protocol,dt.IdentificationCode,dt.DeviceUid,dt.Time)
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
 
@@ -303,6 +308,8 @@ func runScript(param string, script string) *[]DataRowList {
 
 	// 调用映射的函数
 	result = fn(param)
+
+
 	return result
 }
 

@@ -73,6 +73,10 @@ func (api *CassandraTransmitApi) UpdateCassandraTransmit(c *gin.Context) {
 	var newV models.CassandraTransmit
 	newV = old
 	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Username = req.Username
+	newV.Password = req.Password
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -127,7 +131,7 @@ func (api *CassandraTransmitApi) PageCassandraTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /CassandraTransmit/delete/:id [post]
-// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=string} 
+// @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=string}
 
 func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 	var CassandraTransmit models.CassandraTransmit
@@ -155,7 +159,7 @@ func (api *CassandraTransmitApi) DeleteCassandraTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /CassandraTransmit/:id [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit} 
+// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit}
 func (api *CassandraTransmitApi) ByIdCassandraTransmit(c *gin.Context) {
 	var CassandraTransmit models.CassandraTransmit
 
@@ -167,6 +171,20 @@ func (api *CassandraTransmitApi) ByIdCassandraTransmit(c *gin.Context) {
 
 		return
 	}
+
+	servlet.Resp(c, CassandraTransmit)
+}
+
+// ListCassandraTransmit
+// @Tags      CassandraTransmits
+// @Summary   列表
+// @Produce   application/json
+// @Router    /CassandraTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.CassandraTransmit[]}
+func (api *CassandraTransmitApi) ListCassandraTransmit(c *gin.Context) {
+	var CassandraTransmit []models.CassandraTransmit
+
+	glob.GDb.Find(&CassandraTransmit)
 
 	servlet.Resp(c, CassandraTransmit)
 }

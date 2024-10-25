@@ -3,12 +3,14 @@
 import { request } from '@umijs/max';
 
 /** 获取当前的用户 GET /api/currentUser */
-export async function currentUser(options?: { [key: string]: any }) {
+export async function currentUser(token: any) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
-    method: 'GET',
-    ...(options || {}),
+  }>('/api/userinfo', {
+    method: 'post',
+    headers: {
+      Authorization: token,
+    },
   });
 }
 
@@ -23,6 +25,18 @@ export async function outLogin(options?: { [key: string]: any }) {
 /** 登录接口 POST /api/login/account */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
   return request<API.LoginResult>('/api/login/account', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function rellogin(body: API.LoginParams, options?: { [key: string]: any }) {
+  body.user_name = body.username;
+  return request<API.CommonResp<API.LoginResult>>('/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -174,6 +188,36 @@ export async function mqttList() {
   });
 }
 
+export async function CassandraTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/CassandraTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function ClickhouseTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/ClickhouseTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function InfluxdbTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/InfluxdbTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function MongoTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/MongoTransmit/list', {
+    method: 'GET',
+  });
+}
+
+export async function MySQLTransmitList() {
+  return request<API.CommonResp<API.MqttListItem[]>>('/api/MySQLTransmit/list', {
+    method: 'GET',
+  });
+}
+
 export async function deviceList() {
   return request<API.CommonResp<API.DeviceInfoListItem[]>>('/api/DeviceInfo/list', {
     method: 'GET',
@@ -271,7 +315,7 @@ export async function productList() {
   });
 }
 
-export async function FindByShipmentProductDetail(id) {
+export async function FindByShipmentProductDetail(id: string) {
   return request<API.CommonResp<API.ProductItem[]>>(
     '/api/ShipmentRecord/FindByShipmentProductDetail/' + id,
     {
@@ -333,7 +377,7 @@ export async function simCardPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/SimCard/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/SimCard/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -351,6 +395,286 @@ export async function simCardPage(
   };
 }
 
+export async function CassandraTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/CassandraTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function CassandraTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/CassandraTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function ClickhouseTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/ClickhouseTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function InfluxdbTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/InfluxdbTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MongoTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MongoTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MySQLTransmitBindPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MySQLTransmitBind/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function ClickhouseTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/ClickhouseTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MongoTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MongoTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function InfluxdbTransmitUpdateFormPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/InfluxdbTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
+export async function MySQLTransmitPage(
+  params: {
+    /** 当前的页码 */
+    current?: number /** 页面的容量 */;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  const request1 = await request<API.CommonPage<API.CassandraTransmitListItem>>(
+    '/api/MySQLTransmit/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+  return {
+    data: request1.data?.data,
+    success: request1.code === 20000,
+    total: request1.data?.total,
+  };
+}
+
 export async function httpHandlerPage(
   params: {
     /** 当前的页码 */
@@ -359,7 +683,7 @@ export async function httpHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/HttpHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/HttpHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -383,15 +707,18 @@ export async function WebsocketHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/WebsocketHandler/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>(
+    '/api/WebsocketHandler/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -407,7 +734,7 @@ export async function TcpHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/TcpHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/TcpHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -431,7 +758,7 @@ export async function CoapHandlerPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.HttpHandlerListItem>('/api/CoapHandler/page', {
+  const request1 = await request<API.CommonPage<API.HttpHandlerListItem>>('/api/CoapHandler/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -456,7 +783,7 @@ export async function scriptWaringPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal-delay-waring/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/signal-delay-waring/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -480,7 +807,7 @@ export async function calcParamPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.CalcParamListItem>('/api/calc-param/page', {
+  const request1 = await request<API.CommonPage<API.CalcParamListItem>>('/api/calc-param/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -503,7 +830,7 @@ export async function calcRulePage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/calc-rule/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/calc-rule/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -527,15 +854,18 @@ export async function scritpParamPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal-delay-waring-param/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.SimListItem>>(
+    '/api/signal-delay-waring-param/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -551,15 +881,18 @@ export async function signalWaringPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SignalWaringItem>('/api/signal-waring-config/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      ...params,
+  const request1 = await request<API.CommonPage<API.SignalWaringItem>>(
+    '/api/signal-waring-config/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -577,7 +910,7 @@ export async function feishuPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.FeiShuListItem>('/api/FeiShuId/page', {
+  const request1 = await request<API.CommonPage<API.FeiShuListItem>>('/api/FeiShuId/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -604,7 +937,7 @@ export async function dingDingPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.DingDingListItem>('/api/DingDing/page', {
+  const request1 = await request<API.CommonPage<API.DingDingListItem>>('/api/DingDing/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -628,7 +961,7 @@ export async function signalPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/signal/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/signal/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -652,7 +985,7 @@ export async function mqttPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.SimListItem>('/api/mqtt/page', {
+  const request1 = await request<API.CommonPage<API.SimListItem>>('/api/mqtt/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -731,16 +1064,19 @@ export async function shipmentPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.ShipmentRecordListItem>('/api/ShipmentRecord/page', {
-    method: 'GET',
-    params: {
-      page: params.current,
-      page_size: params.pageSize,
-      customer_name: params.customer_name,
-      status: params.status,
+  const request1 = await request<API.CommonPage<API.ShipmentRecordListItem>>(
+    '/api/ShipmentRecord/page',
+    {
+      method: 'GET',
+      params: {
+        page: params.current,
+        page_size: params.pageSize,
+        customer_name: params.customer_name,
+        status: params.status,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
   return {
     data: request1.data?.data,
     success: request1.code === 20000,
@@ -756,7 +1092,7 @@ export async function productPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.ProductItem>('/api/product/page', {
+  const request1 = await request<API.CommonPage<API.ProductItem>>('/api/product/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -780,7 +1116,7 @@ export async function deviceGroupPage(
   },
   options?: { [key: string]: any },
 ) {
-  const request1 = await request<API.DeviceGroupItem>('/api/device_group/page', {
+  const request1 = await request<API.CommonPage<API.DeviceGroupItem>>('/api/device_group/page', {
     method: 'GET',
     params: {
       page: params.current,
@@ -830,6 +1166,96 @@ export async function addUser(options?: { [key: string]: any }) {
 
 export async function addSim(options?: { [key: string]: any }) {
   return request<API.CommonResp<string>>('/api/SimCard/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addCassandraTransmitPage(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addCassandraTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addClickhouseTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addInfluxdbTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMongoTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMySQLTransmitBind(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addClickhouseTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMongoTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addInfluxdbTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/create', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function addMySQLTransmit(options?: { [key: string]: any }) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/create', {
     method: 'POST',
     data: {
       ...(options || {}),
@@ -1024,6 +1450,66 @@ export async function deleteSimCard(id: any) {
   });
 }
 
+export async function deleteCassandraTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteCassandraTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteClickhouseTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteInfluxdbTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMongoTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMySQLTransmitBind(id: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteClickhouseTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMongoTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteInfluxdbTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteMySQLTransmit(id: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/delete/' + id, {
+    method: 'POST',
+  });
+}
+
 export async function delteHttpHandler(id: any) {
   return request<API.CommonResp<string>>('/api/HttpHandler/delete/' + id, {
     method: 'POST',
@@ -1135,6 +1621,76 @@ export async function updateUser(dt: any) {
 
 export async function updateSimCard(dt: any) {
   return request<API.CommonResp<string>>('/api/SimCard/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCassandraTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateCassandraTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/CassandraTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateClickhouseTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateInfluxdbTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMongoTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMySQLTransmitBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmitBind/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateClickhouseTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/ClickhouseTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMongoTransmitPage(dt: any) {
+  return request<API.CommonResp<string>>('/api/MongoTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateInfluxdbTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/InfluxdbTransmit/update', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function updateMySQLTransmit(dt: any) {
+  return request<API.CommonResp<string>>('/api/MySQLTransmit/update', {
     method: 'POST',
     data: dt,
   });
@@ -1256,6 +1812,35 @@ export async function updateDeviceGroup(dt: any) {
   return request<API.CommonResp<string>>('/api/device_group/update', {
     method: 'POST',
     data: dt,
+  });
+}
+export async function updateDeviceGroupBind(dt: any) {
+  return request<API.CommonResp<string>>('/api/device_group/bind_device', {
+    method: 'POST',
+    data: dt,
+  });
+}
+
+export async function queryDeviceGroupBind(dt:any){
+  return request<API.CommonResp<string>>('/api/device_group/query_bind_device?group_id='+dt, {
+    method: 'get',
+  });
+}export async function adminMetrics(){
+  return request<string>('/api/metrics', {
+    method: 'get',
+  });
+}export async function podInfo(){
+  return request<API.CommonResp<string>>('/api/pod_info', {
+    method: 'get',
+  });
+}export async function deviceStats(){
+  return request<API.CommonResp<string>>('/api/device-stats', {
+    method: 'get',
+  });
+}export async function podMetrics(data:any){
+  return request<API.CommonResp<string>>('/api/pod_metrics', {
+    method: 'post',
+data:data,
   });
 }
 

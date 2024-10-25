@@ -79,7 +79,13 @@ func (api *MySQLTransmitApi) UpdateMySQLTransmit(c *gin.Context) {
 
 	var newV models.MySQLTransmit
 	newV = old
-	newV.Name  = req.Name
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Username = req.Username
+	newV.Password = req.Password
+	newV.Database = req.Database
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -172,6 +178,23 @@ func (api *MySQLTransmitApi) ByIdMySQLTransmit(c *gin.Context) {
 
 		return
 	}
+
+	servlet.Resp(c, MySQLTransmit)
+}
+
+
+// ListMySQLTransmit
+// @Tags      MySQLTransmits
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /MySQLTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MySQLTransmit[]}
+func (api *MySQLTransmitApi) ListMySQLTransmit(c *gin.Context) {
+	var MySQLTransmit []models.MySQLTransmit
+
+	glob.GDb.Find(&MySQLTransmit)
+
 
 	servlet.Resp(c, MySQLTransmit)
 }

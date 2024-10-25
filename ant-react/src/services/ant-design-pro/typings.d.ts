@@ -63,6 +63,101 @@ declare namespace API {
     operator?: string;
     expiration?: string;
   };
+  type CassandraTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type CassandraTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    cassandra_transmit_id?: string;
+    database?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
+  type ClickhouseTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    clickhouse_transmit_id?: string;
+    database?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
+  type InfluxdbTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    influxdb_transmit_id?: string;
+    bucket?: string;
+    org?: string;
+    tameasurementborgle?: string;
+    script?: string;
+    enable?: string;
+  };
+  type MongoTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    mongo_transmit_id_transmit_id?: string;
+    database?: string;
+    collection?: string;
+    script?: string;
+    enable?: string;
+  };
+  type MySQLTransmitBindListItem = {
+    ID?: number;
+    protocol?: string;
+    device_uid?: string;
+    identification_code?: string;
+    mysql_transmit_id?: string;
+    table?: string;
+    script?: string;
+    enable?: string;
+  };
+  type ClickhouseTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type MongoTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+  };
+  type InfluxdbTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    token?: string;
+  };
+  type MySQLTransmitListItem = {
+    ID?: number;
+    name?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+    database?: string;
+  };
   type HttpHandlerListItem = {
     ID?: number;
     device_info_id?: string;
@@ -208,7 +303,12 @@ declare namespace API {
   };
   type DeviceGroupItem = {
     ID?: number;
+    device_id?: number[];
     name?: string;
+  };
+  type DeviceGroupBindParam = {
+    group_id?: number;
+    device_id?: number[];
   };
   type ProductItem = {
     ID?: number;
@@ -297,6 +397,7 @@ declare namespace API {
 
   type LoginParams = {
     username?: string;
+    user_name?: string;
     password?: string;
     autoLogin?: boolean;
     type?: string;

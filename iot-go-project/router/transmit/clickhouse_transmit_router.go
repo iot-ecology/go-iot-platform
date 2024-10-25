@@ -72,7 +72,12 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 
 	var newV models.ClickhouseTransmit
 	newV = old
-	newV.Name=req.Name
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Username = req.Username
+	newV.Password = req.Password
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -165,6 +170,21 @@ func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 
 		return
 	}
+
+	servlet.Resp(c, ClickhouseTransmit)
+}
+
+// ListClickhouseTransmit
+// @Tags      ClickhouseTransmits
+// @Summary   单个详情
+// @Produce   application/json
+// @Router    /ClickhouseTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmit[]}
+func (api *ClickhouseTransmitApi) ListClickhouseTransmit(c *gin.Context) {
+	var ClickhouseTransmit []models.ClickhouseTransmit
+
+ glob.GDb.Find(&ClickhouseTransmit)
+
 
 	servlet.Resp(c, ClickhouseTransmit)
 }

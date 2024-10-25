@@ -19,7 +19,8 @@ type MySQLTransmit struct {
 
 type MySQLTransmitBind struct {
 	gorm.Model         `structs:"-"`
-	DeviceUid          string `json:"device_uid"`                                                                                  // 设备UID
+	Protocol           string `json:"protocol"`                                                                                    // 协议
+	DeviceUid          int `json:"device_uid"`                                                                                  // 设备UID
 	IdentificationCode string `json:"identification_code"`                                                                         // 设备标识码
 	MySQLTransmitId    uint   `struct:"mysql_transmit_id" json:"mysql_transmit_id" gorm:"column:mysql_transmit_id;type:int(10);" ` // MySQL传输表的外键ID
 	Table              string `struct:"table" json:"table" gorm:"column:table;type:varchar(255);"`                                 // 表
@@ -39,7 +40,8 @@ type MongoTransmit struct {
 
 type MongoTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -61,7 +63,8 @@ type InfluxdbTransmit struct {
 
 type InfluxdbTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -85,7 +88,8 @@ type ClickhouseTransmit struct {
 
 type ClickhouseTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -108,7 +112,8 @@ type CassandraTransmit struct {
 
 type CassandraTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -131,7 +136,8 @@ type RabbitmqTransmit struct {
 
 type RabbitmqTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 
@@ -151,7 +157,8 @@ type KafkaTransmit struct {
 }
 type KafkaTransmitBind struct {
 	gorm.Model `structs:"-"`
-	DeviceUid  string `json:"device_uid"` // 设备UID
+	DeviceUid  int    `json:"device_uid"` // 设备UID
+	Protocol   string `json:"protocol"`   // 协议
 
 	IdentificationCode string `json:"identification_code"` // 设备标识码
 

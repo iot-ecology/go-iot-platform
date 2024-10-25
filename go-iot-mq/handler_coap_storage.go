@@ -63,10 +63,10 @@ func HandlerDataCoapStorageString(d amqp.Delivery) {
 		}
 		for i := 0; i < len(*data); i++ {
 			row := (*data)[i]
+			(*data)[i].Protocol = "COAP"
 			StorageDataRowList(row, "COAP")
 		}
 		zap.S().Debugf("DataRowList: %+v", data)
-
 		jsonData, err := json.Marshal(data)
 		if err != nil {
 			zap.S().Errorf("推送报警原始数据异常 %s", err)

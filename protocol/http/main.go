@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"os"
 	"strings"
@@ -45,6 +46,7 @@ func main() {
 	go BeatTask(globalConfig.NodeInfo)
 	r := gin.Default()
 	initLog()
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/handler", HandlerMessage)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

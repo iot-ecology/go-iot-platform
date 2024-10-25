@@ -78,6 +78,14 @@ func (api *MongoTransmitBindApi) UpdateMongoTransmitBind(c *gin.Context) {
 
 	var newV models.MongoTransmitBind
 	newV = old
+	newV.DeviceUid = req.DeviceUid
+	newV.Protocol = req.Protocol
+	newV.IdentificationCode = req.IdentificationCode
+	newV.MongoTransmitId = req.MongoTransmitId
+	newV.Collection = req.Collection
+	newV.Database = req.Database
+	newV.Script = req.Script
+	newV.Enable = req.Enable
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {

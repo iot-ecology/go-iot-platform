@@ -80,6 +80,8 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
             value: createProp,
             onClick: (v) => {
               setCreateDeviceUid('');
+
+
             },
           }}
         />

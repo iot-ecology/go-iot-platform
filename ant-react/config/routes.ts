@@ -27,12 +27,17 @@ export default [
     name: 'welcome',
     icon: 'smile',
     component: './Welcome',
+  },  {
+    path: '/dashboard',
+    name: 'dashboard',
+    icon: 'dashboard',
+    component: './dashboard',
   },
   {
     path: '/device',
     name: 'device',
     icon: 'crown',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/device',
@@ -54,7 +59,7 @@ export default [
     path: '/user',
     name: 'user',
     icon: 'TeamOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/user',
@@ -87,7 +92,7 @@ export default [
     path: '/lifecycle',
     name: 'lifecycle',
     icon: 'UnorderedListOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/lifecycle',
@@ -98,21 +103,21 @@ export default [
         name: 'product-list',
         component: './Lifecycle/ProductList/ProductList',
       },
-      {
-        path: '/lifecycle/ShipmentRecord-list',
-        name: 'ShipmentRecord',
-        component: './Lifecycle/ShipmentRecord/ShipmentRecord',
-      },
-      {
-        path: '/lifecycle/produce-list',
-        name: 'produce-list',
-        component: './Lifecycle/ProduceList/ProduceList',
-      },
-      {
-        path: '/lifecycle/operation-list',
-        name: 'operation-list',
-        component: './Lifecycle/OperationList/OperationList',
-      },
+      // {
+      //   path: '/lifecycle/ShipmentRecord-list',
+      //   name: 'ShipmentRecord',
+      //   component: './Lifecycle/ShipmentRecord/ShipmentRecord',
+      // },
+      // {
+      //   path: '/lifecycle/produce-list',
+      //   name: 'produce-list',
+      //   component: './Lifecycle/ProduceList/ProduceList',
+      // },
+      // {
+      //   path: '/lifecycle/operation-list',
+      //   name: 'operation-list',
+      //   component: './Lifecycle/OperationList/OperationList',
+      // },
       {
         path: '/lifecycle/sim-list',
         name: 'sim-list',
@@ -124,7 +129,7 @@ export default [
     path: '/protocol',
     name: 'protocol',
     icon: 'ReadOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/protocol/mqtt',
@@ -134,11 +139,6 @@ export default [
             path: '/protocol/mqtt/clients',
             name: 'clients',
             component: './Protocol/mqtt/clients',
-          },
-          {
-            path: '/protocol/mqtt/nodes',
-            name: 'nodes',
-            component: './Protocol/mqtt/nodes',
           },
         ],
       },
@@ -193,7 +193,7 @@ export default [
     path: '/data',
     name: 'data',
     icon: 'TableOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/data/signal',
@@ -205,11 +205,11 @@ export default [
         name: 'signal-waring',
         component: './Data/SignalWaring',
       },
-      {
-        path: '/data/signal-vis',
-        name: 'signal-vis',
-        component: './Data/SignalVis',
-      },
+      // {
+      //   path: '/data/signal-vis',
+      //   name: 'signal-vis',
+      //   component: './Data/SignalVis',
+      // },
       {
         path: '/data/calc',
         name: 'calc',
@@ -237,7 +237,7 @@ export default [
     path: '/notice',
     name: 'notice',
     icon: 'NotificationOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/notice/feishu',
@@ -255,7 +255,7 @@ export default [
     path: '/forward',
     name: 'forward',
     icon: 'DeliveredProcedureOutlined',
-    access: 'canAdmin',
+
     routes: [
       {
         path: '/forward/cassandra',
@@ -263,9 +263,19 @@ export default [
         component: './forward/cassandra',
       },
       {
+        path: '/forward/cassandra_bind',
+        name: 'cassandra_bind',
+        component: './forward/cassandra_bind',
+      },
+      {
         path: '/forward/clickhouse',
         name: 'clickhouse',
         component: './forward/clickhouse',
+      },
+      {
+        path: '/forward/clickhouse_bind',
+        name: 'clickhouse_bind',
+        component: './forward/clickhouse_bind',
       },
       {
         path: '/forward/influxdb2',
@@ -273,22 +283,48 @@ export default [
         component: './forward/influxdb2',
       },
       {
+        path: '/forward/influxdb2_bind',
+        name: 'influxdb2_bind',
+        component: './forward/influxdb2_bind',
+      },
+      {
         path: '/forward/mongo',
         name: 'mongo',
         component: './forward/mongo',
+      },
+      {
+        path: '/forward/mongo_bind',
+        name: 'mongo_bind',
+        component: './forward/mongo_bind',
       },
       {
         path: '/forward/mysql',
         name: 'mysql',
         component: './forward/mysql',
       },
+      {
+        path: '/forward/mysql_bind',
+        name: 'mysql_bind',
+        component: './forward/mysql_bind',
+      },
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    path: '/mirror',
+    name: '监控',
+    icon: 'DeliveredProcedureOutlined',
+    routes: [
+      {
+        path: '/mirror/admin',
+        name: '管理端监控',
+        component: './mirror/admin',
+      },
+      {
+        path: '/mirror/protocol',
+        name: '协议监控',
+        component: './mirror/protocol',
+      }
+    ]
   },
   {
     path: '/',

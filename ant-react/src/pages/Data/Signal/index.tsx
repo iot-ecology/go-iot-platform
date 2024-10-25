@@ -180,6 +180,7 @@ const Admin: React.FC = () => {
         COAP: { text: 'COAP', status: 'success' },
       },
     },
+
     {
       key: 'identification_code',
       title: <FormattedMessage id="pages.signal.identification_code" />,
@@ -391,7 +392,6 @@ const Admin: React.FC = () => {
           dependencies={['protocol']}
           onChange={async (value) => {
             form.setFieldValue('device_uid', value);
-            debugger;
           }}
           request={async (params) => {
             console.log(params);
@@ -415,7 +415,6 @@ const Admin: React.FC = () => {
           fieldProps={{
             onClick: (v) => {
               console.log(v);
-              debugger;
             },
             showSearch: true,
             allowClear: false,

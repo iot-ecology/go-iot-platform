@@ -2,12 +2,33 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "React后台",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "start"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "cwd": "${workspaceFolder}/ant-react",
+            "type": "node"
+        },
+
+ 
+      
+    
+        {
             "name": "MQTT集群-1",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot",
-            "args": ["-config", "app-local.yml"]
+            "args": [
+                "-config",
+                "app-local.yml"
+            ]
         },
         {
             "name": "MQTT集群-2",
@@ -15,7 +36,10 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot",
-            "args": ["-config", "app-local2.yml"]
+            "args": [
+                "-config",
+                "app-local2.yml"
+            ]
         },
         {
             "name": "服务端",
@@ -23,7 +47,10 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/iot-go-project",
-            "args": ["-config", "app-local.yml"]
+            "args": [
+                "-config",
+                "app-local.yml"
+            ]
         },
         {
             "name": "消息队列-数据持久",
@@ -31,7 +58,10 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot-mq",
-            "args": ["-config", "app-local-pre_handler.yml"]
+            "args": [
+                "-config",
+                "app-local-pre_handler.yml"
+            ]
         },
         {
             "name": "消息队列-基础报警",
@@ -39,21 +69,32 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot-mq",
-            "args": ["-config", "app-local-waring_handler.yml"]
-        }, {
+            "args": [
+                "-config",
+                "app-local-waring_handler.yml"
+            ]
+        },
+        {
             "name": "消息队列-延迟报警",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot-mq",
-            "args": ["-config", "app-local-wd.yml"]
-        },{
+            "args": [
+                "-config",
+                "app-local-wd.yml"
+            ]
+        },
+        {
             "name": "消息队列-数据计算",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/go-iot-mq",
-            "args": ["-config", "app-local-calc.yml"]
+            "args": [
+                "-config",
+                "app-local-calc.yml"
+            ]
         },
     ]
 }

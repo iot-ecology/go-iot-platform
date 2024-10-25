@@ -40,7 +40,8 @@ func (biz *InfluxdbTransmitBindBiz) Bind(req models.InfluxdbTransmitBind) {
 	if req.Enable {
 		jsonData := biz.toByte(req)
 		// 缓存构造
-		glob.GRedis.LPush(context.Background(), "transmit:influxdb:"+req.DeviceUid +":" +req.IdentificationCode, jsonData)
+		glob.GRedis.LPush(context.Background(), "transmit:influxdb:"+ req.Protocol +":"+strconv.Itoa(req.DeviceUid) +":" +req.
+			IdentificationCode, jsonData)
 	}
 }
 
@@ -76,7 +77,7 @@ func (biz *InfluxdbTransmitBindBiz) HandlerRedis(req models.InfluxdbTransmitBind
 	if req.Enable {
 		biz.Bind(req)
 	} else {
-		glob.GRedis.LRem(context.Background(), "transmit:influxdb:"+req.DeviceUid +":" +req.IdentificationCode, 1, biz.toByte(req))
+		glob.GRedis.LRem(context.Background(), "transmit:influxdb:"+req.Protocol +":"+strconv.Itoa(req.DeviceUid) +":" +req.IdentificationCode, 1, biz.toByte(req))
 
 	}
 }
