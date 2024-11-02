@@ -16,7 +16,7 @@
           <template v-if="column.dataIndex === 'image_url'">
             <div>
               <a-image :width="100"
-                  :src="`http://192.168.3.100:8080/file/download?path=${text}`"
+                  :src="`${VITE_APP_API_URL}/file/download?path=${text}`"
               />
             </div>
           </template>
@@ -90,7 +90,6 @@ import {ProductCreate, ProductDelete, ProductPage, ProductUpdate} from "@/api";
 import {useI18n} from "vue-i18n";
 import {Rule} from "ant-design-vue/es/form";
 import {message} from "ant-design-vue";
-import { cloneDeep } from "lodash-es";
 import Upload from '@/components/upload/index.vue'
 import Tag from '@/components/Tag/index.vue'
 
@@ -171,6 +170,7 @@ const columns = ref([
   }
 ]);
 const title = ref(t('message.addition'))
+const VITE_APP_API_URL = import.meta.env.VITE_APP_API_URL
 
 let rules: Record<string, Rule[]> = {
   name: [{ required: true, message: t('message.pleaseName'), trigger: "blur" }],

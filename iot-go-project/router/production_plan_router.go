@@ -22,7 +22,7 @@ var ProductionPlanBiz = biz.ProductionPlanBiz{}
 // @Accept json
 // @Produce json
 // @Param ProductionPlan body servlet.ProductionPlanCreateParam true "生产计划"
-// @Success 201 {object} servlet.JSONResult{data=models.ProductionPlan} "创建成功的生产计划"
+// @Success 200 {object} servlet.JSONResult{data=models.ProductionPlan} "创建成功的生产计划"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ProductionPlan/create [post]
@@ -50,11 +50,12 @@ func (api *ProductionPlanApi) CreateProductionPlan(c *gin.Context) {
 	productionPlan.Description = param.Description
 	productionPlan.StartDate = param.StartDate
 	productionPlan.EndDate = param.EndDate
+	productionPlan.Status = param.Status
 
-	create := tx.Model(models.ProductionPlan{}).Create(productionPlan)
+	create := tx.Model(models.ProductionPlan{}).Create(&productionPlan)
 	if create.Error != nil {
-		tx.Rollback()
 		zap.S().Errorf("创建 ProductionPlan 异常 %+v", create.Error)
+		tx.Rollback()
 		servlet.Error(c, create.Error.Error())
 		return
 	}
@@ -138,8 +139,9 @@ func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
 	productionPlan.Description = param.Description
 	productionPlan.StartDate = param.StartDate
 	productionPlan.EndDate = param.EndDate
+	productionPlan.Status = param.Status
 
-	create := tx.Model(models.ProductionPlan{}).Updates(productionPlan)
+	create := tx.Model(models.ProductionPlan{}).Where("id = ?",old.ID).Updates(productionPlan)
 	if create.Error != nil {
 		tx.Rollback()
 		zap.S().Errorf("更新 ProductionPlan 异常 %+v", create.Error)
@@ -147,7 +149,7 @@ func (api *ProductionPlanApi) UpdateProductionPlan(c *gin.Context) {
 		return
 	}
 
-	db := tx.Model(&models.ProductPlan{}).Where("production_plan_id = ?", productionPlan.ID).Delete(models.ProductPlan{})
+	db := tx.Where("production_plan_id = ?", productionPlan.ID).Delete(&models.ProductPlan{})
 	if db.Error != nil {
 		tx.Rollback()
 		zap.S().Infoln("Error occurred during deletion:", db.Error)
@@ -223,6 +225,7 @@ func (api *ProductionPlanApi) PageProductionPlan(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ProductionPlan/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductionPlanApi) DeleteProductionPlan(c *gin.Context) {
 	var ProductionPlan models.ProductionPlan
 
@@ -268,6 +271,7 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 	res.StartDate = ProductionPlan.StartDate
 	res.EndDate = ProductionPlan.EndDate
 	res.Description = ProductionPlan.Description
+	res.Status = ProductionPlan.Status
 	var dt []models.ProductPlan
 
 	tx := glob.GDb.Model(models.ProductPlan{}).Where("production_plan_id = ?", ProductionPlan.ID).Find(&dt)
@@ -291,6 +295,7 @@ func (api *ProductionPlanApi) ByIdProductionPlan(c *gin.Context) {
 // @Param ProductionPlan body servlet.ProductionPlanChangeParam true "修改参数"
 // @Produce   application/json
 // @Router    /ProductionPlan/change_state [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductionPlanApi) ChangeProductionPlanState(c *gin.Context) {
 	var param servlet.ProductionPlanChangeParam
 	if err := c.ShouldBindJSON(&param); err != nil {

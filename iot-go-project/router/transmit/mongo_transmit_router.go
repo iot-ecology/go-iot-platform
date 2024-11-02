@@ -11,7 +11,7 @@ import (
 
 type MongoTransmitApi struct{}
 
-var MongoTransmit = transmit.MongoTransmitBiz{}
+var MongoTransmitBiz = transmit.MongoTransmitBiz{}
 
 // CreateMongoTransmit
 // @Summary 创建Mongo数据库管理
@@ -20,7 +20,7 @@ var MongoTransmit = transmit.MongoTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param MongoTransmit body models.MongoTransmit true "Mongo数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.MongoTransmit} "创建成功的Mongo数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.MongoTransmit} "创建成功的Mongo数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /MongoTransmit/create [post]
@@ -37,6 +37,7 @@ func (api *MongoTransmitApi) CreateMongoTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	MongoTransmitBiz.SetRedis(MongoTransmit)
 	// 返回创建成功的Mongo数据库管理
 	servlet.Resp(c, MongoTransmit)
 }
@@ -71,6 +72,13 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 
 	var newV models.MongoTransmit
 	newV = old
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Username = req.Username
+	newV.Password = req.Password
+	newV.Port = req.Port
+
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +86,8 @@ func (api *MongoTransmitApi) UpdateMongoTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	MongoTransmitBiz.SetRedis(newV)
+
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +119,7 @@ func (api *MongoTransmitApi) PageMongoTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := MongoTransmit.PageData(name, parseUint, u)
+	data, err := MongoTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -123,6 +133,7 @@ func (api *MongoTransmitApi) PageMongoTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /MongoTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 	var MongoTransmit models.MongoTransmit
 
@@ -140,6 +151,7 @@ func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 		return
 	}
 
+	MongoTransmitBiz.DeleteRedis(MongoTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -149,6 +161,7 @@ func (api *MongoTransmitApi) DeleteMongoTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /MongoTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmit} 
 func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 	var MongoTransmit models.MongoTransmit
 
@@ -163,20 +176,16 @@ func (api *MongoTransmitApi) ByIdMongoTransmit(c *gin.Context) {
 
 	servlet.Resp(c, MongoTransmit)
 }
-
-// MockScript
+// ListMongoTransmit
 // @Tags      MongoTransmits
-// @Summary   模拟脚本
-// @Param MongoTransmit body servlet.TransmitScriptParam true "执行参数"
+// @Summary   单个详情
 // @Produce   application/json
-// @Router    /MongoTransmit/mockScript [post]
-func (api *MongoTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
+// @Router    /MongoTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.MongoTransmit[]}
+func (api *MongoTransmitApi) ListMongoTransmit(c *gin.Context) {
+	var MongoTransmit []models.MongoTransmit
 
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := MongoTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
+glob.GDb.Find(&MongoTransmit, )
+
+	servlet.Resp(c, MongoTransmit)
 }

@@ -33,8 +33,8 @@ func GetClickHouse(id string, addr []string, database, username, password string
 			// 如果连接出现问题，则移除并重新创建
 			delete(clickHouseClientMap, id)
 		} else {
-			fmt.Printf("存在啦直接获取^_^")
-			fmt.Printf("Reusing existing ClickHouse connection for id: %s.\n", id)
+			zap.S().Info("存在啦直接获取^_^")
+			zap.S().Infof("Reusing existing ClickHouse connection for id: %s.\n", id)
 			return session, nil
 		}
 	}
@@ -50,9 +50,9 @@ func GetClickHouse(id string, addr []string, database, username, password string
 			var d net.Dialer
 			return d.DialContext(ctx, "tcp", addr)
 		},
-		Debug: true,
+		Debug: false,
 		Debugf: func(format string, v ...any) {
-			fmt.Printf(format+"\n", v...)
+			zap.S().Infof(format+"\n", v...)
 		},
 		Settings: clickhouse.Settings{
 			"max_execution_time": 60,
@@ -77,12 +77,12 @@ func GetClickHouse(id string, addr []string, database, username, password string
 		},
 	})
 	if err != nil {
-		zap.S().Fatal("Failed to create ClickHouse connection", zap.Error(err))
+		zap.S().Errorf("Failed to create ClickHouse connection", zap.Error(err))
 		return nil, err
 	}
 	err = conn.Ping(context.Background())
 	if err != nil {
-		zap.S().Fatal("Failed to create ClickHouse connection", zap.Error(err))
+		zap.S().Errorf("Failed to create ClickHouse connection", zap.Error(err))
 		return nil, err
 	}
 	clickHouseClientMap[id] = conn
@@ -116,7 +116,7 @@ func (op *ClickhouseOp) Save(dt []ClickhouseParam, table string) string {
 	var fields []string
 	var valueStrs []string
 	for _, param := range dt {
-		fields = append(fields, "\""+param.FieldName+"\"")        // 使用反引号包围字段名
+		fields = append(fields, "`"+param.FieldName+"`")        // 使用反引号包围字段名
 		valueStrs = append(valueStrs, buildValueStr(param.Value)) // 使用自定义函数处理值的格式化
 	}
 
@@ -124,6 +124,7 @@ func (op *ClickhouseOp) Save(dt []ClickhouseParam, table string) string {
 	valueStr := strings.Join(valueStrs, ", ")
 
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s);", table, fieldStr, valueStr)
+	zap.S().Infof("[sql] %s",query)
 	return query
 }
 
@@ -148,14 +149,18 @@ func (op *ClickhouseOp) RunScript(dataRowList []common.DataRowList, script strin
 		return nil
 	}
 	var fn func(string2 []common.DataRowList) [][]ClickhouseParam
-	err = vm.ExportTo(vm.Get("main"), &fn)
+	get := vm.Get("main")
+	if get != nil {
+
+	err = vm.ExportTo(get, &fn)
 	if err != nil {
 		zap.S().Errorf("Js函数映射到 Go 函数失败！")
 		return nil
 	}
 	a := fn(dataRowList)
 	return a
-
+	}
+return  nil
 }
 
 type ClickhouseParam struct {

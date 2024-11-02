@@ -15,7 +15,7 @@ func (biz *UserBiz) PageData(name string, page, size int) (*servlet.PaginationQ,
 	db := glob.GDb
 
 	if name != "" {
-		db = db.Where("name like ?", "%"+name+"%")
+		db = db.Where("username like ?", "%"+name+"%")
 	}
 
 	db.Model(&models.User{}).Count(&pagination.Total) // 计算总记录数

@@ -97,6 +97,7 @@ func ParseToken(tokenStr string) (*jwt.Token, *MyClaims, error) {
 // @Produce   application/json
 // @Param     data  body      servlet.LoginParam true "账号密码"
 // @Router    /login [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func Login(c *gin.Context) {
 
 	var param servlet.LoginParam
@@ -134,6 +135,7 @@ func Login(c *gin.Context) {
 // @Produce   application/json
 // @Param      Authorization  header  string  true  "Authorization token"d
 // @Router    /userinfo [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (v LoginApi) UserInfo(c *gin.Context) {
 	// 从header获取Authorization
 	authorization := GetAuthorizationToken(c)
@@ -149,9 +151,11 @@ func (v LoginApi) UserInfo(c *gin.Context) {
 
 	servlet.Resp(c, gin.H{
 		"uid":      userInfos.Uid,
+		"name":     userInfos.UserName,
 		"username": userInfos.UserName,
 		"roleIds":  userInfos.RoleIds,
 		"token":    tokenObj.Raw,
+		"avatar":   "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
 	})
 
 }

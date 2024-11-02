@@ -16,7 +16,7 @@
           <template v-if="['name', 'parent_name'].includes(String(column.dataIndex))">
             <div>
               <a-input v-if="editableData[record.key] && column.dataIndex==='name'" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
-              <DeptSelect v-else-if="editableData[record.key]" :childValue="editableData[record.key]['id']" @set="setRoleFun(record.key, column.dataIndex, $event)" style="margin: -5px 0" />
+              <DeptSelect v-else-if="editableData[record.key]" v-model:value="editableData[record.key]['parent_id']" @set="setRoleFun(record.key, column.dataIndex, $event)" style="margin: -5px 0" />
               <template v-else>
                 <div>{{ text }}</div>
               </template>
@@ -41,7 +41,7 @@
         </template>
       </a-table>
 
-      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @ok="onAddData()">
+      <a-modal :okText="$t('message.confirm')" :cancelText="$t('message.cancel')" v-model:open="modalVisible" :destroy-on-close="true" :title="$t('message.addition')" @cancel="handleCancel()" @ok="onAddData()">
         <a-form ref="formRef" :label-col="{ style: { width: '120px' } }" :labelWrap="true" :rules="rules" :model="form">
           <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" :placeholder="$t('message.pleaseEnter')" />
@@ -138,6 +138,9 @@ const setRoleFun = (key: any,index: any,value: any)=>{
   editableData[key]['parent_id'] = value;
 }
 
+const handleCancel = ()=> {
+  formRef.value?.resetFields();
+}
 const onAddData = () => {
   (formRef.value as HTMLFormElement)
       .validate()

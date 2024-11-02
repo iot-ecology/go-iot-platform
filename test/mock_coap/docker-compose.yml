@@ -1,0 +1,16 @@
+services:
+  mock-coap:
+    image: mock_coap:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ["/godocker"]
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 11112:11111
+    networks:
+      - iot-net
+networks:
+  iot-net:
+    driver: bridge

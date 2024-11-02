@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 )
 
 var globalConfig ServerConfig
@@ -20,7 +21,7 @@ func main() {
 	InitLog()
 
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)
@@ -44,14 +45,20 @@ func main() {
 }
 
 func beforeStart() {
-	go removeOldData()
-
+	removeOldData()
 	go BeatTask(globalConfig.NodeInfo)
 	go ListenerBeat()
 	go CBeat()
 	go timerNoHandlerConfig()
+
+
 }
+
+
+var PUSH_CHAN = make(chan []byte, 1000)
+
 func removeOldData() {
+	zap.S().Infof("开始清理过期数据")
 	HandlerOffNode(globalConfig.NodeInfo.Name)
 }
 
@@ -80,7 +87,8 @@ func CBeat() {
 // processHeartbeats 函数用于处理心跳信息
 //
 // 参数：
-// service []NodeInfo - 节点信息切片，包含待处理的心跳信息
+//
+//	service []NodeInfo - 节点信息切片，包含待处理的心跳信息
 func processHeartbeats(service []NodeInfo) {
 	for _, info := range service {
 		if !SendBeat(&info, "beat") {
@@ -95,19 +103,23 @@ func processHeartbeats(service []NodeInfo) {
 //
 // 参数：
 //
-//	node_name string - 节点名称
+//   - node_name string - 节点名称
 //
 // 返回值：
 //
-//	bool - 如果处理成功返回false，否则返回true
+//   - bool - 如果处理成功返回false，否则返回true
 func HandlerOffNode(nodeName string) {
+	zap.S().Infof("开始处理节点下线情况, nodeName = %v", nodeName)
 	// 清除节点负载计数器
 
 	// 获取节点对应的MQTT客户端ID
 	mqttClientIds := GetBindClientId(nodeName)
+	zap.S().Infof("获取到节点绑定MQTT客户端ID, nodeName = %v, mqttClientIds = %v", nodeName, mqttClientIds)
 	for _, ele := range mqttClientIds {
+		zap.S().Infof("获取到节点绑定MQTT客户端ID, nodeName = %v, mqttClientId = %v", nodeName, ele)
 		// 获取MQTT客户端ID对应的MQTT配置
 		cf := GetUseConfig(ele)
+		zap.S().Infof("获取到MQTT客户端ID对应的MQTT配置, client id = %v, config = %v", ele, cf)
 		if cf == "" {
 			zap.S().Errorf("HandlerOffNode Error get mqtt config, client id = %s", ele)
 			continue
@@ -117,6 +129,7 @@ func HandlerOffNode(nodeName string) {
 			var config MqttConfig
 			bytes := []byte(cf)
 			err := json.Unmarshal(bytes, &config)
+			zap.S().Infof("HandlerOffNode 解析MQTT配置成功, config = %v", config)
 			if err != nil {
 				zap.S().Errorf("HandlerOffNode Error unmarshalling JSON: %s", err)
 				continue
@@ -126,7 +139,13 @@ func HandlerOffNode(nodeName string) {
 		}
 
 	}
+
+	CheckMqttConfigIsUsingAndMove(nodeName)
+	globalRedisClient.Del(context.Background(), "node_bind:"+nodeName)
+	RunCheckMqttConfigIsUsingAndMove = true
 }
+
+var RunCheckMqttConfigIsUsingAndMove = false
 
 func startHttp() {
 	http.HandleFunc("/beat", HttpBeat)
@@ -149,11 +168,15 @@ func startHttp() {
 	}
 }
 
+// timerNoHandlerConfig 函数定时执行 noHandlerConfig 函数
 func timerNoHandlerConfig() {
 	ticker := time.NewTicker(1 * time.Second)
 
-	for range ticker.C {
-		noHandlerConfig()
+	if RunCheckMqttConfigIsUsingAndMove {
+
+		for range ticker.C {
+			noHandlerConfig()
+		}
 	}
 }
 
@@ -179,6 +202,7 @@ func noHandlerConfig() {
 			if PubCreateMqttClientOp(conf) == -1 {
 				continue
 			}
+			time.Sleep(100 * time.Millisecond)
 		}
 		lock.Unlock()
 	} else {
@@ -190,10 +214,12 @@ func noHandlerConfig() {
 // PubCreateMqttClientOp 函数用于创建MQTT客户端
 //
 // 参数：
-// conf string - MQTT客户端配置信息
+//
+//   - conf string - MQTT客户端配置信息
 //
 // 返回值：
-// int - 创建MQTT客户端的结果，成功返回1，失败返回-1
+//
+//   - int - 创建MQTT客户端的结果，成功返回1，失败返回-1
 func PubCreateMqttClientOp(conf string) int {
 	lose := GetSizeLose("")
 

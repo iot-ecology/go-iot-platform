@@ -23,7 +23,7 @@ var DingDingBiz = notice.DingDingBiz{}
 // @Accept json
 // @Produce json
 // @Param DingDing body models.DingDing true "钉钉通道"
-// @Success 201 {object} servlet.JSONResult{data=models.DingDing} "创建成功的钉钉通道"
+// @Success 200 {object} servlet.JSONResult{data=models.DingDing} "创建成功的钉钉通道"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /DingDing/create [post]
@@ -86,9 +86,12 @@ func (api *DingDingApi) UpdateDingDing(c *gin.Context) {
 	var newV models.DingDing
 	newV = old
 	newV.Name = req.Name
+	newV.AccessToken = req.AccessToken
+	newV.Secret = req.Secret
+	newV.Content = req.Content
 
 	m := structs.Map(newV)
-	result = glob.GDb.Table("DingDings").Where("id = ?", newV.ID).Updates(m)
+	result = glob.GDb.Model(models.DingDing{}).Where("id = ?", newV.ID).Updates(m)
 
 	if result.Error != nil {
 
@@ -116,6 +119,8 @@ func (api *DingDingApi) UpdateDingDing(c *gin.Context) {
 // @Router /DingDing/page [get]
 func (api *DingDingApi) PageDingDing(c *gin.Context) {
 	var name = c.Query("name")
+	var accessToken = c.Query("access_token")
+	var cot = c.Query("content")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -130,7 +135,7 @@ func (api *DingDingApi) PageDingDing(c *gin.Context) {
 		return
 	}
 
-	data, err := DingDingBiz.PageData(name, parseUint, u)
+	data, err := DingDingBiz.PageData(name,accessToken,cot, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -144,6 +149,7 @@ func (api *DingDingApi) PageDingDing(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /DingDing/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DingDingApi) DeleteDingDing(c *gin.Context) {
 	var DingDing models.DingDing
 
@@ -171,6 +177,7 @@ func (api *DingDingApi) DeleteDingDing(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /DingDing/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DingDing} 
 func (api *DingDingApi) ByIdDingDing(c *gin.Context) {
 	var DingDing models.DingDing
 
@@ -192,6 +199,7 @@ func (api *DingDingApi) ByIdDingDing(c *gin.Context) {
 // @Param DingDing body []models.DingDingBindProduct true "钉钉通道"
 // @Produce   application/json
 // @Router    /DingDing/bind [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DingDingApi) Bind(c *gin.Context) {
 	var req  []models.DingDingBindProduct
 	if err := c.ShouldBindJSON(&req); err != nil {

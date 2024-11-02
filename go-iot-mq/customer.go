@@ -98,7 +98,7 @@ func (c *Consumer) Connect() error {
 // connection...
 func (c *Consumer) AnnounceQueue(queueName, bindingKey string) (<-chan amqp.Delivery, error) {
 
-	err := c.channel.Qos(100, 0, false)
+	err := c.channel.Qos(1, 0, false)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting qos: %s", err)
 	}

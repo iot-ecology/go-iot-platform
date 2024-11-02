@@ -96,7 +96,7 @@ export async function DashboardDelete(id: string) {
   return await axios.post(`${url}/dashboard/delete/${id}`);
 }
 
-export async function DashboardId(id: any ) {
+export async function DashboardId(id: any) {
   return await axios.get(`${url}/dashboard/${id}`);
 }
 
@@ -204,28 +204,178 @@ export async function DeptSubs(params: any) {
   return await axios.get(`${url}/Dept/subs`, { params });
 }
 //设备详情
+export const DEVICEINFO_PAGE = "/DeviceInfo/page";
+export const DEVICEINFO_CREATE = "/DeviceInfo/create";
+export const DEVICEINFO_DELETE = "/DeviceInfo/delete";
 export async function DeviceInfoPage(params: any) {
-  return await axios.get(`${url}/DeviceInfo/page`, { params });
+  return await axios.get(`${url}${DEVICEINFO_PAGE}`, { params });
 }
 export async function DeviceInfoCreate(data: any) {
-  return await axios.post(`${url}/DeviceInfo/create`, data);
+  return await axios.post(`${url}${DEVICEINFO_CREATE}`, data);
 }
 export async function DeviceInfoDelete(id: any) {
-  return await axios.post(`${url}/DeviceInfo/delete/${id}`);
+  return await axios.post(`${url}${DEVICEINFO_DELETE}/${id}`);
 }
 export async function DeviceInfoBindMqtt(data: any) {
   return await axios.post(`${url}/DeviceInfo/BindMqtt`, data);
 }
 export async function DeviceInfoQueryBindMqtt(params: any) {
-  return await axios.get(`${url}/DeviceInfo/QueryBindMqtt`, {params});
+  return await axios.get(`${url}/DeviceInfo/QueryBindMqtt`, { params });
 }
 export async function DeviceInfoUpdate(data: any) {
-  return await axios.post(`${url}/DeviceInfo/Update`, data);
+  return await axios.post(`${url}/DeviceInfo/update`, data);
 }
 
-//消息
+// 设备组
+export const DEVICE_GROUP_PAGE = "/device_group/page";
+export const DEVICE_GROUP_CREATE = "/device_group/create";
+export const DEVICE_GROUP_UPDATE = "/device_group/update";
+export const DEVICE_GROUP_DELETE = "/device_group/delete";
+export const DEVICE_GROUP_BIND_DEVICE = "/device_group/bind_device";
+export const DEVICE_GROUP_QUERY_BIND_DEVICE = "/device_group/query_bind_device";
 export async function MessageListPage(params: any) {
-  return await axios.get(`${url}/MessageList/page`, { params });
+  return await axios.get(`${url}${DEVICE_GROUP_PAGE}`, { params });
+}
+export async function DeviceGroupsCreate(data: any) {
+  return await axios.post(`${url}${DEVICE_GROUP_CREATE}`, data);
+}
+export async function DeviceGroupsUpdate(data: any) {
+  return await axios.post(`${url}${DEVICE_GROUP_UPDATE}`, data);
+}
+export async function DeviceGroupsDelete(id: any) {
+  return await axios.post(`${url}${DEVICE_GROUP_DELETE}/${id}`);
+}
+export async function DeviceGroupsBindDevice(data: any) {
+  return await axios.post(`${url}${DEVICE_GROUP_BIND_DEVICE}`, data);
+}
+export async function DeviceGroupsQueryBindDevice(params: any) {
+  return await axios.get(`${url}${DEVICE_GROUP_QUERY_BIND_DEVICE}`, { params });
+}
+
+// 飞书机器人
+export const FEISHU_ID_PAGE = "/FeiShuId/page";
+export const FEISHU_ID_CREATE = "/FeiShuId/create";
+export const FEISHU_ID_UPDATE = "/FeiShuId/update";
+export const FEISHU_ID_DELETE = "/FeiShuId/delete";
+export async function FeiShuPage(params: any) {
+  return await axios.get(`${url}${FEISHU_ID_PAGE}`, { params });
+}
+export async function FeiShuCreate(data: any) {
+  return await axios.post(`${url}${FEISHU_ID_CREATE}`, data);
+}
+export async function FeiShuUpdate(data: any) {
+  return await axios.post(`${url}${FEISHU_ID_UPDATE}`, data);
+}
+export async function FeiShuDelete(id: any) {
+  return await axios.post(`${url}${FEISHU_ID_DELETE}/${id}`);
+}
+
+// 钉钉机器人
+export const DingDing_PAGE = "/DingDing/page";
+export const DingDing_CREATE = "/DingDing/create";
+export const DingDing_UPDATE = "/DingDing/update";
+export const DingDing_DELETE = "/DingDing/delete";
+export async function DingDingPage(params: any) {
+  return await axios.get(`${url}${DingDing_PAGE}`, { params });
+}
+export async function DingDingCreate(data: any) {
+  return await axios.post(`${url}${DingDing_CREATE}`, data);
+}
+export async function DingDingUpdate(data: any) {
+  return await axios.post(`${url}${DingDing_UPDATE}`, data);
+}
+export async function DingDingDelete(id: any) {
+  return await axios.post(`${url}${DingDing_DELETE}/${id}`);
+}
+
+// CassandraTransmit
+export const CASSANDRA_PAGE = "/CassandraTransmit/page";
+export const CASSANDRA_CREATE = "/CassandraTransmit/create";
+export const CASSANDRA_UPDATE = "/CassandraTransmit/update";
+export const CASSANDRA_DELETE = "/CassandraTransmit/delete";
+export async function CassandraTransmitPage(params: any) {
+  return await axios.get(`${url}${CASSANDRA_PAGE}`, { params });
+}
+export async function CassandraTransmitCreate(data: any) {
+  return await axios.post(`${url}${CASSANDRA_CREATE}`, data);
+}
+export async function CassandraTransmitUpdate(data: any) {
+  return await axios.post(`${url}${CASSANDRA_UPDATE}`, data);
+}
+export async function CassandraTransmitDelete(id: any) {
+  return await axios.post(`${url}${CASSANDRA_DELETE}/${id}`);
+}
+
+// ClickhouseTransmit
+export const CLICK_HOUSE_PAGE = "/ClickhouseTransmit/page";
+export const CLICK_HOUSE_CREATE = "/ClickhouseTransmit/create";
+export const CLICK_HOUSE_UPDATE = "/ClickhouseTransmit/update";
+export const CLICK_HOUSE_DELETE = "/ClickhouseTransmit/delete";
+export async function ClickhouseTransmitPage(params: any) {
+  return await axios.get(`${url}${CLICK_HOUSE_PAGE}`, { params });
+}
+export async function ClickhouseTransmitCreate(data: any) {
+  return await axios.post(`${url}${CLICK_HOUSE_CREATE}`, data);
+}
+export async function ClickhouseTransmitUpdate(data: any) {
+  return await axios.post(`${url}${CLICK_HOUSE_UPDATE}`, data);
+}
+export async function ClickhouseTransmitDelete(id: any) {
+  return await axios.post(`${url}${CLICK_HOUSE_DELETE}/${id}`);
+}
+
+// InfluxdbTransmit
+export const INFLUXDB_PAGE = "/InfluxdbTransmit/page";
+export const INFLUXDB_CREATE = "/InfluxdbTransmit/create";
+export const INFLUXDB_UPDATE = "/InfluxdbTransmit/update";
+export const INFLUXDB_DELETE = "/InfluxdbTransmit/delete";
+export async function InfluxdbTransmitPage(params: any) {
+  return await axios.get(`${url}${INFLUXDB_PAGE}`, { params });
+}
+export async function InfluxdbTransmitCreate(data: any) {
+  return await axios.post(`${url}${INFLUXDB_CREATE}`, data);
+}
+export async function InfluxdbTransmitUpdate(data: any) {
+  return await axios.post(`${url}${INFLUXDB_UPDATE}`, data);
+}
+export async function InfluxdbTransmitDelete(id: any) {
+  return await axios.post(`${url}${INFLUXDB_DELETE}/${id}`);
+}
+
+// MongoTransmit
+export const MONGO_PAGE = "/MongoTransmit/page";
+export const MONGO_CREATE = "/MongoTransmit/create";
+export const MONGO_UPDATE = "/MongoTransmit/update";
+export const MONGO_DELETE = "/MongoTransmit/delete";
+export async function MongoTransmitPage(params: any) {
+  return await axios.get(`${url}${MONGO_PAGE}`, { params });
+}
+export async function MongoTransmitCreate(data: any) {
+  return await axios.post(`${url}${MONGO_CREATE}`, data);
+}
+export async function MongoTransmitUpdate(data: any) {
+  return await axios.post(`${url}${MONGO_UPDATE}`, data);
+}
+export async function MongoTransmitDelete(id: any) {
+  return await axios.post(`${url}${MONGO_DELETE}/${id}`);
+}
+
+// MySQLTransmit
+export const MYSQL_PAGE = "/MySQLTransmit/page";
+export const MYSQL_CREATE = "/MySQLTransmit/create";
+export const MYSQL_UPDATE = "/MySQLTransmit/update";
+export const MYSQL_DELETE = "/MySQLTransmit/delete";
+export async function MySQLTransmitPage(params: any) {
+  return await axios.get(`${url}${MYSQL_PAGE}`, { params });
+}
+export async function MySQLTransmitCreate(data: any) {
+  return await axios.post(`${url}${MYSQL_CREATE}`, data);
+}
+export async function MySQLTransmitUpdate(data: any) {
+  return await axios.post(`${url}${MYSQL_UPDATE}`, data);
+}
+export async function MySQLTransmitDelete(id: any) {
+  return await axios.post(`${url}${MYSQL_DELETE}/${id}`);
 }
 
 //角色
@@ -261,8 +411,14 @@ export async function UserDelete(id: any) {
 export async function UserBindRole(data: any) {
   return await axios.post(`${url}/User/BindRole`, data);
 }
+export async function UserBindDept(data: any) {
+  return await axios.post(`${url}/User/BindDept`, data);
+}
 export async function UserQueryBindRole(params: any) {
-  return await axios.get(`${url}/User/QueryBindRole?user_id=${params}`, );
+  return await axios.get(`${url}/User/QueryBindRole?user_id=${params}`);
+}
+export async function UserQueryBindDept(params: any) {
+  return await axios.get(`${url}/User/QueryBindDept?user_id=${params}`, );
 }
 
 //产品
@@ -292,5 +448,19 @@ export async function SimCardDelete(id: any) {
   return await axios.post(`${url}/SimCard/delete/${id}`);
 }
 
-
-
+//生产计划
+export async function ProductionPlanPage(params: any) {
+  return await axios.get(`${url}/ProductionPlan/page`, { params });
+}
+export async function ProductionPlanCreate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/create`, data);
+}
+export async function ProductionPlanUpdate(data: any) {
+  return await axios.post(`${url}/ProductionPlan/update`, data);
+}
+export async function ProductionPlanDelete(id: any) {
+  return await axios.post(`${url}/ProductionPlan/delete/${id}`);
+}
+export async function ProductionPlanDetail(id: any) {
+  return await axios.get(`${url}/ProductionPlan/${id}`);
+}

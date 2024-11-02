@@ -10,7 +10,7 @@ type MessageListBiz struct{}
 
 func (biz *MessageListBiz) PageData(messageTypeId string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var MessageLists []models.MessageList
+	var dt []models.MessageList
 
 	db := glob.GDb
 
@@ -20,9 +20,9 @@ func (biz *MessageListBiz) PageData(messageTypeId string, page, size int) (*serv
 
 	db.Model(&models.MessageList{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&MessageLists)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	pagination.Data = MessageLists
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 

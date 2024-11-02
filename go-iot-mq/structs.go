@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 	"strings"
+	"time"
 )
 
 type MQTTMessage struct {
@@ -12,9 +14,12 @@ type MQTTMessage struct {
 
 type DataRowList struct {
 	Time      int64     `json:"time"`       // 秒级时间戳
-	DeviceUid string    `json:"device_uid"` // 是MqttClient的ID
+	DeviceUid string    `json:"device_uid"` // 能够产生网络通讯的唯一编码
+	IdentificationCode string `json:"identification_code"` // 设备标识码
 	DataRows  []DataRow `json:"data"`
 	Nc        string    `json:"nc"`
+	Protocol string `json:"protocol,omitempty"`
+
 }
 type DataRow struct {
 	Name  string `json:"name"`
@@ -76,6 +81,12 @@ type MongoConfig struct {
 }
 
 type Signal struct {
+	Protocol   string `json:"protocol"`
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
+
 	MqttClientId int    `json:"mqtt_client_id"` // MQTT客户端表的外键ID
 	Name         string `json:"name"`           // 信号的名称，用于标识不同的信号
 	Type         string `json:"type"`           // 信号的数据类型，如整数、字符串等
@@ -96,7 +107,12 @@ type SignalWaringConfig struct {
 
 type SignalDelayWaringParam struct {
 	MqttClientName      string `gorm:"-" json:"mqtt_client_name"`                             // MQTT客户端的名称，不存储在数据库中
-	MqttClientId        int    `json:"mqtt_client_id"`                                        // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol"`
+
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
+
 	Name                string `json:"name"`                                                  // 参数名称
 	SignalName          string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId            int    `gorm:"signal_id"  json:"signal_id" structs:"signal_id"`       // 信号表的外键ID
@@ -122,9 +138,10 @@ type CalcCache struct {
 }
 
 type CalcParamCache struct {
-	MqttClientId int    `json:"mqtt_client_id"`                                        // MQTT客户端表的外键ID
+	Protocol   string `json:"protocol"`
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // MQTT客户端表的外键ID
 	Name         string `json:"name"`                                                  // 参数名称
-	SignalName   string `gorm:"signal_name"  json:"signal_name" structs:"signal_name"` // 信号表 name
 	SignalId     int    `json:"signal_id" structs:"signal_id"`                         // 信号表的外键ID
 	Reduce       string `json:"reduce"`                                                // 数据聚合方式 1. 求和 2. 平均值 3. 最大值 4. 最小值
 	CalcRuleId   int    `json:"calc_rule_id"`                                          // CalcRule 主键
@@ -229,4 +246,19 @@ type FeiShu struct {
 	AccessToken string `json:"access_token" structs:"access_token"`
 	Secret      string `json:"secret" structs:"secret"`
 	Content     string `json:"content" structs:"content"` // 模板内容
+}
+type DeviceInfo struct {
+	ProductId         uint       `json:"product_id" structs:"product_id"`                                                               // 产品ID
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	DeviceUid int    `json:"device_uid"`                                        // 联网设备ID
+	ProductName       string     `gorm:"-" json:"product_name" structs:"product_name"`                                                  // 产品名称
+	SN                string     `json:"sn" structs:"sn"`                                                                               // 设备编号
+	ManufacturingDate *time.Time `json:"manufacturing_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"manufacturing_date"` // 制造日期
+	ProcurementDate   *time.Time `json:"procurement_date,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"procurement_date"`     // 采购日期
+	Source            int        `json:"source" structs:"source"`                                                                       // 设备来源,1: 内部,2: 外源
+	WarrantyExpiry    *time.Time `json:"warranty_expiry,omitempty" gorm:"type:DATETIME; default:NULL;" structs:"warranty_expiry"`       // 保修截止日期
+	PushInterval      int        `json:"push_interval" structs:"push_interval"`                                                          // 推送间隔（秒）
+	ErrorRate         float64   `json:"error_rate,omitempty" structs:"error_rate"`                                                           // 推送时间误差（秒）
+
+	gorm.Model        `structs:"-"`
 }

@@ -5,21 +5,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 // SendCreateMqttMessage 向指定节点发送创建MQTT客户端的请求
 //
 // 参数：
-// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
-// param string - 创建MQTT客户端的参数
+//
+//   - node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+//   - param string - 创建MQTT客户端的参数
 //
 // 返回值：
-// bool - 发送请求是否成功，成功返回true，失败返回false
+//
+//   - bool 发送请求是否成功，成功返回true，失败返回false
 func SendCreateMqttMessage(node *NodeInfo, param string) bool {
-
+	zap.S().Infof("发送创建MQTT客户端请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/create_mqtt", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
@@ -57,13 +60,15 @@ func SendCreateMqttMessage(node *NodeInfo, param string) bool {
 // SendBeat 向指定节点发送心跳请求
 //
 // 参数：
-// node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
-// param string - 心跳请求参数
+//
+//   - node *NodeInfo - 节点信息结构体指针，包含节点主机名和端口号
+//   - param string - 心跳请求参数
 //
 // 返回值：
-// bool - 发送心跳请求是否成功，成功返回true，失败返回false
+//
+//   - bool  发送心跳请求是否成功，成功返回true，失败返回false
 func SendBeat(node *NodeInfo, param string) bool {
-
+	zap.S().Debugf("发送心跳请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/beat", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(data))
@@ -109,12 +114,14 @@ func HttpBeat(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+//
 // 参数：
 //
-//	w http.ResponseWriter: HTTP响应的写入对象
-//	r *http.Request: HTTP请求对象
+//   - w http.ResponseWriter: HTTP响应的写入对象
+//   - r *http.Request: HTTP请求对象
 //
-// 返回值：无
+// 返回值：
+//   - 无
 func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	// 确保请求方法是POST
 	if r.Method != http.MethodPost {
@@ -148,7 +155,14 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 
+	lock := NewRedisDistLock(globalRedisClient, "mqtt_create:" +config.ClientId)
+
+	if lock.TryLock() {
+
+
+
 	if CheckHasConfig(config) {
+		zap.S().Errorf("已经存在客户端id")
 		err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "已经存在客户端id"})
 		if err != nil {
 			zap.S().Errorf("Error: %+v", err)
@@ -160,6 +174,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 		usz := CreateMqttClient(config)
 
 		if usz == -1 {
+			zap.S().Errorf("达到最大客户端数量")
 			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "达到最大客户端数量"})
 			if err != nil {
 				zap.S().Errorf("Error: %+v", err)
@@ -168,6 +183,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 		}
 		if usz == -2 {
+			zap.S().Errorf("MQTT客户端配置异常")
 			err := json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "MQTT客户端配置异常"})
 			if err != nil {
 				zap.S().Errorf("Error: %+v", err)
@@ -184,14 +200,25 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
+		lock.Unlock()
+
+	}else{
+	json.NewEncoder(w).Encode(map[string]any{"status": 400, "message": "上锁异常", "size": -1})
+		return
+	}
+
 
 }
 
 // PubCreateMqttClientHttp 函数处理HTTP请求，用于创建MQTT客户端
+//
 // 参数：
-// w: http.ResponseWriter类型，HTTP响应的写入对象
-// r: *http.Request类型，HTTP请求对象
-// 返回值：无
+//
+//   - w: http.ResponseWriter类型，HTTP响应的写入对象
+//   - r: *http.Request类型，HTTP请求对象
+//
+// 返回值：
+//   - 无
 func PubCreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -275,6 +302,7 @@ func PubRemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendRemoveMqttClient(id string, nodeinfo NodeInfo) {
+	zap.S().Infof("发送移除MQTT客户端请求，节点信息: %+v, 参数: %s", nodeinfo, id)
 	baseUrl := fmt.Sprintf("http://%s:%d/remove_mqtt_client?id=%s", nodeinfo.Host, nodeinfo.Port, id)
 
 	// 发送 GET 请求
@@ -350,7 +378,7 @@ func PubPushMqttData(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendPushMqttData(node NodeInfo, param string) bool {
-
+	zap.S().Infof("发送消息请求，节点信息: %+v, 参数: %s", node, param)
 	url := fmt.Sprintf("http://%s:%d/push_data", node.Host, node.Port)
 	data := []byte(param)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
@@ -470,14 +498,16 @@ func NodeUsingStatus(w http.ResponseWriter, r *http.Request) {
 		for _, el := range GetBindClientId(info.Name) {
 			// 假设GetUseConfig函数返回配置的JSON字符串和错误
 			configJSON := GetUseConfig(el)
+			if configJSON != "" {
 
-			var config MqttConfig
-			b := []byte(configJSON)
-			err := json.Unmarshal(b, &config)
-			if err != nil {
-				zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
+				var config MqttConfig
+				b := []byte(configJSON)
+				err := json.Unmarshal(b, &config)
+				if err != nil {
+					zap.S().Fatalf("HandlerOffNode Error unmarshalling JSON: %s", err)
+				}
+				mc = append(mc, config)
 			}
-			mc = append(mc, config)
 
 		}
 
@@ -637,7 +667,7 @@ func RemoveMqttClient(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 假设GetUseConfig函数返回配置的JSON字符串和错误
-	StopMqttClient(id)
+	StopMqttClient2(id)
 
 	// 将配置信息编码为JSON并发送给客户端
 	err := json.NewEncoder(w).Encode(map[string]any{

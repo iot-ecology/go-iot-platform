@@ -3,15 +3,16 @@ package task
 import (
 	"context"
 	"encoding/json"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/robfig/cron/v3"
-	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/initialize"
 	"log"
 	"strconv"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/robfig/cron/v3"
+	"go.uber.org/zap"
 )
 
 // handlerCalcQueue 函数处理计算任务队列
@@ -102,5 +103,6 @@ func pushToQueue(queueName string, body []byte) {
 }
 
 func InitTask() {
+	zap.S().Info("初始化任务")
 	handlerCalcQueue()
 }

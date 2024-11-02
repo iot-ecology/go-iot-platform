@@ -54,3 +54,20 @@ type CassandraTransmitCache struct {
 	Table    string `json:"table"`
 	Script   string `json:"script"`
 }
+
+type KafkaTransmitCache struct {
+	ID     string `json:"ID"`
+	Host   string `json:"host"`
+	Port   int    `json:"port" `
+	Topic  string `json:"topic"`
+	Script string `json:"script"`
+}
+type RabbitTransmitCache struct {
+	ID         string `json:"ID"`
+	Host       string `json:"host"`
+	Port       int    `json:"port" `
+	Script     string `json:"script"`
+	Exchange   string `json:"exchange" `    // 交换机
+	RoutingKey string `json:"routing_key" ` // 路由键
+
+}

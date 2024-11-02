@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,12 +20,11 @@ import (
 )
 
 var globalConfig ServerConfig
-var writeAPI api.WriteAPI
 
 func main() {
 
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local-pre_handler.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)
@@ -42,7 +40,6 @@ func main() {
 
 	InitGlobalRedisClient(globalConfig.RedisConfig)
 	InitInfluxDbClient(globalConfig.InfluxConfig)
-	writeAPI = GlobalInfluxDbClient.WriteAPI(globalConfig.InfluxConfig.Org, globalConfig.InfluxConfig.Bucket)
 	//InitRabbitCon(globalConfig.MQConfig)
 	err = ConnectToRMQ()
 	if err != nil {
@@ -50,6 +47,7 @@ func main() {
 	}
 	zap.S().Infof("消息队列类型 %s", globalConfig.NodeInfo.Type)
 
+	CreateRabbitQueue("calc_queue")
 	CreateRabbitQueue("waring_handler")
 	CreateRabbitQueue("waring_notice")
 	CreateRabbitQueue("transmit_handler")
@@ -68,43 +66,76 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(deliveries, HandlerDataStorage, 1, "pre_handler", "")
+		cus.Handle(deliveries, HandlerDataStorage, 10, "pre_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_handler" {
-		waring_handler, err := cus.AnnounceQueue("waring_handler", "")
+		waringHandler, err := cus.AnnounceQueue("waring_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_handler, HandlerWaring, 1, "waring_handler", "")
+		cus.Handle(waringHandler, HandlerWaring, 1, "waring_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "calc_queue" {
-		calc_queue, err := cus.AnnounceQueue("calc_queue", "")
+		calcQueue, err := cus.AnnounceQueue("calc_queue", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(calc_queue, HandlerCalc, 1, "calc_queue", "")
+		cus.Handle(calcQueue, HandlerCalc, 1, "calc_queue", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_delay_handler" {
-		waring_delay_handler, err := cus.AnnounceQueue("waring_delay_handler", "")
+		waringDelayHandler, err := cus.AnnounceQueue("waring_delay_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_delay_handler, HandlerWaringDelay, 1, "waring_delay_handler", "")
+		cus.Handle(waringDelayHandler, HandlerWaringDelay, 1, "waring_delay_handler", "")
 	}
 
 	if globalConfig.NodeInfo.Type == "transmit_handler" {
-		transmit_handler, err := cus.AnnounceQueue("transmit_handler", "")
+		transmitHandler, err := cus.AnnounceQueue("transmit_handler", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(transmit_handler, HandlerTransmit, 1, "transmit_handler", "")
+		cus.Handle(transmitHandler, HandlerTransmit, 1, "transmit_handler", "")
 	}
 	if globalConfig.NodeInfo.Type == "waring_notice" {
-		waring_notice, err := cus.AnnounceQueue("waring_notice", "")
+		waringNotice, err := cus.AnnounceQueue("waring_notice", "")
 		if err != nil {
 			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
 		}
-		cus.Handle(waring_notice, HandlerNotice, 1, "waring_notice", "")
+		cus.Handle(waringNotice, HandlerNotice, 1, "waring_notice", "")
+	}
+
+
+
+	// 协议层处理
+	if globalConfig.NodeInfo.Type == "pre_tcp_handler" {
+		preTcpHandler, err := cus.AnnounceQueue("pre_tcp_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preTcpHandler, HandlerTcpDataStorage, 1, "pre_tcp_handler", "")
+	}
+
+	if globalConfig.NodeInfo.Type == "pre_http_handler" {
+		preHttpHandler, err := cus.AnnounceQueue("pre_http_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preHttpHandler, HandlerHttpDataStorage, 1, "pre_http_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "pre_ws_handler" {
+		preWsHandler, err := cus.AnnounceQueue("pre_ws_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preWsHandler, HandlerWsDataStorage, 1, "pre_ws_handler", "")
+	}
+	if globalConfig.NodeInfo.Type == "pre_coap_handler" {
+		preCCoapHandler, err := cus.AnnounceQueue("pre_coap_handler", "")
+		if err != nil {
+			log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		}
+		cus.Handle(preCCoapHandler, HandlerCoapDataStorage, 1, "pre_coap_handler", "")
 	}
 
 }
@@ -170,7 +201,7 @@ func InitInfluxDbClient(config InfluxConfig) {
 // 无
 func PushToQueue(queueName string, body []byte) {
 
-	zap.S().Infof("开始推送消息到队列 %s msg %s", queueName, body)
+	zap.S().Debugf("开始推送消息到队列 %s msg %s", queueName, body)
 
 	err := chann.PublishWithContext(context.Background(), "", queueName, // routing key
 		false, // mandatory

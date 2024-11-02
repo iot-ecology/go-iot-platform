@@ -10,3 +10,11 @@ fileupdate/
 /docker/RocketMQ/data/
 /docker/clickhouse/data/
 /docker/clickhouse/log/
+
+docker/Cassandra/dataa
+
+docker/env/mongo/database
+docker/env/mysql/data
+docker/env/rabbitmq/data
+docker/env/redis/data
+node_modules

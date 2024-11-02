@@ -20,7 +20,7 @@ var dashBiz = biz.DashboardBiz{}
 // @Accept json
 // @Produce json
 // @Param dashboard body models.Dashboard true "面板"
-// @Success 201 {object} servlet.JSONResult{data=models.Dashboard} "创建成功的面板"
+// @Success 200 {object} servlet.JSONResult{data=models.Dashboard} "创建成功的面板"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /dashboard/create [post]
@@ -131,6 +131,7 @@ func (api *DashboardApi) PageDashboard(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /dashboard/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *DashboardApi) DeleteDashboard(c *gin.Context) {
 	var dashboard models.Dashboard
 
@@ -157,6 +158,7 @@ func (api *DashboardApi) DeleteDashboard(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /dashboard/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Dashboard} 
 func (api *DashboardApi) ByIdDashboard(c *gin.Context) {
 	var dashboard models.Dashboard
 

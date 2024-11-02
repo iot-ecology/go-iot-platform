@@ -18,7 +18,7 @@ var conn *amqp.Connection
 var chann *amqp.Channel
 
 func ConnectToRMQ() (err error) {
-	conn, err = amqp.Dial(rmqCredentials)
+	conn, err = amqp.Dial(genUrl(globalConfig.MQConfig))
 	if err != nil {
 		return errors.New("Error de conexion: " + err.Error())
 	}

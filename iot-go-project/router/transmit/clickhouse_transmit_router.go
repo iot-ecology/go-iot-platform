@@ -11,7 +11,7 @@ import (
 
 type ClickhouseTransmitApi struct{}
 
-var ClickhouseTransmit = transmit.ClickhouseTransmitBiz{}
+var ClickhouseTransmitBiz = transmit.ClickhouseTransmitBiz{}
 
 // CreateClickhouseTransmit
 // @Summary 创建Clickhouse数据库管理
@@ -20,7 +20,7 @@ var ClickhouseTransmit = transmit.ClickhouseTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param ClickhouseTransmit body models.ClickhouseTransmit true "Clickhouse数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.ClickhouseTransmit} "创建成功的Clickhouse数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.ClickhouseTransmit} "创建成功的Clickhouse数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /ClickhouseTransmit/create [post]
@@ -37,6 +37,7 @@ func (api *ClickhouseTransmitApi) CreateClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	ClickhouseTransmitBiz.SetRedis(ClickhouseTransmit)
 	// 返回创建成功的Clickhouse数据库管理
 	servlet.Resp(c, ClickhouseTransmit)
 }
@@ -71,6 +72,12 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 
 	var newV models.ClickhouseTransmit
 	newV = old
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Username = req.Username
+	newV.Password = req.Password
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +85,7 @@ func (api *ClickhouseTransmitApi) UpdateClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	ClickhouseTransmitBiz.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +117,7 @@ func (api *ClickhouseTransmitApi) PageClickhouseTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := ClickhouseTransmit.PageData(name, parseUint, u)
+	data, err := ClickhouseTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -123,6 +131,7 @@ func (api *ClickhouseTransmitApi) PageClickhouseTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /ClickhouseTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 	var ClickhouseTransmit models.ClickhouseTransmit
 
@@ -139,7 +148,7 @@ func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	ClickhouseTransmitBiz.DeleteRedis(ClickhouseTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -149,6 +158,7 @@ func (api *ClickhouseTransmitApi) DeleteClickhouseTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /ClickhouseTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmit} 
 func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 	var ClickhouseTransmit models.ClickhouseTransmit
 
@@ -164,19 +174,17 @@ func (api *ClickhouseTransmitApi) ByIdClickhouseTransmit(c *gin.Context) {
 	servlet.Resp(c, ClickhouseTransmit)
 }
 
-// MockScript
+// ListClickhouseTransmit
 // @Tags      ClickhouseTransmits
-// @Summary   模拟脚本
-// @Param ClickhouseTransmit body servlet.TransmitScriptParam true "执行参数"
+// @Summary   单个详情
 // @Produce   application/json
-// @Router    /ClickhouseTransmit/mockScript [post]
-func (api *ClickhouseTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
+// @Router    /ClickhouseTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.ClickhouseTransmit[]}
+func (api *ClickhouseTransmitApi) ListClickhouseTransmit(c *gin.Context) {
+	var ClickhouseTransmit []models.ClickhouseTransmit
 
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := ClickhouseTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
+ glob.GDb.Find(&ClickhouseTransmit)
+
+
+	servlet.Resp(c, ClickhouseTransmit)
 }

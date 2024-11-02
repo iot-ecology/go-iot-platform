@@ -23,7 +23,7 @@ var bizSignal = biz.SignalBiz{}
 // @Accept json
 // @Produce json
 // @Param signal body models.Signal true "信号信息"
-// @Success 201 {object} servlet.JSONResult{data=models.Signal} "创建成功的信号"
+// @Success 200 {object} servlet.JSONResult{data=models.Signal} "创建成功的信号"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal/create [post]
@@ -83,6 +83,7 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 	bizSignal.RemoveSignalCache(&old)
 	var newV models.Signal
 	newV = old
+	newV.IdentificationCode = req.IdentificationCode
 	newV.Name = req.Name
 	newV.Type = req.Type
 	newV.Alias = req.Alias
@@ -91,7 +92,7 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 
 	result = glob.GDb.Model(&newV).Updates(newV)
 
-	removeOldCache(newV.CacheSize, newV.ID, newV.MqttClientId)
+	removeOldCache(newV.CacheSize, newV.ID, newV.DeviceUid, newV.IdentificationCode)
 	bizSignal.SetSignalCache(&newV)
 	if result.Error != nil {
 
@@ -106,13 +107,13 @@ func (api *SignalApi) UpdateSignal(c *gin.Context) {
 // 参数：
 // threshold：int类型，表示保留的元素数量阈值
 // signalId：uint类型，表示信号ID
-// mqttId：int类型，表示MQTT连接ID
+// deviceUid：int类型，表示MQTT连接ID
 //
 // 返回值：无
-func removeOldCache(threshold int, signalId uint, mqttId int) {
+func removeOldCache(threshold int, signalId uint, deviceUid int, code string) {
 	ctx := context.Background()
 
-	redisKey := "signal_delay_warning:" + strconv.Itoa(mqttId) + ":" + strconv.Itoa(int(signalId))
+	redisKey := "signal_delay_warning:" + strconv.Itoa(deviceUid) + ":" + code + ":" + strconv.Itoa(int(signalId))
 	count, err := glob.GRedis.ZCard(ctx, redisKey).Result()
 	if err != nil {
 		panic(err)
@@ -136,8 +137,8 @@ func removeOldCache(threshold int, signalId uint, mqttId int) {
 // @Tags signals
 // @Accept json
 // @Produce json
-// @Param mqtt_client_id query string false "MQTT客户端ID"
-// @Param type query string false "数据类型,数字、中文"
+// @Param device_uid query string false "device_uid"
+// @Param protocol query string false "协议"
 // @Param page query int false "页码" default(0)
 // @Param page_size query int false "每页大小" default(10)
 // @Success 200 {object} servlet.JSONResult{data=servlet.PaginationQ{data=models.Signal}} "信号列表"
@@ -145,8 +146,9 @@ func removeOldCache(threshold int, signalId uint, mqttId int) {
 // @Failure 500 {string} string "查询异常"
 // @Router /signal/page [get]
 func (api *SignalApi) PageSignal(c *gin.Context) {
-	var mqqtClientId = c.Query("mqtt_client_id")
-	var ty = c.Query("type")
+	var deviceUid = c.Query("device_uid")
+	var protocol = c.DefaultQuery("protocol", "MQTT")
+	var ty = c.DefaultQuery("type", "数字")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -161,7 +163,7 @@ func (api *SignalApi) PageSignal(c *gin.Context) {
 		return
 	}
 
-	data, err := bizSignal.PageSignal(mqqtClientId, ty, parseUint, u)
+	data, err := bizSignal.PageSignal(deviceUid, protocol, ty, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -175,6 +177,7 @@ func (api *SignalApi) PageSignal(c *gin.Context) {
 // @Summary   删除信号
 // @Produce   application/json
 // @Router    /signal/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *SignalApi) DeleteSignal(c *gin.Context) {
 	var signal models.Signal
 
@@ -194,4 +197,62 @@ func (api *SignalApi) DeleteSignal(c *gin.Context) {
 	}
 
 	servlet.Resp(c, "删除成功")
+}
+
+func (api *SignalApi) InitCache(c *gin.Context) {
+	var mm []models.Signal
+	glob.GDb.Model(&models.Signal{}).Find(&mm)
+	for _, signal := range mm {
+		bizSignal.SetSignalCache(&signal)
+	}
+	servlet.Resp(c, "缓存初始化成功")
+}
+
+// ListSignal
+// @Tags      signals
+// @Summary   信号列表
+// @Produce   application/json
+// @Router    /signal/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *SignalApi) ListSignal(c *gin.Context) {
+	var deviceUid = c.Query("device_uid")
+	var protocol = c.Query("protocol")
+	var ty = c.Query("type")
+	var mm []models.Signal
+
+	db := glob.GDb.Model(&models.Signal{})
+
+	// 添加条件判断，只有当参数不为空字符串时才进行过滤
+	if deviceUid != "" {
+		db = db.Where("device_uid = ?", deviceUid)
+	}
+	if protocol != "" {
+		db = db.Where("protocol = ?", protocol)
+	}
+	if ty != "" {
+		db = db.Where("type = ?", ty)
+	}
+
+	db.Find(&mm)
+	servlet.Resp(c, mm)
+}
+
+// SignalById
+// @Summary 单个信号详情
+// @Description 单个信号详情
+// @Tags signals
+// @Accept json
+// @Produce json
+// @Param id path int true "信号的ID"
+// @Success 200 {object}  servlet.JSONResult{data=models.Signal} "信号"
+// @Failure 400 {string} string "请求数据错误"
+// @Failure 404 {string} string "信号未找到"
+// @Failure 500 {string} string "内部服务器错误"
+// @Router /signal/byId/:id [get]
+func (api *SignalApi) SignalById(c *gin.Context) {
+	var id =  c.Param("id")
+	var old models.Signal
+	glob.GDb.First(&old, id)
+
+	servlet.Resp(c, old)
 }

@@ -21,7 +21,7 @@ var productBiz = biz.ProductBiz{}
 // @Accept json
 // @Produce json
 // @Param Product body models.Product true "产品"
-// @Success 201 {object} servlet.JSONResult{data=models.Product} "创建成功的产品"
+// @Success 200 {object} servlet.JSONResult{data=models.Product} "创建成功的产品"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /product/create [post]
@@ -78,6 +78,7 @@ func (api *ProductApi) UpdateProduct(c *gin.Context) {
 
 	var newV models.Product
 	newV = old
+	newV.Name = req.Name
 	newV.Description = req.Description
 	newV.SKU = req.SKU
 	newV.Price = req.Price
@@ -142,6 +143,7 @@ func (api *ProductApi) PageProduct(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /product/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *ProductApi) DeleteProduct(c *gin.Context) {
 	var Product models.Product
 
@@ -168,6 +170,7 @@ func (api *ProductApi) DeleteProduct(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /product/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.Product} 
 func (api *ProductApi) ByIdProduct(c *gin.Context) {
 	var Product models.Product
 
@@ -181,4 +184,22 @@ func (api *ProductApi) ByIdProduct(c *gin.Context) {
 	}
 
 	servlet.Resp(c, Product)
+}
+
+
+
+// ListProduct
+// @Summary 产品列表
+// @Description 产品列表
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=models.Product[]} "产品"
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /product/list [get]
+func (api *ProductApi) ListProduct(c *gin.Context) {
+	var list  [] models.Product
+	glob.GDb.Find(&list)
+	servlet.Resp(c, list)
 }

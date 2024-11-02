@@ -11,21 +11,27 @@ import (
 
 type FeiShuBiz struct{}
 
-func (biz *FeiShuBiz) PageData(name string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *FeiShuBiz) PageData(name, token, cot string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var FeiShu []models.FeiShu
+	var feishu []models.FeiShu
 
 	db := glob.GDb
 
 	if name != "" {
 		db = db.Where("name like ?", "%"+name+"%")
 	}
+	if token != "" {
+		db = db.Where("token like ?", "%"+token +"%")
+	}
+	if cot != "" {
+        db = db.Where("content like ?", "%"+cot +"%")
+    }
 
 	db.Model(&models.FeiShu{}).Count(&pagination.Total) // 计算总记录数
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&FeiShu)
+	db.Offset(offset).Limit(size).Find(&feishu)
 
-	pagination.Data = FeiShu
+	pagination.Data = feishu
 	pagination.Page = page
 	pagination.Size = size
 

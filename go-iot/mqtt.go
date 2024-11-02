@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.uber.org/zap"
-	"time"
+	"sync"
 )
+
+var clock sync.Mutex
 
 // MqttConfig 定义了MQTT客户端配置的结构体
 type MqttConfig struct {
@@ -25,73 +25,43 @@ type MQTTMessage struct {
 	Message      string `json:"message"`
 }
 
-var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	zap.S().Debugf("处理消息: %s  消息主题: %s\n", msg.Payload(), msg.Topic())
 
-	reader := client.OptionsReader()
-	id := reader.ClientID()
+func StopMqttClient(clientId string,config MqttConfig) {
 
-	// 创建 MQTTMessage 实例并序列化为 JSON
-	mqttMsg := MQTTMessage{
-		MQTTClientID: id,
-		Message:      string(msg.Payload()),
-	}
-	jsonData, err := json.Marshal(mqttMsg)
-	if err != nil {
-		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
-		return
-	}
-	PushToQueue("pre_handler", jsonData)
+	zap.S().Infof("StopMqttClient 开始, clientId = %v", clientId)
 
+
+	marshal, _ := json.Marshal(config)
+
+	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
+	globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
+	AddNoUseConfig(config, marshal)
 }
 
-var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	zap.S().Debugf("MQTT客户端链接成功")
+func StopMqttClient2(clientId string) {
+	zap.S().Errorf("StopMqttClient 开始, clientId = %v", clientId)
+
+
+
+	globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
+	globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
+	globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
 }
 
-var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-
-	zap.S().Errorf("失去链接: %+v", err)
-	reader := client.OptionsReader()
-	id := reader.ClientID()
-	StopMqttClient(id)
-	config := configMap[id]
-
-	jsonData, err := json.Marshal(config)
-	if err != nil {
-		zap.S().Errorf("to json error ,%+v", err)
-	}
-	PubCreateMqttClientOp(string(jsonData))
-}
-
-var c map[string]mqtt.Client
-
-func StopMqttClient(clientId string) {
-	client := c[clientId]
-	if client != nil {
-		client.Disconnect(0)
-
-		// 删除在 no use 中的配置
-		globalRedisClient.HDel(context.Background(), "mqtt_config:no", clientId)
-		globalRedisClient.HDel(context.Background(), "mqtt_config:use", clientId)
-		globalRedisClient.SRem(context.Background(), "node_bind:"+globalConfig.NodeInfo.Name, 0, clientId)
-		delete(c, clientId)
-	}
-
-}
-
-var configMap map[string]MqttConfig
 
 func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload string) {
-	client := c[clientId]
-	client.Publish(topic, qos, retained, payload)
+	//client := c[clientId]
+	//if client != nil {
+	//	(*client).Publish(topic, qos, retained, payload)
+	//}
 }
 
-func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string, clientId string) mqtt.Client {
-	if configMap == nil {
-		configMap = make(map[string]MqttConfig)
-	}
-	configMap[clientId] = MqttConfig{
+func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string,
+	clientId string) bool {
+
+
+
+	config := MqttConfig{
 		Broker:   broker,
 		Port:     port,
 		Username: username,
@@ -99,36 +69,18 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		SubTopic: subTopic,
 		ClientId: clientId,
 	}
-	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
-	opts.SetPingTimeout(10 * time.Second)
-	opts.SetClientID(clientId)
-	opts.SetUsername(username)
-	opts.SetPassword(password)
-	opts.SetDefaultPublishHandler(messagePubHandler)
-	opts.OnConnect = connectHandler
-	opts.OnConnectionLost = connectLostHandler
-	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		zap.S().Error("创建MQTT客户端异常", token.Error())
-		return nil
-
+	client := NewMqttClient(clientId,config)
+	err := client.Connect(broker, username, password, port)
+	if err != nil {
+		zap.S().Errorf("mqtt connect err = %v", err)
+        return false
 	}
-	sub(client, subTopic)
+	go client.Subscribe(subTopic)
+	go client.HandlerMsg()
+	//c[clientId] = &client.client
 
-	if c == nil {
-		c = make(map[string]mqtt.Client)
-	}
-	c[clientId] = client
+	return true
 
-	return client
-
-}
-
-func sub(client mqtt.Client, topic string) {
-	token := client.Subscribe(topic, 1, nil)
-	token.Wait()
-	zap.S().Debugf("订阅主题: %s", topic)
 }
 
 // CreateMqttClient 函数根据传入的MqttConfig配置创建一个MQTT客户端
@@ -145,7 +97,7 @@ func CreateMqttClient(config MqttConfig) int64 {
 
 	if globalConfig.NodeInfo.Size > i {
 		clientMin := CreateMqttClientMin(config.Broker, config.Port, config.Username, config.Password, config.SubTopic, config.ClientId)
-		if clientMin == nil {
+		if !clientMin  {
 			return -2
 
 		}

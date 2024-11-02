@@ -12,7 +12,7 @@ type SignalDelayWaringParamBiz struct{}
 
 func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var rules []models.SignalDelayWaringParam
+	var dt []models.SignalDelayWaringParam
 
 	db := glob.GDb
 
@@ -26,19 +26,19 @@ func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string,
 	db.Model(&models.SignalDelayWaringParam{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	for i, rule := range rules {
-		id, err := bizMqtt.FindById(strconv.Itoa(rule.MqttClientId))
+	for i, rule := range dt {
+		id, err := bizMqtt.FindById(strconv.Itoa(rule.DeviceUid))
 		if err != nil {
 			return nil, err
 		}
 		if id == nil {
-			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(rule.MqttClientId))
+			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(rule.DeviceUid))
 		}
-		rules[i].MqttClientName = id.ClientId
+		dt[i].MqttClientName = id.ClientId
 	}
-	pagination.Data = rules
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 

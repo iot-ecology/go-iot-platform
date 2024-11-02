@@ -1,9 +1,9 @@
 import type { App } from "vue";
-import { Checkbox, Column, Grid, Table, Tooltip, VXETable } from "vxe-table";
+import {  Column, Grid, Table, VXETable } from "vxe-table";
 import "xe-utils";
 import "vxe-table/lib/style.css";
 
-const components = [Checkbox, Column, Grid, Table, Tooltip];
+const components = [Column, Grid, Table];
 
 // 单元格默认渲染器
 VXETable.renderer.add("cellRender", {

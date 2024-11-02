@@ -70,7 +70,7 @@ const List = async () => {
     params.type = "数字";
   }
   const { data } = await SignalPage(params);
-  const list1 = data.data.data.map((item: any) => ({ value: item[props.name], label: item.name + "（" + item.alias + "）", name: item.name, alias: item.alias, unit: item.unit }));
+  const list1 = data.data.data.map((item: any) => ({ value: item[props.name], label: item.name + "（" + item.alias + "）", name: item.name, alias: item.alias,protocol:item.protocol,device_uid:item.device_uid, identification_code:item.identification_code, unit: item.unit }));
   options.value = options.value.concat(list1);
   if (!props.show) {
     value.value = value.value || Number(route.query.id) || options.value[0]?.value;
@@ -118,7 +118,7 @@ const select = async (ValueClick: any) => {
         params.type = "数字";
       }
       const { data } = await SignalPage(params);
-      const list1 = data.data.data.map((item: any) => ({ value: item[props.name], label: item.name + "（" + item.alias + "）", name: item.name, alias: item.alias, unit: item.unit }));
+      const list1 = data.data.data.map((item: any) => ({ value: item[props.name], label: item.name + "（" + item.alias + "）", name: item.name, alias: item.alias,protocol:item.protocol,device_uid:item.device_uid, identification_code:item.identification_code, unit: item.unit }));
       options.value = options.value.concat(list1);
       if (data.data.total > 0 && options.value.length < data.data.total) {
         page1.value++;

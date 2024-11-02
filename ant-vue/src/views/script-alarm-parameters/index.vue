@@ -13,24 +13,24 @@
       <!--      表格-->
       <a-table :columns="columns" :data-source="list" bordered :pagination="pagination" @change="handleTableChange">
         <template #bodyCell="{ column, text, record }">
-          <template v-if="['name', 'signal_name', 'signal_id', 'mqtt_client_id', 'mqtt_client_name'].includes(column.dataIndex)">
+          <template v-if="['name', 'signal_name', 'signal_id', 'device_uid', 'mqtt_client_name'].includes(column.dataIndex)">
             <div>
               <a-input
-                v-if="editableData[record.key] && !['signal_id', 'mqtt_client_id'].includes(column.dataIndex)"
+                v-if="editableData[record.key] && !['signal_id', 'device_uid'].includes(column.dataIndex)"
                 v-model:value="editableData[record.key][column.dataIndex]"
                 style="margin: -5px 0"
               />
-              <MqttSelect v-else-if="editableData[record.key] && column.dataIndex == 'mqtt_client_id'" v-model="editableData[record.key][column.dataIndex]"></MqttSelect>
+              <MqttSelect v-else-if="editableData[record.key] && column.dataIndex == 'device_uid'" v-model="editableData[record.key][column.dataIndex]"></MqttSelect>
               <SignalSelect
                 v-else-if="editableData[record.key] && column.dataIndex == 'signal_id'"
                 v-model="editableData[record.key][column.dataIndex]"
-                :mqtt_client_id="editableData[record.key]['mqtt_client_id']"
+                :mqtt_client_id="editableData[record.key]['device_uid']"
                 name="ID"
                 :number="true"
                 @custom-event="handleCustomEvent"
               ></SignalSelect>
               <template v-else>
-                <div v-if="column.dataIndex == 'mqtt_client_id'">{{ record.mqtt_client_name }}</div>
+                <div v-if="column.dataIndex == 'device_uid'">{{ record.mqtt_client_name }}</div>
                 <div v-else-if="column.dataIndex == 'signal_id'">{{ record.signal_name }}</div>
                 <div v-else>{{ text }}</div>
               </template>
@@ -60,11 +60,19 @@
           <a-form-item :label="$t('message.name')" name="name">
             <a-input v-model:value="form.name" style="width: 350px" />
           </a-form-item>
-          <a-form-item :label="$t('message.clientID')" name="mqtt_client_id">
-            <MqttSelect v-model="form.mqtt_client_id" style="width: 350px" :show="true"></MqttSelect>
+          <a-form-item label="协议" name="mqtt">
+            <a-select style="width: 350px;" v-model:value="form.protocol">
+              <a-select-option value="mqtt">mqtt</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item :label="$t('message.clientID')" name="device_uid">
+            <MqttSelect v-model="form.device_uid" style="width: 350px" :show="true"></MqttSelect>
           </a-form-item>
           <a-form-item :label="$t('message.signalName')" name="signal_id">
-            <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.mqtt_client_id" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
+            <SignalSelect v-model="form.signal_id" style="width: 350px" :mqtt_client_id="form.device_uid" name="ID" :show="true" :number="true" @custom-event="handleCustomEvent"></SignalSelect>
+          </a-form-item>
+          <a-form-item label="identification_code" name="identification_code">
+            <a-input  v-model:value="form.identification_code" style="width: 350px" />
           </a-form-item>
         </a-form>
         <template #footer>
@@ -87,7 +95,7 @@ import {useI18n} from "vue-i18n";
 
 interface DataItem {
   name: string;
-  mqtt_client_id: string;
+  device_uid: string;
   signal_id: string;
 }
 const { t,locale } = useI18n();
@@ -110,7 +118,7 @@ let rules: Record<string, Rule[]> = {
       trigger: "blur",
     },
   ],
-  mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+  device_uid: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
   signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }],
 };
 const title = ref(t('message.addition'));
@@ -125,10 +133,18 @@ const columns = ref([
   },
   {
     title: t('message.clientID'),
-    dataIndex: "mqtt_client_id",
+    dataIndex: "device_uid",
     render: ({ record }: any) => {
       return record.mqtt_client_name;
     },
+  },
+  {
+    title: 'device_uid',
+    dataIndex: "device_uid",
+  },
+  {
+    title: 'identification_code',
+    dataIndex: "identification_code",
   },
   {
     title: t('message.signalName'),
@@ -150,10 +166,12 @@ const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 const form = reactive({
   id: "",
   name: "",
-  mqtt_client_id: "",
+  device_uid: "",
+  protocol: "",
   signal_delay_waring_id: "",
   signal_name: "",
   signal_id: "",
+  identification_code: ""
 });
 const formState = reactive({ name: "" });
 const signalName = ref("");
@@ -165,9 +183,9 @@ watch(
   },
 );
 watch(
-  () => form.mqtt_client_id,
+  () => form.device_uid,
   () => {
-    (formRef.value as HTMLFormElement).clearValidate("mqtt_client_id");
+    (formRef.value as HTMLFormElement).clearValidate("device_uid");
   },
 );
 watch(
@@ -188,10 +206,18 @@ watch(locale, () => {
     },
     {
       title: t('message.clientID'),
-      dataIndex: "mqtt_client_id",
+      dataIndex: "device_uid",
       render: ({ record }) => {
         return record.mqtt_client_name;
       },
+    },
+    {
+      title: 'device_uid',
+      dataIndex: "device_uid",
+    },
+    {
+      title: 'identification_code',
+      dataIndex: "identification_code",
     },
     {
       title: t('message.signalName'),
@@ -224,12 +250,16 @@ watch(locale, () => {
         trigger: "blur",
       },
     ],
-    mqtt_client_id: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
+    device_uid: [{ required: true, message: t('message.pleaseSelectClientID'), trigger: "change" }],
     signal_id: [{ required: true, message: t('message.pleaseSignalName'), trigger: "change" }]
   }
 });
 
 const onAdd = () => {
+  if (!form.signal_delay_waring_id) {
+    message.error(`${t('message.pleaseCreateScriptAlarmRule')}`);
+    return;
+  }
   modalVisible.value = true;
   title.value = t('message.addition');
 };
@@ -246,10 +276,11 @@ const pageList = async () => {
     key: index,
     ID: item.ID,
     name: item.name,
-    mqtt_client_id: item.mqtt_client_id,
+    device_uid: item.device_uid,
     mqtt_client_name: item.mqtt_client_name,
     signal_name: item.signal_name,
     signal_id: item.signal_id,
+    identification_code: item.identification_code
   }));
 };
 const edit = (key: string) => {
@@ -266,6 +297,10 @@ const handleTableChange = async (page: any) => {
   await pageList();
 };
 const onAddData = () => {
+  if (!form.signal_delay_waring_id) {
+    message.error(`${t('message.pleaseCreateScriptAlarmRule')}`);
+    return;
+  }
   (formRef.value as HTMLFormElement)
     .validate()
     .then(() => {
@@ -312,7 +347,7 @@ const save = async (key: string) => {
   Object.assign(list.value.filter((item) => key === item.key)[0], editableData[key]);
   const data = list.value.filter((item) => key === item.key)[0];
   delete editableData[key];
-  if (!data.mqtt_client_id || !data.signal_name) {
+  if (!data.device_uid || !data.signal_name) {
     message.error(t('message.clientSignal'));
     return;
   }

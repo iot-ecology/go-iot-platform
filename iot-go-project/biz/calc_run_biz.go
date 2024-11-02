@@ -4,6 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"igp/glob"
+	"igp/models"
+	"igp/servlet"
+	"igp/ut"
+	"log"
+	"strconv"
+	"time"
+
 	"github.com/dop251/goja"
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
@@ -11,12 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
-	"igp/glob"
-	"igp/models"
-	"igp/servlet"
-	"log"
-	"strconv"
-	"time"
 )
 
 type CalcRunBiz struct{}
@@ -24,10 +26,12 @@ type CalcRunBiz struct{}
 // Start 根据传入的id启动计算任务
 //
 // 参数：
-// id：计算规则id
+//
+//	id：计算规则id
 //
 // 返回值：
-// bool：启动计算任务是否成功，成功返回true，否则返回false
+//
+//	bool：启动计算任务是否成功，成功返回true，否则返回false
 func (b CalcRunBiz) Start(id any) bool {
 
 	var calcRule models.CalcRule
@@ -69,10 +73,12 @@ func (b CalcRunBiz) Start(id any) bool {
 // RefreshRule 根据id刷新计算规则缓存
 //
 // 参数:
-// id: 计算规则id
+//
+//	id: 计算规则id
 //
 // 返回值:
-// 无
+//
+//	无
 func (b CalcRunBiz) RefreshRule(id any) {
 	var calcRule models.CalcRule
 
@@ -92,14 +98,16 @@ func (b CalcRunBiz) RefreshRule(id any) {
 
 	var m []servlet.CalcParamCache
 
+	// todo: IdentificationCode 字段出出力
 	for _, param := range calcParams {
 		m = append(m, servlet.CalcParamCache{
-			MqttClientId: param.MqttClientId,
-			SignalId:     param.SignalId,
-			Name:         param.Name,
-			SignalName:   param.SignalName,
-			Reduce:       param.Reduce,
-			CalcRuleId:   param.CalcRuleId,
+			DeviceUid:          param.DeviceUid,
+			Protocol:           param.Protocol,
+			IdentificationCode: param.IdentificationCode,
+			SignalId:           param.SignalId,
+			Name:               param.Name,
+			Reduce:             param.Reduce,
+			CalcRuleId:         param.CalcRuleId,
 		})
 	}
 
@@ -123,10 +131,12 @@ func (b CalcRunBiz) RefreshRule(id any) {
 // Stop 根据传入的id停止计算任务
 //
 // 参数：
-// id：计算规则id
+//
+//	id：计算规则id
 //
 // 返回值：
-// bool：停止计算任务是否成功，成功返回true，否则返回false
+//
+//	bool：停止计算任务是否成功，成功返回true，否则返回false
 func (b CalcRunBiz) Stop(id any) bool {
 	var calcRule models.CalcRule
 
@@ -187,37 +197,44 @@ func getNextTime(cronExpr string) int64 {
 	return nextTimestamp
 }
 
+func genMeasurement(deviceUid int, IdentificationCode, protocol string) string {
+	return protocol + "_" + strconv.Itoa(deviceUid) + "_" + IdentificationCode
+}
+
 // MockCalc 是一个CalcRunBiz类型的方法，用于模拟计算操作
 //
 // 参数：
-// start_time：int64类型，表示查询的起始时间戳
-// end_time：int64类型，表示查询的结束时间戳
-// id：string类型，表示计算规则的唯一标识
+//
+//	start_time：int64类型，表示查询的起始时间戳
+//	end_time：int64类型，表示查询的结束时间戳
+//	id：string类型，表示计算规则的唯一标识
 //
 // 返回值：
-// map[string]interface{}类型，表示计算的结果
+//
+//	map[string]interface{}类型，表示计算的结果
 func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interface{} {
 
-	var ccc servlet.CalcCache
+	var calcCache servlet.CalcCache
 	result, err := glob.GRedis.HGet(context.Background(), "calc_cache", strconv.Itoa(id)).Result()
 	if err != nil {
 		zap.S().Errorf("转化异常 %+v", err)
 		return nil
 	}
-	err = json.Unmarshal([]byte(result), &ccc)
+	err = json.Unmarshal([]byte(result), &calcCache)
 	if err != nil {
 		zap.S().Infof("Failed to unmarshal message: %s", err)
 		return nil
 	}
 	var m = make(map[string]any)
-	for _, cache := range ccc.Param {
+	for _, cache := range calcCache.Param {
 
 		if "原始" == cache.Reduce {
 			var fd []string
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 			config := servlet.InfluxQueryConfig{}
-			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
+
+			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.Aggregation = servlet.AggregationConfig{
 				Every:       1,
@@ -254,8 +271,9 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			fd = append(fd, strconv.Itoa(cache.SignalId))
 
 			config := servlet.InfluxQueryConfig{}
-			config.Bucket = glob.GConfig.InfluxConfig.Bucket
-			config.Measurement = strconv.Itoa(cache.MqttClientId)
+			config.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, cache.Protocol,uint(cache.DeviceUid))
+
+			config.Measurement = genMeasurement(cache.DeviceUid, cache.IdentificationCode, cache.Protocol)
 			config.Fields = fd
 			config.StartTime = startTime
 			config.EndTime = endTime
@@ -270,9 +288,6 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			}
 
 			for result.Next() {
-				if result.TableChanged() {
-					fmt.Printf("table: %s\n", result.TableMetadata().String())
-				}
 				values := result.Record().Values()
 				fmt.Printf("value: %v\n", values)
 				m[cache.Name] = values["_value"].(float64)
@@ -280,21 +295,21 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 			}
 		}
 	}
-	scriot := runCalcScriot(m, ccc.Script)
+	script := runCalcScript(m, calcCache.Script)
 
 	var old models.CalcRule
-	_ = glob.GDb.First(&old, ccc.ID)
+	_ = glob.GDb.First(&old, calcCache.ID)
 
 	var newV models.CalcRule
 	newV = old
-	marshal, _ := json.Marshal(scriot)
+	marshal, _ := json.Marshal(script)
 	newV.MockValue = string(marshal)
 	glob.GDb.Model(&newV).Updates(newV)
 
-	return scriot
+	return script
 }
 
-// runCalcScriot 函数执行传入的 JavaScript 脚本，并将计算结果以 map[string]interface{} 的形式返回
+// runCalcScript 函数执行传入的 JavaScript 脚本，并将计算结果以 map[string]interface{} 的形式返回
 //
 // 参数：
 // param: 类型为 map[string]float64，表示计算参数
@@ -302,7 +317,7 @@ func (b CalcRunBiz) MockCalc(startTime, endTime int64, id int) map[string]interf
 //
 // 返回值：
 // 类型为 map[string]interface{}，表示执行 JavaScript 脚本后的计算结果
-func runCalcScriot(param map[string]any, script string) map[string]interface{} {
+func runCalcScript(param map[string]any, script string) map[string]interface{} {
 	vm := goja.New()
 	_, err := vm.RunString(script)
 	if err != nil {
@@ -323,15 +338,20 @@ func runCalcScriot(param map[string]any, script string) map[string]interface{} {
 // QueryRuleExData 函数用于查询指定规则ID在指定时间范围内的扩展数据
 //
 // 参数：
-// rule_id: 规则ID，类型为int64
-// start_time: 查询开始时间，类型为int64
-// end_time: 查询结束时间，类型为int64
+//
+//	rule_id: 规则ID，类型为int64
+//	start_time: 查询开始时间，类型为int64
+//	end_time: 查询结束时间，类型为int64
 //
 // 返回值：
-// 返回查询结果，类型为[]bson.M，即bson.M类型的切片
+//
+//	[]bson.M，即bson.M类型的切片
 func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
-	collection := database.Collection(glob.GConfig.MongoConfig.Collection)
+	// fixme: 暂时使用固定集合名，后续需要改成根据规则ID动态获取
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.Collection, uint(ruleId))
+
+	collection := database.Collection(name)
 
 	filter := bson.M{
 		"calc_rule_id": ruleId,
@@ -371,4 +391,9 @@ func (b CalcRunBiz) QueryRuleExData(ruleId, startTime, endTime int64) []bson.M {
 
 	return c
 
+}
+
+func (b CalcRunBiz) InitMongoCollection(m *models.CalcRule) {
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.Collection, m.ID)
+	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.Collection, name)
 }

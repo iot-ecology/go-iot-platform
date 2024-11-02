@@ -20,14 +20,14 @@ func GetInfluxDb(host, token string, port int, id string) influxdb2.Client {
 
 	client, exists := influxClientMap[id]
 	if exists {
-		fmt.Printf("Reusing existing InfluxDB client for id: %d.\n", id)
+		zap.S().Infof("Reusing existing InfluxDB client for id: %d.\n", id)
 		return client
 	}
 
 	client = influxdb2.NewClient(fmt.Sprintf("http://%s:%d", host, port), token)
 
 	influxClientMap[id] = client
-	fmt.Printf("New InfluxDB client for id %d has been initiated.\n", id)
+	zap.S().Infof("New InfluxDB client for id %d has been initiated.\n", id)
 
 	return client
 }
@@ -71,12 +71,16 @@ func (op *InfluxDbOp) RunScript(dataRowList []common.DataRowList, script string)
 		return nil
 	}
 	var fn func(string2 []common.DataRowList) []common.DataRowList
-	err = vm.ExportTo(vm.Get("main"), &fn)
-	if err != nil {
-		zap.S().Errorf("Js函数映射到 Go 函数失败！")
-		return nil
-	}
-	a := fn(dataRowList)
-	return a
+	get := vm.Get("main")
+	if get != nil {
 
+		err = vm.ExportTo(get, &fn)
+		if err != nil {
+			zap.S().Errorf("Js函数映射到 Go 函数失败！")
+			return nil
+		}
+		a := fn(dataRowList)
+		return a
+	}
+	return nil
 }

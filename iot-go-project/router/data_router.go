@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	"igp/biz"
 	"igp/glob"
 	"igp/servlet"
+	"igp/ut"
 	"reflect"
 )
 
 type InfluxDbApi struct{}
+
+var InfluxdbBiz = biz.InfluxdbBiz{}
 
 // QueryInfluxdb
 // @Tags      DATA
@@ -22,13 +26,16 @@ type InfluxDbApi struct{}
 // @Router    /query/influxdb [post]
 func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 	json := servlet.InfluxQueryConfig{}
+
+	// fixme: 修订多协议的情况
+
 	err := c.ShouldBind(&json)
 	if err != nil {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 
 	}
-	json.Bucket = glob.GConfig.InfluxConfig.Bucket
+	json.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, json.Protocol,json.DeviceUid)
 	query := json.GenerateFluxQuery()
 	glob.GLog.Sugar().Info(query)
 	result, err := glob.GInfluxdb.QueryAPI(glob.GConfig.InfluxConfig.Org).Query(context.Background(), query)
@@ -52,6 +59,27 @@ func (s *InfluxDbApi) QueryInfluxdb(c *gin.Context) {
 
 }
 
+// QueryMeasurement
+// @Tags      DATA
+// @Summary   查询Measurement明细
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      servlet.InfluxQueryConfig true "查询参数"
+// @Success   200  {object}  servlet.JSONResult
+// @Router    /query/QueryMeasurement [post]
+func (s *InfluxDbApi) QueryMeasurement(c *gin.Context) {
+	json := servlet.InfluxQueryConfig{}
+	err := c.ShouldBind(&json)
+	if err != nil {
+		glob.GLog.Sugar().Error("操作异常", err)
+		panic(err)
+
+	}
+
+	measurement := InfluxdbBiz.QueryMeasurement(json.Measurement, json.Protocol)
+	servlet.Resp(c, measurement)
+}
+
 // QueryInfluxdbString
 // @Tags      DATA
 // @Summary   数据查询字符串
@@ -68,7 +96,8 @@ func (s *InfluxDbApi) QueryInfluxdbString(c *gin.Context) {
 		panic(err)
 
 	}
-	json.Bucket = glob.GConfig.InfluxConfig.Bucket
+	json.Bucket = ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, json.Protocol,json.DeviceUid)
+
 	query := json.GenerateFluxQueryString()
 	glob.GLog.Sugar().Info(query)
 	result, err := glob.GInfluxdb.QueryAPI(glob.GConfig.InfluxConfig.Org).Query(context.Background(), query)

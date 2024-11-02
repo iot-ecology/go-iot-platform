@@ -363,8 +363,8 @@ const onAddData = () =>
 ;
 
 const onGo = (id: string) => {
-  routerStore.setRouterName("/calculate-parameters");
-  jump.routeJump({ path: "/calculate-parameters", query: { rule_id: id } });
+  routerStore.setRouterName("/calculate-parameters/index");
+  jump.routeJump({ path: "/calculate-parameters/index", query: { rule_id: id } });
 };
 const handleCancel = () => {
   modalVisible.value = false;

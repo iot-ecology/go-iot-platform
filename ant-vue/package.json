@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build-docker": "vite build --mode docker",
     "lint": "eslint . --ext .cjs,.ts,.vue --fix",
     "svgo:simple": "svgo -f src/icons/simple --config=src/icons/simple.config.cjs",
     "svgo:complex": "svgo -f src/icons/complex --config=src/icons/complex.config.cjs"
@@ -17,7 +18,7 @@
     "@codemirror/view": "6.26.3",
     "@vueuse/core": "^10.5.0",
     "ant-design-vue": "^4.0.7",
-    "axios": "^1.4.0",
+    "axios": "^1.6.8",
     "codemirror": "6.0.1",
     "countup.js": "^2.8.0",
     "cron-parser": "4.9.0",

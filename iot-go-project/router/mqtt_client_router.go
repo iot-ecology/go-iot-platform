@@ -4,20 +4,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type MqttApi struct{}
 
 var bizMqtt = biz.MqttClientBiz{}
 var nodeBiz = biz.NodeBiz{}
-var scriptBiz = biz.ScirptBiz{}
+var scriptBiz = biz.ScriptBiz{}
 
 // CreateMqtt
 // @Tags      MQTT
@@ -34,8 +36,10 @@ func (s *MqttApi) CreateMqtt(c *gin.Context) {
 		glob.GLog.Sugar().Error("操作异常", err)
 		panic(err)
 	}
-
-	servlet.Resp(c, bizMqtt.CreateMqtt(mqttClient))
+	mqtt := bizMqtt.CreateMqtt(mqttClient)
+	name := ut.CalcBucketName(glob.GConfig.InfluxConfig.Bucket, "MQTT", mqtt.ID)
+	ut.CheckBucketNameAndCreate(name)
+	servlet.Resp(c, mqtt)
 }
 
 // UpdateMqtt
@@ -84,6 +88,7 @@ func (s *MqttApi) UpdateMqtt(c *gin.Context) {
 // @Produce   application/json
 // @Param id query string false "mqtt_client表id"
 // @Router    /mqtt/start [get]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) StartMqtt(c *gin.Context) {
 	var id = c.Query("id")
 
@@ -96,7 +101,7 @@ func (s *MqttApi) StartMqtt(c *gin.Context) {
 	if err != nil {
 		zap.S().Error("Error unmarshalling JSON", zap.Error(err))
 		// 这里可以返回错误或者处理错误
-		servlet.Error(c, "MQTT管理工具未启动")
+		servlet.Error(c, "JSON 解析异常")
 		return
 	}
 	msg := m["message"]
@@ -111,6 +116,7 @@ func (s *MqttApi) StartMqtt(c *gin.Context) {
 // @Produce   application/json
 // @Param id query string false "mqtt_client表id"
 // @Router    /mqtt/stop [get]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) StopMqtt(c *gin.Context) {
 	var id = c.Query("id")
 
@@ -140,6 +146,7 @@ func (s *MqttApi) StopMqtt(c *gin.Context) {
 // @Param id query string false "客户端ID"
 // @Param     data  body      servlet.ParamStruct true "消息"
 // @Router    /mqtt/send [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) SendMqttMessage(c *gin.Context) {
 	var id = c.Query("id")
 	requestBody, err := c.GetRawData()
@@ -207,6 +214,7 @@ func (s *MqttApi) PageMqtt(c *gin.Context) {
 // @Summary   查询节点使用情况
 // @Produce   application/json
 // @Router    /mqtt/node-using-status [get]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) NodeUsingStatus(c *gin.Context) {
 
 	status := nodeBiz.SendNodeUsingStatus()
@@ -223,6 +231,7 @@ func (s *MqttApi) NodeUsingStatus(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /mqtt/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) DeleteMqtt(c *gin.Context) {
 	var mqttClient models.MqttClient
 
@@ -251,6 +260,7 @@ func (s *MqttApi) DeleteMqtt(c *gin.Context) {
 // @Param     data  body      servlet.MqttScript true "创建参数"
 // @Produce   application/json
 // @Router    /mqtt/set-script [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) SetScript(c *gin.Context) {
 
 	var scriptData servlet.MqttScript
@@ -289,6 +299,7 @@ func (s *MqttApi) SetScript(c *gin.Context) {
 // @Param     data  body      servlet.CheckScriptReq true "创建参数"
 // @Produce   application/json
 // @Router    /mqtt/check-script [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (s *MqttApi) CheckScript(c *gin.Context) {
 	var req servlet.CheckScriptReq
 	if err := c.BindJSON(&req); err != nil {
@@ -305,4 +316,47 @@ func (s *MqttApi) CheckScript(c *gin.Context) {
 		return
 	}
 
+}
+
+// ListMqtt
+// @Summary  MQTT客户端列表
+// @Description MQTT客户端列表
+// @Tags MQTT
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=models.MqttClient[]}
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /mqtt/list [get]
+func (s *MqttApi) ListMqtt(c *gin.Context) {
+
+	var list []models.MqttClient
+	glob.GDb.Find(&list)
+	servlet.Resp(c, list)
+
+}
+
+// ByIdMqtt
+// @Summary  MQTT单个详情
+// @Description MQTT单个详情
+// @Tags MQTT
+// @Accept json
+// @Produce json
+// @Success 200 {object} servlet.JSONResult{data=models.MqttClient}
+// @Failure 400 {string} string "请求参数错误"
+// @Failure 500 {string} string "查询异常"
+// @Router /mqtt/byId/:id [get]
+func (s *MqttApi) ByIdMqtt(c *gin.Context) {
+	var mqttClient models.MqttClient
+
+	id := c.Param("id")
+
+	result := glob.GDb.First(&mqttClient, id)
+	if result.Error != nil {
+		servlet.Error(c, "MqttClient not found")
+
+		return
+	}
+
+	servlet.Resp(c, mqttClient)
 }

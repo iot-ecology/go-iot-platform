@@ -2,9 +2,20 @@ package initialize
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
+	"igp/glob"
+	"igp/models"
+	"igp/router"
+	"igp/router/notice"
+	"igp/router/statistics"
+	"igp/router/transmit"
+	"igp/router/transmit/transmit_mqtt"
+	"log"
+	"net/url"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -18,21 +29,13 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"igp/biz"
-	"igp/glob"
-	"igp/models"
-	"igp/router"
-	"igp/router/notice"
-	"igp/router/transmit"
-	"log"
-	"net/url"
-	"os"
-	"syscall"
-	"time"
 )
 
 var (
+	podApi = router.PodApi{}
+	statisticsApi  = statistics.StatisticsApi{}
 	mqttApi                   = router.MqttApi{}
+	scriptListApi                   = router.ScriptListApi{}
 	signalApi                 = router.SignalApi{}
 	signalWaringConfigApi     = router.SignalWaringConfigApi{}
 	influxdbApi               = router.InfluxDbApi{}
@@ -60,9 +63,22 @@ var (
 	clickTransmitApi          = transmit.ClickhouseTransmitApi{}
 	cassandraTransmitApi      = transmit.CassandraTransmitApi{}
 
-
-	feishuApi = notice.FeiShuApi{}
+	feishuApi   = notice.FeiShuApi{}
 	dingdingApi = notice.DingDingApi{}
+
+	tcpHandlerApi  = router.TcpHandlerApi{}
+	httpHandlerApi = router.HttpHandlerApi{}
+	coapHandlerApi = router.CoapHandlerApi{}
+	wsHandlerApi   = router.WebsocketHandlerApi{}
+
+	cassandraTransmitBindApi  = transmit_mqtt.CassandraTransmitBindApi{}
+	clickhouseTransmitBindApi = transmit_mqtt.ClickhouseTransmitBindApi{}
+	influxdbTransmitBindApi   = transmit_mqtt.InfluxdbTransmitBindApi{}
+	kafkaTransmitBindApi      = transmit_mqtt.KafkaTransmitBindApi{}
+	mongoTransmitBindApi      = transmit_mqtt.MongoTransmitBindApi{}
+	mySQLTransmitBindApi      = transmit_mqtt.MySQLTransmitBindApi{}
+	rabbitmqTransmitBindApi   = transmit_mqtt.RabbitmqTransmitBindApi{}
+	protocolServiceApi        = router.ProtocolService{}
 )
 
 func initTable() {
@@ -201,6 +217,13 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.UserDept{}) {
+
+		err := glob.GDb.AutoMigrate(&models.UserDept{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 	if !glob.GDb.Migrator().HasTable(&models.Dept{}) {
 
 		err := glob.GDb.AutoMigrate(&models.Dept{})
@@ -300,6 +323,20 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmit{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmit{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CassandraTransmitBind{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CassandraTransmitBind{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 	if !glob.GDb.Migrator().HasTable(&models.InfluxdbTransmit{}) {
 
 		err := glob.GDb.AutoMigrate(&models.InfluxdbTransmit{})
@@ -335,10 +372,59 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
+	if !glob.GDb.Migrator().HasTable(&models.TcpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.TcpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindTcpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindTcpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.HttpHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.HttpHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.WebsocketHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.WebsocketHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.CoapHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.CoapHandler{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.FeiShu{}) {
+
+		err := glob.GDb.AutoMigrate(&models.FeiShu{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DingDing{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
 }
 
 func initDb() {
-
+	zap.S().Info("初始化数据库")
 	username := glob.GConfig.MySQLConfig.Username //账号
 	password := glob.GConfig.MySQLConfig.Password //密码
 	host := glob.GConfig.MySQLConfig.Host         //数据库地址，可以是Ip或者域名
@@ -351,17 +437,20 @@ func initDb() {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
+	s, err := db.DB()
 	if err != nil {
 		glob.GLog.Sugar().Errorf("数据库链接异常 ", err)
 
 	}
+	s.SetConnMaxLifetime(time.Hour)
+	s.SetMaxOpenConns(100)
+	s.SetMaxIdleConns(10)
 	glob.GDb = db
 }
 
 func initMongo() {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username),
-		url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host,
-		glob.GConfig.MongoConfig.Port)
+	zap.S().Info("初始化MongoDB")
+	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d", url.QueryEscape(glob.GConfig.MongoConfig.Username), url.QueryEscape(glob.GConfig.MongoConfig.Password), glob.GConfig.MongoConfig.Host, glob.GConfig.MongoConfig.Port)
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connStr))
 	if err != nil {
 		log.Fatal(err)
@@ -408,12 +497,12 @@ func initLog() {
 	zap.ReplaceGlobals(lg) // 替换全局 Logger
 
 	// 确保日志被刷新
-	defer func(lg *zap.Logger) {
-		err := lg.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			zap.S().Errorf("日志同步失败 %+v", err)
-		}
-	}(lg)
+	//defer func(lg *zap.Logger) {
+	//	err := lg.Sync()
+	//	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	//		zap.S().Errorf("日志同步失败 %+v", err)
+	//	}
+	//}(lg)
 
 	// 记录一条日志作为示例
 	lg.Debug("这是一个调试级别的日志")
@@ -421,10 +510,13 @@ func initLog() {
 }
 
 func initRouter(r *gin.RouterGroup) {
-	r.Use(router.JwtCheck())
+	// todo 暂时屏蔽
+	//r.Use(router.JwtCheck())
 	r.GET("/p/metrics", gin.WrapH(promhttp.Handler()))
 	r.POST("/mqtt/create", mqttApi.CreateMqtt)
 	r.GET("/mqtt/page", mqttApi.PageMqtt)
+	r.GET("/mqtt/list", mqttApi.ListMqtt)
+	r.GET("/mqtt/byId/:id", mqttApi.ByIdMqtt)
 	r.GET("/mqtt/start", mqttApi.StartMqtt)
 	r.GET("/mqtt/stop", mqttApi.StopMqtt)
 	r.POST("/mqtt/update", mqttApi.UpdateMqtt)
@@ -434,12 +526,16 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/mqtt/check-script", mqttApi.CheckScript)
 	r.POST("/mqtt/send", mqttApi.SendMqttMessage)
 	r.POST("/query/influxdb", influxdbApi.QueryInfluxdb)
+	r.POST("/query/QueryMeasurement", influxdbApi.QueryMeasurement)
 	r.POST("/query/str-influxdb", influxdbApi.QueryInfluxdbString)
 
 	r.POST("/signal/create", signalApi.CreateSignal)
 	r.POST("/signal/update", signalApi.UpdateSignal)
 	r.POST("/signal/delete/:id", signalApi.DeleteSignal)
 	r.GET("/signal/page", signalApi.PageSignal)
+	r.GET("/signal/byId/:id", signalApi.SignalById)
+	r.GET("/signal/initCache", signalApi.InitCache)
+	r.GET("/signal/list", signalApi.ListSignal)
 
 	r.POST("/signal-waring-config/create", signalWaringConfigApi.CreateSignalWaringConfig)
 	r.POST("/signal-waring-config/delete/:id", signalWaringConfigApi.DeleteSignalWaringConfig)
@@ -456,41 +552,42 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/MySQLTransmit/create", mysqlTransmitApi.CreateMySQLTransmit)
 	r.POST("/MySQLTransmit/update", mysqlTransmitApi.UpdateMySQLTransmit)
 	r.GET("/MySQLTransmit/:id", mysqlTransmitApi.ByIdMySQLTransmit)
+	r.GET("/MySQLTransmit/list", mysqlTransmitApi.ListMySQLTransmit)
 	r.GET("/MySQLTransmit/page", mysqlTransmitApi.PageMySQLTransmit)
 	r.POST("/MySQLTransmit/delete/:id", mysqlTransmitApi.DeleteMySQLTransmit)
-	r.POST("/MySQLTransmit/mockScript", mysqlTransmitApi.MockScript)
 
-	r.POST("/MongoTransmitApi/create", mongoTransmitApi.CreateMongoTransmit)
-	r.POST("/MongoTransmitApi/update", mongoTransmitApi.UpdateMongoTransmit)
-	r.GET("/MongoTransmitApi/:id", mongoTransmitApi.ByIdMongoTransmit)
-	r.GET("/MongoTransmitApi/page", mongoTransmitApi.PageMongoTransmit)
-	r.POST("/MongoTransmitApi/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
-	r.POST("/MongoTransmitApi/mockScript", mongoTransmitApi.MockScript)
+	r.POST("/MongoTransmit/create", mongoTransmitApi.CreateMongoTransmit)
+	r.POST("/MongoTransmit/update", mongoTransmitApi.UpdateMongoTransmit)
+	r.GET("/MongoTransmit/:id", mongoTransmitApi.ByIdMongoTransmit)
+	r.GET("/MongoTransmit/list", mongoTransmitApi.ListMongoTransmit)
+	r.GET("/MongoTransmit/page", mongoTransmitApi.PageMongoTransmit)
+	r.POST("/MongoTransmit/delete/:id", mongoTransmitApi.DeleteMongoTransmit)
 
-	r.POST("/InfluxdbTransmitApi/create", influxdbTransmitApi.CreateInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
-	r.GET("/InfluxdbTransmitApi/page", influxdbTransmitApi.PageInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
-	r.POST("/InfluxdbTransmitApi/mockScript", influxdbTransmitApi.MockScript)
+	r.POST("/InfluxdbTransmit/create", influxdbTransmitApi.CreateInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/update", influxdbTransmitApi.UpdateInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/:id", influxdbTransmitApi.ByIdInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/list", influxdbTransmitApi.ListInfluxdbTransmit)
+	r.GET("/InfluxdbTransmit/page", influxdbTransmitApi.PageInfluxdbTransmit)
+	r.POST("/InfluxdbTransmit/delete/:id", influxdbTransmitApi.DeleteInfluxdbTransmit)
 
-	r.POST("/ClickTransmitApi/create", clickTransmitApi.CreateClickhouseTransmit)
-	r.POST("/ClickTransmitApi/update", clickTransmitApi.UpdateClickhouseTransmit)
-	r.GET("/ClickTransmitApi/:id", clickTransmitApi.ByIdClickhouseTransmit)
-	r.GET("/ClickTransmitApi/page", clickTransmitApi.PageClickhouseTransmit)
-	r.POST("/ClickTransmitApi/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
-	r.POST("/ClickTransmitApi/mockScript", clickTransmitApi.MockScript)
+	r.POST("/ClickhouseTransmit/create", clickTransmitApi.CreateClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/update", clickTransmitApi.UpdateClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/:id", clickTransmitApi.ByIdClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/list", clickTransmitApi.ListClickhouseTransmit)
+	r.GET("/ClickhouseTransmit/page", clickTransmitApi.PageClickhouseTransmit)
+	r.POST("/ClickhouseTransmit/delete/:id", clickTransmitApi.DeleteClickhouseTransmit)
 
-	r.POST("/CassandraTransmitApi/create", cassandraTransmitApi.CreateCassandraTransmit)
-	r.POST("/CassandraTransmitApi/update", cassandraTransmitApi.UpdateCassandraTransmit)
-	r.GET("/CassandraTransmitApi/:id", cassandraTransmitApi.ByIdCassandraTransmit)
-	r.GET("/CassandraTransmitApi/page", cassandraTransmitApi.PageCassandraTransmit)
-	r.POST("/CassandraTransmitApi/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
-	r.POST("/CassandraTransmitApi/mockScript", cassandraTransmitApi.MockScript)
+	r.POST("/CassandraTransmit/create", cassandraTransmitApi.CreateCassandraTransmit)
+	r.POST("/CassandraTransmit/update", cassandraTransmitApi.UpdateCassandraTransmit)
+	r.GET("/CassandraTransmit/:id", cassandraTransmitApi.ByIdCassandraTransmit)
+	r.GET("/CassandraTransmit/list", cassandraTransmitApi.ListCassandraTransmit)
+	r.GET("/CassandraTransmit/page", cassandraTransmitApi.PageCassandraTransmit)
+	r.POST("/CassandraTransmit/delete/:id", cassandraTransmitApi.DeleteCassandraTransmit)
 
 	r.POST("/product/create", productApi.CreateProduct)
 	r.POST("/product/update", productApi.UpdateProduct)
 	r.GET("/product/:id", productApi.ByIdProduct)
+	r.GET("/product/list", productApi.ListProduct)
 	r.GET("/product/page", productApi.PageProduct)
 	r.POST("/product/delete/:id", productApi.DeleteProduct)
 
@@ -506,12 +603,21 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
 
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
+	r.GET("/DeviceInfo/list", deviceInfoApi.ListDeviceInfo)
 	r.POST("/DeviceInfo/update", deviceInfoApi.UpdateDeviceInfo)
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
 	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
 	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
-	r.POST("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
+	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
+	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
+	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
+	r.POST("/DeviceInfo/BindWebsocket", deviceInfoApi.BindWebsocket)
+	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
+	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
+	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
+	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
+	r.GET("/DeviceInfo/QueryBindWebsocket", deviceInfoApi.QueryBindWebsocket)
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -541,6 +647,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/calc-rule/refresh/:id", calcRuleApi.Refresh)
 	r.POST("/calc-rule/mock", calcRuleApi.MockCalcRule)
 	r.GET("/calc-rule/rd", calcRuleApi.CalcRuleResult)
+	r.GET("/calc-rule/list", calcRuleApi.ListCalcRule)
 
 	r.POST("/calc-param/create", calcParamApi.CreateCalcParam)
 	r.POST("/calc-param/update", calcParamApi.UpdateCalcParam)
@@ -554,7 +661,9 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/User/:id", userApi.ByIdUser)
 	r.GET("/User/list", userApi.ListUser)
 	r.POST("/User/BindRole", userApi.BindRole)
+	r.POST("/User/BindDept", userApi.BindDept)
 	r.GET("/User/QueryBindRole", userApi.QueryBindRole)
+	r.GET("/User/QueryBindDept", userApi.QueryBindDept)
 	r.POST("/User/BindDeviceInfo", userApi.BindDeviceInfo)
 	r.POST("/User/QueryBindDeviceInfo", userApi.QueryBindDeviceInfo)
 
@@ -564,6 +673,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/Dept/delete/:id", deptApi.DeleteDept)
 	r.GET("/Dept/:id", deptApi.ByIdDept)
 	r.GET("/Dept/subs", deptApi.FindByIdSubs)
+	r.GET("/Dept/list", deptApi.ListDept)
 
 	r.POST("/Role/create", roleApi.CreateRole)
 	r.POST("/Role/update", roleApi.UpdateRole)
@@ -577,6 +687,7 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/ShipmentRecord/page", shipmentRecordApi.PageShipmentRecord)
 	r.POST("/ShipmentRecord/delete/:id", shipmentRecordApi.DeleteShipmentRecord)
 	r.GET("/ShipmentRecord/:id", shipmentRecordApi.ByIdShipmentRecord)
+	r.GET("/ShipmentRecord/FindByShipmentProductDetail/:id", shipmentRecordApi.FindByShipmentProductDetail)
 
 	r.POST("/signal-delay-waring-param/create", signalDelayWaringParamApi.CreateSignalDelayWaring)
 	r.POST("/signal-delay-waring-param/update", signalDelayWaringParamApi.UpdateSignalDelayWaring)
@@ -590,6 +701,8 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/signal-delay-waring/Mock/:id", signalDelayWaringApi.Mock)
 	r.POST("/signal-delay-waring/GenParam/:id", signalDelayWaringApi.GenParam)
 	r.POST("/signal-delay-waring/query-row", signalDelayWaringApi.QueryWaringList)
+	r.GET("/signal-delay-waring/list", signalDelayWaringApi.ListSignalDelayWaring)
+	r.GET("/signal-delay-waring/byId/:id", signalDelayWaringApi.ByIdSignalDelayWaring)
 
 	r.POST("/file/update", fileApi.UpdateFile)
 	r.GET("/file/download", fileApi.DownloadFile)
@@ -598,19 +711,12 @@ func initRouter(r *gin.RouterGroup) {
 
 	r.GET("/MessageList/page", messageListApi.PageMessageList)
 
-
-
-
-
-
 	r.POST("/DingDing/create", dingdingApi.CreateDingDing)
 	r.POST("/DingDing/update", dingdingApi.UpdateDingDing)
 	r.GET("/DingDing/:id", dingdingApi.ByIdDingDing)
 	r.GET("/DingDing/page", dingdingApi.PageDingDing)
 	r.POST("/DingDing/delete/:id", dingdingApi.DeleteDingDing)
 	r.POST("/DingDing/bind", dingdingApi.Bind)
-
-
 
 	r.POST("/FeiShuId/create", feishuApi.CreateFeiShu)
 	r.POST("/FeiShuId/update", feishuApi.UpdateFeiShu)
@@ -619,8 +725,94 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/FeiShuId/delete/:id", feishuApi.DeleteFeiShu)
 	r.POST("/FeiShuId/bind", feishuApi.Bind)
 
+	r.POST("/TcpHandler/create", tcpHandlerApi.CreateTcpHandler)
+	r.POST("/TcpHandler/update", tcpHandlerApi.UpdateTcpHandler)
+	r.GET("/TcpHandler/:id", tcpHandlerApi.ByIdTcpHandler)
+	r.GET("/TcpHandler/page", tcpHandlerApi.PageTcpHandler)
+	r.POST("/TcpHandler/delete/:id", tcpHandlerApi.DeleteTcpHandler)
+
+	r.POST("/HttpHandler/create", httpHandlerApi.CreateHttpHandler)
+	r.POST("/HttpHandler/update", httpHandlerApi.UpdateHttpHandler)
+	r.GET("/HttpHandler/:id", httpHandlerApi.ByIdHttpHandler)
+	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
+	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
+
+	r.POST("/CoapHandler/create", coapHandlerApi.CreateCoapHandler)
+	r.POST("/CoapHandler/update", coapHandlerApi.UpdateCoapHandler)
+	r.GET("/CoapHandler/:id", coapHandlerApi.ByIdCoapHandler)
+	r.GET("/CoapHandler/page", coapHandlerApi.PageCoapHandler)
+	r.POST("/CoapHandler/delete/:id", coapHandlerApi.DeleteCoapHandler)
+
+	r.POST("/WebsocketHandler/create", wsHandlerApi.CreateWebsocketHandler)
+	r.POST("/WebsocketHandler/update", wsHandlerApi.UpdateWebsocketHandler)
+	r.GET("/WebsocketHandler/:id", wsHandlerApi.ByIdWebsocketHandler)
+	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
+	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
+
+	r.POST("/CassandraTransmitBind/create", cassandraTransmitBindApi.CreateCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/update", cassandraTransmitBindApi.UpdateCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/:id", cassandraTransmitBindApi.ByIdCassandraTransmitBind)
+	r.GET("/CassandraTransmitBind/page", cassandraTransmitBindApi.PageCassandraTransmitBind)
+	r.POST("/CassandraTransmitBind/delete/:id", cassandraTransmitBindApi.DeleteCassandraTransmitBind)
+
+	r.POST("/ClickhouseTransmitBind/create", clickhouseTransmitBindApi.CreateClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/update", clickhouseTransmitBindApi.UpdateClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/:id", clickhouseTransmitBindApi.ByIdClickhouseTransmitBind)
+	r.GET("/ClickhouseTransmitBind/page", clickhouseTransmitBindApi.PageClickhouseTransmitBind)
+	r.POST("/ClickhouseTransmitBind/delete/:id", clickhouseTransmitBindApi.DeleteClickhouseTransmitBind)
+
+	r.POST("/InfluxdbTransmitBind/create", influxdbTransmitBindApi.CreateInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/update", influxdbTransmitBindApi.UpdateInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/:id", influxdbTransmitBindApi.ByIdInfluxdbTransmitBind)
+	r.GET("/InfluxdbTransmitBind/page", influxdbTransmitBindApi.PageInfluxdbTransmitBind)
+	r.POST("/InfluxdbTransmitBind/delete/:id", influxdbTransmitBindApi.DeleteInfluxdbTransmitBind)
+
+	r.POST("/KafkaTransmitBind/create", kafkaTransmitBindApi.CreateKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/update", kafkaTransmitBindApi.UpdateKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/:id", kafkaTransmitBindApi.ByIdKafkaTransmitBind)
+	r.GET("/KafkaTransmitBind/page", kafkaTransmitBindApi.PageKafkaTransmitBind)
+	r.POST("/KafkaTransmitBind/delete/:id", kafkaTransmitBindApi.DeleteKafkaTransmitBind)
+
+	r.POST("/MongoTransmitBind/create", mongoTransmitBindApi.CreateMongoTransmitBind)
+	r.POST("/MongoTransmitBind/update", mongoTransmitBindApi.UpdateMongoTransmitBind)
+	r.GET("/MongoTransmitBind/:id", mongoTransmitBindApi.ByIdMongoTransmitBind)
+	r.GET("/MongoTransmitBind/page", mongoTransmitBindApi.PageMongoTransmitBind)
+	r.POST("/MongoTransmitBind/delete/:id", mongoTransmitBindApi.DeleteMongoTransmitBind)
+
+	r.POST("/MySQLTransmitBind/create", mySQLTransmitBindApi.CreateMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/update", mySQLTransmitBindApi.UpdateMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/:id", mySQLTransmitBindApi.ByIdMySQLTransmitBind)
+	r.GET("/MySQLTransmitBind/page", mySQLTransmitBindApi.PageMySQLTransmitBind)
+	r.POST("/MySQLTransmitBind/delete/:id", mySQLTransmitBindApi.DeleteMySQLTransmitBind)
+
+	r.POST("/RabbitmqTransmitBind/create", rabbitmqTransmitBindApi.CreateRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/update", rabbitmqTransmitBindApi.UpdateRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/:id", rabbitmqTransmitBindApi.ByIdRabbitmqTransmitBind)
+	r.GET("/RabbitmqTransmitBind/page", rabbitmqTransmitBindApi.PageRabbitmqTransmitBind)
+	r.POST("/RabbitmqTransmitBind/delete/:id", rabbitmqTransmitBindApi.DeleteRabbitmqTransmitBind)
+
+	r.GET("/protocol/ws_info", protocolServiceApi.WsServerInfo)
+	r.GET("/protocol/tcp_info", protocolServiceApi.TcpServerInfo)
+	r.GET("/protocol/coap_info", protocolServiceApi.CoapServerInfo)
+
+
+
+	r.POST("/ScriptListId/create", scriptListApi.CreateScriptList)
+	r.POST("/ScriptListId/update", scriptListApi.UpdateScriptList)
+	r.GET("/ScriptListId/:id", scriptListApi.ByIdScriptList)
+	r.GET("/ScriptListId/page", scriptListApi.PageScriptList)
+	r.POST("/ScriptListId/delete/:id", scriptListApi.DeleteScriptList)
+
+
+	r.GET("/pod_info",podApi.PodInfo)
+	r.GET("/pod_mqtt",podApi.PodMqtt)
+	r.POST("/pod_metrics",podApi.PodMetrics)
+
+
+	r.GET("/device-stats",statisticsApi.GetDeviceStats)
 }
 func initGlobalRedisClient() {
+	zap.S().Info("初始化Redis")
 
 	add := fmt.Sprintf("%s:%d", glob.GConfig.RedisConfig.Host, glob.GConfig.RedisConfig.Port)
 	glob.GRedis = redis.NewClient(&redis.Options{
@@ -636,8 +828,9 @@ func initGlobalRedisClient() {
 
 }
 func InitConfig() {
+	zap.S().Info("初始化配置")
 	var configPath string
-	flag.StringVar(&configPath, "config", "app-node1.yml", "Path to the config file")
+	flag.StringVar(&configPath, "config", "app-local.yml", "Path to the config file")
 	flag.Parse()
 
 	yfile, err := os.ReadFile(configPath)
@@ -653,8 +846,8 @@ func InitConfig() {
 }
 
 func initTableData() {
-
-	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
+	zap.S().Info("初始化数据")
+	glob.GDb.Model(models.User{}).FirstOrCreate(&models.User{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -664,7 +857,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrCreate(&models.User{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -674,7 +867,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrCreate(&models.User{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -684,7 +877,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrCreate(&models.User{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -693,7 +886,7 @@ func initTableData() {
 		Email:    "",
 		Status:   "active",
 	})
-	glob.GDb.Model(models.User{}).FirstOrInit(&models.User{
+	glob.GDb.Model(models.User{}).FirstOrCreate(&models.User{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -703,7 +896,7 @@ func initTableData() {
 		Status:   "active",
 	})
 
-	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrCreate(&models.UserRole{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -711,7 +904,7 @@ func initTableData() {
 		RoleId: 1,
 	})
 
-	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrCreate(&models.UserRole{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -719,21 +912,21 @@ func initTableData() {
 		RoleId: 2,
 	})
 
-	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrCreate(&models.UserRole{
 		Model: gorm.Model{
 			ID: 3,
 		},
 		UserId: 3,
 		RoleId: 3,
 	})
-	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrCreate(&models.UserRole{
 		Model: gorm.Model{
 			ID: 4,
 		},
 		UserId: 4,
 		RoleId: 4,
 	})
-	glob.GDb.Model(models.UserRole{}).FirstOrInit(&models.UserRole{
+	glob.GDb.Model(models.UserRole{}).FirstOrCreate(&models.UserRole{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -741,7 +934,7 @@ func initTableData() {
 		RoleId: 5,
 	})
 
-	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrCreate(&models.Role{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -749,7 +942,7 @@ func initTableData() {
 		Description: "超级管理员",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrCreate(&models.Role{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -757,7 +950,7 @@ func initTableData() {
 		Description: "负责完成生产计划的定制",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrCreate(&models.Role{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -765,7 +958,7 @@ func initTableData() {
 		Description: "负责完成生产",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrCreate(&models.Role{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -773,7 +966,7 @@ func initTableData() {
 		Description: "负责现场维修",
 		CanDel:      false,
 	})
-	glob.GDb.Model(models.Role{}).FirstOrInit(&models.Role{
+	glob.GDb.Model(models.Role{}).FirstOrCreate(&models.Role{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -783,7 +976,7 @@ func initTableData() {
 	})
 
 	// 生产管理员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 1,
 		},
@@ -791,7 +984,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 2,
 		},
@@ -799,7 +992,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 3,
 		},
@@ -807,7 +1000,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 4,
 		},
@@ -815,7 +1008,7 @@ func initTableData() {
 		RoleId:      2,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 5,
 		},
@@ -824,7 +1017,7 @@ func initTableData() {
 	})
 
 	// 生产人员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 6,
 		},
@@ -832,7 +1025,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 7,
 		},
@@ -840,7 +1033,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 8,
 		},
@@ -848,7 +1041,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 9,
 		},
@@ -856,7 +1049,7 @@ func initTableData() {
 		RoleId:      3,
 	})
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 10,
 		},
@@ -865,21 +1058,21 @@ func initTableData() {
 	})
 
 	//维修员 消息类型
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 11,
 		},
 		MessageType: int(glob.MaintenanceNotification),
 		RoleId:      4,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 12,
 		},
 		MessageType: int(glob.MaintenanceStartNotification),
 		RoleId:      4,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 13,
 		},
@@ -888,21 +1081,21 @@ func initTableData() {
 	})
 	//售后员 消息类型
 
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 14,
 		},
 		MessageType: int(glob.MaintenanceNotification),
 		RoleId:      5,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 15,
 		},
 		MessageType: int(glob.MaintenanceStartNotification),
 		RoleId:      5,
 	})
-	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrInit(&models.MessageTypeBindRole{
+	glob.GDb.Model(&models.MessageTypeBindRole{}).FirstOrCreate(&models.MessageTypeBindRole{
 		Model: gorm.Model{
 			ID: 16,
 		},
@@ -928,7 +1121,7 @@ func InitAll(r *gin.RouterGroup) {
 	initMongo()
 
 	initRouter(r)
-	go biz.InitRedisExpireHandler(glob.GRedis)
+	//go biz.InitRedisExpireHandler(glob.GRedis)
 	InitInfluxDbClient()
 }
 
@@ -975,6 +1168,7 @@ func CreateRabbitQueue(queueName string) {
 }
 
 func createFileUpload() {
+	zap.S().Info("初始化文件上传")
 	// 设置文件夹路径
 	dirPath := "./fileupdate"
 
@@ -983,12 +1177,12 @@ func createFileUpload() {
 		// 文件夹不存在，创建文件夹
 		err := os.MkdirAll(dirPath, 0755) // 0755是文件夹权限设置，可根据需要调整
 		if err != nil {
-			fmt.Println("创建文件夹失败：", err)
+			zap.S().Errorf("创建文件夹失败：", err)
 			return
 		}
-		fmt.Println("文件夹已创建：", dirPath)
+		zap.S().Infof("文件夹已创建：", dirPath)
 	} else {
 		// 文件夹已存在
-		fmt.Println("文件夹已存在：", dirPath)
+		zap.S().Infof("文件夹已存在：", dirPath)
 	}
 }

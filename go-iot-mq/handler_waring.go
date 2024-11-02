@@ -59,10 +59,12 @@ func HandlerWaringString(d amqp.Delivery) bool {
 // handlerWaringOnce 处理警告处理器数据的函数
 //
 // 参数：
-// msg DataRowList - 包含反序列化后的消息的数据行列表
+//
+//	- msg DataRowList 包含反序列化后的消息的数据行列表
 //
 // 返回值：
-// bool - 表示是否处理成功
+//
+//	- bool  表示是否处理成功
 func handlerWaringOnce(msg DataRowList) {
 	// 打印反序列化后的消息
 	zap.S().Debugf("处理 waring_handler 数据: %+v", msg)
@@ -70,11 +72,9 @@ func handlerWaringOnce(msg DataRowList) {
 	uid := msg.DeviceUid
 	// 1. 根据设备UID（mqtt客户端ID）获取所有信号
 
-	mapping := getMqttClientMappingSignalWarningConfig(uid)
+	mapping := getMqttClientMappingSignalWarningConfig(uid, msg.IdentificationCode)
 	db := GMongoClient.Database(globalConfig.MongoConfig.Db)
-	collection := db.Collection(globalConfig.MongoConfig.WaringCollection)
 
-	var toInsert []interface{}
 	for _, row := range msg.DataRows {
 		configs := mapping[row.Name]
 
@@ -92,7 +92,7 @@ func handlerWaringOnce(msg DataRowList) {
 				if config.Min <= floatValue && floatValue <= config.Max {
 					// 在范围内，根据需求执行操作
 					zap.S().Infof("当前信号 %s  值在范围内: %+v 命中规则ID %d", row.Name, floatValue, config.ID)
-					toInsert = append(toInsert, bson.M{
+					m := bson.M{
 						"device_uid":  uid,
 						"signal_name": row.Name,
 						"signal_id":   config.SignalId,
@@ -100,13 +100,22 @@ func handlerWaringOnce(msg DataRowList) {
 						"rule_id":     config.ID,
 						"insert_time": time.Now().Unix(),
 						"up_time":     msg.Time,
-					})
+					}
+					name := CalcCollectionName(globalConfig.MongoConfig.WaringCollection, uint(config.ID))
+					collection := db.Collection(name)
+					one, err := collection.InsertOne(context.TODO(), m)
+					if err != nil {
+						zap.S().Errorf("插入数据失败: %+v", err)
+					} else {
+						zap.S().Infof("插入数据成功: %s", one.InsertedID)
+					}
 				}
+
 			} else {
 				if floatValue < config.Min || floatValue > config.Max {
 					// 范围外报警
 					zap.S().Infof("当前信号 %s 范围外报警: %+v 命中规则ID %d", row.Name, floatValue, config.ID)
-					toInsert = append(toInsert, bson.M{
+					m := bson.M{
 						"device_uid":  uid,
 						"signal_name": row.Name,
 						"signal_id":   config.SignalId,
@@ -114,15 +123,23 @@ func handlerWaringOnce(msg DataRowList) {
 						"rule_id":     config.ID,
 						"insert_time": time.Now().Unix(),
 						"up_time":     msg.Time,
-					})
+					}
+
+					name := CalcCollectionName(globalConfig.MongoConfig.WaringCollection, uint(config.ID))
+					collection := db.Collection(name)
+					one, err := collection.InsertOne(context.TODO(), m)
+					if err != nil {
+						zap.S().Errorf("插入数据失败: %+v", err)
+					} else {
+						zap.S().Infof("插入数据成功: %s", one.InsertedID)
+					}
 				}
 			}
 
-
 			// fixme: 将报警元数据分发到不同的数据推送通道。
-			mt :=	models.MessageTemplate{
+			mt := models.MessageTemplate{
 				GeneratorTime: msg.Time,
-				DeviceUid:    uid,
+				DeviceUid:     uid,
 				SignalId:      config.SignalId,
 				MqttClientId:  uid,
 				SignalName:    row.Name,
@@ -140,27 +157,24 @@ func handlerWaringOnce(msg DataRowList) {
 			}
 			PushToQueue("waring_notice", jsonData)
 
-
 		}
 
 	}
-	_, err := collection.InsertMany(context.Background(), toInsert)
-	if err != nil {
-		zap.S().Errorf("消息确认异常：%+v", err)
-	}
+
 }
 
 // getMqttClientMappingSignalWarningConfig 根据 MQTT 客户端 ID 获取信号警告配置的映射
+//
 // 参数:
 //
-//	mqtt_client_id string - MQTT 客户端 ID
+//	- mqtt_client_id string  MQTT 客户端 ID
 //
 // 返回值:
 //
-//	map[string][]SignalWaringConfig - 信号名称到信号警告配置切片的映射
-func getMqttClientMappingSignalWarningConfig(mqttClientId string) map[string][]SignalWaringConfig {
+//	- map[string][]SignalWaringConfig - 信号名称到信号警告配置切片的映射
+func getMqttClientMappingSignalWarningConfig(mqttClientId string, code string) map[string][]SignalWaringConfig {
 	background := context.Background()
-	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId, 0, -1).Result()
+	result, err := globalRedisClient.LRange(background, "signal:"+mqttClientId+":"+code, 0, -1).Result()
 	if err != nil {
 		// 处理错误，例如记录日志或返回错误
 		zap.S().Errorf("获取信号列表失败: %+v", err)

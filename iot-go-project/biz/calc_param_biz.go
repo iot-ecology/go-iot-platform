@@ -12,7 +12,7 @@ type CalcParamBiz struct{}
 
 func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
-	var rules []models.CalcParam
+	var dt []models.CalcParam
 
 	db := glob.GDb
 
@@ -20,9 +20,6 @@ func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string,
 		db = db.Where("name like ?", "%"+name+"%")
 	}
 
-	if mqttClientId != "" {
-		db = db.Where("mqtt_client_id = ?", mqttClientId)
-	}
 	if ruleId != "" {
 		db = db.Where("calc_rule_id = ?", ruleId)
 
@@ -34,19 +31,23 @@ func (biz *CalcParamBiz) PageData(name, mqttClientId, signalName, ruleId string,
 	db.Model(&models.CalcParam{}).Count(&pagination.Total)
 
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&rules)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	for i, rule := range rules {
-		id, err := bizMqtt.FindById(strconv.Itoa(rule.MqttClientId))
-		if err != nil {
-			return nil, err
+	for i, calcParam := range dt {
+		if calcParam.Protocol == "MQTT" {
+
+			id, err := bizMqtt.FindById(strconv.Itoa(calcParam.DeviceUid))
+			if err != nil {
+				return nil, err
+			}
+			if id == nil {
+				return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(calcParam.DeviceUid))
+			}
+			dt[i].MqttClientName = id.ClientId
 		}
-		if id == nil {
-			return nil, fmt.Errorf("no client found for ID: %s", strconv.Itoa(rule.MqttClientId))
-		}
-		rules[i].MqttClientName = id.ClientId
+
 	}
-	pagination.Data = rules
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 

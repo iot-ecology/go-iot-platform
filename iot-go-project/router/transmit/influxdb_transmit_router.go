@@ -11,7 +11,7 @@ import (
 
 type InfluxdbTransmitApi struct{}
 
-var InfluxdbTransmit = transmit.InfluxdbTransmitBiz{}
+var InfluxdbTransmitBiz = transmit.InfluxdbTransmitBiz{}
 
 // CreateInfluxdbTransmit
 // @Summary 创建Influxdb数据库管理
@@ -20,7 +20,7 @@ var InfluxdbTransmit = transmit.InfluxdbTransmitBiz{}
 // @Accept json
 // @Produce json
 // @Param InfluxdbTransmit body models.InfluxdbTransmit true "Influxdb数据库管理"
-// @Success 201 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
+// @Success 200 {object} servlet.JSONResult{data=models.InfluxdbTransmit} "创建成功的Influxdb数据库管理"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /InfluxdbTransmit/create [post]
@@ -37,6 +37,7 @@ func (api *InfluxdbTransmitApi) CreateInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	InfluxdbTransmitBiz.SetRedis(InfluxdbTransmit)
 	// 返回创建成功的Influxdb数据库管理
 	servlet.Resp(c, InfluxdbTransmit)
 }
@@ -71,6 +72,12 @@ func (api *InfluxdbTransmitApi) UpdateInfluxdbTransmit(c *gin.Context) {
 
 	var newV models.InfluxdbTransmit
 	newV = old
+
+
+	newV.Name = req.Name
+	newV.Host = req.Host
+	newV.Port = req.Port
+	newV.Token = req.Token
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
@@ -78,6 +85,7 @@ func (api *InfluxdbTransmitApi) UpdateInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	InfluxdbTransmitBiz.SetRedis(newV)
 	servlet.Resp(c, old)
 }
 
@@ -109,7 +117,7 @@ func (api *InfluxdbTransmitApi) PageInfluxdbTransmit(c *gin.Context) {
 		return
 	}
 
-	data, err := InfluxdbTransmit.PageData(name, parseUint, u)
+	data, err := InfluxdbTransmitBiz.PageData(name, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -123,6 +131,7 @@ func (api *InfluxdbTransmitApi) PageInfluxdbTransmit(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /InfluxdbTransmit/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string} 
 func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 	var InfluxdbTransmit models.InfluxdbTransmit
 
@@ -139,7 +148,7 @@ func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
-
+	InfluxdbTransmitBiz.DeleteRedis(InfluxdbTransmit)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -149,6 +158,7 @@ func (api *InfluxdbTransmitApi) DeleteInfluxdbTransmit(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /InfluxdbTransmit/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.InfluxdbTransmit} 
 func (api *InfluxdbTransmitApi) ByIdInfluxdbTransmit(c *gin.Context) {
 	var InfluxdbTransmit models.InfluxdbTransmit
 
@@ -164,19 +174,17 @@ func (api *InfluxdbTransmitApi) ByIdInfluxdbTransmit(c *gin.Context) {
 	servlet.Resp(c, InfluxdbTransmit)
 }
 
-// MockScript
+// ListInfluxdbTransmit
 // @Tags      InfluxdbTransmits
-// @Summary   模拟脚本
-// @Param InfluxdbTransmit body servlet.TransmitScriptParam true "执行参数"
+// @Summary   单个详情
 // @Produce   application/json
-// @Router    /InfluxdbTransmit/mockScript [post]
-func (api *InfluxdbTransmitApi) MockScript(c *gin.Context) {
-	var req servlet.TransmitScriptParam
-	if err := c.ShouldBindJSON(&req); err != nil {
+// @Router    /InfluxdbTransmit/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.InfluxdbTransmit[]}
+func (api *InfluxdbTransmitApi) ListInfluxdbTransmit(c *gin.Context) {
+	var InfluxdbTransmit []models.InfluxdbTransmit
 
-		servlet.Error(c, err.Error())
-		return
-	}
-	script := InfluxdbTransmit.MockScript(req.DataRowList, req.Script)
-	servlet.Resp(c, script)
+	glob.GDb.Find(&InfluxdbTransmit)
+
+
+	servlet.Resp(c, InfluxdbTransmit)
 }

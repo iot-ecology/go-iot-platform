@@ -10,6 +10,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"strconv"
 )
 
@@ -17,17 +18,20 @@ type SignalBiz struct{}
 
 var bizMqtt = MqttClientBiz{}
 
-func (biz *SignalBiz) PageSignal(mqttClientId, ty string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalBiz) PageSignal(deviceUid ,protocol ,ty string, page, size int) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var signals []models.Signal
 
 	db := glob.GDb
 
-	if mqttClientId != "" {
-		db = db.Where("mqtt_client_id = ?", mqttClientId)
-	}
-	if ty != "" {
+	if ty!=""{
 		db = db.Where("type = ?", ty)
+	}
+	if deviceUid != "" {
+		db = db.Where("device_uid = ?", deviceUid)
+	}
+	if protocol !=""{
+		db = db.Where("protocol = ?", protocol)
 	}
 	db.Model(&models.Signal{}).Count(&pagination.Total) // 计算总记录数
 
@@ -35,7 +39,7 @@ func (biz *SignalBiz) PageSignal(mqttClientId, ty string, page, size int) (*serv
 	db.Offset(offset).Limit(size).Find(&signals)
 
 	for i, signal := range signals {
-		id, err := bizMqtt.FindById(signal.MqttClientId)
+		id, err := bizMqtt.FindById(signal.DeviceUid)
 		if err != nil {
 			zap.S().Errorf("error %+v", err)
 		}
@@ -60,7 +64,7 @@ func (biz *SignalBiz) FindByIdForSignal(id int) (models.Signal, error) {
 		return models.Signal{}, errors.New(result.Error.Error())
 
 	}
-	mqttClient, err := bizMqtt.FindById(signal.MqttClientId)
+	mqttClient, err := bizMqtt.FindById(signal.DeviceUid)
 	if err != nil {
 		return models.Signal{}, err
 	}
@@ -84,33 +88,36 @@ func (biz *SignalBiz) FindByName(name string) (*models.Signal, error) {
 	return &signal, nil
 }
 
-func (biz *SignalBiz) PageSignalWaringConfig(signalId int, mqttClientId string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalBiz) PageSignalWaringConfig(signalId int, device_uid, code, protocol string, page, size int) (*servlet.PaginationQ, error) {
 
 	var pagination servlet.PaginationQ
-	var signals []models.SignalWaringConfig
+	var dt []models.SignalWaringConfig
 
 	db := glob.GDb
 
 	if signalId != -1 {
 		db = db.Where("signal_id = ?", signalId)
 	}
-	if mqttClientId != "" {
-		db = db.Where("mqtt_client_id = ?", mqttClientId)
+	if device_uid != "" {
+		db = db.Where("device_uid = ?", device_uid)
 
 	}
+	if code != "" {
+		db = db.Where("identification_code = ?", code)
+
+	}
+	if protocol != "" {
+		db = db.Where("protocol = ?", protocol)
+
+	}
+
 	db.Model(&models.SignalWaringConfig{}).Count(&pagination.Total) // 计算总记录数
 
 	offset := (page - 1) * size
-	db.Offset(offset).Limit(size).Find(&signals)
+	db.Offset(offset).Limit(size).Find(&dt)
 
-	//for i, signal := range signals {
-	//	forSignal, err := biz.FindByIdForSignal(signal.SignalId)
-	//	if err != nil {
-	//
-	//	}
-	//	signals[i].Signal = forSignal
-	//}
-	pagination.Data = signals
+
+	pagination.Data = dt
 	pagination.Page = page
 	pagination.Size = size
 
@@ -130,11 +137,20 @@ func (biz *SignalBiz) RemoveSignalWaringCache(config models.SignalWaringConfig) 
 func (biz *SignalBiz) SetSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId), configBytes)
+	glob.GRedis.LPush(context.Background(), "signal:"+strconv.Itoa(config.DeviceUid) +":"+  config.
+		IdentificationCode, configBytes)
 }
 
 func (biz *SignalBiz) RemoveSignalCache(config *models.Signal) {
 	configBytes, _ := json.Marshal(config)
 
-	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.MqttClientId), 0, configBytes)
+	glob.GRedis.LRem(context.Background(), "signal:"+strconv.Itoa(config.DeviceUid) +":" + config.
+		IdentificationCode, 0, configBytes)
+}
+
+
+
+func (b SignalBiz) InitMongoCollection(m *models.SignalWaringConfig) {
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.WaringCollection, m.ID)
+	ut.CheckCollectionAndCreate(glob.GConfig.MongoConfig.WaringCollection, name)
 }

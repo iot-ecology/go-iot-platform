@@ -2,14 +2,15 @@ package router
 
 import (
 	"context"
-	"github.com/fatih/structs"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"encoding/json"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type DeviceInfoApi struct{}
@@ -23,7 +24,7 @@ var deviceInfoBiz = biz.DeviceInfoBiz{}
 // @Accept json
 // @Produce json
 // @Param DeviceInfo body models.DeviceInfo true "设备详情"
-// @Success 201 {object} servlet.JSONResult{data=models.DeviceInfo} "创建成功的设备详情"
+// @Success 200 {object} servlet.JSONResult{data=models.DeviceInfo} "创建成功的设备详情"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /DeviceInfo/create [post]
@@ -41,6 +42,12 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 		return
 	}
 
+	sn := deviceInfoBiz.FindBySn(DeviceInfo.SN)
+	if sn.ID > 0 {
+		servlet.Error(c, "设备已存在")
+		return
+	}
+
 	var Product models.Product
 	result := glob.GDb.First(&Product, DeviceInfo.ProductId)
 	if result.Error != nil {
@@ -49,18 +56,25 @@ func (api *DeviceInfoApi) CreateDeviceInfo(c *gin.Context) {
 	}
 	if !DeviceInfo.ManufacturingDate.IsZero() {
 		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
-		DeviceInfo.WarrantyExpiry = &WarrantyExpiry
+		DeviceInfo.WarrantyExpiry = WarrantyExpiry
 	}
 
-	m := structs.Map(DeviceInfo)
+	if DeviceInfo.Source == 2 {
+		DeviceInfo.ManufacturingDate = DeviceInfo.ProcurementDate
+		WarrantyExpiry := DeviceInfo.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		DeviceInfo.WarrantyExpiry = WarrantyExpiry
+	}
 
-	result = glob.GDb.Model(models.DeviceInfo{}).Create(m)
+
+	result = glob.GDb.Model(models.DeviceInfo{}).Create(&DeviceInfo)
 
 	if result.Error != nil {
 		zap.S().Errorw("创建 DeviceInfo 失败", "error", result.Error)
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	deviceInfoBiz.SetRedis(DeviceInfo)
+
 	// 返回创建成功的设备详情
 	servlet.Resp(c, DeviceInfo)
 }
@@ -95,6 +109,14 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 
 	var newV models.DeviceInfo
 	newV = old
+	newV.ProductId = req.ProductId
+	newV.Source = req.Source
+	newV.ManufacturingDate = req.ManufacturingDate
+	newV.ProcurementDate = req.ProcurementDate
+	newV.WarrantyExpiry = req.WarrantyExpiry
+	newV.PushInterval = req.PushInterval
+	newV.ErrorRate = req.ErrorRate
+	newV.Protocol = req.Protocol
 
 	var Product models.Product
 	result = glob.GDb.First(&Product, newV.ProductId)
@@ -102,17 +124,26 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+
+	if newV.Source == 2 {
+		newV.ManufacturingDate = req.ProcurementDate
+		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
+		newV.WarrantyExpiry = WarrantyExpiry
+	}
+
 	if !newV.ManufacturingDate.IsZero() {
 		WarrantyExpiry := newV.ManufacturingDate.AddDate(0, 0, Product.WarrantyPeriod)
-		newV.WarrantyExpiry = &WarrantyExpiry
+		newV.WarrantyExpiry = WarrantyExpiry
 	}
 	result = glob.GDb.Model(&newV).Updates(newV)
 
 	if result.Error != nil {
-
+		zap.S().Errorw("更新 DeviceInfo 失败", "error", result.Error)
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	deviceInfoBiz.SetRedis(newV)
+
 	servlet.Resp(c, old)
 }
 
@@ -133,6 +164,7 @@ func (api *DeviceInfoApi) UpdateDeviceInfo(c *gin.Context) {
 // @Router /DeviceInfo/page [get]
 func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 	var sn = c.Query("sn")
+	var protocol = c.Query("protocol")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
 	parseUint, err := strconv.Atoi(page)
@@ -147,7 +179,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 		return
 	}
 
-	data, err := deviceInfoBiz.PageData(sn, parseUint, u)
+	data, err := deviceInfoBiz.PageData(sn, protocol, parseUint, u)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return
@@ -161,6 +193,7 @@ func (api *DeviceInfoApi) PageDeviceInfo(c *gin.Context) {
 // @Produce   application/json
 // @Param id path int true "主键"
 // @Router    /DeviceInfo/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 
@@ -178,6 +211,7 @@ func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 		return
 	}
 
+	deviceInfoBiz.RemoveRedis(DeviceInfo.ID)
 	servlet.Resp(c, "删除成功")
 }
 
@@ -187,6 +221,7 @@ func (api *DeviceInfoApi) DeleteDeviceInfo(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /DeviceInfo/:id [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo}
 func (api *DeviceInfoApi) ByIdDeviceInfo(c *gin.Context) {
 	var DeviceInfo models.DeviceInfo
 
@@ -209,6 +244,7 @@ func (api *DeviceInfoApi) ByIdDeviceInfo(c *gin.Context) {
 // @Produce json
 // @Param device_info_id path int true "主键"
 // @Router    /DeviceInfo/QueryBindMqtt [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindMqttClient[]}
 func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 	param := c.Param("device_info_id")
 
@@ -224,13 +260,106 @@ func (api *DeviceInfoApi) QueryBindMqtt(c *gin.Context) {
 	servlet.Resp(c, deviceBindMqttClients)
 }
 
+// QueryBindHttp
+// @Tags      DeviceInfos
+// @Summary   查询绑定HTTP客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindHTTP [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]}
+func (api *DeviceInfoApi) QueryBindHttp(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var res []models.DeviceBindTcpHandler
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, res)
+}
+
+// QueryBindCoap
+// @Tags      DeviceInfos
+// @Summary   查询绑定coap客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindCoap [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.CoapHandler[]}
+func (api *DeviceInfoApi) QueryBindCoap(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var res []models.CoapHandler
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, res)
+}
+
+// QueryBindWebsocket
+// @Tags      DeviceInfos
+// @Summary   查询绑定websocket客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindWebsocket [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.WebsocketHandler[]}
+func (api *DeviceInfoApi) QueryBindWebsocket(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var res []models.WebsocketHandler
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, res)
+}
+
+// QueryBindTcp
+// @Tags      DeviceInfos
+// @Summary   查询绑定tcp客户端
+// @Accept json
+// @Produce json
+// @Param device_info_id path int true "主键"
+// @Router    /DeviceInfo/QueryBindTcp [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceBindTcpHandler[]}
+func (api *DeviceInfoApi) QueryBindTcp(c *gin.Context) {
+	param := c.Param("device_info_id")
+
+	var res []models.DeviceBindTcpHandler
+
+	// 使用 Where 和 Find 方法查询记录
+	result := glob.GDb.Where("`device_info_id` = ?", param).Find(&res)
+	if result.Error != nil {
+		zap.S().Infoln("Error occurred during query:", result.Error)
+		servlet.Error(c, "暂无数据")
+		return
+	}
+	servlet.Resp(c, res)
+}
+
 // BindMqtt
 // @Tags      DeviceInfos
 // @Summary   绑定mqtt客户端
 // @Accept json
 // @Produce json
-// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
+// @Param DeviceGroup body servlet.DeviceBindMqttClientParam true "绑定参数"
 // @Router    /DeviceInfo/BindMqtt [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 	var param servlet.DeviceBindMqttClientParam
 	if err := c.ShouldBindJSON(&param); err != nil {
@@ -245,10 +374,9 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 		servlet.Error(c, "Failed to begin transaction")
 		return
 	}
-	var  toDel  []models.DeviceBindMqttClient
+	var toDel []models.DeviceBindMqttClient
 
-	tx.Where("`device_info_id` = ?", param.DeviceId).Find(toDel)
-
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(&toDel)
 
 	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindMqttClient{})
 
@@ -274,6 +402,18 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 		servlet.Error(c, "Error occurred during creation")
 		return
 	}
+
+	var DeviceInfo models.DeviceInfo
+
+	first := tx.First(&DeviceInfo, param.DeviceId)
+
+	if first.Error != nil {
+		servlet.Error(c, "DeviceInfo not found")
+		return
+	}
+
+	tx.Model(&models.DeviceInfo{}).Where("id = ? ", param.DeviceId).Update("protocol", "mqtt")
+
 	if err := tx.Commit().Error; err != nil {
 		servlet.Error(c, "Failed to commit transaction")
 		return
@@ -281,23 +421,282 @@ func (api *DeviceInfoApi) BindMqtt(c *gin.Context) {
 
 	// redis 中建立 mqtt_client_id 与 device_info_id 的映射
 
-
-	var DeviceInfo models.DeviceInfo
-
-	first := tx.First(&DeviceInfo, param.DeviceId)
-	if first.Error != nil {
-		servlet.Error(c, "DeviceInfo not found")
-		return
-	}
-
 	for _, client := range toDel {
-		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(int(client.MqttClientId)))
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_product:"+strconv.Itoa(int(client.MqttClientId)))
 	}
 
 	for _, item := range param.MqttClientId {
-		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+ strconv.Itoa(item), DeviceInfo.ProductId)
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_product:"+strconv.Itoa(item), DeviceInfo.ProductId)
+	}
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(int(client.MqttClientId)))
+	}
+
+	for _, item := range param.MqttClientId {
+		glob.GRedis.LPush(context.Background(), "mqtt_client_id_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
+
 	}
 
 	servlet.Resp(c, "绑定成功")
 
+}
+
+// BindTcp
+// @Tags      DeviceInfos
+// @Summary   绑定tcp处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body servlet.DeviceBindTcpParam true "绑定参数"
+// @Router    /DeviceInfo/BindTcp [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *DeviceInfoApi) BindTcp(c *gin.Context) {
+	var param servlet.DeviceBindTcpParam
+	if err := c.ShouldBindJSON(&param); err != nil {
+
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	// 开启事务
+	tx := glob.GDb.Begin()
+	if tx.Error != nil {
+		servlet.Error(c, "Failed to begin transaction")
+		return
+	}
+	var toDel []models.DeviceBindTcpHandler
+
+	tx.Where("`device_info_id` = ?", param.DeviceId).Find(&toDel)
+
+	result := tx.Where("`device_info_id` = ?", param.DeviceId).Delete(&models.DeviceBindTcpHandler{})
+
+	if result.Error != nil {
+		// 如果出现错误，回滚事务
+		tx.Rollback()
+		servlet.Error(c, "Error occurred during deletion")
+		return
+	}
+
+	var deviceBindTcpHandlers []models.DeviceBindTcpHandler
+	for _, tcpId := range param.TcpHandlerId {
+		deviceBindTcpHandlers = append(deviceBindTcpHandlers, models.DeviceBindTcpHandler{
+			DeviceInfoId: uint(param.DeviceId),
+			TcpHandlerId: uint(tcpId),
+		})
+	}
+
+	result = tx.Model(&models.DeviceBindTcpHandler{}).CreateInBatches(deviceBindTcpHandlers, len(deviceBindTcpHandlers))
+	if result.Error != nil {
+		tx.Rollback()
+		zap.S().Infoln("Error occurred during creation:", result.Error)
+		servlet.Error(c, "Error occurred during creation")
+		return
+	}
+
+	var DeviceInfo models.DeviceInfo
+
+	first := tx.First(&DeviceInfo, param.DeviceId)
+	tx.Model(&models.DeviceInfo{}).Where("id = ? ", param.DeviceId).Update("protocol", "tcp")
+	if first.Error != nil {
+		servlet.Error(c, "DeviceInfo not found")
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		servlet.Error(c, "Failed to commit transaction")
+		return
+	}
+
+	// redis 中建立 tcp 与 device_info_id 的映射
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "tcp_bind_product:"+strconv.Itoa(int(client.TcpHandlerId)))
+	}
+
+	for _, item := range param.TcpHandlerId {
+		glob.GRedis.LPush(context.Background(), "tcp_bind_product:"+strconv.Itoa(item), DeviceInfo.ProductId)
+	}
+
+	for _, client := range toDel {
+		glob.GRedis.Del(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(int(client.TcpHandlerId)))
+	}
+
+	for _, item := range param.TcpHandlerId {
+		glob.GRedis.LPush(context.Background(), "tcp_bind_device_info:"+strconv.Itoa(item), DeviceInfo.ID)
+
+	}
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
+// BindHTTP
+// @Tags      DeviceInfos
+// @Summary   绑定http处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body models.HttpHandler true "绑定参数"
+// @Router    /DeviceInfo/BindHTTP [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *DeviceInfoApi) BindHTTP(c *gin.Context) {
+	var param models.HttpHandler
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	if param.ID != 0 {
+		var old models.HttpHandler
+
+		result := glob.GDb.First(&old, param.ID)
+		if result.Error != nil {
+
+			servlet.Error(c, "HttpHandler not found")
+			return
+		}
+		var newV models.HttpHandler
+		newV = old
+		newV.DeviceInfoId = param.DeviceInfoId
+		newV.Name = param.Name
+		newV.Username = param.Username
+		newV.Password = param.Password
+		newV.Script = param.Script
+		// 更新记录
+		result = glob.GDb.Model(&newV).Updates(newV)
+		SetHttpHandlerRedis(newV)
+	} else {
+		// 新增
+		glob.GDb.Model(models.HttpHandler{}).Create(&param)
+		SetHttpHandlerRedis(param)
+
+	}
+
+	glob.GRedis.LPush(context.Background(), "http_bind_device_info:"+strconv.Itoa(int(param.ID)), param.DeviceInfoId)
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
+// BindHCoap
+// @Tags      DeviceInfos
+// @Summary   绑定coap处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body models.CoapHandler true "绑定参数"
+// @Router    /DeviceInfo/BindHCoap [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *DeviceInfoApi) BindHCoap(c *gin.Context) {
+	var param models.CoapHandler
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	if param.ID != 0 {
+		var old models.CoapHandler
+
+		result := glob.GDb.First(&old, param.ID)
+		if result.Error != nil {
+
+			servlet.Error(c, "HttpHandler not found")
+			return
+		}
+		var newV models.CoapHandler
+		newV = old
+		newV.DeviceInfoId = param.DeviceInfoId
+		newV.Name = param.Name
+		newV.Username = param.Username
+		newV.Password = param.Password
+		newV.Script = param.Script
+		// 更新记录
+		result = glob.GDb.Model(&newV).Updates(newV)
+		SetCoapHandlerRedis(newV)
+	} else {
+		// 新增
+		glob.GDb.Model(models.CoapHandler{}).Create(&param)
+		SetCoapHandlerRedis(param)
+
+	}
+
+	glob.GRedis.LPush(context.Background(), "coap_bind_device_info:"+strconv.Itoa(int(param.ID)), param.DeviceInfoId)
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
+// BindWebsocket
+// @Tags      DeviceInfos
+// @Summary   绑定websocket处理器
+// @Accept json
+// @Produce json
+// @Param DeviceGroup body models.CoapHandler true "绑定参数"
+// @Router    /DeviceInfo/BindWebsocket [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
+func (api *DeviceInfoApi) BindWebsocket(c *gin.Context) {
+	var param models.WebsocketHandler
+	if err := c.ShouldBindJSON(&param); err != nil {
+		servlet.Error(c, err.Error())
+		return
+	}
+
+	if param.ID != 0 {
+		var old models.CoapHandler
+
+		result := glob.GDb.First(&old, param.ID)
+		if result.Error != nil {
+
+			servlet.Error(c, "HttpHandler not found")
+			return
+		}
+		var newV models.CoapHandler
+		newV = old
+		newV.DeviceInfoId = param.DeviceInfoId
+		newV.Name = param.Name
+		newV.Username = param.Username
+		newV.Password = param.Password
+		newV.Script = param.Script
+		// 更新记录
+		result = glob.GDb.Model(&newV).Updates(newV)
+		SetCoapHandlerRedis(newV)
+	} else {
+		// 新增
+		glob.GDb.Model(models.CoapHandler{}).Create(&param)
+		SetWebsocketHandlerRedis(param)
+
+	}
+
+	glob.GRedis.LPush(context.Background(), "ws_bind_device_info:"+strconv.Itoa(int(param.ID)), param.DeviceInfoId)
+
+	servlet.Resp(c, "绑定成功")
+
+}
+
+// ListDeviceInfo
+// @Tags      DeviceInfos
+// @Summary   设备列表
+// @Accept json
+// @Produce json
+// @Router    /DeviceInfo/list [get]
+// @Success 200 {object}  servlet.JSONResult{data=models.DeviceInfo[]}
+func (api *DeviceInfoApi) ListDeviceInfo(c *gin.Context) {
+	var res []models.DeviceInfo
+	glob.GDb.Find(&res)
+	servlet.Resp(c, res)
+
+}
+
+func SetHttpHandlerRedis(config models.HttpHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:http", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
+}
+func SetCoapHandlerRedis(config models.CoapHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:coap", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
+}
+func SetWebsocketHandlerRedis(config models.WebsocketHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:ws", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
+}
+func SetTcpIpHandlerRedis(config models.TcpHandler) {
+	jsonData, _ := json.Marshal(config)
+	glob.GRedis.HSet(context.Background(), "auth:tcp", strconv.Itoa(int(config.DeviceInfoId)), jsonData)
 }

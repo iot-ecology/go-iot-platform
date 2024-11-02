@@ -12,6 +12,7 @@ import (
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
+	"igp/ut"
 	"log"
 	"strconv"
 )
@@ -28,7 +29,7 @@ var SignalDelayWaringBiz = biz.SignalDelayWaringBiz{}
 // @Accept json
 // @Produce json
 // @Param SignalDelayWaring body models.SignalDelayWaring true "脚本报警"
-// @Success 201 {object} servlet.JSONResult{data=models.SignalDelayWaring} "创建成功的脚本报警"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalDelayWaring} "创建成功的脚本报警"
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 500 {string} string "内部服务器错误"
 // @Router /signal-delay-waring/create [post]
@@ -56,6 +57,8 @@ func (api *SignalDelayWaringApi) CreateSignalDelayWaring(c *gin.Context) {
 		glob.GLog.Error("json 序列化异常", zap.Any("err", err))
 	}
 	glob.GRedis.HSet(context.Background(), "signal_delay_config", strconv.Itoa(int(SignalDelayWaring.ID)), jsonData)
+
+	SignalDelayWaringBiz.InitMongoCollection(&SignalDelayWaring)
 
 	// 返回创建成功的脚本报警
 	servlet.Resp(c, SignalDelayWaring)
@@ -154,6 +157,7 @@ func (api *SignalDelayWaringApi) PageSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/delete/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *SignalDelayWaringApi) DeleteSignalDelayWaring(c *gin.Context) {
 	var SignalDelayWaring models.SignalDelayWaring
 
@@ -180,6 +184,7 @@ func (api *SignalDelayWaringApi) DeleteSignalDelayWaring(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/Mock/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *SignalDelayWaringApi) Mock(c *gin.Context) {
 
 	param := c.Param("id")
@@ -198,6 +203,7 @@ func (api *SignalDelayWaringApi) Mock(c *gin.Context) {
 // @Param id path int true "主键"
 // @Produce   application/json
 // @Router    /signal-delay-waring/GenParam/:id [post]
+// @Success 200 {object}  servlet.JSONResult{data=string}
 func (api *SignalDelayWaringApi) GenParam(c *gin.Context) {
 
 	param := c.Param("id")
@@ -216,6 +222,7 @@ func (api *SignalDelayWaringApi) GenParam(c *gin.Context) {
 // @Param config body servlet.WaringRowQuery true "查询参数"
 // @Produce   application/json
 // @Router    /signal-delay-waring/query-row [post]
+// @Success 200 {object}  servlet.JSONResult{data=servlet.WaringRowQuery}
 func (api *SignalDelayWaringApi) QueryWaringList(c *gin.Context) {
 
 	var req servlet.WaringRowQuery
@@ -229,8 +236,11 @@ func (api *SignalDelayWaringApi) QueryWaringList(c *gin.Context) {
 
 }
 func query2(req servlet.WaringRowQuery) []bson.M {
+
+	name := ut.CalcCollectionName(glob.GConfig.MongoConfig.ScriptWaringCollection, uint(req.ID))
+
 	database := glob.GMongoClient.Database(glob.GConfig.MongoConfig.Db)
-	collection := database.Collection(glob.GConfig.MongoConfig.ScriptWaringCollection)
+	collection := database.Collection(name)
 
 	filter := bson.M{
 		"rule_id": req.ID,
@@ -260,4 +270,42 @@ func query2(req servlet.WaringRowQuery) []bson.M {
 		c = append(c, result)
 	}
 	return c
+}
+
+// ListSignalDelayWaring
+// @Summary 脚本报警列表
+// @Description 脚本报警列表
+// @Tags signal-delay-waring
+// @Accept json
+// @Produce json
+// @Param SignalDelayWaring body models.SignalDelayWaring true "脚本报警"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalDelayWaring[]} "创建成功的脚本报警"
+// @Failure 400 {string} string "请求数据错误"
+// @Failure 500 {string} string "内部服务器错误"
+// @Router /signal-delay-waring/list [get]
+func (api *SignalDelayWaringApi) ListSignalDelayWaring(c *gin.Context) {
+	var SignalDelayWaring []models.SignalDelayWaring
+
+	glob.GDb.Find(&SignalDelayWaring)
+
+	servlet.Resp(c, SignalDelayWaring)
+}
+
+// ByIdSignalDelayWaring
+// @Summary 脚本报警详情
+// @Description 脚本报警详情
+// @Tags signal-delay-waring
+// @Accept json
+// @Produce json
+// @Param SignalDelayWaring body models.SignalDelayWaring true "脚本报警"
+// @Success 200 {object} servlet.JSONResult{data=models.SignalDelayWaring[]} "创建成功的脚本报警"
+// @Failure 400 {string} string "请求数据错误"
+// @Failure 500 {string} string "内部服务器错误"
+// @Router /signal-delay-waring/byId/:id [get]
+func (api *SignalDelayWaringApi) ByIdSignalDelayWaring(c *gin.Context) {
+	var SignalDelayWaring models.SignalDelayWaring
+	var id = c.Param("id")
+	glob.GDb.Find(&SignalDelayWaring, id)
+
+	servlet.Resp(c, SignalDelayWaring)
 }

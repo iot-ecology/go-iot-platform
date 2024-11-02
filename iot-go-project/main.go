@@ -1,11 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.uber.org/zap"
 	"igp/docs"
 	"igp/glob"
 	"igp/initialize"
@@ -15,6 +10,12 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 )
 
 // Beat
@@ -48,10 +49,9 @@ func Beat(g *gin.Context) {
 // @BasePath /
 func main() {
 
-	r := gin.Default()
-
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
 	group := r.Group("/")
-
 	group.Use(CORSMiddleware())
 	group.Use(ExceptionMiddleware)
 

@@ -14,9 +14,9 @@ mq_config:
 influx_config:
   host: 127.0.0.1
   port: 8086
-  token: i6XHSnNXeUoU3GoFXMm4qqrrgt69JKvQLqm0FCtnYG-rjb-nkDcry0pdwv4fpcXsSwi-mTGmAUTygkJtR-6CWA==
+  token: mytoken
   org: myorg
-  bucket: buc
+  bucket: mybucket
 
 mysql_config:
   username: root
