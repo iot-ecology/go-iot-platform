@@ -55,7 +55,15 @@ func (m *MqttInterface) Connect(host, username, password string, port int) error
 
 // messageHandler 处理接收到的消息
 func (m *MqttInterface) messageHandler(client mqtt.Client, msg mqtt.Message) {
-
+	mqttMsg := MQTTMessage{
+		MQTTClientID: m.Id,
+		Message:      string(msg.Payload()),
+	}
+	jsonData, err := json.Marshal(mqttMsg)
+	if err != nil {
+		zap.S().Errorf("Error marshalling MQTT message to JSON: %v", err)
+	}
+	go PushToQueue("pre_handler", jsonData)
 }
 
 // Subscribe 订阅一个或多个主题
@@ -67,6 +75,7 @@ func (m *MqttInterface) Subscribe(topics string) error {
 				Message:      string(msg.Payload()),
 			}
 			jsonData, _ := json.Marshal(mqttMsg)
+			go PushToQueue("pre_handler", jsonData)
 
 			m.Chan <- jsonData
 		}()
