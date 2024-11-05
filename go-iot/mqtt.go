@@ -76,7 +76,8 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 		zap.S().Errorf("mqtt connect err = %v", err)
         return false
 	}
-	c[clientId] = &config
+	go client.Subscribe(subTopic)
+	//c[clientId] = &config
 
 	return true
 
