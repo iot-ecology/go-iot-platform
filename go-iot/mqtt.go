@@ -77,6 +77,7 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
         return false
 	}
 	go client.Subscribe(subTopic)
+	go client.HandlerMsg()
 	//c[clientId] = &config
 
 	return true
