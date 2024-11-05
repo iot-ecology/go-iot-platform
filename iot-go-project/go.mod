@@ -13,6 +13,7 @@ replace iot-notice => ../notice
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dop251/goja v0.0.0-20240627195025-eb1f15ee67d2
+	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/fatih/structs v1.1.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
@@ -30,6 +31,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.6
 	gorm.io/gorm v1.25.11
+
 )
 
 require (
@@ -65,6 +67,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -99,12 +102,12 @@ require (
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
-	golang.org/x/tools v0.21.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
 	google.golang.org/grpc v1.58.3 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect

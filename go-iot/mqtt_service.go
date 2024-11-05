@@ -75,7 +75,6 @@ func (m *MqttInterface) Subscribe(topics string) error {
 				Message:      string(msg.Payload()),
 			}
 			jsonData, _ := json.Marshal(mqttMsg)
-			go PushToQueue("pre_handler", jsonData)
 
 			m.Chan <- jsonData
 		}()
@@ -90,8 +89,8 @@ func (m *MqttInterface) Subscribe(topics string) error {
 }
 
 // Publish 向一个主题发布消息
-func (m *MqttInterface) Publish(topic string, payload interface{}) {
-	token := m.client.Publish(topic, 0, false, payload)
+func (m *MqttInterface) Publish(topic string ,qos byte , reatined bool, payload interface{}) {
+	token := m.client.Publish(topic, qos, reatined, payload)
 	token.Wait()
 }
 
