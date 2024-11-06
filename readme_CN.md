@@ -35,6 +35,9 @@ Go IoT 是基于Gin 的开源分布式物联网（IOT）开发平台，用于快
 - transmit_handler队列: 用于将**预处理后**的数据转发到cassandra、clickhouse、influxdb2、mongo、mysql、kafka、rabbit等
 - 定时任务队列集群：这是使用Redis+RabbitMQ实现的定时任务，他能够完成用户定义的复杂计算任务（基于JavaScript编写任务）。
 
+
+![](./readme/数据图.jpg)
+
 ## 开源贡献
 - 从`dev`分支拉取代码`checkout`一个新的分支(注意: 务必保持`dev`分支的最新状态)
 - 分支命名格式: `feat-功能名称` 
