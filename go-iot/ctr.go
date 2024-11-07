@@ -190,7 +190,7 @@ func CreateMqttClientHttp(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		} else {
-			AddNoUseConfig(config, body)
+			//AddNoUseConfig(config, body)
 			BindNode(config, globalConfig.NodeInfo.Name)
 			err := json.NewEncoder(w).Encode(map[string]any{"status": 200, "message": "创建成功", "size": usz})
 			if err != nil {
