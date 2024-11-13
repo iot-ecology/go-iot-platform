@@ -23,7 +23,8 @@ type MySQLTransmitBind struct {
 	DeviceUid          int `json:"device_uid"`                                                                                  // 设备UID
 	IdentificationCode string `json:"identification_code"`                                                                         // 设备标识码
 	MySQLTransmitId    uint   `struct:"mysql_transmit_id" json:"mysql_transmit_id" gorm:"column:mysql_transmit_id;type:int(10);" ` // MySQL传输表的外键ID
-	Table              string `struct:"table" json:"table" gorm:"column:table;type:varchar(255);"`                                 // 表
+	Table              string `struct:"table" json:"table" gorm:"column:table_name;type:varchar(
+255);"`                                 // 表
 	Script             string `struct:"script" json:"script" gorm:"column:script"`                                                 // 转换insert
 	// 语句的脚本
 	Enable bool `structs:"enable" json:"enable" gorm:"column:enable;type:tinyint(1);"` // 是否启用
@@ -96,7 +97,7 @@ type ClickhouseTransmitBind struct {
 	ClickhouseTransmitId uint   `json:"clickhouse_transmit_id" gorm:"column:clickhouse_transmit_id;type:int(10);"` // 传输表的外键ID
 	Database             string `json:"database" gorm:"column:database;type:varchar(255);"`                        // 数据库
 	Script               string `json:"script" gorm:"column:script"`                                               // 转换insert语句的脚本
-	Table                string `json:"table" gorm:"column:table;type:varchar(255);"`                              // 表
+	Table                string `json:"table" gorm:"column:table_name;type:varchar(255);"`                              // 表
 	Enable               bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                             // 是否启用
 
 }
@@ -119,7 +120,7 @@ type CassandraTransmitBind struct {
 
 	CassandraTransmitId uint   `json:"cassandra_transmit_id" gorm:"column:cassandra_transmit_id;type:int(10);"` // 传输表的外键ID
 	Database            string `json:"database" gorm:"column:database;type:varchar(255);"`                      // 数据库
-	Table               string `json:"table" gorm:"column:table;type:varchar(255);"`                            // 表
+	Table               string `json:"table" gorm:"column:table_name;type:varchar(255);"`                            // 表
 	Script              string `json:"script" gorm:"column:script"`                                             // 转换insert语句的脚本
 	Enable              bool   `json:"enable" gorm:"column:enable;type:tinyint(1);" `                           // 是否启用
 
