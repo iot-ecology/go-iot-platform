@@ -27,8 +27,11 @@ const CoapHandlerUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -40,6 +43,12 @@ const CoapHandlerUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'device_info_id'}
@@ -58,22 +67,56 @@ const CoapHandlerUpdateForm: React.FC<UpdateFormProps> = (props) => {
               value: 'ID',
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.http.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.http.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'username'}
           label={<FormattedMessage id="pages.http.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           key={'password'}
           label={<FormattedMessage id="pages.http.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormTextArea
           key={'script'}
           label={<FormattedMessage id="pages.http.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

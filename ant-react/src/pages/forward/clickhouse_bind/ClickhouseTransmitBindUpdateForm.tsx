@@ -32,8 +32,11 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -45,6 +48,12 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           disabled={true}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -58,6 +67,12 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'protocol'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -99,12 +114,24 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           request={async () => {
@@ -122,16 +149,34 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'clickhouse_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
           name="clickhouse_transmit_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'database'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.database" />}
           name="database"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'table'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
           name="table"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormTextArea
           tooltip={
@@ -163,6 +208,12 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormRadio.Group
@@ -176,6 +227,12 @@ const ClickhouseTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
             {
               label: '停用',
               value: false,
+            },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}
         />

@@ -1,4 +1,4 @@
-import { CassandraTransmitList, ClickhouseTransmitList, deviceList, InfluxdbTransmitList, mqttList } from '@/services/ant-design-pro/api';
+import { deviceList, InfluxdbTransmitList, mqttList } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { ProFormRadio, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { Form, Modal } from 'antd';
@@ -27,8 +27,11 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -40,6 +43,12 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           disabled={true}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -53,6 +62,12 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'protocol'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -94,12 +109,24 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           request={async () => {
@@ -117,26 +144,56 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'influxdb_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
           name="influxdb_transmit_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'org'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.org" />}
           name="org"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'bucket'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.bucket" />}
           name="bucket"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'measurement'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.measurement" />}
           name="measurement"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormRadio.Group
@@ -150,6 +207,12 @@ const InfluxdbTransmitBindUpdateForm: React.FC<UpdateFormProps> = (props) => {
             {
               label: '停用',
               value: false,
+            },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}
         />

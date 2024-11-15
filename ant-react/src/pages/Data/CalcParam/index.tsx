@@ -116,7 +116,7 @@ const Admin: React.FC = () => {
     {
       key: 'protocol',
       title: <FormattedMessage id="pages.calc-param.protocol" />,
-      order:99,
+      order: 99,
       hideInSearch: false,
       dataIndex: 'protocol',
       initialValue: 'MQTT',
@@ -157,9 +157,9 @@ const Admin: React.FC = () => {
 
     {
       key: 'device_uid',
-      dependencies:["protocol"],
+      dependencies: ['protocol'],
       title: <FormattedMessage id="pages.calc-param.device_uid" />,
-      order:98,
+      order: 98,
       hideInSearch: false,
       dataIndex: 'device_uid',
       valueType: 'select',
@@ -231,7 +231,7 @@ const Admin: React.FC = () => {
     {
       key: 'calc_rule_id',
       title: <FormattedMessage id="pages.calc-param.calc_rule_id" />,
-      order:100,
+      order: 100,
       hideInSearch: false,
       dataIndex: 'calc_rule_id',
       request: async () => {
@@ -320,6 +320,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.CalcParamListItem);
           if (success) {
@@ -346,6 +349,12 @@ const Admin: React.FC = () => {
               value: 'ID',
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           valueEnum={{
@@ -363,6 +372,12 @@ const Admin: React.FC = () => {
               setCreateDeviceUid('');
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -402,12 +417,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.calc-param.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.calc-param.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -433,12 +460,24 @@ const Admin: React.FC = () => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.calc-param.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'name'}
           label={<FormattedMessage id="pages.calc-param.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -452,6 +491,12 @@ const Admin: React.FC = () => {
           key={'reduce'}
           label={<FormattedMessage id="pages.calc-param.reduce" />}
           name="reduce"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 

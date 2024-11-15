@@ -216,6 +216,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.ScriptWaringListItem);
           if (success) {
@@ -226,8 +229,28 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.name" />} name="name" />
-        <ProFormText key={'script'} label={<FormattedMessage id="pages.script" />} name="script" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
+        <ProFormText
+          key={'script'}
+          label={<FormattedMessage id="pages.script" />}
+          name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
       </ModalForm>
 
       <DebugScript

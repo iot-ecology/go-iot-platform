@@ -398,6 +398,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.SignalWaringItem);
           if (success) {
@@ -419,6 +422,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.signal.waring.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           multiple={false}
@@ -441,12 +450,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.signal.waring.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.signal.waring.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -472,16 +493,34 @@ const Admin: React.FC = () => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.signal.waring.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'min'}
           label={<FormattedMessage id="pages.signal.waring.min" />}
           name="min"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'max'}
           label={<FormattedMessage id="pages.signal.waring.max" />}
           name="max"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'in_or_out'}
@@ -491,6 +530,12 @@ const Admin: React.FC = () => {
             1: { text: '范围内报警', status: 'success' },
             0: { text: '范围外报警', status: 'success' },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 

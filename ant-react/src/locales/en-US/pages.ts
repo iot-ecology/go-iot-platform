@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': 'Batch Deletion',
   'pages.searchTable.batchApproval': 'Batch Approval',
 
+  'pages.rules.select': 'Please Select',
+  'pages.rules.input': 'Please Input',
+
   'pages.new': 'New',
   'pages.deleted': 'Deleted',
   'pages.set-param': 'Set Params',

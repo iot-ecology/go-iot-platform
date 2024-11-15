@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': 'ลบเป็นกลุ่ม',
   'pages.searchTable.batchApproval': 'อนุมัติเป็นกลุ่ม',
 
+  'pages.rules.select': 'لطفا انتخاب کنید',
+  'pages.rules.input': 'لطفا وارد شوید',
+
   'pages.new': 'สร้างใหม่',
   'pages.deleted': 'ลบ',
   'pages.set-param': 'ตั้งค่าพารามิเตอร์',

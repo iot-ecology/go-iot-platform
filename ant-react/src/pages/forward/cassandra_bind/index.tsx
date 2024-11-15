@@ -251,6 +251,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.CassandraTransmitBindListItem);
           if (success) {
@@ -272,6 +275,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -313,12 +322,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           request={async () => {
@@ -336,16 +357,34 @@ const Admin: React.FC = () => {
           key={'cassandra_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
           name="cassandra_transmit_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'database'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.database" />}
           name="database"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'table'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.table" />}
           name="table"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormTextArea
           tooltip={
@@ -382,6 +421,12 @@ const Admin: React.FC = () => {
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormRadio.Group
@@ -395,6 +440,12 @@ const Admin: React.FC = () => {
             {
               label: '停用',
               value: false,
+            },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}
         />

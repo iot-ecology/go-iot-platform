@@ -1,11 +1,12 @@
 import ScriptNameShow from '@/pages/Data/ScriptParam/ScriptNameShow';
 import ScriptParamUpdateForm from '@/pages/Data/ScriptParam/ScriptParamUpdateForm';
-import { initSearchDeviceUidForMqtt } from '@/pages/Data/Signal';
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import SignalNameShow from '@/pages/Data/Signal/SignalNameShow';
+import { initSearchSignalId } from '@/pages/Data/SignalWaring';
 import {
   addScriptWaringParam,
-  deleteScriptWaringParam, deviceList,
+  deleteScriptWaringParam,
+  deviceList,
   mqttList,
   scriptWaringList,
   scritpParamPage,
@@ -28,7 +29,6 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
-import {initSearchSignalId} from "@/pages/Data/SignalWaring";
 
 const handleAdd = async (fields: API.ScriptWaringParamListItem) => {
   const hide = message.loading('正在添加');
@@ -147,7 +147,7 @@ const Admin: React.FC = () => {
         options: opDeviceUid,
         placeholder: '请选择',
       },
-      order:99,
+      order: 99,
       valueEnum: {
         MQTT: { text: 'MQTT', status: 'success' },
         HTTP: { text: 'HTTP', status: 'success' },
@@ -165,7 +165,7 @@ const Admin: React.FC = () => {
 
     {
       key: 'device_uid',
-      order:98,
+      order: 98,
       title: <FormattedMessage id="pages.waring-param.device_uid" />,
       hideInSearch: false,
       dataIndex: 'device_uid',
@@ -174,7 +174,6 @@ const Admin: React.FC = () => {
         onChange: async (value) => {
           setSearchDeviceUid(Number(value));
           await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
-
         },
         value: searchDeviceUid,
 
@@ -209,7 +208,7 @@ const Admin: React.FC = () => {
     {
       key: 'signal_id',
       title: <FormattedMessage id="pages.waring-param.signal_id" />,
-      order:97,
+      order: 97,
       hideInSearch: false,
       dataIndex: 'signal_id',
       valueType: 'select',
@@ -334,6 +333,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.ScriptWaringParamListItem);
           if (success) {
@@ -360,6 +362,12 @@ const Admin: React.FC = () => {
               setCreateDeviceUid('');
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -399,12 +407,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.waring-param.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.waring-param.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -430,6 +450,12 @@ const Admin: React.FC = () => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.waring-param.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -449,12 +475,24 @@ const Admin: React.FC = () => {
           key={'signal_delay_waring_id'}
           label={<FormattedMessage id="pages.waring-param.signal_delay_waring_id" />}
           name="signal_delay_waring_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'name'}
           label={<FormattedMessage id="pages.waring-param.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
       <ScriptParamUpdateForm

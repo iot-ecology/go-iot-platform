@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': 'Penghapusan Massal',
   'pages.searchTable.batchApproval': 'Persetujuan Massal',
 
+  'pages.rules.select': 'Silakan pilih',
+  'pages.rules.input': 'Silakan masuk',
+
   'pages.new': 'Baru',
   'pages.deleted': 'Dihapus',
   'pages.set-param': 'Setel Parameter',

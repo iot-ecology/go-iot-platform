@@ -143,6 +143,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.RoleListItem);
           if (success) {
@@ -153,8 +156,26 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText label={<FormattedMessage id="pages.name" />} name="name" />{' '}
-        <ProFormText label={<FormattedMessage id="pages.desc" />} name="description" />
+        <ProFormText
+          label={<FormattedMessage id="pages.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />{' '}
+        <ProFormText
+          label={<FormattedMessage id="pages.desc" />}
+          name="description"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
       </ModalForm>
 
       <Drawer

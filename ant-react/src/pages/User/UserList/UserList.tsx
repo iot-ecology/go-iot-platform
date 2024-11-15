@@ -188,6 +188,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.UserListItem);
           if (success) {
@@ -202,16 +205,34 @@ const Admin: React.FC = () => {
           key={'username'}
           label={<FormattedMessage id="pages.user-list.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'email'}
           label={<FormattedMessage id="pages.user-list.mail" />}
           name="email"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           key={'password'}
           label={<FormattedMessage id="pages.user-list.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

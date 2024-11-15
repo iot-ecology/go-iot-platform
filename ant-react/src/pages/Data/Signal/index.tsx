@@ -365,6 +365,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.SignalListItem);
           if (success) {
@@ -386,6 +389,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.signal.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           multiple={false}
@@ -426,18 +435,46 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.signal.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.signal.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.signal.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.signal.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'alias'}
           label={<FormattedMessage id="pages.signal.alias" />}
           name="alias"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'type'}
@@ -447,13 +484,35 @@ const Admin: React.FC = () => {
           }}
           label={<FormattedMessage id="pages.signal.type" />}
           name="type"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText key={'unit'} label={<FormattedMessage id="pages.signal.unit" />} name="unit" />
+        <ProFormText
+          key={'unit'}
+          label={<FormattedMessage id="pages.signal.unit" />}
+          name="unit"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormDigit
           fieldProps={{ precision: 0 }}
           key={'cache_size'}
           label={<FormattedMessage id="pages.signal.cache_size" />}
           name="cache_size"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

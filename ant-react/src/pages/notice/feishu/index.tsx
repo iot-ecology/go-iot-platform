@@ -200,6 +200,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.FeiShuListItem);
           if (success) {
@@ -210,16 +213,38 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.feishu.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.feishu.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'access_token'}
           label={<FormattedMessage id="pages.feishu.access_token" />}
           name="access_token"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'secret'}
           label={<FormattedMessage id="pages.feishu.secret" />}
           name="secret"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'content'}
@@ -234,6 +259,12 @@ const Admin: React.FC = () => {
             '  单位: {{unit}}<br>\n' +
             '  范围内，范围外: {{in_or_out}}'
           }
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

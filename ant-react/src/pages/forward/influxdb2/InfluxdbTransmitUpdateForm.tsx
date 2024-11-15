@@ -26,8 +26,11 @@ const InfluxdbTransmitUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -39,26 +42,56 @@ const InfluxdbTransmitUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'name'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'host'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.host" />}
           name="host"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'port'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.port" />}
           name="port"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'token'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.token" />}
           name="token"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

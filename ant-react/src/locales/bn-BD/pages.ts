@@ -65,6 +65,9 @@ export default  {
   'pages.searchTable.batchDeletion': 'একসাথে মুছুন',
   'pages.searchTable.batchApproval': 'একসাথে অনুমোদন',
 
+  'pages.rules.select': 'অনুগ্রহ করে নির্বাচন করুন',
+  'pages.rules.input': 'প্রবেশ করুন',
+
   'pages.new': 'নতুন',
   'pages.deleted': 'মুছে ফেলা',
   'pages.set-param': 'প্যারামিটার নির্ধারণ',

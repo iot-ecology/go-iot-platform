@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': '一括削除',
   'pages.searchTable.batchApproval': '一括承認',
 
+  'pages.rules.select': '選択してください',
+  'pages.rules.input': '入力してください',
+
   'pages.new': '新規',
   'pages.deleted': '削除',
   'pages.set-param': 'パラメーター設定',

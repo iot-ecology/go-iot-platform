@@ -207,6 +207,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.ClickhouseTransmitListItem);
           if (success) {
@@ -221,26 +224,56 @@ const Admin: React.FC = () => {
           key={'name'}
           label={<FormattedMessage id="pages.CassandraTransmit.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'host'}
           label={<FormattedMessage id="pages.CassandraTransmit.host" />}
           name="host"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'port'}
           label={<FormattedMessage id="pages.CassandraTransmit.port" />}
           name="port"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'username'}
           label={<FormattedMessage id="pages.CassandraTransmit.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'password'}
           label={<FormattedMessage id="pages.CassandraTransmit.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

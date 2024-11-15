@@ -294,6 +294,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.CalcRuleListItem);
           if (success) {
@@ -308,21 +311,45 @@ const Admin: React.FC = () => {
           key={'name'}
           label={<FormattedMessage id="pages.calc-rule.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'cron'}
           label={<FormattedMessage id="pages.calc-rule.cron" />}
           name="cron"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'script'}
           label={<FormattedMessage id="pages.calc-rule.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'offset'}
           label={<FormattedMessage id="pages.calc-rule.offset" />}
           name="offset"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
       <CalcRuleUpdateForm

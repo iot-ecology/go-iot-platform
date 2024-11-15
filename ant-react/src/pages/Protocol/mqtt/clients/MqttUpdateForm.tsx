@@ -26,8 +26,11 @@ const MqttUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -39,42 +42,84 @@ const MqttUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={'127.0.0.1'}
           key={'host'}
           label={<FormattedMessage id="pages.mqtt.host" />}
           name="host"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           initialValue={1883}
           key={'port'}
           label={<FormattedMessage id="pages.mqtt.port" />}
           name="port"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           disabled={true}
           key={'client_id'}
           label={<FormattedMessage id="pages.mqtt.client_id" />}
           name="client_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={'admin'}
           key={'username'}
           label={<FormattedMessage id="pages.mqtt.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           initialValue={'admin'}
           key={'password'}
           label={<FormattedMessage id="pages.mqtt.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={'/test_topic/0'}
           key={'subtopic'}
           label={<FormattedMessage id="pages.mqtt.subtopic" />}
           name="subtopic"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

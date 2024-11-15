@@ -258,6 +258,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.InfluxdbTransmitBindListItem);
           if (success) {
@@ -279,6 +282,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -320,12 +329,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           request={async () => {
@@ -343,26 +364,56 @@ const Admin: React.FC = () => {
           key={'influxdb_transmit_id'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.cassandra_transmit_id" />}
           name="influxdb_transmit_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'org'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.org" />}
           name="org"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'bucket'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.bucket" />}
           name="bucket"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'measurement'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.measurement" />}
           name="measurement"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'script'}
           label={<FormattedMessage id="pages.CassandraTransmitBind.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormRadio.Group
@@ -376,6 +427,12 @@ const Admin: React.FC = () => {
             {
               label: '停用',
               value: false,
+            },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}
         />

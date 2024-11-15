@@ -281,6 +281,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.DeviceInfoItem);
           if (success) {
@@ -306,8 +309,23 @@ const Admin: React.FC = () => {
           }}
           label={<FormattedMessage id="pages.device-info.product_id" />}
           name="product_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText label={<FormattedMessage id="pages.device-info.sn" />} name="sn" />
+        <ProFormText
+          label={<FormattedMessage id="pages.device-info.sn" />}
+          name="sn"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
 
         <ProFormSelect
           valueEnum={{
@@ -320,6 +338,12 @@ const Admin: React.FC = () => {
           }}
           label={<FormattedMessage id="pages.device-info.source" />}
           name="source"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         {sourceValue === '1' && (
@@ -330,6 +354,12 @@ const Admin: React.FC = () => {
             }}
             label={<FormattedMessage id="pages.device-info.manufacturing_date" />}
             name="manufacturing_date"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         {sourceValue === '2' && (
@@ -340,6 +370,12 @@ const Admin: React.FC = () => {
             }}
             label={<FormattedMessage id="pages.device-info.procurement_date" />}
             name="procurement_date"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         {sourceValue === '1' && (
@@ -350,15 +386,33 @@ const Admin: React.FC = () => {
             }}
             label={<FormattedMessage id="pages.device-info.warranty_expiry" />}
             name="warranty_expiry"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         <ProFormDigit
           label={<FormattedMessage id="pages.device-info.push_interval" />}
           name="push_interval"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           label={<FormattedMessage id="pages.device-info.error_rate" />}
           name="error_rate"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           valueEnum={{
@@ -370,6 +424,12 @@ const Admin: React.FC = () => {
           }}
           label={<FormattedMessage id="pages.device-info.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
       <DeviceInfoUpdateForm

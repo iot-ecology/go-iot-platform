@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': '批量刪除',
   'pages.searchTable.batchApproval': '批量審批',
 
+  'pages.rules.select': '請選擇',
+  'pages.rules.input': '請輸入',
+
   'pages.new': '新增',
   'pages.deleted': '刪除',
   'pages.set-param': '參數設定',

@@ -27,8 +27,11 @@ const SimUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -40,18 +43,56 @@ const SimUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'access_number'}
           label={<FormattedMessage id="pages.sim.access_number" />}
           name="access_number"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
-        <ProFormText key={'iccid'} label={<FormattedMessage id="pages.sim.iccid" />} name="iccid" />
-        <ProFormText key={'imsi'} label={<FormattedMessage id="pages.sim.imsi" />} name="imsi" />
+        <ProFormText
+          key={'iccid'}
+          label={<FormattedMessage id="pages.sim.iccid" />}
+          name="iccid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
+        <ProFormText
+          key={'imsi'}
+          label={<FormattedMessage id="pages.sim.imsi" />}
+          name="imsi"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'operator'}
           label={<FormattedMessage id="pages.sim.operator" />}
           name="operator"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDatePicker
           transform={(value) => {
@@ -60,6 +101,12 @@ const SimUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'expiration'}
           label={<FormattedMessage id="pages.sim.expiration" />}
           name="expiration"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

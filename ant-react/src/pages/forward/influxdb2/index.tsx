@@ -200,6 +200,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.InfluxdbTransmitListItem);
           if (success) {
@@ -214,21 +217,45 @@ const Admin: React.FC = () => {
           key={'name'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'host'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.host" />}
           name="host"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'port'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.port" />}
           name="port"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'token'}
           label={<FormattedMessage id="pages.InfluxdbTransmit.token" />}
           name="token"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

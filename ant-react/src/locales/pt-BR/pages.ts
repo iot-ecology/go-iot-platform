@@ -66,6 +66,9 @@ export default {
   'pages.searchTable.batchDeletion': 'Exclusão em lote',
   'pages.searchTable.batchApproval': 'Aprovação em lote',
 
+  'pages.rules.select': 'Selecione',
+  'pages.rules.input': 'Por favor insira',
+
   'pages.new': 'Novo',
   'pages.deleted': 'Excluído',
   'pages.set-param': 'Configurar parâmetros',

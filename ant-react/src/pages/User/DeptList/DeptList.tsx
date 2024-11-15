@@ -168,6 +168,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.DeptListItem);
           if (success) {
@@ -179,13 +182,29 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
 
         <ProFormSelect
           key={'parent_id'}
           label={<FormattedMessage id="pages.dept-top" />}
           name="parent_id"
           options={options}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 

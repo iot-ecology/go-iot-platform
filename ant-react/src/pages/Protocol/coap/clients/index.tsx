@@ -235,6 +235,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.CoapHandlerListItem);
           if (success) {
@@ -288,17 +291,45 @@ const Admin: React.FC = () => {
               value: 'ID',
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.http.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.http.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'username'}
           label={<FormattedMessage id="pages.http.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           key={'password'}
           label={<FormattedMessage id="pages.http.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormTextArea
           initialValue={createScript}
@@ -308,6 +339,12 @@ const Admin: React.FC = () => {
           key={'script'}
           label={<FormattedMessage id="pages.http.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 
@@ -315,6 +352,9 @@ const Admin: React.FC = () => {
         title={'验证脚本'}
         open={setScriptModalOpen}
         onOpenChange={handleSetScriptModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           console.log('设置脚本参数');
         }}
@@ -347,11 +387,23 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id="pages.mock-param" />}
           name={'mock-param'}
           key={'mock-param'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
         <ProFormTextArea
           label={<FormattedMessage id={'pages.mock-result'} />}
           name={'mock-result'}
           key={'mock-result'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
       </ModalForm>
       <HttpHandlerUpdateForm
