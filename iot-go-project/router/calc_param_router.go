@@ -164,6 +164,7 @@ func (api *CalcParamApi) DeleteCalcParam(c *gin.Context) {
 		servlet.Error(c, result.Error.Error())
 		return
 	}
+	calcRunBiz.RefreshRule(CalcParam.CalcRuleId)
 
 	servlet.Resp(c, "删除成功")
 }
