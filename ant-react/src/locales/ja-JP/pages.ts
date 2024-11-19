@@ -68,6 +68,10 @@ export default {
   'pages.rules.select': '選択してください',
   'pages.rules.input': '入力してください',
 
+  'pages.deleteConfirm': 'このレコードを削除してもよろしいですか？',
+  'pages.yes': 'はい',
+  'pages.no': 'いいえ',
+
   'pages.new': '新規',
   'pages.deleted': '削除',
   'pages.set-param': 'パラメーター設定',

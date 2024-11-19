@@ -68,6 +68,10 @@ export default  {
   'pages.rules.select': 'অনুগ্রহ করে নির্বাচন করুন',
   'pages.rules.input': 'প্রবেশ করুন',
 
+  'pages.deleteConfirm': 'এই রেকর্ডটি মুছে ফেলার নিশ্চিত আছেন?',
+  'pages.yes': 'হ্যাঁ',
+  'pages.no': 'না',
+
   'pages.new': 'নতুন',
   'pages.deleted': 'মুছে ফেলা',
   'pages.set-param': 'প্যারামিটার নির্ধারণ',

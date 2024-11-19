@@ -68,6 +68,10 @@ export default {
   'pages.rules.select': 'Please Select',
   'pages.rules.input': 'Please Input',
 
+  'pages.deleteConfirm': 'Are you sure you want to delete this record?',
+  'pages.yes': 'Yes',
+  'pages.no': 'No',
+
   'pages.new': 'New',
   'pages.deleted': 'Deleted',
   'pages.set-param': 'Set Params',

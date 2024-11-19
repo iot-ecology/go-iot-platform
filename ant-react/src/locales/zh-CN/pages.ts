@@ -69,6 +69,10 @@ export default {
   'pages.rules.select': '请选择',
   'pages.rules.input': '请输入',
 
+  'pages.deleteConfirm': '确定要删除这条记录吗？',
+  'pages.yes': '是',
+  'pages.no': '否',
+
   'pages.new': '新增',
   'pages.deleted': '删除',
   'pages.set-param': '参数设置',

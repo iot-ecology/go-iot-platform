@@ -68,6 +68,10 @@ export default {
   'pages.rules.select': '請選擇',
   'pages.rules.input': '請輸入',
 
+  'pages.deleteConfirm': '您確定要刪除這筆記錄嗎？',
+  'pages.yes': '是',
+  'pages.no': '否',
+
   'pages.new': '新增',
   'pages.deleted': '刪除',
   'pages.set-param': '參數設定',

@@ -69,6 +69,10 @@ export default {
   'pages.rules.select': 'Selecione',
   'pages.rules.input': 'Por favor insira',
 
+  'pages.deleteConfirm': 'Tem certeza de que deseja excluir este registro?',
+  'pages.yes': 'Sim',
+  'pages.no': 'Não',
+
   'pages.new': 'Novo',
   'pages.deleted': 'Excluído',
   'pages.set-param': 'Configurar parâmetros',

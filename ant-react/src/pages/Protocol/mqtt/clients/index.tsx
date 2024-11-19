@@ -6,6 +6,8 @@ import {
   mqttScriptCheck,
   sendMqttClientMessage,
   setMqttScriptCheck,
+  startMqttClient,
+  stopMqttClient,
   updateMQTT,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
@@ -24,10 +26,12 @@ import {
   ProFormText,
   ProFormTextArea,
   ProTable,
+  TableDropdown,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message, Tag } from 'antd';
+import { Button, Drawer, message, Popconfirm, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
+import { history } from 'umi';
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -78,6 +82,7 @@ const handlerUpdate = async (fields: API.MqttListItem) => {
     return false;
   }
 };
+
 const Admin: React.FC = () => {
   const intl = useIntl();
   /**
@@ -102,13 +107,50 @@ const Admin: React.FC = () => {
   const [curMqttClientId, setCurMqttClientId] = useState<number>(-1);
   const [canSubmmitScript, setSubmmitScript] = useState<boolean>(false);
 
+  const handleSignalConfig = (record: any) => {
+    history.push({
+      pathname: '/data/signal?id=' + record.ID + '&protocol=MQTT',
+    });
+  };
+
+  const handleMockSend = (record: any) => {
+    setCurMqttClientId(record.ID);
+    setSendMqttMessage(true);
+    setCurrentRow(record);
+  };
+
+  const handleSetScript = (record: any) => {
+    setCurMqttClientId(record.ID);
+    handleSetScriptModalOpen(true);
+  };
+
+  const handleStart = async (record: any) => {
+    let newVar = await startMqttClient(record.ID);
+    if (newVar.code === 20000) {
+      await actionRef.current?.reload();
+      message.success('启动成功');
+    } else {
+      message.error('启动失败 ' + newVar.message);
+    }
+  };
+
+  const handleStop = async (record: any) => {
+    let newVar = await stopMqttClient(record.ID);
+    if (newVar.code == 20000) {
+      await actionRef.current?.reload();
+      message.success('停止成功');
+    } else {
+      message.error('停止失败 ' + newVar.message);
+    }
+  };
+
   const columns: ProColumns<API.MqttListItem>[] = [
     {
       key: 'ID',
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
       hideInSearch: true,
       dataIndex: 'ID', // @ts-ignore
-
+      width: '100px',
       render: (dom, entity) => {
         return (
           <a
@@ -171,6 +213,7 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.mqtt.start" />,
       hideInSearch: true,
       dataIndex: 'start',
+      width: '100px',
       render: (_, record) => {
         if (record.start) {
           return <Tag color="green">启动</Tag>;
@@ -193,7 +236,7 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      width: '200px',
+      width: '150px',
       render: (_, record) => [
         <Button
           key="update"
@@ -205,90 +248,75 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-        <Button
-          key="update"
-          onClick={() => {
-            history.push({
-              pathname: '/data/signal?id=' + record.ID + '&protocol=MQTT',
-            });
-          }}
-        >
-          <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />
-        </Button>,
-        <Button
-          key="update"
-          onClick={() => {
-            setCurMqttClientId(record.ID);
-            setSendMqttMessage(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="pages.mock-send" defaultMessage="模拟发送" />
-        </Button>,
-
         record.start === false && (
-          <Button
+          <Popconfirm
             key="delete"
-            onClick={async () => {
+            title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+            onConfirm={async () => {
               // todo: 删除接口
               const success = await handleRemove(record.ID);
               if (success) {
                 if (actionRef.current) {
-                  actionRef.current.reload();
+                  await actionRef.current.reload();
                 }
               }
             }}
-            danger={true}
+            okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+            cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
           >
-            <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-          </Button>
+            <Button danger>
+              <FormattedMessage id="pages.delete" defaultMessage="删除" />
+            </Button>
+          </Popconfirm>
         ),
-        record.start === false && (
-          <Button
-            key="set-script"
-            onClick={async () => {
-              setCurMqttClientId(record.ID);
-              handleSetScriptModalOpen(true);
-            }}
-          >
-            <FormattedMessage id="pages.set-script" defaultMessage="设置脚本" />
-          </Button>
-        ),
-
-        record.start === false && (
-          <Button
-            key="start"
-            onClick={async () => {
-              let newVar = await startMqttClient(record.ID);
-              if (newVar.code == 20000) {
-                await actionRef.current?.reload();
-                message.success('启动成功');
-              } else {
-                message.error('启动失败 ' + newVar.message);
-              }
-            }}
-            type={'primary'}
-          >
-            <FormattedMessage id="pages.start" defaultMessage="启动" />
-          </Button>
-        ),
-        record.start === true && (
-          <Button
-            key="stop"
-            onClick={async () => {
-              let newVar = await stopMqttClient(record.ID);
-              if (newVar.code == 20000) {
-                await actionRef.current?.reload();
-                message.success('停止成功');
-              } else {
-                message.error('停止失败 ' + newVar.message);
-              }
-            }}
-            danger={true}
-          >
-            <FormattedMessage id="pages.stop" defaultMessage="停止" />
-          </Button>
-        ),
+        <TableDropdown
+          key="actionGroup"
+          onSelect={(e) => {
+            if (e === 'signal-config') {
+              handleSignalConfig(record);
+            }
+            if (e === 'mock-send') {
+              handleMockSend(record);
+            }
+            if (e === 'set-script') {
+              handleSetScript(record);
+            }
+            if (e === 'start') {
+              handleStart(record);
+            }
+            if (e === 'end') {
+              handleStop(record);
+            }
+          }}
+          menus={[
+            {
+              key: 'signal-config',
+              name: <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />,
+            },
+            {
+              key: 'mock-send',
+              name: <FormattedMessage id="pages.mock-send" defaultMessage="模拟发送" />,
+            },
+            {
+              key: 'set-script',
+              name: record.start === false && (
+                <FormattedMessage id="pages.set-script" defaultMessage="设置脚本" />
+              ),
+            },
+            {
+              key: 'start',
+              name: record.start === false && (
+                <FormattedMessage id="pages.start" defaultMessage="启动" />
+              ),
+            },
+            {
+              key: 'stop',
+              name: record.start === true && (
+                <FormattedMessage id="pages.stop" defaultMessage="停止" />
+              ),
+            },
+          ].filter(({ name }) => !!name)}
+        />,
       ],
     },
   ];

@@ -68,6 +68,10 @@ export default {
   'pages.rules.select': 'Silakan pilih',
   'pages.rules.input': 'Silakan masuk',
 
+  'pages.deleteConfirm': 'Apakah Anda yakin ingin menghapus catatan ini?',
+  'pages.yes': 'Ya',
+  'pages.no': 'Tidak',
+
   'pages.new': 'Baru',
   'pages.deleted': 'Dihapus',
   'pages.set-param': 'Setel Parameter',

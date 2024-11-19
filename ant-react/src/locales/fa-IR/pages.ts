@@ -68,6 +68,10 @@ export default {
   'pages.rules.select': 'لطفا انتخاب کنید',
   'pages.rules.input': 'لطفا وارد شوید',
 
+  'pages.deleteConfirm': 'آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟',
+  'pages.yes': 'بله',
+  'pages.no': 'خیر',
+
   'pages.new': 'สร้างใหม่',
   'pages.deleted': 'ลบ',
   'pages.set-param': 'ตั้งค่าพารามิเตอร์',
