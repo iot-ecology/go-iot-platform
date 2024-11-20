@@ -1,6 +1,6 @@
-import React from 'react';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { Card, Col, Row } from 'antd';
-import { UpOutlined, DownOutlined } from '@ant-design/icons';
+import React from 'react';
 
 interface ProtocolStats {
   protocol: string;
@@ -20,25 +20,33 @@ const ProtocolStatsCards: React.FC = () => {
   return (
     <Row gutter={16}>
       {mockData.map((protocol) => (
-        <Col span={6} key={protocol.protocol}>
+        <Col span={12} key={protocol.protocol}>
           <Card
             bordered={false}
             style={{
-              marginBottom: 24,
+              marginBottom: 12,
               borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-              backgroundColor: '#f0f4f8',
-              padding: '30px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              // backgroundColor: '#f0f4f8',
+              // padding: '2px',
               transition: 'transform 0.2s, box-shadow 0.2s',
             }}
             hoverable
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h4 style={{ margin: '0 0 12px', fontSize: '1.5rem', color: '#333' }}>{protocol.protocol}</h4>
-                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>Today: <strong>{protocol.today_processed}</strong></p>
-                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>Yesterday: <strong>{protocol.yesterday_processed}</strong></p>
-                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>Total: <strong>{protocol.total_processed}</strong></p>
+                <h4 style={{ margin: '0 0 12px', fontSize: '1.4rem', color: '#333' }}>
+                  {protocol.protocol}
+                </h4>
+                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>
+                  Today: <strong>{protocol.today_processed}</strong>
+                </p>
+                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>
+                  Yesterday: <strong>{protocol.yesterday_processed}</strong>
+                </p>
+                <p style={{ margin: '0', color: '#666', fontSize: '1rem' }}>
+                  Total: <strong>{protocol.total_processed}</strong>
+                </p>
               </div>
               <div>
                 {protocol.today_processed > protocol.yesterday_processed ? (

@@ -22,7 +22,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, Form, message } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.HttpHandlerListItem) => {
@@ -170,21 +170,25 @@ const Admin: React.FC = () => {
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
 
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
         <Button
           key="check-script"
           onClick={async () => {
@@ -235,6 +239,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.HttpHandlerListItem);
           if (success) {
@@ -288,17 +295,45 @@ const Admin: React.FC = () => {
               value: 'ID',
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.http.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.http.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'username'}
           label={<FormattedMessage id="pages.http.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           key={'password'}
           label={<FormattedMessage id="pages.http.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormTextArea
           initialValue={createScript}
@@ -308,6 +343,12 @@ const Admin: React.FC = () => {
           key={'script'}
           label={<FormattedMessage id="pages.http.script" />}
           name="script"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 
@@ -315,6 +356,9 @@ const Admin: React.FC = () => {
         title={'验证脚本'}
         open={setScriptModalOpen}
         onOpenChange={handleSetScriptModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           console.log('设置脚本参数');
         }}
@@ -323,6 +367,7 @@ const Admin: React.FC = () => {
             return [
               <Button key="ok">取消</Button>,
               <Button
+                type="primary"
                 key="check"
                 onClick={async () => {
                   let newVar = await mqttScriptCheck(
@@ -347,11 +392,24 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id="pages.mock-param" />}
           name={'mock-param'}
           key={'mock-param'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
         <ProFormTextArea
           label={<FormattedMessage id={'pages.mock-result'} />}
           name={'mock-result'}
           key={'mock-result'}
+          disabled={true}
+          rules={[
+            {
+              required: false,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
       </ModalForm>
       <HttpHandlerUpdateForm

@@ -4,6 +4,7 @@ import SignalWaringUpdateForm from '@/pages/Data/SignalWaring/SignalWaringUpdate
 import {
   addSignalWaring,
   deleteSignalWaring,
+  deviceList,
   mqttList,
   signalList,
   signalWaringPage,
@@ -25,7 +26,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { initSearchDeviceUidForMqtt } from '../Signal';
 
@@ -122,6 +123,8 @@ const Admin: React.FC = () => {
 
   const [opSignal, setOpSignal] = useState<any>();
 
+  const form = ProForm.useFormInstance();
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     if (queryParams.get('protocol')) {
@@ -130,7 +133,29 @@ const Admin: React.FC = () => {
 
     async function extracted() {
       let v = await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+
       initSearchSignalId('MQTT', v, setOpSignal, setSearchSignalId);
+    }
+
+    async function getMqttList() {
+      let res = await mqttList();
+      let data = res.data;
+      setOpDeviceUid(data);
+    }
+
+    async function getOtherList(value) {
+      let c = await deviceList();
+
+      let r = [];
+      c.data.forEach((e) => {
+        if (e.protocol === value) {
+          r.push({
+            client_id: e.sn,
+            ID: e.ID,
+          });
+        }
+      });
+      setOpDeviceUid(r);
     }
 
     if (queryParams.get('client_id')) {
@@ -140,6 +165,14 @@ const Admin: React.FC = () => {
     }
     if (queryParams.get('id')) {
       setSearchSignalId(Number(queryParams.get('id')));
+    }
+    if (queryParams.get('protocol')) {
+      setSearchProtocol(queryParams.get('protocol'));
+      if (queryParams.get('protocol') === 'MQTT') {
+        getMqttList();
+      } else {
+        getOtherList(queryParams.get('protocol'));
+      }
     }
   }, []);
 
@@ -177,14 +210,28 @@ const Admin: React.FC = () => {
           } else {
             setSearchDeviceUid('');
             setSearchSignalId('');
-            setOpDeviceUid([
-              {
-                client_id: 'ccc',
-                ID: '1',
-              },
-            ]);
+            // setOpDeviceUid([
+            //   {
+            //     client_id: 'ccc',
+            //     ID: '1',
+            //   },
+            // ]);
+            let c = await deviceList();
+            console.log(c, 'c');
+
+            let r = [];
+            c.data.forEach((e) => {
+              if (e.protocol === value) {
+                r.push({
+                  client_id: e.sn,
+                  ID: e.ID,
+                });
+              }
+            });
+            setOpDeviceUid(r);
           }
         },
+        value: searchProtocol,
       },
       formItemProps: {
         rules: [
@@ -329,25 +376,28 @@ const Admin: React.FC = () => {
           <FormattedMessage id="pages.signal.waring.history" defaultMessage="报警历史" />
         </Button>,
 
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
-  const form = ProForm.useFormInstance();
   return (
     <PageContainer>
       <ProTable<API.SignalWaringItem, API.PageParams>
@@ -398,6 +448,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.SignalWaringItem);
           if (success) {
@@ -419,6 +472,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.signal.waring.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           multiple={false}
@@ -441,12 +500,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.signal.waring.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.signal.waring.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -472,16 +543,34 @@ const Admin: React.FC = () => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.signal.waring.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'min'}
           label={<FormattedMessage id="pages.signal.waring.min" />}
           name="min"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'max'}
           label={<FormattedMessage id="pages.signal.waring.max" />}
           name="max"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'in_or_out'}
@@ -491,6 +580,12 @@ const Admin: React.FC = () => {
             1: { text: '范围内报警', status: 'success' },
             0: { text: '范围外报警', status: 'success' },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 

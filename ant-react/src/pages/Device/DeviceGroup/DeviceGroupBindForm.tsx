@@ -1,8 +1,8 @@
+import { deviceList, queryDeviceGroupBind } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { Form, Modal } from 'antd';
 import React, { useEffect } from 'react';
-import { deviceList, queryDeviceGroupBind } from "@/services/ant-design-pro/api";
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: API.DeviceGroupItem) => void;
@@ -22,11 +22,12 @@ const DeviceGroupBindForm: React.FC<UpdateFormProps> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await queryDeviceGroupBind(props.values.ID);
-      const deviceIds = response.data.map(item => item.device_info_id); // 提取 device_info_id
+      const deviceIds = response.data.map((item) => item.device_info_id); // 提取 device_info_id
       form.setFieldsValue({ device_id: deviceIds }); // 设置提取的值
     };
 
-    if (props.updateModalOpen) { // 只有在模态框打开时才调用
+    if (props.updateModalOpen) {
+      // 只有在模态框打开时才调用
       fetchData();
     }
   }, [props.updateModalOpen, props.values.ID]); // 添加依赖数组
@@ -38,8 +39,11 @@ const DeviceGroupBindForm: React.FC<UpdateFormProps> = (props) => {
       forceRender={true}
       open={props.updateModalOpen}
       onCancel={() => props.onCancel()}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
     >
       <Form key={'userupdateform'} form={form} style={{ padding: '32px 40px 48px' }}>
@@ -48,6 +52,12 @@ const DeviceGroupBindForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           request={async () => {
@@ -55,8 +65,7 @@ const DeviceGroupBindForm: React.FC<UpdateFormProps> = (props) => {
             return a.data;
           }}
           fieldProps={{
-
-            mode: "multiple",
+            mode: 'multiple',
             showSearch: true,
             allowClear: true, // 允许清空选择
             fieldNames: {
@@ -67,6 +76,12 @@ const DeviceGroupBindForm: React.FC<UpdateFormProps> = (props) => {
           key={'device_id'}
           label={<FormattedMessage id="pages.device" />}
           name="device_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

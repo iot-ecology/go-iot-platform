@@ -1,8 +1,7 @@
 import { FormattedMessage } from '@@/exports';
-import { ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { Form, message, Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { deptList } from '@/services/ant-design-pro/api';
+import { ProFormText } from '@ant-design/pro-components';
+import { Form, Modal } from 'antd';
+import React, { useEffect } from 'react';
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: API.RoleListItem) => void;
@@ -12,20 +11,14 @@ export type UpdateFormProps = {
   values: API.RoleListItem;
 };
 const RoleUpdateForm: React.FC<UpdateFormProps> = (props) => {
-
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
     form.setFieldsValue(props.values);
   });
 
-
-
-
-
   return (
     <Modal
- 
       key="userupdateform"
       destroyOnClose
       forceRender={true}
@@ -33,8 +26,11 @@ const RoleUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -46,10 +42,34 @@ const RoleUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'id'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.name" />} name="name" />
-        <ProFormText label={<FormattedMessage id="pages.desc" />} name="description" />
-
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
+        <ProFormText
+          label={<FormattedMessage id="pages.desc" />}
+          name="description"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
       </Form>
     </Modal>
   );

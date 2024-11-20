@@ -65,6 +65,13 @@ export default {
   'pages.searchTable.batchDeletion': 'Penghapusan Massal',
   'pages.searchTable.batchApproval': 'Persetujuan Massal',
 
+  'pages.rules.select': 'Silakan pilih',
+  'pages.rules.input': 'Silakan masuk',
+
+  'pages.deleteConfirm': 'Apakah Anda yakin ingin menghapus catatan ini?',
+  'pages.yes': 'Ya',
+  'pages.no': 'Tidak',
+
   'pages.new': 'Baru',
   'pages.deleted': 'Dihapus',
   'pages.set-param': 'Setel Parameter',
@@ -248,4 +255,5 @@ export default {
   "pages.welcome.a6": "Platform Pengembangan Go IoT adalah platform pengembangan IoT terbuka sumber, kami harap Anda bisa bergabung dan memperkaya proyek ini bersama kami.",
   "pages.welcome.a2": "Platform Pengembangan Go IoT adalah solusi IoT gratis, efisien, dan dapat diperluas yang dikembangkan dengan menggunakan bahasa Go.\n" +
     "            Platform ini mendukung transmisi protokol MQTT, HTTP, WebSocket, COAP, TCP, menyediakan alat konfigurasi ringan untuk menyelesaikan fungsi peringatan data, dan menyediakan layanan statistik data berbasis JavaScript.",
+    "pages.more": "Lainnya"
 };

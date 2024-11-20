@@ -65,6 +65,13 @@ export default {
   'pages.searchTable.batchDeletion': '一括削除',
   'pages.searchTable.batchApproval': '一括承認',
 
+  'pages.rules.select': '選択してください',
+  'pages.rules.input': '入力してください',
+
+  'pages.deleteConfirm': 'このレコードを削除してもよろしいですか？',
+  'pages.yes': 'はい',
+  'pages.no': 'いいえ',
+
   'pages.new': '新規',
   'pages.deleted': '削除',
   'pages.set-param': 'パラメーター設定',
@@ -248,6 +255,6 @@ export default {
   "pages.welcome.a6": "Go IoT開発プラットフォームは、オープンソースの物联网開発プラットフォームであり、このプロジェクトを一緒に充実させるためにあなたの参加を望んでいます。",
   "pages.welcome.a2": "Go IoT開発プラットフォームは、Go言語で開発された無料、効率的、スケーラブルな物联网ソリューションです。\n" +
     "            このプラットフォームはMQTT、HTTP、WebSocket、COAP、TCPプロトコルの伝送をサポートし、軽量の設定ツールを提供してデータのアラーム機能を完了させ、JavaScriptに基づくデータ統計サービスを提供します。",
-
+  "pages.more": "もっと"
 };
 

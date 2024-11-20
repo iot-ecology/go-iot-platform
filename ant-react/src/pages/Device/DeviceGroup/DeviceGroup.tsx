@@ -1,9 +1,11 @@
+import DeviceGroupBindForm from '@/pages/Device/DeviceGroup/DeviceGroupBindForm';
 import DeviceGroupUpdateForm from '@/pages/Device/DeviceGroup/DeviceGroupUpdateForm';
 import {
   addDeviceGroup,
   deleteDeviceGroup,
   deviceGroupPage,
-  updateDeviceGroup, updateDeviceGroupBind,
+  updateDeviceGroup,
+  updateDeviceGroupBind,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -18,9 +20,8 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
-import DeviceGroupBindForm from "@/pages/Device/DeviceGroup/DeviceGroupBindForm";
 
 const handleAdd = async (fields: API.DeviceGroupItem) => {
   const hide = message.loading('正在添加');
@@ -147,21 +148,22 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.bind" defaultMessage="绑定" />
         </Button>,
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
-            // todo: 删除接口
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除此项吗？" />}
+          onConfirm={async () => {
             const success = await handleRemove(record.ID);
             if (success) {
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              actionRef.current?.reload();
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -201,6 +203,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.DeviceGroupItem);
           if (success) {
@@ -211,7 +216,17 @@ const Admin: React.FC = () => {
           }
         }}
       >
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
       </ModalForm>
 
       <DeviceGroupUpdateForm
@@ -253,8 +268,8 @@ const Admin: React.FC = () => {
 
           await handlerBind({
             group_id: value.ID,
-            device_id:value.device_id
-          } );
+            device_id: value.device_id,
+          });
           handleBindModalOpen(false);
           if (actionRef.current) {
             await actionRef.current.reload();

@@ -28,8 +28,11 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -41,6 +44,12 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'id'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -54,6 +63,12 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'protocol'}
           label={<FormattedMessage id="pages.signal.waring.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           multiple={false}
@@ -76,12 +91,24 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.signal.waring.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.signal.waring.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -107,16 +134,34 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.signal.waring.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'min'}
           label={<FormattedMessage id="pages.signal.waring.min" />}
           name="min"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           key={'max'}
           label={<FormattedMessage id="pages.signal.waring.max" />}
           name="max"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'in_or_out'}
@@ -126,6 +171,12 @@ const SignalWaringUpdateForm: React.FC<UpdateFormProps> = (props) => {
             1: { text: '范围内报警', status: 'success' },
             0: { text: '范围外报警', status: 'success' },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

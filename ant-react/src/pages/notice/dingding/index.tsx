@@ -18,7 +18,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.DingDingListItem) => {
@@ -150,22 +150,25 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -205,6 +208,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.DingDingListItem);
           if (success) {
@@ -219,16 +225,34 @@ const Admin: React.FC = () => {
           key={'name'}
           label={<FormattedMessage id="pages.dingding.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'access_token'}
           label={<FormattedMessage id="pages.dingding.access_token" />}
           name="access_token"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'secret'}
           label={<FormattedMessage id="pages.dingding.secret" />}
           name="secret"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'content'}
@@ -243,6 +267,12 @@ const Admin: React.FC = () => {
             '  单位: {{unit}}<br>\n' +
             '  范围内，范围外: {{in_or_out}}'
           }
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

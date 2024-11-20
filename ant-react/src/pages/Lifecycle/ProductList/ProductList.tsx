@@ -22,7 +22,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, Form, Image, message } from 'antd';
+import { Button, Drawer, Form, Image, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.ProductItem) => {
@@ -209,9 +209,10 @@ const Admin: React.FC = () => {
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
 
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
@@ -220,10 +221,13 @@ const Admin: React.FC = () => {
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -266,6 +270,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.ProductItem);
           if (success) {
@@ -281,51 +288,115 @@ const Admin: React.FC = () => {
             key={'name'}
             label={<FormattedMessage id="pages.product.name" />}
             name="name"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
           <ProFormText
             key={'description'}
             label={<FormattedMessage id="pages.product.description" />}
             name="description"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
-          <ProFormText key={'sku'} label={<FormattedMessage id="pages.product.sku" />} name="sku" />
+          <ProFormText
+            key={'sku'}
+            label={<FormattedMessage id="pages.product.sku" />}
+            name="sku"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
+          />
         </ProForm.Group>
         <ProForm.Group>
           <ProFormDigit
             key={'price'}
             label={<FormattedMessage id="pages.product.price" />}
             name="price"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
           <ProFormDigit
             key={'cost'}
             label={<FormattedMessage id="pages.product.cost" />}
             name="cost"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
           <ProFormDigit
             key={'quantity'}
             label={<FormattedMessage id="pages.product.quantity" />}
             name="quantity"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
           <ProFormDigit
             key={'minimum_stock'}
             label={<FormattedMessage id="pages.product.minimum_stock" />}
             name="minimum_stock"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
           <ProFormDigit
             key={'warranty_period'}
             label={<FormattedMessage id="pages.product.warranty_period" />}
             name="warranty_period"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.input" />,
+              },
+            ]}
           />
         </ProForm.Group>
         <ProFormText
           key={'status'}
           label={<FormattedMessage id="pages.product.status" />}
           name="status"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'tags'}
           label={<FormattedMessage id="pages.product.tags" />}
           placeholder={'请输入,如果存在多个请用逗号分割'}
           name="tags"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormUploadDragger
           name="image_url"
@@ -336,6 +407,12 @@ const Admin: React.FC = () => {
             action: '/api/file/update',
             multiple: false,
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 

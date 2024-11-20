@@ -26,7 +26,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, Form, message } from 'antd';
+import { Button, Drawer, Form, message, Popconfirm } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.SignalListItem) => {
@@ -102,14 +102,40 @@ const Admin: React.FC = () => {
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
-  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string>('');
+  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string | undefined>('');
 
   const [opDeviceUid, setOpDeviceUid] = useState<any>();
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
 
+    async function getMqttList() {
+      let res = await mqttList();
+      let data = res.data;
+      setOpDeviceUid(data);
+    }
+
+    async function getOtherList(value) {
+      let c = await deviceList();
+
+      let r = [];
+      c.data.forEach((e) => {
+        if (e.protocol === value) {
+          r.push({
+            client_id: e.sn,
+            ID: e.ID,
+          });
+        }
+      });
+      setOpDeviceUid(r);
+    }
+
     if (queryParams.get('protocol')) {
       setSearchProtocol(queryParams.get('protocol'));
+      if (queryParams.get('protocol') === 'MQTT') {
+        getMqttList();
+      } else {
+        getOtherList(queryParams.get('protocol'));
+      }
     }
     if (queryParams.get('id')) {
       setSearchDeviceUid(Number(queryParams.get('id')));
@@ -155,9 +181,10 @@ const Admin: React.FC = () => {
           if (value === 'MQTT') {
             await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
           } else {
-            setSearchDeviceUid('');
+            setSearchDeviceUid(undefined);
 
             let c = await deviceList();
+
             let r = [];
             c.data.forEach((e) => {
               if (e.protocol === value) {
@@ -296,21 +323,25 @@ const Admin: React.FC = () => {
           <FormattedMessage id="pages.waring-setting" defaultMessage="报警配置" />
         </Button>,
 
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -328,7 +359,7 @@ const Admin: React.FC = () => {
         rowKey="key"
         onReset={() => {
           setSearchProtocol('MQTT');
-          setSearchDeviceUid('');
+          setSearchDeviceUid(undefined);
         }}
         search={{
           labelWidth: 120,
@@ -365,6 +396,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.SignalListItem);
           if (success) {
@@ -386,6 +420,12 @@ const Admin: React.FC = () => {
           key={'protocol'}
           label={<FormattedMessage id="pages.signal.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           multiple={false}
@@ -426,18 +466,46 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.signal.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.signal.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.signal.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.signal.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'alias'}
           label={<FormattedMessage id="pages.signal.alias" />}
           name="alias"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'type'}
@@ -447,13 +515,35 @@ const Admin: React.FC = () => {
           }}
           label={<FormattedMessage id="pages.signal.type" />}
           name="type"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
-        <ProFormText key={'unit'} label={<FormattedMessage id="pages.signal.unit" />} name="unit" />
+        <ProFormText
+          key={'unit'}
+          label={<FormattedMessage id="pages.signal.unit" />}
+          name="unit"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormDigit
           fieldProps={{ precision: 0 }}
           key={'cache_size'}
           label={<FormattedMessage id="pages.signal.cache_size" />}
           name="cache_size"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

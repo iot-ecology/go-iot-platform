@@ -1,11 +1,11 @@
-import ScriptNameShow from '@/pages/Data/ScriptParam/ScriptNameShow';
 import ScriptParamUpdateForm from '@/pages/Data/ScriptParam/ScriptParamUpdateForm';
-import { initSearchDeviceUidForMqtt } from '@/pages/Data/Signal';
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import SignalNameShow from '@/pages/Data/Signal/SignalNameShow';
+import { initSearchSignalId } from '@/pages/Data/SignalWaring';
 import {
   addScriptWaringParam,
-  deleteScriptWaringParam, deviceList,
+  deleteScriptWaringParam,
+  deviceList,
   mqttList,
   scriptWaringList,
   scritpParamPage,
@@ -26,9 +26,10 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import {initSearchSignalId} from "@/pages/Data/SignalWaring";
+import { Button, Drawer, message, Popconfirm } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { initSearchDeviceUidForMqtt } from '../Signal';
+import ScriptNameShow from './ScriptNameShow';
 
 const handleAdd = async (fields: API.ScriptWaringParamListItem) => {
   const hide = message.loading('正在添加');
@@ -105,6 +106,15 @@ const Admin: React.FC = () => {
   const [opDeviceUid, setOpDeviceUid] = useState<any>();
   const [opSignal, setOpSignal] = useState<any>();
 
+  useEffect(() => {
+    async function extracted() {
+      let v = await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+
+      initSearchSignalId('MQTT', v, setOpSignal, setSearchSignalId);
+    }
+    extracted();
+  }, []);
+
   const columns: ProColumns<API.ScriptWaringParamListItem>[] = [
     {
       key: 'ID',
@@ -126,6 +136,27 @@ const Admin: React.FC = () => {
       },
     },
     {
+      key: 'signal_delay_waring_id',
+      title: <FormattedMessage id="pages.waring-param.signal_delay_waring_id" />,
+      hideInSearch: true,
+      dataIndex: 'signal_delay_waring_id',
+      fieldProps: {
+        showSearch: true,
+        allowClear: false,
+        fieldNames: {
+          label: 'name',
+          value: 'ID',
+        },
+      },
+      render: (dom, entity) => {
+        return (
+          <>
+            <ScriptNameShow id={entity.signal_delay_waring_id} />
+          </>
+        );
+      },
+    },
+    {
       key: 'protocol',
       title: <FormattedMessage id="pages.waring-param.protocol" />,
       hideInSearch: false,
@@ -133,21 +164,38 @@ const Admin: React.FC = () => {
       initialValue: 'MQTT',
       fieldProps: {
         onChange: async (value) => {
-          setSearchDeviceUid(Number(value));
-          await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
-        },
-        value: searchDeviceUid,
+          console.log(value, 'value');
 
-        showSearch: true,
-        allowClear: false,
-        fieldNames: {
-          label: 'client_id',
-          value: 'ID',
+          setSearchProtocol(value);
+          if (value === 'MQTT') {
+            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+          } else {
+            setSearchDeviceUid('');
+            setSearchSignalId('');
+            // setOpDeviceUid([
+            //   {
+            //     client_id: 'ccc',
+            //     ID: '1',
+            //   },
+            // ]);
+            let c = await deviceList();
+            console.log(c, 'c');
+
+            let r = [];
+            c.data.forEach((e) => {
+              if (e.protocol === value) {
+                r.push({
+                  client_id: e.sn,
+                  ID: e.ID,
+                });
+              }
+            });
+            setOpDeviceUid(r);
+          }
         },
-        options: opDeviceUid,
-        placeholder: '请选择',
+        value: searchProtocol,
       },
-      order:99,
+      order: 99,
       valueEnum: {
         MQTT: { text: 'MQTT', status: 'success' },
         HTTP: { text: 'HTTP', status: 'success' },
@@ -165,7 +213,7 @@ const Admin: React.FC = () => {
 
     {
       key: 'device_uid',
-      order:98,
+      order: 98,
       title: <FormattedMessage id="pages.waring-param.device_uid" />,
       hideInSearch: false,
       dataIndex: 'device_uid',
@@ -174,7 +222,6 @@ const Admin: React.FC = () => {
         onChange: async (value) => {
           setSearchDeviceUid(Number(value));
           await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
-
         },
         value: searchDeviceUid,
 
@@ -202,14 +249,14 @@ const Admin: React.FC = () => {
     {
       key: 'name',
       title: <FormattedMessage id="pages.waring-param.name" />,
-      hideInSearch: true,
+      hideInSearch: false,
       dataIndex: 'name',
     },
 
     {
       key: 'signal_id',
       title: <FormattedMessage id="pages.waring-param.signal_id" />,
-      order:97,
+      order: 97,
       hideInSearch: false,
       dataIndex: 'signal_id',
       valueType: 'select',
@@ -243,27 +290,6 @@ const Admin: React.FC = () => {
         options: opSignal,
       },
     },
-    {
-      key: 'signal_delay_waring_id',
-      title: <FormattedMessage id="pages.waring-param.signal_delay_waring_id" />,
-      hideInSearch: true,
-      dataIndex: 'signal_delay_waring_id',
-      fieldProps: {
-        showSearch: true,
-        allowClear: false,
-        fieldNames: {
-          label: 'name',
-          value: 'ID',
-        },
-      },
-      render: (dom, entity) => {
-        return (
-          <>
-            <ScriptNameShow id={entity.signal_delay_waring_id} />
-          </>
-        );
-      },
-    },
 
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
@@ -280,21 +306,25 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -322,7 +352,18 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={scritpParamPage}
+        request={async (params, sorter, filter) => {
+          if (searchProtocol) {
+            params.protocol = searchProtocol;
+          }
+          if (searchDeviceUid) {
+            params.device_uid = Number(searchDeviceUid);
+          }
+          if (searchSignalId) {
+            params.signal_id = Number(searchSignalId);
+          }
+          return scritpParamPage(params);
+        }}
         columns={columns}
       />
       <ModalForm
@@ -334,6 +375,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.ScriptWaringParamListItem);
           if (success) {
@@ -360,6 +404,12 @@ const Admin: React.FC = () => {
               setCreateDeviceUid('');
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -399,12 +449,24 @@ const Admin: React.FC = () => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.waring-param.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.waring-param.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -430,6 +492,12 @@ const Admin: React.FC = () => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.waring-param.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -449,12 +517,24 @@ const Admin: React.FC = () => {
           key={'signal_delay_waring_id'}
           label={<FormattedMessage id="pages.waring-param.signal_delay_waring_id" />}
           name="signal_delay_waring_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'name'}
           label={<FormattedMessage id="pages.waring-param.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
       <ScriptParamUpdateForm

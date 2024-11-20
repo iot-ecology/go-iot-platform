@@ -14,7 +14,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import dayjs from 'dayjs';
 import React, { useRef, useState } from 'react';
 
@@ -146,22 +146,25 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+          onConfirm={async () => {
             // todo: 删除接口
             const success = await handleRemove(record.ID);
             if (success) {
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -201,6 +204,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.SimListItem);
           if (success) {
@@ -215,13 +221,45 @@ const Admin: React.FC = () => {
           key={'access_number'}
           label={<FormattedMessage id="pages.sim.access_number" />}
           name="access_number"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
-        <ProFormText key={'iccid'} label={<FormattedMessage id="pages.sim.iccid" />} name="iccid" />
-        <ProFormText key={'imsi'} label={<FormattedMessage id="pages.sim.imsi" />} name="imsi" />
+        <ProFormText
+          key={'iccid'}
+          label={<FormattedMessage id="pages.sim.iccid" />}
+          name="iccid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
+        <ProFormText
+          key={'imsi'}
+          label={<FormattedMessage id="pages.sim.imsi" />}
+          name="imsi"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'operator'}
           label={<FormattedMessage id="pages.sim.operator" />}
           name="operator"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDatePicker
           transform={(value) => {
@@ -230,6 +268,12 @@ const Admin: React.FC = () => {
           key={'expiration'}
           label={<FormattedMessage id="pages.sim.expiration" />}
           name="expiration"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 
