@@ -10,7 +10,7 @@ import (
 
 type SignalDelayWaringParamBiz struct{}
 
-func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string, page, size int) (*servlet.PaginationQ, error) {
+func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string, page, size int, device_uid, signal_id string) (*servlet.PaginationQ, error) {
 	var pagination servlet.PaginationQ
 	var dt []models.SignalDelayWaringParam
 
@@ -21,6 +21,13 @@ func (biz *SignalDelayWaringParamBiz) PageData(name, signalDelayWaringId string,
 	}
 	if signalDelayWaringId != "" {
 		db = db.Where("signal_delay_waring_id=?", signalDelayWaringId)
+	}
+
+	if device_uid !=""{
+		db = db.Where("device_uid = ? ",device_uid)
+	}
+	if signal_id !=""{
+		db = db.Where("signal_id = ? ",signal_id)
 	}
 
 	db.Model(&models.SignalDelayWaringParam{}).Count(&pagination.Total)
