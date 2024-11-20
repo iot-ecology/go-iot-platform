@@ -367,6 +367,7 @@ const Admin: React.FC = () => {
             return [
               <Button key="ok">取消</Button>,
               <Button
+                type="primary"
                 key="check"
                 onClick={async () => {
                   let newVar = await mqttScriptCheck(
@@ -404,10 +405,11 @@ const Admin: React.FC = () => {
           key={'mock-result'}
           rules={[
             {
-              required: true,
+              required: false,
               message: <FormattedMessage id="pages.rules.input" />,
             },
           ]}
+          disabled={true}
         ></ProFormTextArea>
       </ModalForm>
       <WsHandlerUpdateForm

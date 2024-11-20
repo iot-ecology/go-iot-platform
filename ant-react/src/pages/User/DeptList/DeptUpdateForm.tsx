@@ -92,7 +92,7 @@ const DeptUpdateForm: React.FC<UpdateFormProps> = (props) => {
           options={options}
           rules={[
             {
-              required: true,
+              required: false,
               message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}

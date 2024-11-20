@@ -255,5 +255,7 @@ export default {
   "pages.welcome.a6":"Go IoT开发平台是一个开源的物联网开发平台，希望你可以加入我们一起完善这个项目。",
   "pages.welcome.a2":"Go IoT 开发平台 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。\n" +
     "            该平台支持MQTT、HTTP、WebSocket、COAP、TCP协议传输，提供轻量化的配置工具完成数据的报警功能，提供基于JavaScript的数据统计服务。",
+  "pages.more": "更多"
+    
 
 };

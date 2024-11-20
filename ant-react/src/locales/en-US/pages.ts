@@ -254,5 +254,7 @@ export default {
   "pages.welcome.a8": "We have made all design documentation publicly available for users to consult at any time.",
   "pages.welcome.a6": "Go IoT Development Platform is an open-source IoT development platform, and we hope you can join us to improve this project together.",
   "pages.welcome.a2": "Go IoT Development Platform is a free, efficient, and scalable IoT solution developed using the Go language.\n" +
-    "            The platform supports MQTT, HTTP, WebSocket, COAP, TCP protocol transmissions, provides lightweight configuration tools for data alarm functions, and offers data statistical services based on JavaScript."
+    "            The platform supports MQTT, HTTP, WebSocket, COAP, TCP protocol transmissions, provides lightweight configuration tools for data alarm functions, and offers data statistical services based on JavaScript.",
+
+    "pages.more": 'More'
 };

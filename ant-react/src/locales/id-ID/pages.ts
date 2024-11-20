@@ -255,4 +255,5 @@ export default {
   "pages.welcome.a6": "Platform Pengembangan Go IoT adalah platform pengembangan IoT terbuka sumber, kami harap Anda bisa bergabung dan memperkaya proyek ini bersama kami.",
   "pages.welcome.a2": "Platform Pengembangan Go IoT adalah solusi IoT gratis, efisien, dan dapat diperluas yang dikembangkan dengan menggunakan bahasa Go.\n" +
     "            Platform ini mendukung transmisi protokol MQTT, HTTP, WebSocket, COAP, TCP, menyediakan alat konfigurasi ringan untuk menyelesaikan fungsi peringatan data, dan menyediakan layanan statistik data berbasis JavaScript.",
+    "pages.more": "Lainnya"
 };

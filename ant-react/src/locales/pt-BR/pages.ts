@@ -257,4 +257,5 @@ export default {
   "pages.welcome.a6": "A plataforma de desenvolvimento Go IoT é uma plataforma de desenvolvimento de IoT de código aberto, esperamos que você possa se juntar a nós para perfeccionar este projeto.",
   "pages.welcome.a2": "A plataforma de desenvolvimento Go IoT é uma solução de IoT gratuita, eficiente e escalável desenvolvida usando a linguagem Go.\n" +
     "             Esta plataforma suporta a transmissão de protocolos MQTT, HTTP, WebSocket, COAP, TCP, fornecendo ferramentas de configuração leve para concluir a função de alarme de dados, fornecendo serviços de estatísticas de dados baseados em JavaScript.",
+    "pages.more": "Mais"
 };

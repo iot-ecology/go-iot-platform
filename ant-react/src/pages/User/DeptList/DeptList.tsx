@@ -1,5 +1,5 @@
 import DeptUpdateForm from '@/pages/User/DeptList/DeptUpdateForm';
-import { addDept, deptList, deptPage, updateDept } from '@/services/ant-design-pro/api';
+import { addDept, deleteDept, deptList, deptPage, updateDept } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
 import { PlusOutlined } from '@ant-design/icons';
 import {
@@ -14,7 +14,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 const Admin: React.FC = () => {
@@ -34,6 +34,20 @@ const Admin: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.DeptListItem>();
+
+  const handleRemove = async (id: any) => {
+    const hide = message.loading('正在删除');
+    try {
+      await deleteDept(id);
+      hide();
+      message.success('删除 successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Delete failed, please try again!');
+      return false;
+    }
+  };
 
   const columns: ProColumns<API.DeptListItem>[] = [
     {
@@ -78,6 +92,22 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
+        <Popconfirm
+          key="delete"
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除此项吗？" />}
+          onConfirm={async () => {
+            const success = await handleRemove(record.ID);
+            if (success) {
+              actionRef.current?.reload();
+            }
+          }}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
+        >
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -201,7 +231,7 @@ const Admin: React.FC = () => {
           options={options}
           rules={[
             {
-              required: true,
+              required: false,
               message: <FormattedMessage id="pages.rules.select" />,
             },
           ]}

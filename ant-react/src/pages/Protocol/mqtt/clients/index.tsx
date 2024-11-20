@@ -11,7 +11,7 @@ import {
   updateMQTT,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
-import { PlusOutlined } from '@ant-design/icons';
+import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 
 import {
   type ActionType,
@@ -29,7 +29,7 @@ import {
   TableDropdown,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message, Popconfirm, Tag } from 'antd';
+import { Button, Drawer, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import { history } from 'umi';
 
@@ -150,7 +150,6 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
       hideInSearch: true,
       dataIndex: 'ID', // @ts-ignore
-      width: '100px',
       render: (dom, entity) => {
         return (
           <a
@@ -213,7 +212,6 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.mqtt.start" />,
       hideInSearch: true,
       dataIndex: 'start',
-      width: '100px',
       render: (_, record) => {
         if (record.start) {
           return <Tag color="green">启动</Tag>;
@@ -236,7 +234,7 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      width: '150px',
+      fixed: 'right',
       render: (_, record) => [
         <Button
           key="update"
@@ -316,7 +314,13 @@ const Admin: React.FC = () => {
               ),
             },
           ].filter(({ name }) => !!name)}
-        />,
+        >
+          <Space>
+            <Button type="primary" icon={<DownOutlined />} iconPosition="end">
+              <FormattedMessage id="pages.more" defaultMessage="更多" />
+            </Button>
+          </Space>
+        </TableDropdown>,
       ],
     },
   ];
@@ -330,9 +334,11 @@ const Admin: React.FC = () => {
         })}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
+        search={
+          {
+            // labelWidth: 120,
+          }
+        }
         toolBarRender={() => [
           <Button
             type="primary"
@@ -346,6 +352,7 @@ const Admin: React.FC = () => {
         ]}
         request={mqttPage}
         columns={columns}
+        scroll={{ x: 'max-content' }}
       />
 
       <ModalForm

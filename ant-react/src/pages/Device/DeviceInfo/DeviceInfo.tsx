@@ -289,6 +289,9 @@ const Admin: React.FC = () => {
         onOpenChange={handleModalOpen}
         modalProps={{
           destroyOnClose: true,
+          onCancel: () => {
+            setSourceValue(0);
+          },
         }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.DeviceInfoItem);

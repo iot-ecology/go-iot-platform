@@ -1,4 +1,3 @@
-import ScriptNameShow from '@/pages/Data/ScriptParam/ScriptNameShow';
 import ScriptParamUpdateForm from '@/pages/Data/ScriptParam/ScriptParamUpdateForm';
 import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import SignalNameShow from '@/pages/Data/Signal/SignalNameShow';
@@ -29,6 +28,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
+import ScriptNameShow from './ScriptNameShow';
 
 const handleAdd = async (fields: API.ScriptWaringParamListItem) => {
   const hide = message.loading('正在添加');
@@ -126,6 +126,27 @@ const Admin: React.FC = () => {
       },
     },
     {
+      key: 'signal_delay_waring_id',
+      title: <FormattedMessage id="pages.waring-param.signal_delay_waring_id" />,
+      hideInSearch: true,
+      dataIndex: 'signal_delay_waring_id',
+      fieldProps: {
+        showSearch: true,
+        allowClear: false,
+        fieldNames: {
+          label: 'name',
+          value: 'ID',
+        },
+      },
+      render: (dom, entity) => {
+        return (
+          <>
+            <ScriptNameShow id={entity.signal_delay_waring_id} />
+          </>
+        );
+      },
+    },
+    {
       key: 'protocol',
       title: <FormattedMessage id="pages.waring-param.protocol" />,
       hideInSearch: false,
@@ -201,7 +222,7 @@ const Admin: React.FC = () => {
     {
       key: 'name',
       title: <FormattedMessage id="pages.waring-param.name" />,
-      hideInSearch: true,
+      hideInSearch: false,
       dataIndex: 'name',
     },
 
@@ -240,27 +261,6 @@ const Admin: React.FC = () => {
           value: 'ID',
         },
         options: opSignal,
-      },
-    },
-    {
-      key: 'signal_delay_waring_id',
-      title: <FormattedMessage id="pages.waring-param.signal_delay_waring_id" />,
-      hideInSearch: true,
-      dataIndex: 'signal_delay_waring_id',
-      fieldProps: {
-        showSearch: true,
-        allowClear: false,
-        fieldNames: {
-          label: 'name',
-          value: 'ID',
-        },
-      },
-      render: (dom, entity) => {
-        return (
-          <>
-            <ScriptNameShow id={entity.signal_delay_waring_id} />
-          </>
-        );
       },
     },
 

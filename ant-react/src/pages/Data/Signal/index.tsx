@@ -1,4 +1,3 @@
-import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import HistoryList from '@/pages/Data/Signal/History';
 import SignalUpdateForm from '@/pages/Data/Signal/SignalUpdateForm';
 import {
@@ -102,7 +101,7 @@ const Admin: React.FC = () => {
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [searchProtocol, setSearchProtocol] = useState<string>('MQTT');
-  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string>('');
+  const [searchDeviceUid, setSearchDeviceUid] = useState<number | string | undefined>('');
 
   const [opDeviceUid, setOpDeviceUid] = useState<any>();
   useEffect(() => {
@@ -155,7 +154,7 @@ const Admin: React.FC = () => {
           if (value === 'MQTT') {
             await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
           } else {
-            setSearchDeviceUid('');
+            setSearchDeviceUid(undefined);
 
             let c = await deviceList();
             let r = [];
@@ -332,7 +331,7 @@ const Admin: React.FC = () => {
         rowKey="key"
         onReset={() => {
           setSearchProtocol('MQTT');
-          setSearchDeviceUid('');
+          setSearchDeviceUid(undefined);
         }}
         search={{
           labelWidth: 120,
