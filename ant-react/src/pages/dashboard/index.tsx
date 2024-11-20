@@ -1,24 +1,22 @@
-import DeviceMap from "@/pages/dashboard/DeviceMap";
-import ProtocolStatsCards from "@/pages/dashboard/ProtocolStatsTable";
-import MessageList from "@/pages/dashboard/MessageList";
-import { Col, Row } from "antd";
-import AlarmStatistics from "@/pages/dashboard/AlarmStatistics";
-import ProductDeviceChart from "@/pages/dashboard/ProductDeviceCards";
+import AlarmStatistics from '@/pages/dashboard/AlarmStatistics';
+import DeviceMap from '@/pages/dashboard/DeviceMap';
+import MessageList from '@/pages/dashboard/MessageList';
+import ProtocolStatsCards from '@/pages/dashboard/ProtocolStatsTable';
+import { Col, Row } from 'antd';
 
 const Dashboard = () => {
   return (
     <>
-      <Row gutter={[16,16]} style={{height:"auto"}}>
-        <Col span={12} style={{height:"700px"}}>
+      <Row gutter={[16, 16]} style={{ height: 'auto' }}>
+        <Col span={12} style={{ height: '700px' }}>
           <DeviceMap />
         </Col>
-        <Col span={12}  >
+        <Col span={12}>
           <ProtocolStatsCards />
-          <AlarmStatistics  />
+          <AlarmStatistics />
           <MessageList />
         </Col>
       </Row>
-
     </>
   );
 };

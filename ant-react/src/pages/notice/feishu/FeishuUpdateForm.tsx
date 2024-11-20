@@ -26,8 +26,11 @@ const FeishuUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -39,22 +42,56 @@ const FeishuUpdateForm: React.FC<UpdateFormProps> = (props) => {
           label={<FormattedMessage id="pages.id" />}
           disabled={true}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
-        <ProFormText key={'name'} label={<FormattedMessage id="pages.feishu.name" />} name="name" />
+        <ProFormText
+          key={'name'}
+          label={<FormattedMessage id="pages.feishu.name" />}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormText
           key={'access_token'}
           label={<FormattedMessage id="pages.feishu.access_token" />}
           name="access_token"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'secret'}
           label={<FormattedMessage id="pages.feishu.secret" />}
           name="secret"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'content'}
           label={<FormattedMessage id="pages.feishu.content" />}
           name="content"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

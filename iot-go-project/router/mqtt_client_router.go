@@ -4,12 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/uuid"
 	"igp/biz"
 	"igp/glob"
 	"igp/models"
 	"igp/servlet"
 	"igp/ut"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -155,23 +158,59 @@ func (s *MqttApi) SendMqttMessage(c *gin.Context) {
 		return
 	}
 
-	param := nodeBiz.SendPushData(id, requestBody)
+	type paramStruct struct {
+		Topic    string `json:"topic"`
+		QOS      byte   `json:"qos"`
+		Retained bool   `json:"retained"`
+		Payload  string `json:"payload"`
+	}
+	var params paramStruct
 
-	var m map[string]interface{}
+	err = json.Unmarshal([]byte(requestBody), &params)
 
-	err = json.Unmarshal([]byte(param), &m)
+
+	byId, err := bizMqtt.FindByClientId(id)
+
 	if err != nil {
-		zap.S().Error("Error unmarshalling JSON", zap.Error(err))
-		// 这里可以返回错误或者处理错误
+		servlet.Error(c, err.Error())
 		return
 	}
-	glob.GLog.Sugar().Info(param)
+	connect := MqttConnect(byId.Host, byId.Password, byId.Password, byId.Port,"send+"+uuid.New().String())
+	if connect != nil {
 
-	msg := m["message"]
+	connect.Publish(params.Topic,params.QOS,params.Retained,params.Payload)
+	connect.Disconnect(10)
 
-	servlet.Resp2(c, fmt.Sprintf("%v", msg))
+	}
+
+
+	servlet.Resp2(c, fmt.Sprintf("%v", "发送成功"))
 
 }
+
+
+func  MqttConnect(host, username, password string, port int,id string) mqtt.Client {
+	opts := mqtt.NewClientOptions()
+	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", host, port))
+	opts.SetUsername(username)
+	opts.SetAutoReconnect(false)
+	opts.SetPassword(password)
+	opts.SetClientID(id)
+	opts.OnConnectionLost = func(client mqtt.Client, err error) {
+		zap.S().Errorf("mqtt connection lost id = %s , error = %+v", id, err)
+	}
+
+	opts.SetOrderMatters(false)
+	opts.SetKeepAlive(60 * time.Second)
+	// 创建并启动客户端
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		return nil
+	}
+
+	return client
+}
+
 
 // PageMqtt
 // @Tags      MQTT

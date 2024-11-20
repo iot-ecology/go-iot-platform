@@ -54,6 +54,11 @@ func main() {
 	group := r.Group("/")
 	group.Use(CORSMiddleware())
 	group.Use(ExceptionMiddleware)
+	r.Use(func(c *gin.Context) {
+		clientIP := c.ClientIP() // 获取客户端 IP
+		zap.S().Info("Request from IP: %s", clientIP)
+		c.Next() // 继续处理下一个中间件或请求
+	})
 
 	r.Use(CORSMiddleware())
 	r.Use(ExceptionMiddleware)

@@ -244,6 +244,17 @@ func StorageDataRowList(dt DataRowList, protocol string) {
 						// 处理错误
 						zap.S().Errorf("移除 ZSet 元素异常：%+v", err)
 					}
+
+
+					err = globalRedisClient.ZAdd(context.Background(),
+						"signal_delay_warning:"+dt.DeviceUid+":"+dt.IdentificationCode+":"+strconv.Itoa(signal2[row.
+							Name].
+							ID),
+						redis.Z{Score: float64(dt.Time), Member: row.Value}).Err()
+					if err != nil {
+						// 处理错误
+						zap.S().Errorf("写入 ZSet 元素异常：%+v", err)
+					}
 				}
 			} else {
 				zap.S().Errorf("当前大小未超过配置大小,写入缓存")

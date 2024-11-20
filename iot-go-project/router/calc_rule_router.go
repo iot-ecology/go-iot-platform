@@ -179,6 +179,8 @@ func (api *CalcRuleApi) StartCalcRule(c *gin.Context) {
 	param := c.Param("id")
 
 	start := calcRunBiz.Start(param)
+	calcRunBiz.RefreshRule(param)
+
 	if start {
 
 		servlet.Resp(c, "启动成功")

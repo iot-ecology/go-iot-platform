@@ -13,7 +13,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const handleAdd = async (fields: API.UserListItem) => {
@@ -134,21 +134,22 @@ const Admin: React.FC = () => {
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
 
-        <Button
+        <Popconfirm
           key="delete"
-          onClick={async () => {
-            // todo: 删除接口
+          title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除此项吗？" />}
+          onConfirm={async () => {
             const success = await handleRemove(record.ID);
             if (success) {
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              actionRef.current?.reload();
             }
           }}
-          danger={true}
+          okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+          cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
         >
-          <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-        </Button>,
+          <Button danger>
+            <FormattedMessage id="pages.delete" defaultMessage="删除" />
+          </Button>
+        </Popconfirm>,
       ],
     },
   ];
@@ -188,6 +189,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.UserListItem);
           if (success) {
@@ -202,16 +206,34 @@ const Admin: React.FC = () => {
           key={'username'}
           label={<FormattedMessage id="pages.user-list.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           key={'email'}
           label={<FormattedMessage id="pages.user-list.mail" />}
           name="email"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           key={'password'}
           label={<FormattedMessage id="pages.user-list.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

@@ -11,8 +11,7 @@ import {
   updateMQTT,
 } from '@/services/ant-design-pro/api';
 import { FormattedMessage } from '@@/exports';
-import { PlusOutlined } from '@ant-design/icons';
-import { history } from 'umi';
+import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 
 import {
   type ActionType,
@@ -27,10 +26,12 @@ import {
   ProFormText,
   ProFormTextArea,
   ProTable,
+  TableDropdown,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Drawer, message, Tag } from 'antd';
+import { Button, Drawer, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
+import { history } from 'umi';
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -81,6 +82,7 @@ const handlerUpdate = async (fields: API.MqttListItem) => {
     return false;
   }
 };
+
 const Admin: React.FC = () => {
   const intl = useIntl();
   /**
@@ -105,13 +107,49 @@ const Admin: React.FC = () => {
   const [curMqttClientId, setCurMqttClientId] = useState<number>(-1);
   const [canSubmmitScript, setSubmmitScript] = useState<boolean>(false);
 
+  const handleSignalConfig = (record: any) => {
+    history.push({
+      pathname: '/data/signal?id=' + record.ID + '&protocol=MQTT',
+    });
+  };
+
+  const handleMockSend = (record: any) => {
+    setCurMqttClientId(record.ID);
+    setSendMqttMessage(true);
+    setCurrentRow(record);
+  };
+
+  const handleSetScript = (record: any) => {
+    setCurMqttClientId(record.ID);
+    handleSetScriptModalOpen(true);
+  };
+
+  const handleStart = async (record: any) => {
+    let newVar = await startMqttClient(record.ID);
+    if (newVar.code === 20000) {
+      await actionRef.current?.reload();
+      message.success('启动成功');
+    } else {
+      message.error('启动失败 ' + newVar.message);
+    }
+  };
+
+  const handleStop = async (record: any) => {
+    let newVar = await stopMqttClient(record.ID);
+    if (newVar.code == 20000) {
+      await actionRef.current?.reload();
+      message.success('停止成功');
+    } else {
+      message.error('停止失败 ' + newVar.message);
+    }
+  };
+
   const columns: ProColumns<API.MqttListItem>[] = [
     {
       key: 'ID',
       title: <FormattedMessage id="pages.id" defaultMessage="唯一码" />,
       hideInSearch: true,
       dataIndex: 'ID', // @ts-ignore
-
       render: (dom, entity) => {
         return (
           <a
@@ -196,6 +234,7 @@ const Admin: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
+      fixed: 'right',
       render: (_, record) => [
         <Button
           key="update"
@@ -207,90 +246,81 @@ const Admin: React.FC = () => {
         >
           <FormattedMessage id="pages.update" defaultMessage="修改" />
         </Button>,
-        <Button
-          key="update"
-          onClick={() => {
-            history.push({
-              pathname: '/data/signal?id=' + record.ID + '&protocol=MQTT',
-            });
-          }}
-        >
-          <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />
-        </Button>,
-        <Button
-          key="update"
-          onClick={() => {
-            setCurMqttClientId(record.ID);
-            setSendMqttMessage(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="pages.mock-send" defaultMessage="模拟发送" />
-        </Button>,
-
         record.start === false && (
-          <Button
+          <Popconfirm
             key="delete"
-            onClick={async () => {
+            title={<FormattedMessage id="pages.deleteConfirm" defaultMessage="确定要删除吗？" />}
+            onConfirm={async () => {
               // todo: 删除接口
               const success = await handleRemove(record.ID);
               if (success) {
                 if (actionRef.current) {
-                  actionRef.current.reload();
+                  await actionRef.current.reload();
                 }
               }
             }}
-            danger={true}
+            okText={<FormattedMessage id="pages.yes" defaultMessage="确定" />}
+            cancelText={<FormattedMessage id="pages.no" defaultMessage="取消" />}
           >
-            <FormattedMessage id="pages.deleted" defaultMessage="删除" />
-          </Button>
+            <Button danger>
+              <FormattedMessage id="pages.delete" defaultMessage="删除" />
+            </Button>
+          </Popconfirm>
         ),
-        record.start === false && (
-          <Button
-            key="set-script"
-            onClick={async () => {
-              setCurMqttClientId(record.ID);
-              handleSetScriptModalOpen(true);
-            }}
-          >
-            <FormattedMessage id="pages.set-script" defaultMessage="设置脚本" />
-          </Button>
-        ),
-
-        record.start === false && (
-          <Button
-            key="start"
-            onClick={async () => {
-              let newVar = await startMqttClient(record.ID);
-              if (newVar.code == 20000) {
-                await actionRef.current?.reload();
-                message.success('启动成功');
-              } else {
-                message.error('启动失败 ' + newVar.message);
-              }
-            }}
-            type={'primary'}
-          >
-            <FormattedMessage id="pages.start" defaultMessage="启动" />
-          </Button>
-        ),
-        record.start === true && (
-          <Button
-            key="stop"
-            onClick={async () => {
-              let newVar = await stopMqttClient(record.ID);
-              if (newVar.code == 20000) {
-                await actionRef.current?.reload();
-                message.success('停止成功');
-              } else {
-                message.error('停止失败 ' + newVar.message);
-              }
-            }}
-            danger={true}
-          >
-            <FormattedMessage id="pages.stop" defaultMessage="停止" />
-          </Button>
-        ),
+        <TableDropdown
+          key="actionGroup"
+          onSelect={(e) => {
+            if (e === 'signal-config') {
+              handleSignalConfig(record);
+            }
+            if (e === 'mock-send') {
+              handleMockSend(record);
+            }
+            if (e === 'set-script') {
+              handleSetScript(record);
+            }
+            if (e === 'start') {
+              handleStart(record);
+            }
+            if (e === 'end') {
+              handleStop(record);
+            }
+          }}
+          menus={[
+            {
+              key: 'signal-config',
+              name: <FormattedMessage id="pages.config-signal" defaultMessage="信号配置" />,
+            },
+            {
+              key: 'mock-send',
+              name: <FormattedMessage id="pages.mock-send" defaultMessage="模拟发送" />,
+            },
+            {
+              key: 'set-script',
+              name: record.start === false && (
+                <FormattedMessage id="pages.set-script" defaultMessage="设置脚本" />
+              ),
+            },
+            {
+              key: 'start',
+              name: record.start === false && (
+                <FormattedMessage id="pages.start" defaultMessage="启动" />
+              ),
+            },
+            {
+              key: 'stop',
+              name: record.start === true && (
+                <FormattedMessage id="pages.stop" defaultMessage="停止" />
+              ),
+            },
+          ].filter(({ name }) => !!name)}
+        >
+          <Space>
+            <Button type="primary" icon={<DownOutlined />} iconPosition="end">
+              <FormattedMessage id="pages.more" defaultMessage="更多" />
+            </Button>
+          </Space>
+        </TableDropdown>,
       ],
     },
   ];
@@ -304,9 +334,11 @@ const Admin: React.FC = () => {
         })}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
+        search={
+          {
+            // labelWidth: 120,
+          }
+        }
         toolBarRender={() => [
           <Button
             type="primary"
@@ -320,12 +352,16 @@ const Admin: React.FC = () => {
         ]}
         request={mqttPage}
         columns={columns}
+        scroll={{ x: 'max-content' }}
       />
 
       <ModalForm
         title={'模拟发送'}
         open={sendMqttMessage}
         onOpenChange={setSendMqttMessage}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           console.log('设置脚本参数');
         }}
@@ -356,6 +392,12 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id={'pages.mqtt.payload'} />}
           name={'payload'}
           key={'payload'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />{' '}
         <ProFormSelect
           valueEnum={{
@@ -366,11 +408,23 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id={'pages.mqtt.qos'} />}
           name={'qos'}
           key={'qos'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />{' '}
         <ProFormText
           label={<FormattedMessage id={'pages.mqtt.topic'} />}
           name={'topic'}
           key={'topic'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />{' '}
         <ProFormRadio.Group
           initialValue={false}
@@ -384,6 +438,12 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id={'pages.mqtt.retained'} />}
           name={'retained'}
           key={'retained'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </ModalForm>
 
@@ -391,6 +451,9 @@ const Admin: React.FC = () => {
         title={'设置数据解析脚本'}
         open={setScriptModalOpen}
         onOpenChange={handleSetScriptModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           console.log('设置脚本参数');
         }}
@@ -465,16 +528,34 @@ const Admin: React.FC = () => {
           label={<FormattedMessage id={'pages.script'} />}
           name={'script'}
           key={'script'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
         <ProFormTextArea
           label={<FormattedMessage id="pages.mock-param" />}
           name={'mock-param'}
           key={'mock-param'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
         <ProFormTextArea
           label={<FormattedMessage id={'pages.mock-result'} />}
           name={'mock-result'}
           key={'mock-result'}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         ></ProFormTextArea>
       </ModalForm>
       <ModalForm
@@ -486,6 +567,9 @@ const Admin: React.FC = () => {
         width="75%"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        modalProps={{
+          destroyOnClose: true,
+        }}
         onFinish={async (value) => {
           const success = await handleAdd(value as API.MqttListItem);
           if (success) {
@@ -501,36 +585,72 @@ const Admin: React.FC = () => {
           key={'host'}
           label={<FormattedMessage id="pages.mqtt.host" />}
           name="host"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormDigit
           initialValue={1883}
           key={'port'}
           label={<FormattedMessage id="pages.mqtt.port" />}
           name="port"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={generateUUID()}
           key={'client_id'}
           label={<FormattedMessage id="pages.mqtt.client_id" />}
           name="client_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={'admin'}
           key={'username'}
           label={<FormattedMessage id="pages.mqtt.username" />}
           name="username"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText.Password
           initialValue={'admin'}
           key={'password'}
           label={<FormattedMessage id="pages.mqtt.password" />}
           name="password"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormText
           initialValue={'/test_topic/0'}
           key={'subtopic'}
           label={<FormattedMessage id="pages.mqtt.subtopic" />}
           name="subtopic"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
       </ModalForm>
 

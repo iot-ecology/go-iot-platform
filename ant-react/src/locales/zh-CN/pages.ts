@@ -66,6 +66,13 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
+  'pages.rules.select': '请选择',
+  'pages.rules.input': '请输入',
+
+  'pages.deleteConfirm': '确定要删除这条记录吗？',
+  'pages.yes': '是',
+  'pages.no': '否',
+
   'pages.new': '新增',
   'pages.deleted': '删除',
   'pages.set-param': '参数设置',
@@ -250,8 +257,10 @@ export default {
   "pages.welcome.a2":"Go IoT 开发平台 是一个使用Go语言开发的免费、高效、可扩展的物联网解决方案。\n" +
     "            该平台支持MQTT、HTTP、WebSocket、COAP、TCP协议传输，提供轻量化的配置工具完成数据的报警功能，提供基于JavaScript的数据统计服务。",
 
-
+  "pages.more": '更多',
 
 
   "pages.device":"物理设备"
+
+  
 };

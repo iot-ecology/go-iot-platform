@@ -36,15 +36,28 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
       }}
     >
       <Form key={'userupdateform'} form={form} style={{ padding: '32px 40px 48px' }}>
-        <ProFormText disabled={true} label={<FormattedMessage id="pages.id" />} name="ID" />
+        <ProFormText
+          disabled={true}
+          label={<FormattedMessage id="pages.id" />}
+          name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
+        />
         <ProFormSelect
           request={async () => {
             let resp = await productList();
@@ -60,11 +73,23 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
           }}
           label={<FormattedMessage id="pages.device-info.product_id" />}
           name="product_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormText
           disabled={true}
           label={<FormattedMessage id="pages.device-info.sn" />}
           name="sn"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -78,6 +103,12 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
           }}
           label={<FormattedMessage id="pages.device-info.source" />}
           name="source"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         {sourceValue === '1' && (
@@ -88,6 +119,12 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
             }}
             label={<FormattedMessage id="pages.device-info.manufacturing_date" />}
             name="manufacturing_date"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         {sourceValue === '2' && (
@@ -98,6 +135,12 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
             }}
             label={<FormattedMessage id="pages.device-info.procurement_date" />}
             name="procurement_date"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         {sourceValue === '1' && (
@@ -108,11 +151,23 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
             }}
             label={<FormattedMessage id="pages.device-info.warranty_expiry" />}
             name="warranty_expiry"
+            rules={[
+              {
+                required: true,
+                message: <FormattedMessage id="pages.rules.select" />,
+              },
+            ]}
           />
         )}
         <ProFormDigit
           label={<FormattedMessage id="pages.device-info.error_rate" />}
           name="error_rate"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           disabled={true}
@@ -125,6 +180,12 @@ const DeviceInfoUpdateForm: React.FC<UpdateFormProps> = (props) => {
           }}
           label={<FormattedMessage id="pages.device-info.protocol" />}
           name="protocol"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

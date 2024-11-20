@@ -142,6 +142,8 @@ func (api *SignalDelayWaringParamApi) PageSignalDelayWaring(c *gin.Context) {
 	var signalDelayWaringId = c.Query("signal_delay_waring_id")
 	var page = c.DefaultQuery("page", "0")
 	var pageSize = c.DefaultQuery("page_size", "10")
+	var device_uid = c.Query("device_uid")
+	var signal_id = c.Query("signal_id")
 	parseUint, err := strconv.Atoi(page)
 	if err != nil {
 		servlet.Error(c, "无效的页码")
@@ -154,7 +156,9 @@ func (api *SignalDelayWaringParamApi) PageSignalDelayWaring(c *gin.Context) {
 		return
 	}
 
-	data, err := SignalDelayWaringParamBiz.PageData(name, signalDelayWaringId, parseUint, u)
+	data, err := SignalDelayWaringParamBiz.PageData(name, signalDelayWaringId, parseUint, u,
+		device_uid,
+	signal_id)
 	if err != nil {
 		servlet.Error(c, "查询异常")
 		return

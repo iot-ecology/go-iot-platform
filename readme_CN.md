@@ -1,6 +1,6 @@
 # Go IoT 
 
-Go IoT 是基于Gin 的开源分布式物联网（IOT）开发平台，用于快速开发，部署物联设备接入项目，是一套涵盖数据生产、数据使用和数据展示的解决方案。
+Go IoT 是开源分布式物联网（IOT）开发平台，用于快速开发，部署物联设备接入项目，是一套涵盖数据生产、数据使用和数据展示的解决方案。
 
 
 > :rocket: 非常欢迎广大兴趣爱好者的加入，你的 Star 是我们开发的动力 ！
@@ -35,6 +35,9 @@ Go IoT 是基于Gin 的开源分布式物联网（IOT）开发平台，用于快
 - transmit_handler队列: 用于将**预处理后**的数据转发到cassandra、clickhouse、influxdb2、mongo、mysql、kafka、rabbit等
 - 定时任务队列集群：这是使用Redis+RabbitMQ实现的定时任务，他能够完成用户定义的复杂计算任务（基于JavaScript编写任务）。
 
+
+![](./readme/数据图.jpg)
+
 ## 开源贡献
 - 从`dev`分支拉取代码`checkout`一个新的分支(注意: 务必保持`dev`分支的最新状态)
 - 分支命名格式: `feat-功能名称` 
@@ -49,3 +52,9 @@ Go IoT 遵循 [Apache2](./LICENSE) 开源协议发布。允许商业使用, 但�
 如有任何问题，可以通过以下方式联系我们：
 
 - 发送邮件至 [huifer97@163.com](mailto:huifer97@163.com)
+
+
+## 模块扩展
+- 物联网卡发卡平台
+    - 套餐
+    - 

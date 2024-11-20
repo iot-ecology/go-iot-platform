@@ -1444,6 +1444,20 @@ export async function deleteUser(id: any) {
   });
 }
 
+export async function deleteDept(id: any) {
+  return request<API.CommonResp<string>>('/api/Dept/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+export async function deleteRole(id: any) {
+  return request<API.CommonResp<string>>('/api/Role/delete/' + id, {
+    method: 'POST',
+  });
+}
+
+
+
 export async function deleteSimCard(id: any) {
   return request<API.CommonResp<string>>('/api/SimCard/delete/' + id, {
     method: 'POST',

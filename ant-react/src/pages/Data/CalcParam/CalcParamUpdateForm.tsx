@@ -30,8 +30,11 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={(vvv) => {
         props.onCancel();
       }}
-      onOk={() => {
-        props.onSubmit(form.getFieldsValue());
+      onOk={async () => {
+        let success = await form.validateFields();
+        if (success) {
+          props.onSubmit(form.getFieldsValue());
+        }
       }}
       onClose={() => {
         props.onCancel();
@@ -43,6 +46,12 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'ID'}
           label={<FormattedMessage id="pages.id" />}
           name="ID"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
         <ProFormSelect
           key={'calc_rule_id'}
@@ -61,6 +70,12 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
               value: 'ID',
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
         <ProFormSelect
           valueEnum={{
@@ -80,10 +95,14 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
             value: createProp,
             onClick: (v) => {
               setCreateDeviceUid('');
-
-
             },
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -123,12 +142,24 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'device_uid'}
           label={<FormattedMessage id="pages.calc-param.device_uid" />}
           name="device_uid"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'identification_code'}
           label={<FormattedMessage id="pages.calc-param.identification_code" />}
           name="identification_code"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -155,12 +186,24 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'signal_id'}
           label={<FormattedMessage id="pages.calc-param.signal_id" />}
           name="signal_id"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
 
         <ProFormText
           key={'name'}
           label={<FormattedMessage id="pages.calc-param.name" />}
           name="name"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.input" />,
+            },
+          ]}
         />
 
         <ProFormSelect
@@ -174,6 +217,12 @@ const CalcParamUpdateForm: React.FC<UpdateFormProps> = (props) => {
           key={'reduce'}
           label={<FormattedMessage id="pages.calc-param.reduce" />}
           name="reduce"
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.rules.select" />,
+            },
+          ]}
         />
       </Form>
     </Modal>

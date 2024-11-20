@@ -55,6 +55,7 @@ func PushMqttMsg(clientId string, topic string, qos byte, retained bool, payload
 	//	(*client).Publish(topic, qos, retained, payload)
 	//}
 }
+var c = make(map[string]*MqttConfig)
 
 func CreateMqttClientMin(broker string, port int, username string, password string, subTopic string,
 	clientId string) bool {
@@ -77,7 +78,7 @@ func CreateMqttClientMin(broker string, port int, username string, password stri
 	}
 	go client.Subscribe(subTopic)
 	go client.HandlerMsg()
-	//c[clientId] = &client.client
+	//c[clientId] = &config
 
 	return true
 

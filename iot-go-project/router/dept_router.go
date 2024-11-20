@@ -209,7 +209,7 @@ func (api *DeptApi) FindByIdSubs(c *gin.Context) {
 // @Failure 400 {string} string "请求数据错误"
 // @Failure 404 {string} string "部门未找到"
 // @Failure 500 {string} string "内部服务器错误"
-// @Router /Dept/list [post]
+// @Router /Dept/list [get]
 func (api *DeptApi) ListDept(c *gin.Context) {
 
 	var depts []models.Dept
