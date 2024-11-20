@@ -27,7 +27,8 @@ import {
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Button, Drawer, message, Popconfirm } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { initSearchDeviceUidForMqtt } from '../Signal';
 import ScriptNameShow from './ScriptNameShow';
 
 const handleAdd = async (fields: API.ScriptWaringParamListItem) => {
@@ -105,6 +106,15 @@ const Admin: React.FC = () => {
   const [opDeviceUid, setOpDeviceUid] = useState<any>();
   const [opSignal, setOpSignal] = useState<any>();
 
+  useEffect(() => {
+    async function extracted() {
+      let v = await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+
+      initSearchSignalId('MQTT', v, setOpSignal, setSearchSignalId);
+    }
+    extracted();
+  }, []);
+
   const columns: ProColumns<API.ScriptWaringParamListItem>[] = [
     {
       key: 'ID',
@@ -154,19 +164,36 @@ const Admin: React.FC = () => {
       initialValue: 'MQTT',
       fieldProps: {
         onChange: async (value) => {
-          setSearchDeviceUid(Number(value));
-          await initSearchSignalId(searchProtocol, value, setOpSignal, setSearchSignalId);
-        },
-        value: searchDeviceUid,
+          console.log(value, 'value');
 
-        showSearch: true,
-        allowClear: false,
-        fieldNames: {
-          label: 'client_id',
-          value: 'ID',
+          setSearchProtocol(value);
+          if (value === 'MQTT') {
+            await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+          } else {
+            setSearchDeviceUid('');
+            setSearchSignalId('');
+            // setOpDeviceUid([
+            //   {
+            //     client_id: 'ccc',
+            //     ID: '1',
+            //   },
+            // ]);
+            let c = await deviceList();
+            console.log(c, 'c');
+
+            let r = [];
+            c.data.forEach((e) => {
+              if (e.protocol === value) {
+                r.push({
+                  client_id: e.sn,
+                  ID: e.ID,
+                });
+              }
+            });
+            setOpDeviceUid(r);
+          }
         },
-        options: opDeviceUid,
-        placeholder: '请选择',
+        value: searchProtocol,
       },
       order: 99,
       valueEnum: {
@@ -325,7 +352,18 @@ const Admin: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={scritpParamPage}
+        request={async (params, sorter, filter) => {
+          if (searchProtocol) {
+            params.protocol = searchProtocol;
+          }
+          if (searchDeviceUid) {
+            params.device_uid = Number(searchDeviceUid);
+          }
+          if (searchSignalId) {
+            params.signal_id = Number(searchSignalId);
+          }
+          return scritpParamPage(params);
+        }}
         columns={columns}
       />
       <ModalForm

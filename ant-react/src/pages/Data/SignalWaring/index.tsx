@@ -4,6 +4,7 @@ import SignalWaringUpdateForm from '@/pages/Data/SignalWaring/SignalWaringUpdate
 import {
   addSignalWaring,
   deleteSignalWaring,
+  deviceList,
   mqttList,
   signalList,
   signalWaringPage,
@@ -122,6 +123,8 @@ const Admin: React.FC = () => {
 
   const [opSignal, setOpSignal] = useState<any>();
 
+  const form = ProForm.useFormInstance();
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     if (queryParams.get('protocol')) {
@@ -130,7 +133,29 @@ const Admin: React.FC = () => {
 
     async function extracted() {
       let v = await initSearchDeviceUidForMqtt(setSearchDeviceUid, setOpDeviceUid);
+
       initSearchSignalId('MQTT', v, setOpSignal, setSearchSignalId);
+    }
+
+    async function getMqttList() {
+      let res = await mqttList();
+      let data = res.data;
+      setOpDeviceUid(data);
+    }
+
+    async function getOtherList(value) {
+      let c = await deviceList();
+
+      let r = [];
+      c.data.forEach((e) => {
+        if (e.protocol === value) {
+          r.push({
+            client_id: e.sn,
+            ID: e.ID,
+          });
+        }
+      });
+      setOpDeviceUid(r);
     }
 
     if (queryParams.get('client_id')) {
@@ -140,6 +165,14 @@ const Admin: React.FC = () => {
     }
     if (queryParams.get('id')) {
       setSearchSignalId(Number(queryParams.get('id')));
+    }
+    if (queryParams.get('protocol')) {
+      setSearchProtocol(queryParams.get('protocol'));
+      if (queryParams.get('protocol') === 'MQTT') {
+        getMqttList();
+      } else {
+        getOtherList(queryParams.get('protocol'));
+      }
     }
   }, []);
 
@@ -177,14 +210,28 @@ const Admin: React.FC = () => {
           } else {
             setSearchDeviceUid('');
             setSearchSignalId('');
-            setOpDeviceUid([
-              {
-                client_id: 'ccc',
-                ID: '1',
-              },
-            ]);
+            // setOpDeviceUid([
+            //   {
+            //     client_id: 'ccc',
+            //     ID: '1',
+            //   },
+            // ]);
+            let c = await deviceList();
+            console.log(c, 'c');
+
+            let r = [];
+            c.data.forEach((e) => {
+              if (e.protocol === value) {
+                r.push({
+                  client_id: e.sn,
+                  ID: e.ID,
+                });
+              }
+            });
+            setOpDeviceUid(r);
           }
         },
+        value: searchProtocol,
       },
       formItemProps: {
         rules: [
@@ -351,7 +398,6 @@ const Admin: React.FC = () => {
       ],
     },
   ];
-  const form = ProForm.useFormInstance();
   return (
     <PageContainer>
       <ProTable<API.SignalWaringItem, API.PageParams>

@@ -1,3 +1,4 @@
+import DeviceUidShow from '@/pages/Data/Signal/DeviceUidShow';
 import HistoryList from '@/pages/Data/Signal/History';
 import SignalUpdateForm from '@/pages/Data/Signal/SignalUpdateForm';
 import {
@@ -107,8 +108,34 @@ const Admin: React.FC = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
 
+    async function getMqttList() {
+      let res = await mqttList();
+      let data = res.data;
+      setOpDeviceUid(data);
+    }
+
+    async function getOtherList(value) {
+      let c = await deviceList();
+
+      let r = [];
+      c.data.forEach((e) => {
+        if (e.protocol === value) {
+          r.push({
+            client_id: e.sn,
+            ID: e.ID,
+          });
+        }
+      });
+      setOpDeviceUid(r);
+    }
+
     if (queryParams.get('protocol')) {
       setSearchProtocol(queryParams.get('protocol'));
+      if (queryParams.get('protocol') === 'MQTT') {
+        getMqttList();
+      } else {
+        getOtherList(queryParams.get('protocol'));
+      }
     }
     if (queryParams.get('id')) {
       setSearchDeviceUid(Number(queryParams.get('id')));
@@ -157,6 +184,7 @@ const Admin: React.FC = () => {
             setSearchDeviceUid(undefined);
 
             let c = await deviceList();
+
             let r = [];
             c.data.forEach((e) => {
               if (e.protocol === value) {
