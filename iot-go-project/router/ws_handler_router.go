@@ -188,3 +188,28 @@ func (api *WebsocketHandlerApi) ByIdWebsocketHandler(c *gin.Context) {
 
 	servlet.Resp(c, WebsocketHandler)
 }
+
+
+
+// FindByDeviceInfoId
+// @Tags      WebsocketHandlerApi
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /WebsocketHandler/FindByDeviceInfoId/:device_info_id [get]
+// @Success 200 {object} servlet.JSONResult{data=models.WebsocketHandler}
+func (api *WebsocketHandlerApi) FindByDeviceInfoId(c *gin.Context) {
+	var WebsocketHandler models.WebsocketHandler
+
+	param := c.Param("device_info_id")
+
+	result := glob.GDb.Where("device_info_id = ?",param).Find(&WebsocketHandler)
+
+	if result.Error != nil {
+		servlet.Error(c, "WebsocketHandler not found")
+
+		return
+	}
+
+	servlet.Resp(c, WebsocketHandler)
+}

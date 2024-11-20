@@ -201,3 +201,26 @@ func (api *HttpHandlerApi) ByIdHttpHandler(c *gin.Context) {
 
 
 
+
+// FindByDeviceInfoId
+// @Tags      HttpHandlerApi
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /HttpHandler/FindByDeviceInfoId/:device_info_id [get]
+// @Success 200 {object} servlet.JSONResult{data=models.HttpHandler}
+func (api *HttpHandlerApi) FindByDeviceInfoId(c *gin.Context) {
+	var HttpHandler models.HttpHandler
+
+	param := c.Param("device_info_id")
+
+	result := glob.GDb.Where("device_info_id = ?",param).Find(&HttpHandler)
+
+	if result.Error != nil {
+		servlet.Error(c, "HttpHandler not found")
+
+		return
+	}
+
+	servlet.Resp(c, HttpHandler)
+}

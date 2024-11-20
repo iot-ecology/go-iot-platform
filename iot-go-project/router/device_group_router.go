@@ -184,7 +184,7 @@ func (api *DeviceGroupApi) ByIdDeviceGroup(c *gin.Context) {
 // @Router    /device_group/query_bind_device [get]
 // @Success 200 {object}  servlet.JSONResult{data=models.DeviceGroupDevice[]} 
 func (api *DeviceGroupApi) QueryBindDeviceInfo(c *gin.Context) {
-	param := c.Query("group_id")
+		param := c.Query("group_id")
 
 	var deviceGroupDevices []models.DeviceGroupDevice
 
@@ -254,81 +254,4 @@ func (api *DeviceGroupApi) BindDeviceInfo(c *gin.Context) {
 
 }
 
-// QueryBindMqtt
-// @Tags      DeviceGroups
-// @Summary   查询绑定MQTT客户端
-// @Accept json
-// @Produce json
-// @Param group_id path int true "主键"
-// @Router    /device_group/QueryBindMqtt [get]
-// @Success 200 {object}  servlet.JSONResult{data=models.DeviceGroupBindMqttClient[]} 
-func (api *DeviceGroupApi) QueryBindMqtt(c *gin.Context) {
-	param := c.Param("group_id")
 
-	var deviceGroupDevices []models.DeviceGroupBindMqttClient
-
-	// 使用 Where 和 Find 方法查询记录
-	result := glob.GDb.Where("`device_group_id` = ?", param).Find(&deviceGroupDevices)
-	if result.Error != nil {
-		zap.S().Infoln("Error occurred during query:", result.Error)
-		servlet.Error(c, "暂无数据")
-		return
-	}
-	servlet.Resp(c, deviceGroupDevices)
-}
-
-// BindMqtt
-// @Tags      DeviceGroups
-// @Summary   绑定mqtt客户端
-// @Accept json
-// @Produce json
-// @Param DeviceGroup body servlet.DeviceGroupCreateParam true "绑定参数"
-// @Router    /device_group/BindMqtt [post]
-// @Success 200 {object}  servlet.JSONResult{data=string} 
-func (api *DeviceGroupApi) BindMqtt(c *gin.Context) {
-	var param servlet.DeviceGroupBindMqttClientParam
-	if err := c.ShouldBindJSON(&param); err != nil {
-
-		servlet.Error(c, err.Error())
-		return
-	}
-
-	// 开启事务
-	tx := glob.GDb.Begin()
-	if tx.Error != nil {
-		servlet.Error(c, "Failed to begin transaction")
-		return
-	}
-
-	result := tx.Where("`device_group_id` = ?", param.DeviceGroupId).Delete(&models.DeviceGroupBindMqttClient{})
-
-	if result.Error != nil {
-		// 如果出现错误，回滚事务
-		tx.Rollback()
-		servlet.Error(c, "Error occurred during deletion")
-		return
-	}
-
-	var groupBindMqttClients []models.DeviceGroupBindMqttClient
-	for _, mqttClientId := range param.MqttClientId {
-		groupBindMqttClients = append(groupBindMqttClients, models.DeviceGroupBindMqttClient{
-			DeviceGroupId: uint(param.DeviceGroupId),
-			MqttClientId:  uint(mqttClientId),
-		})
-	}
-
-	result = tx.Model(&models.DeviceGroupBindMqttClient{}).CreateInBatches(groupBindMqttClients, len(groupBindMqttClients))
-	if result.Error != nil {
-		tx.Rollback()
-		zap.S().Infoln("Error occurred during creation:", result.Error)
-		servlet.Error(c, "Error occurred during creation")
-		return
-	}
-	if err := tx.Commit().Error; err != nil {
-		servlet.Error(c, "Failed to commit transaction")
-		return
-	}
-
-	servlet.Resp(c, "绑定成功")
-
-}

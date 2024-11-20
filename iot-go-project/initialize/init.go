@@ -251,20 +251,6 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&models.DeviceBindMqttClient{}) {
-
-		err := glob.GDb.AutoMigrate(&models.DeviceBindMqttClient{})
-		if err != nil {
-			zap.S().Errorf("数据库表创建失败 %+v", err)
-		}
-	}
-	if !glob.GDb.Migrator().HasTable(&models.DeviceGroupBindMqttClient{}) {
-
-		err := glob.GDb.AutoMigrate(&models.DeviceGroupBindMqttClient{})
-		if err != nil {
-			zap.S().Errorf("数据库表创建失败 %+v", err)
-		}
-	}
 	if !glob.GDb.Migrator().HasTable(&models.MessageTypeBindRole{}) {
 
 		err := glob.GDb.AutoMigrate(&models.MessageTypeBindRole{})
@@ -378,13 +364,6 @@ func initTable() {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
 	}
-	if !glob.GDb.Migrator().HasTable(&models.DeviceBindTcpHandler{}) {
-
-		err := glob.GDb.AutoMigrate(&models.DeviceBindTcpHandler{})
-		if err != nil {
-			zap.S().Errorf("数据库表创建失败 %+v", err)
-		}
-	}
 	if !glob.GDb.Migrator().HasTable(&models.HttpHandler{}) {
 
 		err := glob.GDb.AutoMigrate(&models.HttpHandler{})
@@ -416,6 +395,13 @@ func initTable() {
 	if !glob.GDb.Migrator().HasTable(&models.DingDing{}) {
 
 		err := glob.GDb.AutoMigrate(&models.DingDing{})
+		if err != nil {
+			zap.S().Errorf("数据库表创建失败 %+v", err)
+		}
+	}
+	if !glob.GDb.Migrator().HasTable(&models.DeviceBindHandler{}) {
+
+		err := glob.GDb.AutoMigrate(&models.DeviceBindHandler{})
 		if err != nil {
 			zap.S().Errorf("数据库表创建失败 %+v", err)
 		}
@@ -598,8 +584,6 @@ func initRouter(r *gin.RouterGroup) {
 
 	r.GET("/device_group/query_bind_device", deviceGroupApi.QueryBindDeviceInfo)
 	r.POST("/device_group/bind_device", deviceGroupApi.BindDeviceInfo)
-	r.POST("/device_group/BindMqtt", deviceGroupApi.BindMqtt)
-	r.POST("/device_group/QueryBindMqtt", deviceGroupApi.QueryBindMqtt)
 
 	r.POST("/DeviceInfo/create", deviceInfoApi.CreateDeviceInfo)
 	r.GET("/DeviceInfo/list", deviceInfoApi.ListDeviceInfo)
@@ -607,16 +591,8 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/DeviceInfo/:id", deviceInfoApi.ByIdDeviceInfo)
 	r.GET("/DeviceInfo/page", deviceInfoApi.PageDeviceInfo)
 	r.POST("/DeviceInfo/delete/:id", deviceInfoApi.DeleteDeviceInfo)
-	r.POST("/DeviceInfo/BindMqtt", deviceInfoApi.BindMqtt)
-	r.POST("/DeviceInfo/BindTcp", deviceInfoApi.BindTcp)
-	r.POST("/DeviceInfo/BindHTTP", deviceInfoApi.BindHTTP)
-	r.POST("/DeviceInfo/BindHCoap", deviceInfoApi.BindHCoap)
-	r.POST("/DeviceInfo/BindWebsocket", deviceInfoApi.BindWebsocket)
-	r.GET("/DeviceInfo/QueryBindMqtt", deviceInfoApi.QueryBindMqtt)
-	r.GET("/DeviceInfo/QueryBindTcp", deviceInfoApi.QueryBindTcp)
-	r.GET("/DeviceInfo/QueryBindHTTP", deviceInfoApi.QueryBindHttp)
-	r.GET("/DeviceInfo/QueryBindCoap", deviceInfoApi.QueryBindCoap)
-	r.GET("/DeviceInfo/QueryBindWebsocket", deviceInfoApi.QueryBindWebsocket)
+	r.POST("/DeviceInfo/BindHandlers", deviceInfoApi.BindHandlers)
+
 
 	r.POST("/ProductionPlan/create", productionPlanApi.CreateProductionPlan)
 	r.POST("/ProductionPlan/update", productionPlanApi.UpdateProductionPlan)
@@ -727,12 +703,14 @@ func initRouter(r *gin.RouterGroup) {
 	r.POST("/TcpHandler/create", tcpHandlerApi.CreateTcpHandler)
 	r.POST("/TcpHandler/update", tcpHandlerApi.UpdateTcpHandler)
 	r.GET("/TcpHandler/:id", tcpHandlerApi.ByIdTcpHandler)
+	r.GET("/TcpHandler/FindByDeviceInfoId/:device_info_id", tcpHandlerApi.ByIdTcpHandler)
 	r.GET("/TcpHandler/page", tcpHandlerApi.PageTcpHandler)
 	r.POST("/TcpHandler/delete/:id", tcpHandlerApi.DeleteTcpHandler)
 
 	r.POST("/HttpHandler/create", httpHandlerApi.CreateHttpHandler)
 	r.POST("/HttpHandler/update", httpHandlerApi.UpdateHttpHandler)
 	r.GET("/HttpHandler/:id", httpHandlerApi.ByIdHttpHandler)
+	r.GET("/HttpHandler/FindByDeviceInfoId/:device_info_id", httpHandlerApi.FindByDeviceInfoId)
 	r.GET("/HttpHandler/page", httpHandlerApi.PageHttpHandler)
 	r.POST("/HttpHandler/delete/:id", httpHandlerApi.DeleteHttpHandler)
 
@@ -741,12 +719,14 @@ func initRouter(r *gin.RouterGroup) {
 	r.GET("/CoapHandler/:id", coapHandlerApi.ByIdCoapHandler)
 	r.GET("/CoapHandler/page", coapHandlerApi.PageCoapHandler)
 	r.POST("/CoapHandler/delete/:id", coapHandlerApi.DeleteCoapHandler)
+	r.GET("/CoapHandler/FindByDeviceInfoId/:device_info_id", coapHandlerApi.FindByDeviceInfoId)
 
 	r.POST("/WebsocketHandler/create", wsHandlerApi.CreateWebsocketHandler)
 	r.POST("/WebsocketHandler/update", wsHandlerApi.UpdateWebsocketHandler)
 	r.GET("/WebsocketHandler/:id", wsHandlerApi.ByIdWebsocketHandler)
 	r.GET("/WebsocketHandler/page", wsHandlerApi.PageWebsocketHandler)
 	r.POST("/WebsocketHandler/delete/:id", wsHandlerApi.DeleteWebsocketHandler)
+	r.POST("/WebsocketHandler/FindByDeviceInfoId/:device_info_id", wsHandlerApi.FindByDeviceInfoId)
 
 	r.POST("/CassandraTransmitBind/create", cassandraTransmitBindApi.CreateCassandraTransmitBind)
 	r.POST("/CassandraTransmitBind/update", cassandraTransmitBindApi.UpdateCassandraTransmitBind)

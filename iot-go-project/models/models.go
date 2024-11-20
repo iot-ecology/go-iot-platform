@@ -258,20 +258,7 @@ type UserBindDeviceInfo struct {
 	DeviceId   uint `json:"device_id" structs:"device_id"` // 设备ID
 }
 
-type DeviceBindMqttClient struct {
-	gorm.Model         `structs:"-"`
-	DeviceInfoId       uint   `json:"device_info_id" structs:"device_info_id"`           // 设备ID
-	MqttClientId       uint   `json:"mqtt_client_id" structs:"mqtt_client_id"`           // MQTT客户端表的外键ID
-	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
-}
 
-type DeviceBindTcpHandler struct {
-	gorm.Model         `structs:"-"`
-	DeviceInfoId       uint   `json:"device_info_id" structs:"device_info_id"`           // 设备ID
-	TcpHandlerId       uint   `json:"tcp_handler_id" structs:"tcp_handler_id"`           // TCP处理器的ID
-	IdentificationCode string `json:"identification_code" structs:"identification_code"` // 设备标识码
-
-}
 
 // TcpHandler 表示TCP数据处理器
 type TcpHandler struct {
@@ -310,11 +297,6 @@ type WebsocketHandler struct {
 	gorm.Model   `structs:"-"`
 }
 
-type DeviceGroupBindMqttClient struct {
-	gorm.Model    `structs:"-"`
-	DeviceGroupId uint `json:"device_group_id" structs:"device_group_id"` // 设备组ID
-	MqttClientId  uint `json:"mqtt_client_id" structs:"mqtt_client_id"`   // MQTT客户端表的外键ID
-}
 
 type MessageTypeBindRole struct {
 	gorm.Model  `structs:"-"`
@@ -353,5 +335,15 @@ type ScriptList struct {
 	gorm.Model  `structs:"-"`
 	Content string `json:"content" structs:"content" gorm:"type:text"` // 脚本内容
 	Name string `json:"name" structs:"name" `
+
+}
+
+
+type DeviceBindHandler struct {
+	gorm.Model  `structs:"-"`
+	DeviceInfoId       uint      `json:"device_info_id" structs:"device_info_id"`   // 设备表的外键ID
+	Protocol   string `json:"protocol"` // 协议
+	IdentificationCode string `json:"identification_code"` // 设备标识码
+	HandlerId uint `json:"handler_id"` // mqtt client 表主键 、TcpHandler Ws .... id
 
 }
