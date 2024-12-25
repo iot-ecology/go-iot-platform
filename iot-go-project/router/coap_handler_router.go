@@ -190,3 +190,25 @@ func (api *CoapHandlerApi) ByIdCoapHandler(c *gin.Context) {
 
 
 
+// FindByDeviceInfoId
+// @Tags      CoapHandlers
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /CoapHandler/FindByDeviceInfoId/:device_info_id [get]
+// @Success 200 {object} servlet.JSONResult{data=models.CoapHandler}
+func (api *CoapHandlerApi) FindByDeviceInfoId(c *gin.Context) {
+	var CoapHandler models.CoapHandler
+
+	param := c.Param("device_info_id")
+
+	result := glob.GDb.Where("device_info_id = ?",param).Find(&CoapHandler)
+
+	if result.Error != nil {
+		servlet.Error(c, "CoapHandler not found")
+
+		return
+	}
+
+	servlet.Resp(c, CoapHandler)
+}

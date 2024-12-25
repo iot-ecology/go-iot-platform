@@ -190,3 +190,26 @@ func (api *TcpHandlerApi) ByIdTcpHandler(c *gin.Context) {
 
 
 
+
+// FindByDeviceInfoId
+// @Tags      TcpHandlerApi
+// @Summary   单个详情
+// @Param id path int true "主键"
+// @Produce   application/json
+// @Router    /TcpHandler/FindByDeviceInfoId/:device_info_id [get]
+// @Success 200 {object} servlet.JSONResult{data=models.TcpHandler}
+func (api *TcpHandlerApi) FindByDeviceInfoId(c *gin.Context) {
+	var TcpHandler models.TcpHandler
+
+	param := c.Param("device_info_id")
+
+	result := glob.GDb.Where("device_info_id = ?",param).Find(&TcpHandler)
+
+	if result.Error != nil {
+		servlet.Error(c, "TcpHandler not found")
+
+		return
+	}
+
+	servlet.Resp(c, TcpHandler)
+}
