@@ -1,4 +1,7 @@
-/*
+#!/bin/bash
+
+
+header='/*
 Copyright 2024 - 2025 Zen HuiFer
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +16,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+'
 
-package main
-
-import (
-	"log"
-	"time"
-
-	"github.com/tbrandon/mbserver"
-)
-
-func main() {
-	serv := mbserver.NewServer()
-	err := serv.ListenTCP("127.0.0.1:1502")
-	if err != nil {
-		log.Printf("%v\n", err)
-	}
-	defer serv.Close()
-	// Wait forever
-	serv.RegisterFunctionHandler(1, func(s *mbserver.Server, f mbserver.Framer) ([]byte, *mbserver.Exception) {
-		log.Printf("Function 1 called\n")
-		return []byte{0x01, 0x02}, nil
-	})
-
-	for {
-		time.Sleep(1 * time.Second)
-	}
-}
+# 遍历所有 .go 文件
+find . -type f -name "*.go" | while read -r file; do
+    # 判断文件是否已有版权头（检查前几行是否包含关键词 Copyright）
+    if head -n 10 "$file" | grep -q "Copyright"; then
+        echo "Skipped (already has header): $file"
+    else
+        echo "Adding header to $file"
+        # 创建临时文件，先写header，再写原文件内容
+        tmpfile=$(mktemp)
+        echo "$header" > "$tmpfile"
+        cat "$file" >> "$tmpfile"
+        mv "$tmpfile" "$file"
+    fi
+done
